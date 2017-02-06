@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e0418386-1761-4501-bb6e-03f63ee3916e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/ch/unibas/dmi/dbis/reqman/core/Requirement.java" afterPath="$PROJECT_DIR$/src/main/java/ch/unibas/dmi/dbis/reqman/core/Requirement.java" />
-    </list>
+    <list default="true" id="e0418386-1761-4501-bb6e-03f63ee3916e" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -94,12 +92,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Milestone.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Milestone.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ch/unibas/dmi/dbis/reqman/core/Milestone.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="459">
-              <caret line="27" column="29" lean-forward="false" selection-start-line="27" selection-start-column="29" selection-end-line="27" selection-end-column="29" />
+            <state relative-caret-position="272">
+              <caret line="16" column="0" lean-forward="true" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
               <folding>
+                <element signature="e#439#440#0" expanded="true" />
                 <element signature="e#469#470#0" expanded="true" />
                 <element signature="e#512#513#0" expanded="true" />
                 <element signature="e#550#551#0" expanded="true" />
@@ -111,6 +110,44 @@
                 <element signature="e#736#737#0" expanded="true" />
                 <element signature="e#774#775#0" expanded="true" />
                 <element signature="e#806#807#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Catalogue.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ch/unibas/dmi/dbis/reqman/core/Catalogue.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="462">
+              <caret line="79" column="5" lean-forward="true" selection-start-line="79" selection-start-column="5" selection-end-line="79" selection-end-column="5" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#342#353#0" expanded="true" />
+                <element signature="e#412#425#0" expanded="true" />
+                <element signature="e#722#723#0" expanded="true" />
+                <element signature="e#752#753#0" expanded="true" />
+                <element signature="e#798#799#0" expanded="true" />
+                <element signature="e#836#837#0" expanded="true" />
+                <element signature="e#867#868#0" expanded="true" />
+                <element signature="e#894#895#0" expanded="true" />
+                <element signature="e#934#935#0" expanded="true" />
+                <element signature="e#966#967#0" expanded="true" />
+                <element signature="e#1004#1005#0" expanded="true" />
+                <element signature="e#1038#1039#0" expanded="true" />
+                <element signature="e#1092#1093#0" expanded="true" />
+                <element signature="e#1138#1139#0" expanded="true" />
+                <element signature="e#1173#1174#0" expanded="true" />
+                <element signature="e#1204#1205#0" expanded="true" />
+                <element signature="e#1252#1253#0" expanded="true" />
+                <element signature="e#1292#1293#0" expanded="true" />
+                <element signature="e#1347#1348#0" expanded="true" />
+                <element signature="e#1395#1396#0" expanded="true" />
+                <element signature="e#1453#1454#0" expanded="true" />
+                <element signature="e#1504#1505#0" expanded="true" />
+                <element signature="e#1565#1566#0" expanded="true" />
+                <element signature="e#1617#1618#0" expanded="true" />
+                <element signature="e#1681#1682#0" expanded="true" />
+                <element signature="e#1736#1737#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -474,6 +511,7 @@
         <option value="$PROJECT_DIR$/build.gradle" />
         <option value="$PROJECT_DIR$/src/main/java/ch/unibas/dmi/dbis/reqman/core/Requirement.java" />
         <option value="$PROJECT_DIR$/src/main/java/ch/unibas/dmi/dbis/reqman/core/Milestone.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ch/unibas/dmi/dbis/reqman/core/Catalogue.java" />
       </list>
     </option>
   </component>
@@ -977,12 +1015,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1486391509087</updated>
-      <workItem from="1486391518692" duration="2620000" />
+      <workItem from="1486391518692" duration="2976000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2620000" />
+    <option name="totallyTimeSpent" value="2976000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -1090,9 +1128,10 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ch/unibas/dmi/dbis/reqman/core/Milestone.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="459">
-          <caret line="27" column="29" lean-forward="false" selection-start-line="27" selection-start-column="29" selection-end-line="27" selection-end-column="29" />
+        <state relative-caret-position="272">
+          <caret line="16" column="0" lean-forward="true" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
           <folding>
+            <element signature="e#439#440#0" expanded="true" />
             <element signature="e#469#470#0" expanded="true" />
             <element signature="e#512#513#0" expanded="true" />
             <element signature="e#550#551#0" expanded="true" />
@@ -1104,6 +1143,42 @@
             <element signature="e#736#737#0" expanded="true" />
             <element signature="e#774#775#0" expanded="true" />
             <element signature="e#806#807#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ch/unibas/dmi/dbis/reqman/core/Catalogue.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="462">
+          <caret line="79" column="5" lean-forward="true" selection-start-line="79" selection-start-column="5" selection-end-line="79" selection-end-column="5" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#342#353#0" expanded="true" />
+            <element signature="e#412#425#0" expanded="true" />
+            <element signature="e#722#723#0" expanded="true" />
+            <element signature="e#752#753#0" expanded="true" />
+            <element signature="e#798#799#0" expanded="true" />
+            <element signature="e#836#837#0" expanded="true" />
+            <element signature="e#867#868#0" expanded="true" />
+            <element signature="e#894#895#0" expanded="true" />
+            <element signature="e#934#935#0" expanded="true" />
+            <element signature="e#966#967#0" expanded="true" />
+            <element signature="e#1004#1005#0" expanded="true" />
+            <element signature="e#1038#1039#0" expanded="true" />
+            <element signature="e#1092#1093#0" expanded="true" />
+            <element signature="e#1138#1139#0" expanded="true" />
+            <element signature="e#1173#1174#0" expanded="true" />
+            <element signature="e#1204#1205#0" expanded="true" />
+            <element signature="e#1252#1253#0" expanded="true" />
+            <element signature="e#1292#1293#0" expanded="true" />
+            <element signature="e#1347#1348#0" expanded="true" />
+            <element signature="e#1395#1396#0" expanded="true" />
+            <element signature="e#1453#1454#0" expanded="true" />
+            <element signature="e#1504#1505#0" expanded="true" />
+            <element signature="e#1565#1566#0" expanded="true" />
+            <element signature="e#1617#1618#0" expanded="true" />
+            <element signature="e#1681#1682#0" expanded="true" />
+            <element signature="e#1736#1737#0" expanded="true" />
           </folding>
         </state>
       </provider>
