@@ -15,8 +15,6 @@ public class Catalogue {
     private String description;
     private String semester;
 
-
-
     private List<Milestone> milestones = new Vector<Milestone>();
     private List<Requirement> requirements = new Vector<Requirement>();
 
@@ -63,19 +61,20 @@ public class Catalogue {
         this.semester = semester;
     }
 
-    public boolean addMilestone(Milestone milestone){
+    public boolean addMilestone(Milestone milestone) {
         return milestones.add(milestone);
     }
 
-    public boolean removeMilestone(Milestone milestone){
+    public boolean removeMilestone(Milestone milestone) {
         return milestones.remove(milestone);
     }
 
-    public boolean addRequirement(Requirement requirement){
+    public boolean addRequirement(Requirement requirement) {
         return requirements.add(requirement);
     }
 
-    public boolean removeRequirement(Requirement requirement){
+    public boolean removeRequirement(Requirement requirement) {
         return requirements.remove(requirement);
     }
+
 }
