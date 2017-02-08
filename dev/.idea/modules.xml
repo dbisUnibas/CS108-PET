@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/reqman.iml" filepath="$PROJECT_DIR$/.idea/modules/reqman.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/reqman_main.iml" filepath="$PROJECT_DIR$/.idea/modules/reqman_main.iml" group="reqman" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/reqman_test.iml" filepath="$PROJECT_DIR$/.idea/modules/reqman_test.iml" group="reqman" />
+    </modules>
+  </component>
+</project>
