@@ -1,6 +1,25 @@
+/*
+ * Group name
+ */
 group 'ch.unibas.dmi.dbis'
-version '0.0.1-SNAPSHOT'
+/*
+ * The version is read
+ */
+version = readVersion()
+/*
+ * Adding a description
+ */
+description ="""
+short description
 
+Project name: ${project.name}
+
+brief(er) description
+"""
+
+/*
+ * Adds default tasks related to java projects
+ */
 apply plugin: 'java'
 
 sourceCompatibility = 1.5
@@ -16,29 +35,60 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
 
-def incrementVersionTask(versionPart){
-    return tasks.create("increment${versionPart}"){
-        doLast {
-            String vKey = "artifact${versionPart}"
-            Properties p = new Properties()
-            File pF = new File('version.properties')
-            p.load(pF.newDataInputStream() )
-            Integer version = (p.getProperty(vKey) as Integer)
-            logger.debug('old'+vKey+': '+version)
-            Integer nextVersion = version + 1
-            logger.debug('next' + vKey+': '+nextVersion)
-            p.setProperty(vKey, nextVersion.toString() )
-            p.store(pF.newWriter(), null)
-            p.load(pF.newDataInputStream() )
-        }
+/**
+ * Increments the specified versionPart in the version.properties file.
+ * This increments the specified versionPart in the version.properties file by 1
+ *
+ * Allowed versionParts are: MajorVersion, MinorVersion, FixVersion, BuildNumber
+ * The versionParts following the pattern *Version are under the Apache Versioning rules.
+ *
+ * The BuildNumber is incremented whenever the project is built.
+ *
+ * @param versionPart The versionPart to increment: Either MajorVersion, MinorVersion, FixVersion or BuildNumber
+ */
+void incrementVersion(String versionPart){
+    String vKey = "artifact${versionPart}"
+    Properties p = new Properties()
+    File pF = new File('version.properties')
+    p.load(pF.newDataInputStream() )
+    Integer version = (p.getProperty(vKey) as Integer)
+    Integer nextVersion = version + 1
+    p.setProperty(vKey, nextVersion.toString() )
+    p.store(pF.newWriter(), null)
+    p.load(pF.newDataInputStream() )
+}
 
+task incrementMajorVersion{
+    group = 'versioning'
+    description = 'Increments the majro version (so the M in M.m.F) number by 1. Only invoke when a major version update is appropriate.'
+    doFirst{
+        incrementVersion('MajorVersion')
     }
 }
 
-task incrementVersionTask('MajorVersion')
-task incrementVersionTask('MinorVersion')
-task incrementVersionTask('FixVersion')
-task incrementVersionTask('BuildNumber')
+task incrementMinorVersion{
+    group = 'versioning'
+    description = 'Increments the minor version (so the m in M.m.F) number by 1. Only invoke when a minor version update is appropriate.'
+    doFirst{
+        incrementVersion('MinorVersion')
+    }
+}
+
+task incrementFixVersion{
+    group = 'versioning'
+    description = 'Increments the fix version (so the F in  M.m.F) number by 1. Only invoke when a bugfix is applied.'
+    doFirst{
+        incrementVersion('FixVersion')
+    }
+}
+
+task incrementBuildNumber(dependsOn: build){
+    group = 'versioning'
+    description = 'Increments the build number by 1. Will be invoked right after build.'
+    doLast{
+        incrementVersion('BuildNumber')
+    }
+}
 
 task incrementTest {
     doLast{
@@ -55,16 +105,33 @@ task incrementTest {
     }
 }
 
-task buildVersion{
-    doLast{
-        Properties p = new Properties()
-        File f = new File('version.properties')
-        p.load(f.newDataInputStream() )
-        Integer build = (p.getProperty('artifactBuildNumber') as Integer)
-        Integer fix = (p.getProperty('artifactFixVersion') as Integer)
-        Integer minor = (p.getProperty('artifactMinorVersion') as Integer)
-        Integer major = (p.getProperty('artifactMajorVersion') as Integer)
-        String v = major.toString()+'.'+minor+'.'+fix+'-b'+build.toString()
+/**
+ * Reads the version.properties file with its artifact version numbers and concatenats these numbers
+ * to the version in format M.m.F-bB where M is the artifactMajorVersion, m is the artifactMinorVersion
+ * F is the artifactFixVersion and B is the artifactBuildNumber.
+ * The versioning follows the Appache Versioning rules.
+ * @return The read version
+ */
+String readVersion(){
+    Properties p = new Properties()
+    File f = new File('version.properties')
+    p.load(f.newDataInputStream() )
+    Integer build = (p.getProperty('artifactBuildNumber') as Integer)
+    Integer fix = (p.getProperty('artifactFixVersion') as Integer)
+    Integer minor = (p.getProperty('artifactMinorVersion') as Integer)
+    Integer major = (p.getProperty('artifactMajorVersion') as Integer)
+    return major.toString()+'.'+minor+'.'+fix+'-b'+build.toString()
+}
+
+/**
+ * Reads the version.properties file with its artifact version numbers and then creats the version string
+ * with respect to that file's content.
+ */
+task setupVersion{
+    group = 'versioning'
+    description  = 'Reads the version from version.properties file and sets the projects version as that read version.'
+    doFirst{
+        String v = readVersion()
         setVersion(v)
     }
 }
