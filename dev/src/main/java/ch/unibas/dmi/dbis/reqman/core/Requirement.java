@@ -21,7 +21,7 @@ public class Requirement {
     private Map<String, String> propertiesMap;
     private boolean malus;
 
-    public Requirement(){
+    public Requirement() {
 
     }
 
@@ -39,20 +39,20 @@ public class Requirement {
         propertiesMap = new HashMap<String, String>();
     }
 
-    public void addPredecessorName(String name){
+    public void addPredecessorName(String name) {
         predecessorNames.add(name);
     }
 
-    public boolean removePredecessorName(String name){
+    public boolean removePredecessorName(String name) {
         return predecessorNames.remove(name);
     }
 
-    public List<String> getPredecessorNames(){
+    public List<String> getPredecessorNames() {
         return new ArrayList<String>(predecessorNames);
     }
 
 
-    public String addProperty(String key, String value){
+    public String addProperty(String key, String value) {
         return propertiesMap.put(key, value);
     }
 
@@ -120,12 +120,12 @@ public class Requirement {
         this.malus = malus;
     }
 
-    public String removeProperty(String key){
+    public String removeProperty(String key) {
         return propertiesMap.remove(key);
 
     }
 
-    public Map<String, String> getPropertiesMap(){
+    public Map<String, String> getPropertiesMap() {
         return new HashMap<String, String>(propertiesMap);
     }
 }

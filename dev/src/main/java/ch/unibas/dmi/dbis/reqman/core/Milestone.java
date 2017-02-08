@@ -15,11 +15,11 @@ public class Milestone {
 
     private Date date;
 
-    public Milestone(){
+    public Milestone() {
 
     }
 
-    public Milestone(String name, int ordinal, Date date){
+    public Milestone(String name, int ordinal, Date date) {
         this.name = name;
         this.ordinal = ordinal;
         this.date = date;
