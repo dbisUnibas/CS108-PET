@@ -19,7 +19,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-public class GraphicalUI extends Application {
+public class SandboxUI extends Application {
 
     public static void main(String[] args) {
         launch(args);
