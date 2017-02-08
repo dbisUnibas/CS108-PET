@@ -1,7 +1,28 @@
 ## .gitignore
-## updated: 02/06/2017 (MM/DD/YYYY)
 ## update by: loris.sauter
+##
 #####################################
+
+## Gradle entries by:
+## https://raw.githubusercontent.com/github/gitignore/b89498a4674a21f2f4feb3994e82acc58d747236/Gradle.gitignore
+## 
+
+.gradle
+build/
+
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Cache of project
+.gradletasknamecache
+
+# # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
+# gradle/wrapper/gradle-wrapper.properties
+
+## --- END Gradle.gitignore ---
 
 ## IntelliJ entries by:
 ## https://raw.githubusercontent.com/github/gitignore/master/Global/JetBrains.gitignore
@@ -49,6 +70,8 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+## --- END JetBrains.gitignore ---
 
 ## LaTeX .gitignore entries by:
 ## https://github.com/github/gitignore/blob/master/TeX.gitignore 
@@ -274,3 +297,5 @@ TSWLatexianTemp*
 
 # expex forward references with \gathertags
 *-tags.tex
+
+## --- END TEX.gitignore ---
