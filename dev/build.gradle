@@ -46,7 +46,7 @@ dependencies {
  *
  * @param versionPart The versionPart to increment: Either MajorVersion, MinorVersion, FixVersion or BuildNumber
  */
-void incrementVersion(String versionPart){
+static void incrementVersion(String versionPart){
     String vKey = "artifact${versionPart}"
     Properties p = new Properties()
     File pF = new File('version.properties')
@@ -82,12 +82,16 @@ task incrementFixVersion{
     }
 }
 
-task incrementBuildNumber(dependsOn: build){
+task incrementBuildNumber(){
     group = 'versioning'
     description = 'Increments the build number by 1. Will be invoked right after build.'
     doLast{
         incrementVersion('BuildNumber')
     }
+}
+
+build.doLast{
+    incrementVersion('BuildNumber')
 }
 
 task incrementTest {
@@ -112,7 +116,7 @@ task incrementTest {
  * The versioning follows the Appache Versioning rules.
  * @return The read version
  */
-String readVersion(){
+static String readVersion(){
     Properties p = new Properties()
     File f = new File('version.properties')
     p.load(f.newDataInputStream() )
