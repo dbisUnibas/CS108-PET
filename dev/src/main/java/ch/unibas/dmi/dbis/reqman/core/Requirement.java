@@ -6,26 +6,76 @@ import java.util.*;
  * The class {@link Requirement} represents a requirement as defined by the definitions document.
  *
  * @author loris.sauter
- * @version 0.0.1
  */
 public class Requirement {
 
+    /**
+     * The name of the requirement. Shall be unique.
+     */
     private String name;
+    /**
+     * The desciption of the requirement. May be a long-ish string.
+     */
     private String description;
+    /**
+     * The minimal milestone name this requirement firstly occurs
+     */
     private String minMilestoneName;
+    /**
+     * The maximal milestone name this requirement must be met
+     */
     private String maxMilestoneName;
+    /**
+     * The maximal amount of points received upon meeting this requirement
+     */
     private double maxPoints;
+    /**
+     * Whether this requirement is binary or not:
+     * If this requirement can be met or not, or if it
+     * could potentially be partially met
+     */
     private boolean binary;
+    /**
+     * Whether this requirement is mandatory or not.
+     */
     private boolean mandatory;
-    private List<String> predecessorNames;
-    private Map<String, String> propertiesMap;
+    /**
+     * A list of predecessor requirement names this requirement depends on.
+     */
+    private List<String> predecessorNames = new Vector<String>();
+    /**
+     * A map of key-value-pairs related to export this requirement
+     */
+    private Map<String, String> propertiesMap = new HashMap<String, String>();
+    /**
+     * Whether this requirement has a malus role or not.
+     * So to speak if maxPoints is negative or not.
+     */
     private boolean malus;
 
+    /**
+     * The default constructor for a requirement.
+     * All the properties of this requirement have to be set manually after this instance is created.
+     */
     public Requirement() {
 
     }
 
+    /**
+     * Creates a new {@link Requirement} with given properties.
+     *
+     * @param name             The name of the requirement which shall be short, descriptive and unique
+     * @param description      A description of this requirement.
+     * @param minMilestoneName The name of the {@link Milestone} upon this requirement is active
+     * @param maxMilestoneName The name of the {@link Milestone} this requirement is active up to
+     * @param maxPoints        The absolute, maximal amount of points this requirement can generate.
+     * @param binary           Whether this requirement is binary (achieved: yes/no or partial).
+     * @param mandatory        Whether this requirement is mandatory
+     * @param malus            Whether this requirement has to be considered as a malus.
+     */
     public Requirement(String name, String description, String minMilestoneName, String maxMilestoneName, double maxPoints, boolean binary, boolean mandatory, boolean malus) {
+        this();
+
         this.name = name;
         this.description = description;
         this.minMilestoneName = minMilestoneName;
@@ -34,19 +84,40 @@ public class Requirement {
         this.binary = binary;
         this.mandatory = mandatory;
         this.malus = malus;
-
-        predecessorNames = new Vector<String>();
-        propertiesMap = new HashMap<String, String>();
     }
 
-    public void addPredecessorName(String name) {
-        predecessorNames.add(name);
+    /**
+     * Adds the given name of a requirement to the list of requirements this requirement depends on.
+     * <p>
+     * The corresponding {@link Requirement} with the given name is then a predecessor of this requirement.
+     *
+     * @param name The name of the requirement this requirement depends on. Must be a valid requirement name.
+     * @return {@code true} As specified in {@link List#add(Object)}
+     * @see List#add(Object)
+     */
+    public boolean addPredecessorName(String name) {
+        return predecessorNames.add(name);
     }
 
+    /**
+     * Removes the specified requirement name of the list of
+     *
+     * @param name The name of the requirement this requirement no longer depends on. Must be a valid requirement name.
+     * @return {@code true} If the specified name was in the list of predecessors (and is now not anymore).
+     */
     public boolean removePredecessorName(String name) {
         return predecessorNames.remove(name);
     }
 
+    /**
+     * Returns a copy of the predecessor list.
+     *
+     * The {@link List} returned is a copy and not referenced within this instance.
+     * Thus modifying the returning list <b>will not be synced</b> with the list of this instance.
+     * To modify the list of predecessors use the appropriate methods provided by {@link Requirement}
+     *
+     * @return A copy of the list of predecessor names.
+     */
     public List<String> getPredecessorNames() {
         return new ArrayList<String>(predecessorNames);
     }
