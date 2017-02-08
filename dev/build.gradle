@@ -15,3 +15,56 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
+
+def incrementVersionTask(versionPart){
+    return tasks.create("increment${versionPart}"){
+        doLast {
+            String vKey = "artifact${versionPart}"
+            Properties p = new Properties()
+            File pF = new File('version.properties')
+            p.load(pF.newDataInputStream() )
+            Integer version = (p.getProperty(vKey) as Integer)
+            logger.debug('old'+vKey+': '+version)
+            Integer nextVersion = version + 1
+            logger.debug('next' + vKey+': '+nextVersion)
+            p.setProperty(vKey, nextVersion.toString() )
+            p.store(pF.newWriter(), null)
+            p.load(pF.newDataInputStream() )
+        }
+
+    }
+}
+
+task incrementVersionTask('MajorVersion')
+task incrementVersionTask('MinorVersion')
+task incrementVersionTask('FixVersion')
+task incrementVersionTask('BuildNumber')
+
+task incrementTest {
+    doLast{
+        Properties p = new Properties()
+        File pF = new File('version.properties')
+        p.load(pF.newDataInputStream() )
+        Integer fix = (p.getProperty('artifactFixVersion') as Integer)
+        logger.debug('fix version: '+fix.toString() )
+        Integer nextFix = fix + 1
+        logger.debug('next fix version: '+nextFix.toString() )
+        p.setProperty('artifactFixVersion', nextFix.toString() )
+        p.store(pF.newWriter(), null)
+        p.load(pF.newDataInputStream() )
+    }
+}
+
+task buildVersion{
+    doLast{
+        Properties p = new Properties()
+        File f = new File('version.properties')
+        p.load(f.newDataInputStream() )
+        Integer build = (p.getProperty('artifactBuildNumber') as Integer)
+        Integer fix = (p.getProperty('artifactFixVersion') as Integer)
+        Integer minor = (p.getProperty('artifactMinorVersion') as Integer)
+        Integer major = (p.getProperty('artifactMajorVersion') as Integer)
+        String v = major.toString()+'.'+minor+'.'+fix+'-b'+build.toString()
+        setVersion(v)
+    }
+}
