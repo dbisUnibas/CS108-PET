@@ -56,7 +56,67 @@ public class Requirement {
         return propertiesMap.put(key, value);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Requirement that = (Requirement) o;
+
+        if (Double.compare(that.getMaxPoints(), getMaxPoints()) != 0) {
+            return false;
+        }
+        if (isBinary() != that.isBinary()) {
+            return false;
+        }
+        if (isMandatory() != that.isMandatory()) {
+            return false;
+        }
+        if (isMalus() != that.isMalus()) {
+            return false;
+        }
+        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) {
+            return false;
+        }
+        if (getDescription() != null ? !getDescription().equals(that.getDescription()) : that.getDescription() != null) {
+            return false;
+        }
+        if (getMinMilestoneName() != null ? !getMinMilestoneName().equals(that.getMinMilestoneName()) : that.getMinMilestoneName() != null) {
+            return false;
+        }
+        if (getMaxMilestoneName() != null ? !getMaxMilestoneName().equals(that.getMaxMilestoneName()) : that.getMaxMilestoneName() != null) {
+            return false;
+        }
+        if (getPredecessorNames() != null ? !getPredecessorNames().equals(that.getPredecessorNames()) : that.getPredecessorNames() != null) {
+            return false;
+        }
+        return getPropertiesMap() != null ? getPropertiesMap().equals(that.getPropertiesMap()) : that.getPropertiesMap() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = getName() != null ? getName().hashCode() : 0;
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
+        result = 31 * result + (getMinMilestoneName() != null ? getMinMilestoneName().hashCode() : 0);
+        result = 31 * result + (getMaxMilestoneName() != null ? getMaxMilestoneName().hashCode() : 0);
+        temp = Double.doubleToLongBits(getMaxPoints());
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (isBinary() ? 1 : 0);
+        result = 31 * result + (isMandatory() ? 1 : 0);
+        result = 31 * result + (getPredecessorNames() != null ? getPredecessorNames().hashCode() : 0);
+        result = 31 * result + (getPropertiesMap() != null ? getPropertiesMap().hashCode() : 0);
+        result = 31 * result + (isMalus() ? 1 : 0);
+        return result;
+    }
+
     public String getName() {
+
         return name;
     }
 
