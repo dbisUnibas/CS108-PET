@@ -2,14 +2,13 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -54,8 +53,16 @@ public class EditorApplication extends Application {
         // Setting the main node.
         wrapperPane.setCenter(main);
 
-        BorderPane topSide = createPrototype("TOP", new Label("Hello World"));
-        BorderPane bottomSide = createPrototype("BOTTOM", new Label("This is different"));
+        ListView<String> topList = new ListView<>();
+        ListView<String> bottomList = new ListView<>();
+        ObservableList<String> topItems = FXCollections.observableArrayList("First", "Second", "Third", "another");
+        topList.setItems(topItems);
+        ObservableList<String> bottomItems = FXCollections.observableArrayList("Antoher", "List", "Item", "Definition", "Superlongnamethatgoeson");
+        bottomList.setItems(bottomItems);
+
+
+        BorderPane topSide = createPrototype("TOP", topList);
+        BorderPane bottomSide = createPrototype("BOTTOM", bottomList);
 
 
         topSide.setPrefWidth(scene.getWidth()/3.0);
