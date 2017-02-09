@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -15,8 +16,8 @@ public class Catalogue {
     private String description;
     private String semester;
 
-    private List<Milestone> milestones = new Vector<Milestone>();
-    private List<Requirement> requirements = new Vector<Requirement>();
+    private List<Milestone> milestones = new ArrayList<Milestone>();
+    private List<Requirement> requirements = new ArrayList<Requirement>();
 
     public Catalogue() {
 

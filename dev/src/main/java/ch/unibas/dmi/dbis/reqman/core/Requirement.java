@@ -42,7 +42,7 @@ public class Requirement {
     /**
      * A list of predecessor requirement names this requirement depends on.
      */
-    private List<String> predecessorNames = new Vector<String>();
+    private List<String> predecessorNames = new ArrayList<String>();
     /**
      * A map of key-value-pairs related to export this requirement
      */
