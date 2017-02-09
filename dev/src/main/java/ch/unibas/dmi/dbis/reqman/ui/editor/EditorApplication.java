@@ -58,7 +58,6 @@ public class EditorApplication extends Application {
         BorderPane bottomSide = createPrototype("BOTTOM", new Label("This is different"));
 
 
-
         topSide.setPrefWidth(scene.getWidth()/3.0);
         bottomSide.setPrefWidth(scene.getWidth()/3.0);
 
@@ -86,10 +85,11 @@ public class EditorApplication extends Application {
         pane.setStyle("-fx-border-width: 1; -fx-border-color: gray");
         // TitleBar:
         AnchorPane titleBar = new AnchorPane();
+
         titleBar.setStyle("-fx-border-width: 0 0 1 0; -fx-border-color: gray;");
         // Buttons
         HBox buttons = new HBox();
-        buttons.setPadding(new Insets(0, 10, 10, 10));
+        buttons.setPadding(new Insets(10, 10, 10, 10));
         buttons.setSpacing(10);
         Button add = new Button("+");
         Button remove = new Button("-");
@@ -102,7 +102,8 @@ public class EditorApplication extends Application {
         titleText.setStyle("-fx-font-size: 12pt");
 
         titleBar.getChildren().addAll(titleText, buttons);
-        AnchorPane.setLeftAnchor(titleText, 0.0);
+        AnchorPane.setLeftAnchor(titleText, 10.0);
+        AnchorPane.setTopAnchor(titleText, 10.0);
         AnchorPane.setRightAnchor(buttons, 0.0);
 
         // Content
