@@ -1,36 +1,21 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
 import javafx.application.Application;
-<<<<<<< HEAD:dev/src/main/java/ch/unibas/dmi/dbis/reqman/ui/SandboxUI.java
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-=======
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
->>>>>>> 5800484e2b667283e9d85dd30238f8175c3fcf4a:dev/src/main/java/ch/unibas/dmi/dbis/reqman/ui/GraphicalUI.java
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-<<<<<<< HEAD:dev/src/main/java/ch/unibas/dmi/dbis/reqman/ui/SandboxUI.java
-public class SandboxUI extends Application {
-=======
 /**
  * A sandbox
  */
 public class GraphicalUI extends Application {
->>>>>>> 5800484e2b667283e9d85dd30238f8175c3fcf4a:dev/src/main/java/ch/unibas/dmi/dbis/reqman/ui/GraphicalUI.java
 
     public static void main(String[] args) {
         launch(args);
