@@ -53,15 +53,13 @@ public class EditorApplication extends Application {
         // Setting the main node.
         wrapperPane.setCenter(main);
 
-        ListView<String> topList = new ListView<>();
         ListView<String> bottomList = new ListView<>();
-        ObservableList<String> topItems = FXCollections.observableArrayList("First", "Second", "Third", "another");
-        topList.setItems(topItems);
         ObservableList<String> bottomItems = FXCollections.observableArrayList("Antoher", "List", "Item", "Definition", "Superlongnamethatgoeson");
         bottomList.setItems(bottomItems);
 
+        ModifiableListView<String> modifiableListView = new ModifiableListView<>("TITLE");
+        BorderPane topSide = modifiableListView.getView();
 
-        BorderPane topSide = createPrototype("TOP", topList);
         BorderPane bottomSide = createPrototype("BOTTOM", bottomList);
 
 
