@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
+import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListController;
+import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import ch.unibas.dmi.dbis.reqman.ui.editor.CataloguePropertiesScene;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.application.Application;
@@ -29,16 +31,18 @@ public class GraphicalUI extends Application {
         primaryStage.setTitle("Requirement Manager");
 
         // Requirement Properties:
-        //primaryStage.setScene(createRequirementPropertiesScene() );
+        primaryStage.setScene(createRequirementPropertiesScene() );
         // Milestone Properties:
         //primaryStage.setScene(createMilestonePropertiesScene() );
         // Catalogue Primary Properties
-        primaryStage.setScene(new CataloguePropertiesScene() );
+        //primaryStage.setScene(new CataloguePropertiesScene() );
 
         primaryStage.show();
     }
 
     private Scene createRequirementPropertiesScene() {
+        // TODO: wrap in scrollpane
+
         GridPane grid = generateDefaultGridPane();
         Scene scene = new Scene(grid);
 
@@ -65,6 +69,13 @@ public class GraphicalUI extends Application {
         Spinner<Double> spinnerPoints = new Spinner(0d, Double.MAX_VALUE, 0.0);
         spinnerPoints.setEditable(true);
 
+        ModifiableListView<String> inputPredecessors = new ModifiableListView<>("Predecessors", new ModifiableListController<String>() {
+            private int counter = 0;
+            @Override
+            protected String createNew() {
+                return "New element"+(counter++);
+            }
+        });
 
         AnchorPane buttonWrapper = generateOkCancelButtonWrapper();
 
@@ -134,9 +145,10 @@ public class GraphicalUI extends Application {
         // Separator
         grid.add(new Separator(), 0, rowIndex++, 2, 1);
 
+        // Predecessor list
         grid.add(lblPredecessors, 0, rowIndex);
-        grid.add(new Label("Predecessor list or so"), 1, rowIndex++);
-
+        grid.add(inputPredecessors.getView(), 1, rowIndex++,1,2);
+        rowIndex += 2;
 
         // Buttons, last row
         grid.add(buttonWrapper, 1, ++rowIndex, 2, 1);

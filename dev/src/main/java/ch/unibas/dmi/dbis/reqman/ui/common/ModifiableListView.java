@@ -19,6 +19,9 @@ import javafx.scene.text.FontWeight;
  */
 public class ModifiableListView<T> {
 
+    // TODO Allow custom styling
+    // TODO derive from panel or similar.
+
     private ModifiableListController<T> controller;
 
     public ModifiableListView(String title, ModifiableListController<T> controller){
@@ -76,7 +79,6 @@ public class ModifiableListView<T> {
 
         // Title
         Label titleText = new Label(title);
-        titleText.setStyle("-fx-font-size: 12pt");
 
         titleBar.getChildren().addAll(titleText, buttons);
         AnchorPane.setLeftAnchor(titleText, 10.0);
