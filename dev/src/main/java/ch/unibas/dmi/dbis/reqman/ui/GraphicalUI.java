@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.ui.editor.CataloguePropertiesScene;
-import ch.unibas.dmi.dbis.reqman.ui.editor.SaveCancelPane;
+import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

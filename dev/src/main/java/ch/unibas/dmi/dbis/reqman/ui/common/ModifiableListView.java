@@ -1,9 +1,7 @@
-package ch.unibas.dmi.dbis.reqman.ui.editor;
+package ch.unibas.dmi.dbis.reqman.ui.common;
 
-import com.sun.org.apache.xpath.internal.SourceTree;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;

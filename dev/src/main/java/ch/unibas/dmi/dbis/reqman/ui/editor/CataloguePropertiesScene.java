@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.ui.common.AbstractPopulatedGridScene;
+import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;

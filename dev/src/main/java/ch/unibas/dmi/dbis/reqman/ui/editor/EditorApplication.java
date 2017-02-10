@@ -1,19 +1,17 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 
+import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListController;
+import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Rectangle2D;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**

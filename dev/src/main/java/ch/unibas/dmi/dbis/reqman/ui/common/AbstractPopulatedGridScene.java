@@ -1,6 +1,5 @@
-package ch.unibas.dmi.dbis.reqman.ui.editor;
+package ch.unibas.dmi.dbis.reqman.ui.common;
 
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Region;

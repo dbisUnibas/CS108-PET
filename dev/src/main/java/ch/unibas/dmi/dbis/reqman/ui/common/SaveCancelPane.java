@@ -1,13 +1,11 @@
-package ch.unibas.dmi.dbis.reqman.ui.editor;
+package ch.unibas.dmi.dbis.reqman.ui.common;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 /**

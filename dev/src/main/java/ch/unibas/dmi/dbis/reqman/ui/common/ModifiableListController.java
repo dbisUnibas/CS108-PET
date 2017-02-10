@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.reqman.ui.editor;
+package ch.unibas.dmi.dbis.reqman.ui.common;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
