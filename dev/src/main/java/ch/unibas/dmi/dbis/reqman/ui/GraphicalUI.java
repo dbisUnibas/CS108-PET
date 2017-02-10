@@ -26,9 +26,12 @@ public class GraphicalUI extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Requirement Manager");
 
+        // Requirement Properties:
         //primaryStage.setScene(createRequirementPropertiesScene() );
-        primaryStage.setScene(createMilestonePropertiesScene() );
-
+        // Milestone Properties:
+        //primaryStage.setScene(createMilestonePropertiesScene() );
+        // Catalogue Primary Properties
+        primaryStage.setScene(createCataloguePropertiesScene() );
 
         primaryStage.show();
     }
@@ -140,6 +143,7 @@ public class GraphicalUI extends Application {
     }
 
     private AnchorPane generateOkCancelButtonWrapper() {
+        // TODO Extract class with respective save and cancel handlers
         Button saveButton = new Button("Save");
         Button cancelButton = new Button("Cancel");
         HBox buttons = new HBox();
@@ -180,6 +184,40 @@ public class GraphicalUI extends Application {
         grid.add(inputDate, 1,rowIndex++);
 
         grid.add(buttonWrapper,0,++rowIndex, 2,1);
+
+        return scene;
+    }
+
+    public Scene createCataloguePropertiesScene(){
+        GridPane grid = generateDefaultGridPane();
+        Scene scene = new Scene(grid);
+
+        Label lblLecture = new Label("Lecture");
+        Label lblName = new Label("Name");
+        Label lblDescription = new Label("Description");
+        // Milestones and Labels added via different scene
+        Label lblSemester = new Label("Semester");
+
+        TextField tfLecture = new TextField();
+        TextField tfName = new TextField();
+        TextArea taDesc = new TextArea();
+        TextField tfSemester = new TextField();
+
+        AnchorPane buttonWrapper = generateOkCancelButtonWrapper();
+
+        int rowIndex = 0;
+
+        grid.add(lblLecture, 0, rowIndex);
+        grid.add(tfLecture, 1, rowIndex++);
+        grid.add(lblSemester, 0,rowIndex);
+        grid.add(tfSemester, 1, rowIndex++);
+        grid.add(lblName, 0, rowIndex);
+        grid.add(tfName, 1, rowIndex++);
+        grid.add(lblDescription, 0, rowIndex);
+        grid.add(taDesc, 1, rowIndex, 1, 3);
+        rowIndex += 3;
+        grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
+
 
         return scene;
     }
