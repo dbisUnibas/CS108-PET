@@ -20,9 +20,8 @@ public abstract class AbstractPopulatedGridScene extends Scene {
     /**
      * Creates a new {@link AbstractPopulatedGridScene} and populates it.
      * The term <i>populates</i> refers to a call of {@link AbstractPopulatedGridScene#populateScene()}
-     * @param root
      */
-    public AbstractPopulatedGridScene(Parent root) {
+    public AbstractPopulatedGridScene() {
         super(new Region());
         setRoot(grid);
 

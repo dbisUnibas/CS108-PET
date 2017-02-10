@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
+import ch.unibas.dmi.dbis.reqman.ui.editor.CataloguePropertiesScene;
 import ch.unibas.dmi.dbis.reqman.ui.editor.SaveCancelPane;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -32,7 +33,7 @@ public class GraphicalUI extends Application {
         // Milestone Properties:
         //primaryStage.setScene(createMilestonePropertiesScene() );
         // Catalogue Primary Properties
-        primaryStage.setScene(createCataloguePropertiesScene());
+        primaryStage.setScene(new CataloguePropertiesScene() );
 
         primaryStage.show();
     }
@@ -189,6 +190,8 @@ public class GraphicalUI extends Application {
         return scene;
     }
 
+
+    @Deprecated
     public Scene createCataloguePropertiesScene() {
         GridPane grid = generateDefaultGridPane();
         Scene scene = new Scene(grid);
