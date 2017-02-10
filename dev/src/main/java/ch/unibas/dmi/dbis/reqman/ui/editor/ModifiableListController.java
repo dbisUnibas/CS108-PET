@@ -45,7 +45,10 @@ public abstract class ModifiableListController<T> {
 
     public void onRemove(ModifiableListView.RemoveEvent<T> event){
         T toRemove = event.getSelected();
-        items.remove(toRemove);
+        System.out.println("C: selected: "+toRemove);
+        int index = items.indexOf(toRemove);
+        System.out.println("Index: "+index);
+        items.remove(index);
     }
 
     public void onAdd(ActionEvent event){

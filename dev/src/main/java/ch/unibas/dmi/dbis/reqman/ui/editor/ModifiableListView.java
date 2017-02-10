@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import com.sun.org.apache.xpath.internal.SourceTree;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -65,6 +66,7 @@ public class ModifiableListView<T> {
         Button buttonRemove = new Button("-");
         buttonRemove.setOnAction((event) -> {
             T selected = listView.getSelectionModel().getSelectedItem();
+            System.out.println("Selected: "+selected);
             RemoveEvent<T> removeEvent = new RemoveEvent<T>(event, selected);
             controller.onRemove(removeEvent);
         });
@@ -101,6 +103,7 @@ public class ModifiableListView<T> {
 
         public RemoveEvent(ActionEvent source, T selected){
             super(source.getSource(), source.getTarget());
+            this.selected = selected;
         }
 
         @Override
