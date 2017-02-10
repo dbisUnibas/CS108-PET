@@ -10,11 +10,14 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.SubScene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 
 /**
@@ -31,11 +34,31 @@ public class GraphicalUI extends Application {
         primaryStage.setTitle("Requirement Manager");
 
         // Requirement Properties:
-        primaryStage.setScene(createRequirementPropertiesScene() );
+        //primaryStage.setScene(createRequirementPropertiesScene() );
         // Milestone Properties:
         //primaryStage.setScene(createMilestonePropertiesScene() );
         // Catalogue Primary Properties
         //primaryStage.setScene(new CataloguePropertiesScene() );
+
+        // Popup test:
+        Scene ms = createMilestonePropertiesScene();
+        Stage popupStage = new Stage();
+        HBox box = new HBox();
+        Button showPopup = new Button("Show");
+        showPopup.setOnAction(event -> popupStage.showAndWait());
+        box.getChildren().add(showPopup);
+        Scene testScene = new Scene(box);
+
+        /*
+        Way to dialog: create normal stage, then create second stage and upon opening set second stage.showAndWati()
+        dont forget the modality
+         */
+
+        primaryStage.setScene(testScene);
+
+        popupStage.setScene(ms);
+        popupStage.initModality(Modality.APPLICATION_MODAL);
+        popupStage.setTitle("POPUP");
 
         primaryStage.show();
     }
@@ -187,7 +210,15 @@ public class GraphicalUI extends Application {
 
         TextField inputDate = new TextField(); // TODO: Replace with DatePicker
 
-        AnchorPane buttonWrapper = generateOkCancelButtonWrapper();
+        SaveCancelPane buttonWrapper = new SaveCancelPane();
+
+        buttonWrapper.setOnSave(event -> {
+            System.out.println("Saved!");
+        });
+
+        buttonWrapper.setOnCancel(event -> {
+            System.out.println("Cancelled!");
+        });
 
         int rowIndex = 0;
 
