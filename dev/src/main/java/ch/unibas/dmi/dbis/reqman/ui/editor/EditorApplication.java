@@ -57,7 +57,13 @@ public class EditorApplication extends Application {
         ObservableList<String> bottomItems = FXCollections.observableArrayList("Antoher", "List", "Item", "Definition", "Superlongnamethatgoeson");
         bottomList.setItems(bottomItems);
 
-        ModifiableListView<String> modifiableListView = new ModifiableListView<>("TITLE");
+        ModifiableListView<String> modifiableListView = new ModifiableListView<>("TITLE", new ModifiableListController<String>() {
+            private int counter = 0;
+            @Override
+            protected String createNew() {
+                return "New element"+(counter++);
+            }
+        });
         BorderPane topSide = modifiableListView.getView();
 
         BorderPane bottomSide = createPrototype("BOTTOM", bottomList);

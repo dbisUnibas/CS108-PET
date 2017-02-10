@@ -26,17 +26,16 @@ public class GraphicalUI extends Application {
     public void start(Stage primaryStage) {
         primaryStage.setTitle("Requirement Manager");
 
-        primaryStage.setScene(createRequirementPropertiesScene() );
+        //primaryStage.setScene(createRequirementPropertiesScene() );
+        primaryStage.setScene(createMilestonePropertiesScene() );
+
 
         primaryStage.show();
     }
 
     private Scene createRequirementPropertiesScene(){
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setStyle("-fx-padding: 10px; -fx-spacing: 10px; -fx-hgap: 10px;-fx-vgap: 10px");
-
-        Scene scene = new Scene(grid);
+        GridPane grid = generateDefaultGridPane();
+        Scene scene = new Scene(grid );
 
         Label lblName = new Label("Name");
         Label lblDesc = new Label("Description");
@@ -62,14 +61,7 @@ public class GraphicalUI extends Application {
         spinnerPoints.setEditable(true);
 
 
-        Button saveButton = new Button("Save");
-        Button cancelButton = new Button("Cancel");
-        HBox buttons = new HBox();
-        buttons.setStyle("-fx-padding: 5px; -fx-spacing: 5px");
-        buttons.getChildren().addAll(saveButton, cancelButton);
-        AnchorPane buttonWrapper = new AnchorPane();
-        buttonWrapper.getChildren().add(buttons);
-        AnchorPane.setRightAnchor(buttons, 0d);
+        AnchorPane buttonWrapper = generateOkCancelButtonWrapper();
 
         HBox binaryGroup = new HBox();
         binaryGroup.setStyle("-fx-spacing: 10px");
@@ -143,6 +135,51 @@ public class GraphicalUI extends Application {
 
         // Buttons, last row
         grid.add(buttonWrapper, 1, ++rowIndex, 2, 1);
+
+        return scene;
+    }
+
+    private AnchorPane generateOkCancelButtonWrapper() {
+        Button saveButton = new Button("Save");
+        Button cancelButton = new Button("Cancel");
+        HBox buttons = new HBox();
+        buttons.setStyle("-fx-padding: 5px; -fx-spacing: 5px");
+        buttons.getChildren().addAll(saveButton, cancelButton);
+        AnchorPane buttonWrapper = new AnchorPane();
+        buttonWrapper.getChildren().add(buttons);
+        AnchorPane.setRightAnchor(buttons, 0d);
+        return buttonWrapper;
+    }
+
+    private GridPane generateDefaultGridPane() {
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setStyle("-fx-padding: 10px; -fx-spacing: 10px; -fx-hgap: 10px;-fx-vgap: 10px");
+        return grid;
+    }
+
+    public Scene createMilestonePropertiesScene(){
+        GridPane grid = generateDefaultGridPane();
+        Scene scene = new Scene(grid);
+
+        Label lblName = new Label("Name");
+        Label lblDate = new Label("Date");
+
+        TextField tfName = new TextField();
+
+        TextField inputDate = new TextField(); // TODO: Replace with DatePicker
+
+        AnchorPane buttonWrapper = generateOkCancelButtonWrapper();
+
+        int rowIndex = 0;
+
+        grid.add(lblName, 0, rowIndex);
+        grid.add(tfName,1,rowIndex++);
+
+        grid.add(lblDate, 0, rowIndex);
+        grid.add(inputDate, 1,rowIndex++);
+
+        grid.add(buttonWrapper,0,++rowIndex, 2,1);
 
         return scene;
     }
