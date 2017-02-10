@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
+import ch.unibas.dmi.dbis.reqman.ui.editor.SaveCancelPane;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -31,14 +32,14 @@ public class GraphicalUI extends Application {
         // Milestone Properties:
         //primaryStage.setScene(createMilestonePropertiesScene() );
         // Catalogue Primary Properties
-        primaryStage.setScene(createCataloguePropertiesScene() );
+        primaryStage.setScene(createCataloguePropertiesScene());
 
         primaryStage.show();
     }
 
-    private Scene createRequirementPropertiesScene(){
+    private Scene createRequirementPropertiesScene() {
         GridPane grid = generateDefaultGridPane();
-        Scene scene = new Scene(grid );
+        Scene scene = new Scene(grid);
 
         Label lblName = new Label("Name");
         Label lblDesc = new Label("Description");
@@ -99,38 +100,38 @@ public class GraphicalUI extends Application {
         malusGroup.getChildren().addAll(lblMalus, malusYes, malusNo);
 
         GridPane groupWrapper = new GridPane();
-        groupWrapper.setPadding(new Insets(0,10,0,10));
-        groupWrapper.add(binaryGroup, 0,0);
+        groupWrapper.setPadding(new Insets(0, 10, 0, 10));
+        groupWrapper.add(binaryGroup, 0, 0);
         GridPane.setHgrow(binaryGroup, Priority.ALWAYS);
-        groupWrapper.add(mandatoryGroup, 1,0);
+        groupWrapper.add(mandatoryGroup, 1, 0);
         GridPane.setHgrow(mandatoryGroup, Priority.ALWAYS);
-        groupWrapper.add(malusGroup, 2,0);
+        groupWrapper.add(malusGroup, 2, 0);
         GridPane.setHgrow(malusGroup, Priority.ALWAYS);
 
         int rowIndex = 0;
 
-        grid.add(lblName, 0,rowIndex);
-        grid.add(tfName, 1,rowIndex++);
+        grid.add(lblName, 0, rowIndex);
+        grid.add(tfName, 1, rowIndex++);
 
-        grid.add(lblDesc, 0,rowIndex);
-        grid.add(taDesc, 1,rowIndex,1,2);
+        grid.add(lblDesc, 0, rowIndex);
+        grid.add(taDesc, 1, rowIndex, 1, 2);
         rowIndex += 2;
         // Skip two rows
         grid.add(lblMinMS, 0, rowIndex);
         grid.add(cbMinMS, 1, rowIndex++);
 
         grid.add(lblMaxMS, 0, rowIndex);
-        grid.add(cbMaxMS, 1,rowIndex++);
+        grid.add(cbMaxMS, 1, rowIndex++);
 
         grid.add(lblMaxPoints, 0, rowIndex);
-        grid.add(spinnerPoints, 1,rowIndex++);
+        grid.add(spinnerPoints, 1, rowIndex++);
         // separator
-        grid.add(new Separator(), 0,rowIndex++,2,1);
+        grid.add(new Separator(), 0, rowIndex++, 2, 1);
         // RadioButton groups
         grid.add(groupWrapper, 0, rowIndex++, 2, 1);
         GridPane.setHgrow(groupWrapper, Priority.ALWAYS);
         // Separator
-        grid.add(new Separator(), 0,rowIndex++,2,1);
+        grid.add(new Separator(), 0, rowIndex++, 2, 1);
 
         grid.add(lblPredecessors, 0, rowIndex);
         grid.add(new Label("Predecessor list or so"), 1, rowIndex++);
@@ -162,7 +163,7 @@ public class GraphicalUI extends Application {
         return grid;
     }
 
-    public Scene createMilestonePropertiesScene(){
+    public Scene createMilestonePropertiesScene() {
         GridPane grid = generateDefaultGridPane();
         Scene scene = new Scene(grid);
 
@@ -178,17 +179,17 @@ public class GraphicalUI extends Application {
         int rowIndex = 0;
 
         grid.add(lblName, 0, rowIndex);
-        grid.add(tfName,1,rowIndex++);
+        grid.add(tfName, 1, rowIndex++);
 
         grid.add(lblDate, 0, rowIndex);
-        grid.add(inputDate, 1,rowIndex++);
+        grid.add(inputDate, 1, rowIndex++);
 
-        grid.add(buttonWrapper,0,++rowIndex, 2,1);
+        grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
 
         return scene;
     }
 
-    public Scene createCataloguePropertiesScene(){
+    public Scene createCataloguePropertiesScene() {
         GridPane grid = generateDefaultGridPane();
         Scene scene = new Scene(grid);
 
@@ -203,13 +204,22 @@ public class GraphicalUI extends Application {
         TextArea taDesc = new TextArea();
         TextField tfSemester = new TextField();
 
-        AnchorPane buttonWrapper = generateOkCancelButtonWrapper();
+        SaveCancelPane buttonWrapper = new SaveCancelPane();
+        buttonWrapper.setOnSave(event -> {
+            System.out.println("Saving.... " + tfName.getText());
+        });
+
+        buttonWrapper.setOnCancel(event -> {
+            System.out.println("Canceling...");
+            System.exit(0);
+        });
+
 
         int rowIndex = 0;
 
         grid.add(lblLecture, 0, rowIndex);
         grid.add(tfLecture, 1, rowIndex++);
-        grid.add(lblSemester, 0,rowIndex);
+        grid.add(lblSemester, 0, rowIndex);
         grid.add(tfSemester, 1, rowIndex++);
         grid.add(lblName, 0, rowIndex);
         grid.add(tfName, 1, rowIndex++);

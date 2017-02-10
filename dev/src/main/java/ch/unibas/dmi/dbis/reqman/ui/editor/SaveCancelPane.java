@@ -126,6 +126,8 @@ public class SaveCancelPane extends AnchorPane {
         btnBox.getChildren().addAll(saveButton, cancelButton);
         getChildren().add(btnBox);
         setRightAnchor(btnBox, 0d);
+
+        btnBox.setStyle("-fx-spacing: inherit;-fx-padding: inherit");
     }
 
 
