@@ -7,11 +7,15 @@ import javafx.event.ActionEvent;
 import java.util.ArrayList;
 
 /**
- * TODO: write JavaDoc
+ * Abstract controller for the {@link ModifiableListView}
+ *
+ * Handles the adding and removing of elements.
+ *
+ *
  *
  * @author loris.sauter
  */
-public class ModifiableListController<T> {
+public abstract class ModifiableListController<T> {
 
     private ObservableList<T> items = FXCollections.observableList(new ArrayList<T>() );
 
@@ -40,10 +44,15 @@ public class ModifiableListController<T> {
     }
 
     public void onRemove(ModifiableListView.RemoveEvent<T> event){
-        System.out.println("REMOVE");
+        T toRemove = event.getSelected();
+        items.remove(toRemove);
     }
 
     public void onAdd(ActionEvent event){
-        System.out.println("ADD");
+        items.add(createNew() );
     }
+
+
+    protected abstract T createNew();
+
 }

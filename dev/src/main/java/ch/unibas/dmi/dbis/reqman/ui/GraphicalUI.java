@@ -11,8 +11,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.scene.text.Text;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 /**
@@ -72,8 +70,6 @@ public class GraphicalUI extends Application {
         AnchorPane buttonWrapper = new AnchorPane();
         buttonWrapper.getChildren().add(buttons);
         AnchorPane.setRightAnchor(buttons, 0d);
-
-        // TODO: Fix radioButtonGroups
 
         HBox binaryGroup = new HBox();
         binaryGroup.setStyle("-fx-spacing: 10px");

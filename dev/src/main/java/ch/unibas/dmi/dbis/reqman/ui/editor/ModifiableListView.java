@@ -22,9 +22,9 @@ public class ModifiableListView<T> {
 
     private ModifiableListController<T> controller;
 
-    public ModifiableListView(String title){
+    public ModifiableListView(String title, ModifiableListController<T> controller){
         theView = createView(title, listView);
-        controller = new ModifiableListController<>();
+        this.controller = controller;
         listView.setItems(controller.getItems() );
 
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
