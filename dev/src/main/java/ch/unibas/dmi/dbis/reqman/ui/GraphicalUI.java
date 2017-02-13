@@ -1,24 +1,26 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
+import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListController;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
-import ch.unibas.dmi.dbis.reqman.ui.editor.CataloguePropertiesScene;
+import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
+import ch.unibas.dmi.dbis.reqman.ui.editor.CataloguePropertiesScene;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.SubScene;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.stage.Modality;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
+
+import javax.management.timer.Timer;
 
 /**
  * A sandbox
@@ -41,11 +43,18 @@ public class GraphicalUI extends Application {
         //primaryStage.setScene(new CataloguePropertiesScene() );
 
         // Popup test:
-        Scene ms = createMilestonePropertiesScene();
-        Stage popupStage = new Stage();
+        CataloguePropertiesScene catProps = new CataloguePropertiesScene();
+        PopupStage popupStage = new PopupStage("Catalogue Properties", catProps );
+
         HBox box = new HBox();
         Button showPopup = new Button("Show");
-        showPopup.setOnAction(event -> popupStage.showAndWait());
+        showPopup.setOnAction(event -> {
+            popupStage.showAndWait();
+            System.out.println("Done.");
+            Catalogue catalogue = catProps.create();
+            System.out.println(catalogue.getLecture());
+
+        });
         box.getChildren().add(showPopup);
         Scene testScene = new Scene(box);
 
@@ -56,9 +65,6 @@ public class GraphicalUI extends Application {
 
         primaryStage.setScene(testScene);
 
-        popupStage.setScene(ms);
-        popupStage.initModality(Modality.APPLICATION_MODAL);
-        popupStage.setTitle("POPUP");
 
         primaryStage.show();
     }
