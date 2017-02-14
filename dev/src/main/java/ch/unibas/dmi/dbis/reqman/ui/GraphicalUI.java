@@ -1,11 +1,15 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
+import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
+import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListController;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import ch.unibas.dmi.dbis.reqman.ui.editor.CataloguePropertiesScene;
+import ch.unibas.dmi.dbis.reqman.ui.editor.MilestonePropertiesScene;
+import ch.unibas.dmi.dbis.reqman.ui.editor.RequirementPropertiesScene;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,10 +21,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
-
-import javax.management.timer.Timer;
 
 /**
  * A sandbox
@@ -38,16 +39,33 @@ public class GraphicalUI extends Application {
         // Requirement Properties:
         //primaryStage.setScene(createRequirementPropertiesScene() );
         // Milestone Properties:
-        //primaryStage.setScene(createMilestonePropertiesScene() );
+        //primaryStage.setScene(new MilestonePropertiesScene() );
         // Catalogue Primary Properties
         //primaryStage.setScene(new CataloguePropertiesScene() );
 
-        // Popup test:
+        // Popup example:
         CataloguePropertiesScene catProps = new CataloguePropertiesScene();
-        PopupStage popupStage = new PopupStage("Catalogue Properties", catProps );
+        MilestonePropertiesScene msProps = new MilestonePropertiesScene();
+        RequirementPropertiesScene reqProps = new RequirementPropertiesScene();
+
+        PopupStage popupStage = new PopupStage("Catalogue Properties", msProps );
 
         HBox box = new HBox();
         Button showPopup = new Button("Show");
+        showPopup.setOnAction(event -> {
+            popupStage.showAndWait();
+            System.out.println("Done.");
+            if(!msProps.isCreatorReady() ){
+                return;
+            }
+            Milestone ms = msProps.create();
+            try {
+                System.out.println("Created: "+ JSONUtils.toJSON(ms));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
+        /*
         showPopup.setOnAction(event -> {
             popupStage.showAndWait();
             System.out.println("Done.");
@@ -58,6 +76,7 @@ public class GraphicalUI extends Application {
             System.out.println(catalogue.getLecture());
 
         });
+        */
         box.getChildren().add(showPopup);
         Scene testScene = new Scene(box);
 

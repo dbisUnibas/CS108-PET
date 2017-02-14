@@ -17,14 +17,13 @@ public abstract class AbstractPopulatedGridScene extends Scene {
     protected GridPane grid = UIUtilities.generateDefaultGridPane();
 
     /**
-     * Creates a new {@link AbstractPopulatedGridScene} and populates it.
-     * The term <i>populates</i> refers to a call of {@link AbstractPopulatedGridScene#populateScene()}
+     * Creates a new {@link AbstractPopulatedGridScene}.
+     * An implementing subclass must call {@link AbstractPopulatedGridScene#populateScene()} later on to populate the scene.
      */
     public AbstractPopulatedGridScene() {
         super(new Region());
         setRoot(grid);
 
-        populateScene();
     }
 
     /**

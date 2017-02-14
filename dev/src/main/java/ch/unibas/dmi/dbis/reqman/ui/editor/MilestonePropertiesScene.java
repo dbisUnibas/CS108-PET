@@ -20,6 +20,7 @@ public class MilestonePropertiesScene extends AbstractPopulatedGridScene impleme
 
     public MilestonePropertiesScene(){
         super();
+        populateScene();
     }
 
     public MilestonePropertiesScene(Milestone milestone){
@@ -47,11 +48,13 @@ public class MilestonePropertiesScene extends AbstractPopulatedGridScene impleme
         Label lblName = new Label("Name");
         Label lblDate = new Label("Date");
 
+        loadMilestone();
 
         SaveCancelPane buttonWrapper = new SaveCancelPane();
         // TODO Add SaveCancelHandler
 
         buttonWrapper.setOnSave(event -> {
+            // TODO Ordinal handling
             milestone = new Milestone(
                     tfName.getText(),
                     0,

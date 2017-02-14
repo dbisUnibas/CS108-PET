@@ -22,6 +22,7 @@ public class CataloguePropertiesScene extends AbstractPopulatedGridScene impleme
 
     public CataloguePropertiesScene() {
         super();
+        populateScene();
     }
 
     public CataloguePropertiesScene(Catalogue catalogue){
@@ -55,6 +56,7 @@ public class CataloguePropertiesScene extends AbstractPopulatedGridScene impleme
         // Milestones and Labels added via different scene
         Label lblSemester = new Label("Semester");
 
+        loadCatalogue();
 
         SaveCancelPane buttonWrapper = new SaveCancelPane();
 

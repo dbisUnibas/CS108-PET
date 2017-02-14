@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.sandbox;
 
-import ch.unibas.dmi.dbis.reqman.common.IOUtilites;
+import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.core.ProgressSummary;
 import org.junit.After;
 import org.junit.Before;
@@ -31,17 +31,17 @@ public class BasicTest {
      */
     @Before
     public void setUp() throws Exception {
-        IOUtilites.writeToJSONFile(ps, file);
+        JSONUtils.writeToJSONFile(ps, file);
     }
 
     /**
-     * Tests whether the {@link IOUtilites#readFromJSONFile(File, Class)} works.
+     * Tests whether the {@link JSONUtils#readFromJSONFile(File, Class)} works.
      * As a consequence it tests if {@link ProgressSummary#equals(Object)} works properly.
      * @throws IOException If the reading of the json file fails
      */
     @Test
     public void testReadAndEquals() throws IOException {
-        ProgressSummary test = (ProgressSummary) IOUtilites.readFromJSONFile(file, ProgressSummary.class);
+        ProgressSummary test = (ProgressSummary) JSONUtils.readFromJSONFile(file, ProgressSummary.class);
         assertEquals(ps, test);
     }
 
