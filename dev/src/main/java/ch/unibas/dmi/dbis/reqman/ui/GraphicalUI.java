@@ -63,6 +63,7 @@ public class GraphicalUI extends Application {
                 }
             }
         });
+        // USAGE PromptPopup class
         Button showMS = new Button("Milestone Popup");
         showMS.setOnAction(event -> {
             PromptPopup<Milestone> prompt = new PromptPopup<Milestone>(msProps);

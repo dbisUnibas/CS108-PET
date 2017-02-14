@@ -16,9 +16,13 @@ public class UIUtilities {
      */
     public static GridPane generateDefaultGridPane() {
         GridPane grid = new GridPane();
+        applyDefaultGridSetup(grid);
+        return grid;
+    }
+
+    public static void applyDefaultGridSetup(GridPane grid){
         grid.setAlignment(Pos.CENTER);
         grid.setStyle("-fx-padding: 10px; -fx-spacing: 10px; -fx-hgap: 10px;-fx-vgap: 10px");
-        return grid;
     }
 
 }

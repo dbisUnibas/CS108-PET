@@ -66,7 +66,7 @@ public class EditorApplication extends Application {
 
         BorderPane bottomSide = createPrototype("BOTTOM", bottomList);
 
-
+        // TODO Make width *relative* to total width: Use property
         topSide.setPrefWidth(scene.getWidth()/3.0);
         bottomSide.setPrefWidth(scene.getWidth()/3.0);
 

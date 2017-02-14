@@ -54,6 +54,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     @Override
     protected void populateScene() {
+        ScrollPane scrollPane = new ScrollPane();
         Label lblName = new Label("Name");
         Label lblDesc = new Label("Description");
         Label lblMinMS = new Label("Minimal Milestone");
@@ -172,6 +173,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         // Buttons, last row
         grid.add(buttonWrapper, 1, ++rowIndex, 2, 1);
 
+        scrollPane.setContent(grid);
+        setRoot(scrollPane);
     }
 
     @Override
