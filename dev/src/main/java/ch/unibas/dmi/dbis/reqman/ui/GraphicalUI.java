@@ -51,7 +51,10 @@ public class GraphicalUI extends Application {
         showPopup.setOnAction(event -> {
             popupStage.showAndWait();
             System.out.println("Done.");
-            Catalogue catalogue = catProps.create();
+            if(!catProps.isCreatorReady() ){
+                return;
+            }
+            Catalogue catalogue = catProps.create(); // Throws exception if not ready.
             System.out.println(catalogue.getLecture());
 
         });
