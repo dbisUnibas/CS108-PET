@@ -1,10 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.ui.common.AbstractPopulatedGridScene;
-import ch.unibas.dmi.dbis.reqman.ui.common.Creator;
-import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelHandler;
-import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
+import ch.unibas.dmi.dbis.reqman.ui.common.*;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -18,7 +15,7 @@ import javafx.stage.Stage;
  *
  * @author loris.sauter
  */
-public class CataloguePropertiesScene extends AbstractPopulatedGridScene implements Creator<Catalogue> {
+public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
 
     public CataloguePropertiesScene() {
         super();
@@ -100,5 +97,10 @@ public class CataloguePropertiesScene extends AbstractPopulatedGridScene impleme
     @Override
     public boolean isCreatorReady() {
         return catalogue != null;
+    }
+
+    @Override
+    public String getPromptTitle() {
+        return "Catalogue Properties";
     }
 }

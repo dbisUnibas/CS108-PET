@@ -15,7 +15,7 @@ import javafx.scene.layout.Priority;
  *
  * @author loris.sauter
  */
-public class RequirementPropertiesScene extends AbstractPopulatedGridScene implements Creator<Requirement>{
+public class RequirementPropertiesScene extends AbstractVisualCreator<Requirement>{
 
     private TextField tfName = new TextField();
     private TextArea taDesc = new TextArea();
@@ -185,5 +185,10 @@ public class RequirementPropertiesScene extends AbstractPopulatedGridScene imple
     @Override
     public boolean isCreatorReady() {
         return requirement != null;
+    }
+
+    @Override
+    public String getPromptTitle() {
+        return "Requirement Properties";
     }
 }

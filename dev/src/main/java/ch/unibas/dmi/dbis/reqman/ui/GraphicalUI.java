@@ -2,10 +2,8 @@ package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListController;
-import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
-import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
-import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
+import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.ui.common.*;
 import ch.unibas.dmi.dbis.reqman.ui.editor.CataloguePropertiesScene;
 import ch.unibas.dmi.dbis.reqman.ui.editor.MilestonePropertiesScene;
 import ch.unibas.dmi.dbis.reqman.ui.editor.RequirementPropertiesScene;
@@ -48,24 +46,39 @@ public class GraphicalUI extends Application {
         MilestonePropertiesScene msProps = new MilestonePropertiesScene();
         RequirementPropertiesScene reqProps = new RequirementPropertiesScene();
 
-        PopupStage popupStage = new PopupStage("Catalogue Properties", msProps );
+        PopupStage popupStage = new PopupStage("Catalogue Properties", reqProps );
 
         HBox box = new HBox();
         Button showPopup = new Button("Show");
+        // REQPROPS HANDLING
         showPopup.setOnAction(event -> {
             popupStage.showAndWait();
-            System.out.println("Done.");
-            if(!msProps.isCreatorReady() ){
-                return;
+            System.out.println("Done");
+            if(reqProps.isCreatorReady() ){
+                Requirement req = reqProps.create();
+                try {
+                    System.out.println("Created: "+JSONUtils.toJSON(req));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
             }
-            Milestone ms = msProps.create();
-            try {
-                System.out.println("Created: "+ JSONUtils.toJSON(ms));
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
+        });
+        Button showMS = new Button("Milestone Popup");
+        showMS.setOnAction(event -> {
+            PromptPopup<Milestone> prompt = new PromptPopup<Milestone>(msProps);
+            Milestone result = prompt.prompt();
+            if(result != null){
+                try {
+                    System.out.println("Newly created: "+JSONUtils.toJSON(result));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                System.out.println("user cancelled");
             }
         });
         /*
+        // CATPROPS HANDLING
         showPopup.setOnAction(event -> {
             popupStage.showAndWait();
             System.out.println("Done.");
@@ -77,7 +90,7 @@ public class GraphicalUI extends Application {
 
         });
         */
-        box.getChildren().add(showPopup);
+        box.getChildren().addAll(showPopup, showMS);
         Scene testScene = new Scene(box);
 
         /*

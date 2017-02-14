@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractPopulatedGridScene;
+import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.Creator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.scene.control.DatePicker;
@@ -16,7 +17,7 @@ import java.util.Date;
  *
  * @author loris.sauter
  */
-public class MilestonePropertiesScene extends AbstractPopulatedGridScene implements Creator<Milestone>{
+public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone>{
 
     public MilestonePropertiesScene(){
         super();
@@ -87,5 +88,10 @@ public class MilestonePropertiesScene extends AbstractPopulatedGridScene impleme
     @Override
     public boolean isCreatorReady() {
         return milestone != null;
+    }
+
+    @Override
+    public String getPromptTitle() {
+        return "Milestone Properties";
     }
 }
