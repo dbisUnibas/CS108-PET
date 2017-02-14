@@ -24,7 +24,28 @@ public class CataloguePropertiesScene extends AbstractPopulatedGridScene impleme
         super();
     }
 
+    public CataloguePropertiesScene(Catalogue catalogue){
+        this();
+        this.catalogue = catalogue;
+    }
+
     private Catalogue catalogue = null;
+
+    private TextField tfLecture = new TextField();
+    private TextField tfName = new TextField();
+    private TextArea taDesc = new TextArea();
+    private TextField tfSemester = new TextField();
+
+    private void loadCatalogue(){
+        if(catalogue != null){
+            // TODO: Proper check if value exists
+            tfLecture.setText(catalogue.getLecture() );
+            tfName.setText(catalogue.getName() );
+            taDesc.setText(catalogue.getDescription() );
+            tfSemester.setText(catalogue.getSemester() );
+        }
+
+    }
 
     @Override
     protected void populateScene(){
@@ -34,10 +55,6 @@ public class CataloguePropertiesScene extends AbstractPopulatedGridScene impleme
         // Milestones and Labels added via different scene
         Label lblSemester = new Label("Semester");
 
-        TextField tfLecture = new TextField();
-        TextField tfName = new TextField();
-        TextArea taDesc = new TextArea();
-        TextField tfSemester = new TextField();
 
         SaveCancelPane buttonWrapper = new SaveCancelPane();
 
