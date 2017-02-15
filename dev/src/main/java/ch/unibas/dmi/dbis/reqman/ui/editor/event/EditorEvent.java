@@ -11,9 +11,9 @@ import javafx.event.EventType;
  */
 public class EditorEvent extends ActionEvent {
 
-    public static EventType<EditorEvent> CREATION = new EventType<>(ACTION, "creation");
-    public static EventType<EditorEvent> DELETION = new EventType<>(ACTION, "deletion");
-    public static EventType<EditorEvent> MODIFICATION = new EventType<>(ACTION, "modification");
+    public static final EventType<EditorEvent> CREATION = new EventType<>(ACTION, "creation");
+    public static final EventType<EditorEvent> DELETION = new EventType<>(ACTION, "deletion");
+    public static final EventType<EditorEvent> MODIFICATION = new EventType<>(ACTION, "modification");
 
     private TargetEntity targetEntity;
 
