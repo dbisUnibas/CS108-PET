@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.reqman.ui.common;
+package ch.unibas.dmi.dbis.reqman.common;
 
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
