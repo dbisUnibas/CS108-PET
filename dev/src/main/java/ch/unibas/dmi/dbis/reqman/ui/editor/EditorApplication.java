@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListController;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -164,5 +165,11 @@ public class EditorApplication extends Application {
         msView.setDisable(disable);
     }
 
+    public void passRequirementsToView(ObservableList<Requirement> requirements){
+        reqView.setItems(requirements);
+    }
 
+    public void passMilestonesToView(ObservableList<Milestone> milestones){
+        msView.setItems(milestones);
+    }
 }

@@ -4,16 +4,13 @@ import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
-import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListHandler;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import sun.nio.ch.IOUtil;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,10 +36,12 @@ public class EditorController  {
         this.controlledStage = controlledStage;
     }
 
-    public void setCatalogue(Catalogue catalogue){
+    public void openCatalogue(Catalogue catalogue){
         this.catalogue = catalogue;
         observableReqs = FXCollections.observableArrayList(catalogue.getRequirements() );
         observableMs = FXCollections.observableArrayList(catalogue.getMilestones() );
+        editor.passRequirementsToView(observableReqs);
+        editor.passMilestonesToView(observableMs);
     }
 
     public Catalogue getCatalogue(){
@@ -145,14 +144,14 @@ public class EditorController  {
     }
 
     public void handleExportCatalogue(ActionEvent event){
-
+        System.out.println("Exporting..."); // TODO implementation
     }
 
     public void handleOpenCatalogue(ActionEvent event){
         FileChooser openChooser = createCatalogueFileChooser("Open");
         File f = openChooser.showOpenDialog(controlledStage);
         try {
-            setCatalogue(JSONUtils.readCatalogueJSONFile(f));
+            openCatalogue(JSONUtils.readCatalogueJSONFile(f));
         } catch (IOException e) {
             e.printStackTrace();
         }
