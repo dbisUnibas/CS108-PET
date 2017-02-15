@@ -64,7 +64,6 @@ jar{
         attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication'
     }
 
-    archiveName = ''+project.name+project.version+'.jar'
 }
 
 /**
@@ -172,4 +171,11 @@ task setupVersion{
     }
 }
 
-task deploy(dependsOn: [build, jar])
+task deployEditor(dependsOn: [build, jar])
+
+gradle.taskGraph.whenReady{
+    taskGraph ->
+        if(taskGraph.hasTask(deployEditor)){
+            jar.appendix = 'editor'
+        }
+}
