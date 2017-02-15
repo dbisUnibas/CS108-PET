@@ -17,7 +17,7 @@ import javafx.scene.text.FontWeight;
  *
  * @author loris.sauter
  */
-public class ModifiableListView<T> {
+public class ModifiableListView<T> extends BorderPane{
 
     // TODO Allow custom styling
     // TODO derive from panel or similar.
@@ -25,14 +25,14 @@ public class ModifiableListView<T> {
     private ModifiableListController<T> controller;
 
     public ModifiableListView(String title, ModifiableListController<T> controller){
-        theView = createView(title, listView);
+        super();
+        createView(title, listView);
         this.controller = controller;
         listView.setItems(controller.getItems() );
 
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
     }
 
-    private BorderPane theView;
     private ListView<T> listView = new ListView();
 
     public void setItems(ObservableList<T> items){
@@ -45,11 +45,10 @@ public class ModifiableListView<T> {
 
 
 
-    protected BorderPane createView(String title, Region content){
-        BorderPane pane = new BorderPane();
+    protected void createView(String title, Region content){
 
         // Border style
-        pane.setStyle("-fx-border-width: 1; -fx-border-color: silver");
+        this.setStyle("-fx-border-width: 1; -fx-border-color: silver");
 
         // TitleBar with Add / Remove Buttons
         AnchorPane titleBar = new AnchorPane();
@@ -86,15 +85,11 @@ public class ModifiableListView<T> {
         AnchorPane.setRightAnchor(buttons, 0.0);
 
         // Content
-        pane.setTop(titleBar);
-        pane.setCenter(content);
+        this.setTop(titleBar);
+        this.setCenter(content);
 
-        return pane;
     }
 
-    public BorderPane getView(){
-        return theView;
-    }
 
     public static class RemoveEvent<T> extends ActionEvent{
         private T selected;

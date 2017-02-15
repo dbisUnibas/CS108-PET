@@ -48,9 +48,7 @@ public abstract class ModifiableListController<T> {
         if(toRemove == null){
             return; // Cannot remove a non selected item.
         }
-        System.out.println("C: selected: "+toRemove);
         int index = items.indexOf(toRemove);
-        System.out.println("Index: "+index);
         items.remove(index);
     }
 

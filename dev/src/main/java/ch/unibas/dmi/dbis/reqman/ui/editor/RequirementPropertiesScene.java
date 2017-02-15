@@ -167,7 +167,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         // Predecessor list
         grid.add(lblPredecessors, 0, rowIndex);
-        grid.add(inputPredecessors.getView(), 1, rowIndex++,1,2);
+        grid.add(inputPredecessors, 1, rowIndex++,1,2);
         rowIndex += 2;
 
         // Buttons, last row
