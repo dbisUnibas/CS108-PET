@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.ui.common.AbstractPopulatedGridScene;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.Creator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
+import javafx.event.ActionEvent;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -27,6 +28,7 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone>{
     public MilestonePropertiesScene(Milestone milestone){
         this();
         this.milestone = milestone;
+        loadMilestone();
     }
 
     private Milestone milestone = null;
@@ -42,7 +44,13 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone>{
     private TextField tfName = new TextField();
     private DatePicker inputDate = new DatePicker();
 
+    private void handleSaving(ActionEvent event){
+        String name = (tfName.getText() == null || tfName.getText().isEmpty() )? "Milestone" : tfName.getText(); // Default name
+        Date d = Date.from(inputDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant() );
 
+        milestone = new Milestone(name, 0, d);// ordinal is handled later
+        getWindow().hide();
+    }
 
     @Override
     protected void populateScene() {
@@ -54,15 +62,7 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone>{
         SaveCancelPane buttonWrapper = new SaveCancelPane();
         // TODO Add SaveCancelHandler
 
-        buttonWrapper.setOnSave(event -> {
-            // TODO Ordinal handling
-            milestone = new Milestone(
-                    tfName.getText(),
-                    0,
-                    Date.from(inputDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant() )
-            );
-            getWindow().hide();
-        });
+        buttonWrapper.setOnSave(this::handleSaving);
 
         buttonWrapper.setOnCancel(event -> getWindow().hide());
 

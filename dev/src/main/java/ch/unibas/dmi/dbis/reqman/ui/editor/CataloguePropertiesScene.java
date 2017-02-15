@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 
 /**
  * A scene which contains all of the properties a catalogue needs to have.
- *
+ * <p>
  * This scene then must be handed safely to its stage. This stage most probably is a pop up window.
  *
  * @author loris.sauter
@@ -22,7 +22,7 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         populateScene();
     }
 
-    public CataloguePropertiesScene(Catalogue catalogue){
+    public CataloguePropertiesScene(Catalogue catalogue) {
         this();
         this.catalogue = catalogue;
         loadCatalogue();
@@ -35,19 +35,19 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
     private TextArea taDesc = new TextArea();
     private TextField tfSemester = new TextField();
 
-    private void loadCatalogue(){
-        if(catalogue != null){
+    private void loadCatalogue() {
+        if (catalogue != null) {
             // TODO: Proper check if value exists
-            tfLecture.setText(catalogue.getLecture() );
-            tfName.setText(catalogue.getName() );
-            taDesc.setText(catalogue.getDescription() );
-            tfSemester.setText(catalogue.getSemester() );
+            tfLecture.setText(catalogue.getLecture());
+            tfName.setText(catalogue.getName());
+            taDesc.setText(catalogue.getDescription());
+            tfSemester.setText(catalogue.getSemester());
         }
 
     }
 
     @Override
-    protected void populateScene(){
+    protected void populateScene() {
         Label lblLecture = new Label("Lecture");
         Label lblName = new Label("Name");
         Label lblDescription = new Label("Description");
@@ -60,15 +60,7 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
             getWindow().hide();
         });
 
-        buttonWrapper.setOnSave(event -> {
-            catalogue = new Catalogue(
-                    tfLecture.getText(),
-                    tfName.getText(),
-                    taDesc.getText(),
-                    tfSemester.getText()
-            );
-            getWindow().hide();
-        });
+        buttonWrapper.setOnSave(this::handleSaving);
 
         int rowIndex = 0;
 
@@ -86,7 +78,7 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
 
     @Override
     public Catalogue create() {
-        if(!isCreatorReady() ){
+        if (!isCreatorReady()) {
             throw new IllegalStateException("Creation failed: Was not ready");
         }
 
@@ -101,5 +93,23 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
     @Override
     public String getPromptTitle() {
         return "Catalogue Properties";
+    }
+
+    private void handleSaving(ActionEvent event) {
+        String name = tfName.getText();
+        String lecture = tfLecture.getText();
+
+        if(name == null && lecture == null){
+            throw new IllegalArgumentException("[Catalogue] Name and Lecture MUST not be null");
+        }
+
+        catalogue = new Catalogue(
+                name,
+                lecture,
+                taDesc.getText(),
+                tfSemester.getText()
+        );
+        getWindow().hide();
+
     }
 }

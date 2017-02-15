@@ -10,6 +10,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.stage.Stage;
 
+import java.awt.*;
+import java.util.ArrayList;
+
 /**
  * TODO: write JavaDoc
  *
@@ -21,10 +24,13 @@ public class EditorController  {
 
     private Stage controlledStage;
 
+    private EditorApplication editor;
+
     private ObservableList<Requirement> observableReqs = FXCollections.observableArrayList();
     private ObservableList<Milestone> observableMs = FXCollections.observableArrayList();
 
-    public EditorController(Stage controlledStage){
+    public EditorController(EditorApplication editor, Stage controlledStage){
+        this.editor = editor;
         this.controlledStage = controlledStage;
     }
 
@@ -52,21 +58,47 @@ public class EditorController  {
         Requirement r = EditorPromptFactory.promptNewRequirement();
         if(r != null){ // user may cancelled the prompt
             observableReqs.add(r );
-        }else{
-            System.out.println("nulll");
         }
 
     }
 
     public void handleRemoveRequirement(ModifiableListView.RemoveEvent<Requirement> event){
-        observableReqs.remove(event.getSelectedIndex() );
+        if(event.getSelected() != null){ // If nothing selected - don't remove it!
+            observableReqs.remove(event.getSelectedIndex() );
+        }
+
     }
 
     public void handleAddMilestone(ActionEvent event){
+        Milestone m = EditorPromptFactory.promptNewMilestone();
+        if(m != null){
+            m.setOrdinal(getNextMsOrdinal() );
+            observableMs.add(m);
+        }
+    }
 
+    private int getNextMsOrdinal(){
+        ArrayList<Milestone> temp = new ArrayList<>(observableMs);
+        temp.sort((ms1, ms2) -> {
+            // TODO nullcheck
+            if(ms1.getOrdinal() < ms2.getOrdinal() ){
+                return -1;
+            }else if(ms1.getOrdinal() == ms2.getOrdinal() ){
+                return 0;
+            }else{
+                return 1;
+            }
+        });
+        if(temp.isEmpty() ){
+            return 1;
+        }
+        return temp.get(temp.size()-1).getOrdinal()+1;
     }
 
     public void handleRemoveMilestone(ModifiableListView.RemoveEvent<Milestone> event){
+        if(event.getSelected() != null){ // If nothing selected - don't remove it!
+            observableMs.remove(event.getSelectedIndex());
+        }
 
     }
 
@@ -75,6 +107,7 @@ public class EditorController  {
         if(cat != null){
             this.catalogue = cat;
             updateTitle();
+            editor.enableAll();
         }
     }
 
@@ -94,14 +127,19 @@ public class EditorController  {
 
     }
 
+    public void handleOpenCatalogue(ActionEvent event){
+        editor.enableAll();
+    }
+
+
     private void updateTitle(){
         StringBuffer sb = new StringBuffer("ReqMan: Editor");
         sb.append(" - ");
-        sb.append(catalogue.getName());
+        sb.append(catalogue.getName() != null ? catalogue.getName() : "N/A");
         sb.append(" (");
-        sb.append(catalogue.getLecture() );
+        sb.append(catalogue.getLecture() != null ? catalogue.getLecture() : "N/A" );
         sb.append(" @ ");
-        sb.append(catalogue.getSemester() );
+        sb.append(catalogue.getSemester() != null ? catalogue.getSemester() : "N/A" );
         sb.append(")");
         controlledStage.setTitle(sb.toString());
     }

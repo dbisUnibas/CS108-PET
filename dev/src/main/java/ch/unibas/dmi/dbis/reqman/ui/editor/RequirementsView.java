@@ -41,6 +41,8 @@ public class RequirementsView extends ModifiableListView<Requirement> implements
             super.updateItem(item, empty);
             if(!empty){
                 setText(item.getName() );
+            }else{
+                setText("");
             }
         }
     }

@@ -129,7 +129,7 @@ public class ModifiableListView<T> extends BorderPane {
 
         private int index;
 
-        public static final EventType<RemoveEvent> REMOVE = new EventType(ActionEvent.ACTION, "remove");
+        public static final EventType<RemoveEvent> REMOVE = new EventType<>(ActionEvent.ACTION, "remove");
 
         public RemoveEvent(ActionEvent source, T selected, int index) {
             super(source.getSource(), source.getTarget());
