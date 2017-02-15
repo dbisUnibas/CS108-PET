@@ -46,8 +46,8 @@ public class EditorController  {
     }
 
     public Catalogue getCatalogue(){
-        catalogue.addAllRequirements(observableReqs.toArray(new Requirement[0]));
-        catalogue.addAllMilestones(observableMs.toArray(new Milestone[0]));
+        catalogue.setRequirements(observableReqs);
+        catalogue.setMilestones(observableMs);
         return catalogue;
     }
 

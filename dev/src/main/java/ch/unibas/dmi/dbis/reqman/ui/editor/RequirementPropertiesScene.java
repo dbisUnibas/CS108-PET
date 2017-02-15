@@ -92,7 +92,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         cbMinMS.setOnAction(event -> {
             // Make so that the maxMS is set to the same value as this one. (initially as soon as this one is set)
             Milestone selected = cbMinMS.getSelectionModel().getSelectedItem();
-            if(selected != null){
+            Milestone target = cbMaxMS.getSelectionModel().getSelectedItem();
+            if(selected != null && target == null){
                 cbMaxMS.getSelectionModel().select(selected);
             }
         });

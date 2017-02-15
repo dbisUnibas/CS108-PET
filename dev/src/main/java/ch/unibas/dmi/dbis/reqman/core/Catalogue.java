@@ -61,6 +61,22 @@ public class Catalogue {
         return semester;
     }
 
+    public void setMilestones(List<Milestone> milestones) {
+        this.milestones = milestones;
+    }
+
+    public void setRequirements(List<Requirement> requirements) {
+        this.requirements = requirements;
+    }
+
+    public void clearMilestones(){
+        milestones = new ArrayList<>();
+    }
+
+    public void clearRequirements(){
+        requirements = new ArrayList<>();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
