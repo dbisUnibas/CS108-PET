@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -109,12 +110,20 @@ public class Catalogue {
         return milestones.remove(milestone);
     }
 
+    public List<Milestone> getMilestones(){
+        return new ArrayList<>(milestones);
+    }
+
     public boolean addRequirement(Requirement requirement) {
         return requirements.add(requirement);
     }
 
     public boolean removeRequirement(Requirement requirement) {
         return requirements.remove(requirement);
+    }
+
+    public List<Requirement> getRequirements(){
+        return new ArrayList<>(requirements);
     }
 
 }

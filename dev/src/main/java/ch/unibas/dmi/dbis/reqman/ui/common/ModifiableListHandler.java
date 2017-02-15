@@ -10,5 +10,5 @@ import javafx.event.ActionEvent;
 public interface ModifiableListHandler<T> {
     void onRemove(ModifiableListView.RemoveEvent<T> event);
 
-    void onAdd(ActionEvent event);
+    void onAdd(ModifiableListView.AddEvent<T> event);
 }

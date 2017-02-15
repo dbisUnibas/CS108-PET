@@ -24,7 +24,7 @@ import javafx.stage.Stage;
  */
 public class EditorApplication extends Application {
 
-    private EditorController controller;
+    private EditorController controller = new EditorController();
 
     private ModifiableListView<Requirement> reqView;
     private ModifiableListView<Milestone> msView;
@@ -78,13 +78,7 @@ public class EditorApplication extends Application {
     private GridPane main = new GridPane();
 
     private void initReqView(){
-        reqView = new ModifiableListView<Requirement>("Requirements", new ModifiableListController<Requirement>() {
-            @Override
-            protected Requirement createNew() {
-                return null;
-            }
-        });
-
+        reqView = new RequirementsView(controller);
 
     }
 

@@ -54,7 +54,7 @@ public abstract class ModifiableListController<T> implements ModifiableListHandl
     }
 
     @Override
-    public void onAdd(ActionEvent event){
+    public void onAdd(ModifiableListView.AddEvent<T> event){
         items.add(createNew() );
     }
 

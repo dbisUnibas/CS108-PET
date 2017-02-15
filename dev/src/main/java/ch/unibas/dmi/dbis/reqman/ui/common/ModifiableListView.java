@@ -19,7 +19,7 @@ import java.util.ArrayList;
  *
  * @author loris.sauter
  */
-public class ModifiableListView<T> extends BorderPane{
+public class ModifiableListView<T> extends BorderPane {
 
     // TODO Allow custom styling
 
@@ -27,64 +27,65 @@ public class ModifiableListView<T> extends BorderPane{
 
     private ArrayList<ModifiableListHandler<T>> handlers = new ArrayList<>();
 
-    public ModifiableListView(String title){
+    public ModifiableListView(String title) {
         super();
         initComponents(title, listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
     }
 
-    public ModifiableListView(String title, ModifiableListController<T> controller){
+    public ModifiableListView(String title, ModifiableListController<T> controller) {
         this(title);
         this.controller = controller;
-        listView.setItems(controller.getItems() );
+        listView.setItems(controller.getItems());
     }
 
-    public void addHandler(ModifiableListHandler<T> handler){
+    public void addHandler(ModifiableListHandler<T> handler) {
         handlers.add(handler);
     }
 
-    public void removeHandler(ModifiableListHandler<T> handler){
+    public void removeHandler(ModifiableListHandler<T> handler) {
         handlers.remove(handler);
     }
 
     protected ListView<T> listView = new ListView();
 
-    public void setItems(ObservableList<T> items){
+    public void setItems(ObservableList<T> items) {
         listView.setItems(items);
     }
 
-    public ObservableList<T> getItems(){
+    public ObservableList<T> getItems() {
         return listView.getItems();
     }
 
 
-    protected void setOnAddAction(ActionEvent event){
-        if(hasController() ){
-            controller.onAdd(event);
-        }else{
-            handlers.forEach(handler -> handler.onAdd(event));
+    protected void setOnAddAction(ActionEvent event) {
+        AddEvent<T> addEvent = new AddEvent<T>(event);
+        if (hasController()) {
+            controller.onAdd(addEvent);
+        } else {
+            handlers.forEach(handler -> handler.onAdd(addEvent));
         }
 
     }
 
-    protected void setOnRemoveAction(ActionEvent event){
+    protected void setOnRemoveAction(ActionEvent event) {
         T selected = listView.getSelectionModel().getSelectedItem();
         int index = listView.getSelectionModel().getSelectedIndex();
         RemoveEvent<T> removeEvent = new RemoveEvent<T>(event, selected, index);
 
-        if(hasController() ){
+        if (hasController()) {
             controller.onRemove(removeEvent);
-        }else{
+        } else {
             handlers.forEach(handler -> handler.onRemove(removeEvent));
         }
     }
 
-    protected boolean hasController(){
+    protected boolean hasController() {
         return controller != null;
     }
 
-    protected void initComponents(String title, Region content){
+    protected void initComponents(String title, Region content) {
 
         // Border style
         this.setStyle("-fx-border-width: 1; -fx-border-color: silver");
@@ -123,14 +124,14 @@ public class ModifiableListView<T> extends BorderPane{
     }
 
 
-    public static class RemoveEvent<T> extends ActionEvent{
+    public static class RemoveEvent<T> extends ActionEvent {
         private T selected;
 
         private int index;
 
-        public static EventType<RemoveEvent> REMOVE = new EventType(ActionEvent.ACTION, "remove");
+        public static final EventType<RemoveEvent> REMOVE = new EventType(ActionEvent.ACTION, "remove");
 
-        public RemoveEvent(ActionEvent source, T selected, int index){
+        public RemoveEvent(ActionEvent source, T selected, int index) {
             super(source.getSource(), source.getTarget());
             this.selected = selected;
             this.index = index;
@@ -144,8 +145,26 @@ public class ModifiableListView<T> extends BorderPane{
         public T getSelected() {
             return selected;
         }
-        public int getSelectedIndex(){
+
+        public int getSelectedIndex() {
             return index;
+        }
+    }
+
+    /**
+     * Rather a flag event
+     * @param <T>
+     */
+    public static class AddEvent<T> extends ActionEvent{
+        public static final EventType<AddEvent> ADD = new EventType<>(ActionEvent.ACTION, "add");
+
+        public AddEvent(ActionEvent source){
+            super(source.getSource(), source.getTarget() );
+        }
+
+        @Override
+        public EventType<? extends ActionEvent> getEventType(){
+            return ADD;
         }
     }
 
