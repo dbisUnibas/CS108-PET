@@ -1,5 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+
 /**
  * TODO: write JavaDoc
  *
@@ -13,6 +16,14 @@ public class PromptPopup<T> {
     public PromptPopup(AbstractVisualCreator creator){
         this.creator = creator;
         stage = new PopupStage(creator.getPromptTitle(), creator);
+        creator.getRoot().setOnKeyReleased(this::handleEscape);
+    }
+
+    private void handleEscape(KeyEvent event){
+        System.out.println("Bump"+event.getCode().toString());
+        if(KeyCode.ESCAPE.equals(event.getCode() ) ){
+            stage.hide();
+        }
     }
 
     /**

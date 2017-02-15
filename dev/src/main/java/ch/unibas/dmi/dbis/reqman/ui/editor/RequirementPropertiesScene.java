@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -17,7 +18,7 @@ import javafx.scene.layout.Priority;
  *
  * @author loris.sauter
  */
-public class RequirementPropertiesScene extends AbstractVisualCreator<Requirement>{
+public class RequirementPropertiesScene extends AbstractVisualCreator<Requirement> {
 
     private TextField tfName = new TextField();
     private TextArea taDesc = new TextArea();
@@ -36,7 +37,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     private EditorController controller;
 
-    public RequirementPropertiesScene(EditorController controller){
+    public RequirementPropertiesScene(EditorController controller) {
         super();
         this.controller = controller;
         populateScene();
@@ -44,14 +45,14 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     private Requirement requirement = null;
 
-    public RequirementPropertiesScene(EditorController controller, Requirement requirement){
+    public RequirementPropertiesScene(EditorController controller, Requirement requirement) {
         this(controller);
         this.requirement = requirement;
         loadRequirement();
     }
 
-    private void loadRequirement(){
-        if(requirement != null){
+    private void loadRequirement() {
+        if (requirement != null) {
 
         }
     }
@@ -60,11 +61,11 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     @Override
     protected void populateScene() {
         ScrollPane scrollPane = new ScrollPane();
-        Label lblName = new Label("Name");
+        Label lblName = new Label("Name*");
         Label lblDesc = new Label("Description");
-        Label lblMinMS = new Label("Minimal Milestone");
+        Label lblMinMS = new Label("Minimal Milestone*");
         Label lblMaxMS = new Label("Maximal Milestone");
-        Label lblMaxPoints = new Label("Maximal Points");
+        Label lblMaxPoints = new Label("Maximal Points*");
         Label lblBinary = new Label("Binary");
         Label lblMandatory = new Label("Mandatory");
         Label lblMalus = new Label("Malus");
@@ -87,10 +88,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         Button newMaxMS = new Button("New ...");
         newMaxMS.setOnAction(this::handleNewMaxMS);
         maxMSBox.getChildren().addAll(cbMaxMS, newMaxMS);
-        cbMinMS.setCellFactory((ListView<Milestone> l) -> new MilestonesView.MilestoneCell() );
-        cbMinMS.setButtonCell(new MilestonesView.MilestoneCell() );
-        cbMaxMS.setCellFactory((ListView<Milestone> lv) -> new MilestonesView.MilestoneCell() );
-        cbMaxMS.setButtonCell(new MilestonesView.MilestoneCell() );
+        cbMinMS.setCellFactory((ListView<Milestone> l) -> new MilestonesView.MilestoneCell());
+        cbMinMS.setButtonCell(new MilestonesView.MilestoneCell());
+        cbMaxMS.setCellFactory((ListView<Milestone> lv) -> new MilestonesView.MilestoneCell());
+        cbMaxMS.setButtonCell(new MilestonesView.MilestoneCell());
 
         cbMinMS.setItems(milestoneList);
         cbMaxMS.setItems(milestoneList); // NOTE: This is intentionally the same list
@@ -98,31 +99,11 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         spinnerPoints.setEditable(true);
 
-        ModifiableListView<String> inputPredecessors = new ModifiableListView<>("Predecessors", new ModifiableListController<String>() {
-            // TODO Proper handling of Predecessors
-            private int counter = 0;
-            @Override
-            protected String createNew() {
-                return "New element"+(counter++);
-            }
-        });
+        BorderPane inputPredecessors = createPredecessorChoice();
 
         SaveCancelPane buttonWrapper = new SaveCancelPane();
-        // TODO SaveCancelHandler
-        buttonWrapper.setOnSave(event -> {
-            requirement = new Requirement(
-                    tfName.getText(),
-                    taDesc.getText(),
-                    cbMinMS.getValue().toString(),
-                    cbMaxMS.getValue().toString(),
-                    (double)spinnerPoints.getValue(),
-                    binaryYes.isSelected(),
-                    mandatoryYes.isSelected(),
-                    malusYes.isSelected()
-            );
-            // TODO Add Predecessors / Properties to req
-            getWindow().hide();
-        });
+
+        buttonWrapper.setOnSave(this::handleSaving);
 
         buttonWrapper.setOnCancel(event -> getWindow().hide());
 
@@ -140,7 +121,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         ToggleGroup mandatoryButtons = new ToggleGroup();
         mandatoryYes.setToggleGroup(mandatoryButtons);
         mandatoryNo.setToggleGroup(mandatoryButtons);
-        mandatoryNo.setSelected(true);
+        mandatoryYes.setSelected(true);
         mandatoryGroup.getChildren().addAll(lblMandatory, mandatoryYes, mandatoryNo);
 
 
@@ -188,7 +169,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         // Predecessor list
         grid.add(lblPredecessors, 0, rowIndex);
-        grid.add(inputPredecessors, 1, rowIndex++,1,2);
+        grid.add(inputPredecessors, 1, rowIndex++, 1, 2);
         rowIndex += 2;
 
         // Buttons, last row
@@ -198,19 +179,90 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         setRoot(scrollPane);
     }
 
+    private void handleSaving(ActionEvent event) {
+        String name = tfName.getText();
+        Milestone min = cbMinMS.getValue();
+        double maxPoints = (double) spinnerPoints.getValue();
+
+        if((name == null || name.isEmpty()) || min == null || Double.compare(0.0,maxPoints)==0){
+            throw new IllegalArgumentException("[Requirement] Name, Minimal Milestone and Max Points are mandatory fields");
+        }
+
+        Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
+
+        requirement = new Requirement(
+                name,
+                taDesc.getText(),
+                min.getName(),
+                max.getName(),
+                maxPoints,
+                binaryYes.isSelected(),
+                mandatoryYes.isSelected(),
+                malusYes.isSelected()
+        );
+        // TODO Add Predecessors / Properties to req
+        getWindow().hide();
+    }
+
+    private ObservableList<Requirement> predecessors = FXCollections.observableArrayList();
+
+    private BorderPane createPredecessorChoice(){
+        BorderPane pane = new BorderPane();
+        HBox upper = new HBox();
+        Button addPred = new Button("+");
+        Button rmPred = new Button("-");
+
+        ListView<Requirement> predList = new ListView<>();
+        predList.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
+        predList.setItems(predecessors);
+        ComboBox<Requirement> reqBox = new ComboBox<>();
+        reqBox.setButtonCell(new RequirementsView.RequirementCell() );
+        reqBox.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
+        reqBox.setItems(controller.getObservableRequirements() );
+
+        upper.getChildren().addAll(reqBox, addPred, rmPred);
+
+        upper.setStyle("-fx-spacing: 10px; -fx-padding: 10px;");
+        pane.setStyle("-fx-spacing: 10px; -fx-padding: 10px;");
+        pane.setTop(upper);
+        pane.setCenter(predList);
+
+        rmPred.setOnAction(event -> {
+            int index = predList.getSelectionModel().getSelectedIndex();
+            Requirement selected = predList.getSelectionModel().getSelectedItem();
+            if(selected == null){
+                return; // Do not remove when nothing is selected
+            }else{
+                predecessors.remove(index);
+            }
+        });
+
+        addPred.setOnAction(event -> {
+            Requirement selected = reqBox.getSelectionModel().getSelectedItem();
+            if(selected == null){
+                return;
+            }
+            predecessors.add(selected);
+        });
+
+        pane.setStyle("-fx-border-width: 0 0 1 0; -fx-border-color: silver;");
+
+        return pane;
+    }
+
     private void handleNewMaxMS(ActionEvent event) {
         controller.handleAddMilestone(event);
-        cbMaxMS.getSelectionModel().select(milestoneList.size()-1);
+        cbMaxMS.getSelectionModel().select(milestoneList.size() - 1);
     }
 
     private void handleNewMinMS(ActionEvent event) {
         controller.handleAddMilestone(event);
-        cbMinMS.getSelectionModel().select(milestoneList.size()-1);
+        cbMinMS.getSelectionModel().select(milestoneList.size() - 1);
     }
 
     @Override
     public Requirement create() throws IllegalStateException {
-        if(!isCreatorReady() ){
+        if (!isCreatorReady()) {
             throw new IllegalStateException("Creation failed: Creator not ready");
         }
         return requirement;
@@ -228,7 +280,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     private ObservableList<Milestone> milestoneList;
 
-    private void loadMilestoneNames(){
+    private void loadMilestoneNames() {
         milestoneList = controller.getObservableMilestones();
     }
 
