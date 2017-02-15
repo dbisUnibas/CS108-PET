@@ -12,6 +12,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.util.ArrayList;
+
 /**
  * Class to represent a {@link ListView} which has a title and buttons to add / remove items.
  *
@@ -20,20 +22,33 @@ import javafx.scene.text.FontWeight;
 public class ModifiableListView<T> extends BorderPane{
 
     // TODO Allow custom styling
-    // TODO derive from panel or similar.
 
-    private ModifiableListController<T> controller;
+    protected ModifiableListController<T> controller = null;
 
-    public ModifiableListView(String title, ModifiableListController<T> controller){
+    private ArrayList<ModifiableListHandler<T>> handlers = new ArrayList<>();
+
+    public ModifiableListView(String title){
         super();
-        createView(title, listView);
-        this.controller = controller;
-        listView.setItems(controller.getItems() );
-
+        initComponents(title, listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+
     }
 
-    private ListView<T> listView = new ListView();
+    public ModifiableListView(String title, ModifiableListController<T> controller){
+        this(title);
+        this.controller = controller;
+        listView.setItems(controller.getItems() );
+    }
+
+    public void addHandler(ModifiableListHandler<T> handler){
+        handlers.add(handler);
+    }
+
+    public void removeHandler(ModifiableListHandler<T> handler){
+        handlers.remove(handler);
+    }
+
+    protected ListView<T> listView = new ListView();
 
     public void setItems(ObservableList<T> items){
         listView.setItems(items);
@@ -44,8 +59,32 @@ public class ModifiableListView<T> extends BorderPane{
     }
 
 
+    protected void setOnAddAction(ActionEvent event){
+        if(hasController() ){
+            controller.onAdd(event);
+        }else{
+            handlers.forEach(handler -> handler.onAdd(event));
+        }
 
-    protected void createView(String title, Region content){
+    }
+
+    protected void setOnRemoveAction(ActionEvent event){
+        T selected = listView.getSelectionModel().getSelectedItem();
+        int index = listView.getSelectionModel().getSelectedIndex();
+        RemoveEvent<T> removeEvent = new RemoveEvent<T>(event, selected, index);
+
+        if(hasController() ){
+            controller.onRemove(removeEvent);
+        }else{
+            handlers.forEach(handler -> handler.onRemove(removeEvent));
+        }
+    }
+
+    protected boolean hasController(){
+        return controller != null;
+    }
+
+    protected void initComponents(String title, Region content){
 
         // Border style
         this.setStyle("-fx-border-width: 1; -fx-border-color: silver");
@@ -60,16 +99,9 @@ public class ModifiableListView<T> extends BorderPane{
         buttons.setSpacing(10);
 
         Button buttonAdd = new Button("+");
-        buttonAdd.setOnAction((event) -> {
-            controller.onAdd(event);
-        });
+        buttonAdd.setOnAction(this::setOnAddAction);
         Button buttonRemove = new Button("-");
-        buttonRemove.setOnAction((event) -> {
-            T selected = listView.getSelectionModel().getSelectedItem();
-            System.out.println("Selected: "+selected);
-            RemoveEvent<T> removeEvent = new RemoveEvent<T>(event, selected);
-            controller.onRemove(removeEvent);
-        });
+        buttonRemove.setOnAction(this::setOnRemoveAction);
 
         Font fontButton = Font.font("sans-serif", FontWeight.EXTRA_BOLD, 12);
         buttonAdd.setFont(fontButton);
@@ -94,11 +126,14 @@ public class ModifiableListView<T> extends BorderPane{
     public static class RemoveEvent<T> extends ActionEvent{
         private T selected;
 
+        private int index;
+
         public static EventType<RemoveEvent> REMOVE = new EventType(ActionEvent.ACTION, "remove");
 
-        public RemoveEvent(ActionEvent source, T selected){
+        public RemoveEvent(ActionEvent source, T selected, int index){
             super(source.getSource(), source.getTarget());
             this.selected = selected;
+            this.index = index;
         }
 
         @Override
@@ -108,6 +143,9 @@ public class ModifiableListView<T> extends BorderPane{
 
         public T getSelected() {
             return selected;
+        }
+        public int getSelectedIndex(){
+            return index;
         }
     }
 

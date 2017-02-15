@@ -15,7 +15,7 @@ import java.util.ArrayList;
  *
  * @author loris.sauter
  */
-public abstract class ModifiableListController<T> {
+public abstract class ModifiableListController<T> implements ModifiableListHandler<T> {
 
     private ObservableList<T> items = FXCollections.observableList(new ArrayList<T>() );
 
@@ -43,6 +43,7 @@ public abstract class ModifiableListController<T> {
         this.items.addAll(items);
     }
 
+    @Override
     public void onRemove(ModifiableListView.RemoveEvent<T> event){
         T toRemove = event.getSelected();
         if(toRemove == null){
@@ -52,6 +53,7 @@ public abstract class ModifiableListController<T> {
         items.remove(index);
     }
 
+    @Override
     public void onAdd(ActionEvent event){
         items.add(createNew() );
     }
