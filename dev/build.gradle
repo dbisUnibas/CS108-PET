@@ -32,6 +32,7 @@ repositories {
 dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.6'
+    
     compile group: 'com.j2html', name: 'j2html', version: '0.88'
     
 
