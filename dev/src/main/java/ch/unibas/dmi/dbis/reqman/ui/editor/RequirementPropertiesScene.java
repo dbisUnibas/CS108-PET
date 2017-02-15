@@ -1,9 +1,11 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -19,8 +21,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     private TextField tfName = new TextField();
     private TextArea taDesc = new TextArea();
-    private ComboBox cbMinMS = new ComboBox(); // TODO Type safety
-    private ComboBox cbMaxMS = new ComboBox();
+    private ComboBox<Milestone> cbMinMS = new ComboBox<>();
+    private ComboBox<Milestone> cbMaxMS = new ComboBox<>();
     private Spinner spinnerPoints = new Spinner(0d, Double.MAX_VALUE, 0.0);
 
     private RadioButton binaryYes = new RadioButton("Yes");
@@ -32,17 +34,20 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     private RadioButton malusYes = new RadioButton("Yes");
     private RadioButton malusNo = new RadioButton("No");
 
+    private EditorController controller;
 
-    public RequirementPropertiesScene(){
+    public RequirementPropertiesScene(EditorController controller){
         super();
+        this.controller = controller;
         populateScene();
     }
 
     private Requirement requirement = null;
 
-    public RequirementPropertiesScene(Requirement requirement){
-        this();
+    public RequirementPropertiesScene(EditorController controller, Requirement requirement){
+        this(controller);
         this.requirement = requirement;
+        loadRequirement();
     }
 
     private void loadRequirement(){
@@ -70,9 +75,25 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         // TODO Proper MS choice
 
-        ObservableList<String> list = FXCollections.observableArrayList("Create new...", "Milestone1", "Milestone2");
-        cbMinMS.setItems(list);
-        cbMaxMS.setItems(list); // NOTE: This is intentionally the same list
+        loadMilestoneNames();
+        HBox minMSBox = new HBox();
+        minMSBox.setStyle("-fx-spacing: 10px;");
+        Button newMinMS = new Button("New ...");
+        newMinMS.setOnAction(this::handleNewMinMS);
+        minMSBox.getChildren().addAll(cbMinMS, newMinMS);
+
+        HBox maxMSBox = new HBox();
+        maxMSBox.setStyle("-fx-spacing: 10px;");
+        Button newMaxMS = new Button("New ...");
+        newMaxMS.setOnAction(this::handleNewMaxMS);
+        maxMSBox.getChildren().addAll(cbMaxMS, newMaxMS);
+        cbMinMS.setCellFactory((ListView<Milestone> l) -> new MilestonesView.MilestoneCell() );
+        cbMinMS.setButtonCell(new MilestonesView.MilestoneCell() );
+        cbMaxMS.setCellFactory((ListView<Milestone> lv) -> new MilestonesView.MilestoneCell() );
+        cbMaxMS.setButtonCell(new MilestonesView.MilestoneCell() );
+
+        cbMinMS.setItems(milestoneList);
+        cbMaxMS.setItems(milestoneList); // NOTE: This is intentionally the same list
 
 
         spinnerPoints.setEditable(true);
@@ -150,10 +171,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         rowIndex += 2;
         // Skip two rows
         grid.add(lblMinMS, 0, rowIndex);
-        grid.add(cbMinMS, 1, rowIndex++);
+        grid.add(minMSBox, 1, rowIndex++);
 
         grid.add(lblMaxMS, 0, rowIndex);
-        grid.add(cbMaxMS, 1, rowIndex++);
+        grid.add(maxMSBox, 1, rowIndex++);
 
         grid.add(lblMaxPoints, 0, rowIndex);
         grid.add(spinnerPoints, 1, rowIndex++);
@@ -177,6 +198,16 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         setRoot(scrollPane);
     }
 
+    private void handleNewMaxMS(ActionEvent event) {
+        controller.handleAddMilestone(event);
+        cbMaxMS.getSelectionModel().select(milestoneList.size()-1);
+    }
+
+    private void handleNewMinMS(ActionEvent event) {
+        controller.handleAddMilestone(event);
+        cbMinMS.getSelectionModel().select(milestoneList.size()-1);
+    }
+
     @Override
     public Requirement create() throws IllegalStateException {
         if(!isCreatorReady() ){
@@ -194,4 +225,11 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     public String getPromptTitle() {
         return "Requirement Properties";
     }
+
+    private ObservableList<Milestone> milestoneList;
+
+    private void loadMilestoneNames(){
+        milestoneList = controller.getObservableMilestones();
+    }
+
 }

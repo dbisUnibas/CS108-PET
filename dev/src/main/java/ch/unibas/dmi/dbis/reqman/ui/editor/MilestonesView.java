@@ -34,7 +34,7 @@ public class MilestonesView extends ModifiableListView<Milestone> implements Mod
 
     }
 
-    static class MilestoneCell extends ListCell<Milestone> {
+    public static class MilestoneCell extends ListCell<Milestone> {
 
         @Override
         public void updateItem(Milestone item, boolean empty){

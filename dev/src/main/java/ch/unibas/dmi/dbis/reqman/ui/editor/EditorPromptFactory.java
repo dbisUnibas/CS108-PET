@@ -16,13 +16,13 @@ public class EditorPromptFactory {
         // no public constructor
     }
 
-    public static Requirement promptNewRequirement(){
-        PromptPopup<Requirement> prompt = new PromptPopup<>(new RequirementPropertiesScene());
+    public static Requirement promptNewRequirement(EditorController controller){
+        PromptPopup<Requirement> prompt = new PromptPopup<>(new RequirementPropertiesScene(controller));
         return prompt.prompt();
     }
 
-    public static Requirement promptRequirement(Requirement requirement){
-        PromptPopup<Requirement> prompt = new PromptPopup<>(new RequirementPropertiesScene(requirement ));
+    public static Requirement promptRequirement(EditorController controller, Requirement requirement){
+        PromptPopup<Requirement> prompt = new PromptPopup<>(new RequirementPropertiesScene(controller, requirement ));
         return prompt.prompt();
     }
 

@@ -44,25 +44,10 @@ public class GraphicalUI extends Application {
         // Popup example:
         CataloguePropertiesScene catProps = new CataloguePropertiesScene();
         MilestonePropertiesScene msProps = new MilestonePropertiesScene();
-        RequirementPropertiesScene reqProps = new RequirementPropertiesScene();
 
-        PopupStage popupStage = new PopupStage("Catalogue Properties", reqProps );
 
         HBox box = new HBox();
         Button showPopup = new Button("Show");
-        // REQPROPS HANDLING
-        showPopup.setOnAction(event -> {
-            popupStage.showAndWait();
-            System.out.println("Done");
-            if(reqProps.isCreatorReady() ){
-                Requirement req = reqProps.create();
-                try {
-                    System.out.println("Created: "+JSONUtils.toJSON(req));
-                } catch (JsonProcessingException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
         // USAGE PromptPopup class
         Button showMS = new Button("Milestone Popup");
         showMS.setOnAction(event -> {

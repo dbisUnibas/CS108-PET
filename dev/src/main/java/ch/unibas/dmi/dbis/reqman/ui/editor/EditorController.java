@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO: write JavaDoc
@@ -59,7 +60,7 @@ public class EditorController  {
     }
 
     public void handleAddRequirement(ActionEvent event){
-        Requirement r = EditorPromptFactory.promptNewRequirement();
+        Requirement r = EditorPromptFactory.promptNewRequirement(this);
         if(r != null){ // user may cancelled the prompt
             observableReqs.add(r );
         }
@@ -170,7 +171,6 @@ public class EditorController  {
         sb.append(")");
         controlledStage.setTitle(sb.toString());
     }
-
 
 
 }

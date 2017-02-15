@@ -27,8 +27,8 @@ public class EditorApplication extends Application {
 
     private EditorController controller;
 
-    private ModifiableListView<Requirement> reqView;
-    private ModifiableListView<Milestone> msView;
+    private RequirementsView reqView;
+    private MilestonesView msView;
 
     public static void main(String[] args) {
         launch(args);
