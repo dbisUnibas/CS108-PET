@@ -13,6 +13,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 /**
  * TODO: write JavaDoc
  *
@@ -53,8 +56,38 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     private void loadRequirement() {
         if (requirement != null) {
+            tfName.setText(requirement.getName() );
+            taDesc.setText(requirement.getDescription());
+            cbMinMS.getSelectionModel().select(getMilestoneFromString(requirement.getMinMilestone()));
+            cbMaxMS.getSelectionModel().select(getMilestoneFromString(requirement.getMaxMilestone() ) );
+            spinnerPoints.getValueFactory().setValue(requirement.getMaxPoints());
 
+            binaryYes.setSelected(requirement.isBinary());
+            binaryNo.setSelected(!requirement.isBinary());
+
+            mandatoryYes.setSelected(requirement.isMandatory());
+            mandatoryNo.setSelected(!requirement.isMandatory());
+
+            malusYes.setSelected(requirement.isMalus());
+            malusNo.setSelected(!requirement.isMalus());
+
+            loadPredecessors();
         }
+    }
+
+    private Milestone getMilestoneFromString(String milestone){
+        String ordinalStr = milestone.substring(milestone.indexOf(":")+1);
+        int ordinal = Integer.parseInt(ordinalStr);
+        return controller.findMilestoneForOrdinal(ordinal);
+    }
+
+    private void loadPredecessors(){
+        requirement.getPredecessorNames().forEach(name -> {
+            Requirement r = controller.findRequirementByName(name);
+            if(r != null){
+                predecessors.add(r);
+            }
+        });
     }
 
 
@@ -177,7 +210,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         // Predecessor list
         grid.add(lblPredecessors, 0, rowIndex);
-        grid.add(inputPredecessors, 1, rowIndex++, 1, 2);
+        grid.add(inputPredecessors, 1, rowIndex++, 1, 1);
         rowIndex += 2;
 
         // Buttons, last row
@@ -201,14 +234,20 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         requirement = new Requirement(
                 name,
                 taDesc.getText(),
-                min.getName(),
-                max.getName(),
+                min.getName()+":"+min.getOrdinal(),
+                max.getName()+":"+max.getOrdinal(),
                 maxPoints,
                 binaryYes.isSelected(),
                 mandatoryYes.isSelected(),
                 malusYes.isSelected()
         );
-        // TODO Add Predecessors / Properties to req
+
+        if(!predecessors.isEmpty() ){
+            ArrayList<String> names = new ArrayList<>();
+            predecessors.forEach(pred -> names.add(pred.getName()));
+            requirement.setPredecessorNames(names);
+        }
+
         getWindow().hide();
     }
 
@@ -253,7 +292,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
             predecessors.add(selected);
         });
 
-        pane.setStyle("-fx-border-width: 0 0 1 0; -fx-border-color: silver;");
+        pane.setStyle("-fx-border-width: 1; -fx-border-color: silver;");
 
         return pane;
     }

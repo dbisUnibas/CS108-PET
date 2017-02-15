@@ -190,4 +190,24 @@ public class EditorController  {
             observableMs.add(index, update);
         }
     }
+
+    public Milestone findMilestoneForOrdinal(int ordinal) {
+        Milestone result = null;
+        for(Milestone ms : observableMs){
+            if(ms.getOrdinal() == ordinal){
+                result = ms;
+            }
+        }
+        return result;
+    }
+
+    public Requirement findRequirementByName(String name){
+        Requirement result = null;
+        for(Requirement req : observableReqs){
+            if(req.getName().equals(name)){
+                result = req;
+            }
+        }
+        return result;
+    }
 }

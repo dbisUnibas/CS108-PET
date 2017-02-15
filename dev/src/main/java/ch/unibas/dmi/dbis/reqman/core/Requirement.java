@@ -20,11 +20,11 @@ public class Requirement {
     /**
      * The minimal milestone name this requirement firstly occurs
      */
-    private String minMilestoneName;
+    private String minMilestone;
     /**
      * The maximal milestone name this requirement must be met
      */
-    private String maxMilestoneName;
+    private String maxMilestone;
     /**
      * The maximal amount of points received upon meeting this requirement
      */
@@ -66,24 +66,40 @@ public class Requirement {
      *
      * @param name             The name of the requirement which shall be short, descriptive and unique
      * @param description      A description of this requirement.
-     * @param minMilestoneName The name of the {@link Milestone} upon this requirement is active
-     * @param maxMilestoneName The name of the {@link Milestone} this requirement is active up to
+     * @param minMilestone The name of the {@link Milestone} upon this requirement is active
+     * @param maxMilestone The name of the {@link Milestone} this requirement is active up to
      * @param maxPoints        The absolute, maximal amount of points this requirement can generate.
      * @param binary           Whether this requirement is binary (achieved: yes/no or partial).
      * @param mandatory        Whether this requirement is mandatory
      * @param malus            Whether this requirement has to be considered as a malus.
      */
-    public Requirement(String name, String description, String minMilestoneName, String maxMilestoneName, double maxPoints, boolean binary, boolean mandatory, boolean malus) {
+    public Requirement(String name, String description, String minMilestone, String maxMilestone, double maxPoints, boolean binary, boolean mandatory, boolean malus) {
         this();
 
         this.name = name;
         this.description = description;
-        this.minMilestoneName = minMilestoneName;
-        this.maxMilestoneName = maxMilestoneName;
+        this.minMilestone = minMilestone;
+        this.maxMilestone = maxMilestone;
         this.maxPoints = maxPoints;
         this.binary = binary;
         this.mandatory = mandatory;
         this.malus = malus;
+    }
+
+    public void setPredecessorNames(List<String> predecessorNames) {
+        this.predecessorNames = predecessorNames;
+    }
+
+    public void clearPredecessorNames(){
+        predecessorNames = new ArrayList<>();
+    }
+
+    public void setPropertiesMap(Map<String, String> propertiesMap) {
+        this.propertiesMap = propertiesMap;
+    }
+
+    public void clearPropertiesMap(){
+        propertiesMap = new HashMap<>();
     }
 
     /**
@@ -156,10 +172,10 @@ public class Requirement {
         if (getDescription() != null ? !getDescription().equals(that.getDescription()) : that.getDescription() != null) {
             return false;
         }
-        if (getMinMilestoneName() != null ? !getMinMilestoneName().equals(that.getMinMilestoneName()) : that.getMinMilestoneName() != null) {
+        if (getMinMilestone() != null ? !getMinMilestone().equals(that.getMinMilestone()) : that.getMinMilestone() != null) {
             return false;
         }
-        if (getMaxMilestoneName() != null ? !getMaxMilestoneName().equals(that.getMaxMilestoneName()) : that.getMaxMilestoneName() != null) {
+        if (getMaxMilestone() != null ? !getMaxMilestone().equals(that.getMaxMilestone()) : that.getMaxMilestone() != null) {
             return false;
         }
         if (getPredecessorNames() != null ? !getPredecessorNames().equals(that.getPredecessorNames()) : that.getPredecessorNames() != null) {
@@ -174,8 +190,8 @@ public class Requirement {
         long temp;
         result = getName() != null ? getName().hashCode() : 0;
         result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
-        result = 31 * result + (getMinMilestoneName() != null ? getMinMilestoneName().hashCode() : 0);
-        result = 31 * result + (getMaxMilestoneName() != null ? getMaxMilestoneName().hashCode() : 0);
+        result = 31 * result + (getMinMilestone() != null ? getMinMilestone().hashCode() : 0);
+        result = 31 * result + (getMaxMilestone() != null ? getMaxMilestone().hashCode() : 0);
         temp = Double.doubleToLongBits(getMaxPoints());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (isBinary() ? 1 : 0);
@@ -203,20 +219,20 @@ public class Requirement {
         this.description = description;
     }
 
-    public String getMinMilestoneName() {
-        return minMilestoneName;
+    public String getMinMilestone() {
+        return minMilestone;
     }
 
-    public void setMinMilestoneName(String minMilestoneName) {
-        this.minMilestoneName = minMilestoneName;
+    public void setMinMilestone(String minMilestone) {
+        this.minMilestone = minMilestone;
     }
 
-    public String getMaxMilestoneName() {
-        return maxMilestoneName;
+    public String getMaxMilestone() {
+        return maxMilestone;
     }
 
-    public void setMaxMilestoneName(String maxMilestoneName) {
-        this.maxMilestoneName = maxMilestoneName;
+    public void setMaxMilestone(String maxMilestone) {
+        this.maxMilestone = maxMilestone;
     }
 
     public double getMaxPoints() {
