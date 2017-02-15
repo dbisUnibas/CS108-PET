@@ -2,7 +2,8 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
-import ch.unibas.dmi.dbis.reqman.ui.common.*;
+import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
+import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,7 +15,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * TODO: write JavaDoc
@@ -139,6 +139,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
 
         spinnerPoints.setEditable(true);
+        // TODO add spinner-handler
 
         BorderPane inputPredecessors = createPredecessorChoice();
 

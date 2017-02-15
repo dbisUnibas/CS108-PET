@@ -87,12 +87,16 @@ public class SimpleCatalogueExporter {
         if(!requirement.isMandatory() ){
             containerClass.append(" bonus");
         }
+        StringBuilder points = new StringBuilder(String.valueOf(requirement.getMaxPoints() ));
+        if(requirement.isMalus() ){
+            points.insert(0, "-");
+        }
         return div().withClass(containerClass.toString()).with(
                 div().withClass("achievement-img-container").with(img().withSrc("img/placeholder.png")),
                 div().withClass("achievement-content-container").with(
                         div().withClass("achievement-header").with(
                                 span(requirement.getName()).withClass("achievement-title"),
-                                span(String.valueOf(requirement.getMaxPoints())).withClass("achievement-points"),
+                                span(points.toString()).withClass("achievement-points"),
                                 span(toHumanReadable(requirement.getMinMilestone())).withClass("achievement-date")
                         ),
                         span(requirement.getDescription() ).withClass("achievement-description")

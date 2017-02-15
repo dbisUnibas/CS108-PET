@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
+import ch.unibas.dmi.dbis.reqman.common.SimpleCatalogueExporter;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
@@ -11,10 +12,11 @@ import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * TODO: write JavaDoc
@@ -145,7 +147,18 @@ public class EditorController  {
     }
 
     public void handleExportCatalogue(ActionEvent event){
-        System.out.println("Exporting..."); // TODO implementation
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Export Catalogue");
+        fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
+        File f = fc.showSaveDialog(controlledStage);
+        SimpleCatalogueExporter exporter = new SimpleCatalogueExporter(getCatalogue() );
+        String html = exporter.exportHTML();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
+            bw.write(html);
+            bw.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void handleOpenCatalogue(ActionEvent event){
