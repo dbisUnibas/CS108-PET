@@ -8,6 +8,7 @@ import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.stage.Stage;
 
 /**
  * TODO: write JavaDoc
@@ -18,11 +19,13 @@ public class EditorController  {
 
     private Catalogue catalogue;
 
+    private Stage controlledStage;
+
     private ObservableList<Requirement> observableReqs = FXCollections.observableArrayList();
     private ObservableList<Milestone> observableMs = FXCollections.observableArrayList();
 
-    public EditorController(){
-
+    public EditorController(Stage controlledStage){
+        this.controlledStage = controlledStage;
     }
 
     public void setCatalogue(Catalogue catalogue){
@@ -32,6 +35,8 @@ public class EditorController  {
     }
 
     public Catalogue getCatalogue(){
+        catalogue.addAllRequirements(observableReqs.toArray(new Requirement[0]));
+        catalogue.addAllMilestones(observableMs.toArray(new Milestone[0]));
         return catalogue;
     }
 
@@ -43,7 +48,7 @@ public class EditorController  {
         return observableMs;
     }
 
-    public void requestAddRequirement(ActionEvent event){
+    public void handleAddRequirement(ActionEvent event){
         Requirement r = EditorPromptFactory.promptNewRequirement();
         if(r != null){ // user may cancelled the prompt
             observableReqs.add(r );
@@ -53,15 +58,52 @@ public class EditorController  {
 
     }
 
-    public void requestRemoveRequirement(ModifiableListView.RemoveEvent<Requirement> event){
+    public void handleRemoveRequirement(ModifiableListView.RemoveEvent<Requirement> event){
         observableReqs.remove(event.getSelectedIndex() );
     }
 
-    public void requestAddMilestone(ActionEvent event){
+    public void handleAddMilestone(ActionEvent event){
 
     }
 
-    public void requestRemoveMilestone(ModifiableListView.RemoveEvent<Milestone> event){
+    public void handleRemoveMilestone(ModifiableListView.RemoveEvent<Milestone> event){
 
     }
+
+    public void handleNewCatalogue(ActionEvent event){
+        Catalogue cat = EditorPromptFactory.promptNewCatalogue();
+        if(cat != null){
+            this.catalogue = cat;
+            updateTitle();
+        }
+    }
+
+    public void handleModifyCatalogue(ActionEvent event){
+        Catalogue updated = EditorPromptFactory.promptCatalogue(catalogue);
+        if(updated != null){
+            this.catalogue = updated;
+            updateTitle();
+        }
+    }
+
+    public void handleSaveCatalogue(ActionEvent event){
+
+    }
+
+    public void handleExportCatalogue(ActionEvent event){
+
+    }
+
+    private void updateTitle(){
+        StringBuffer sb = new StringBuffer("ReqMan: Editor");
+        sb.append(" - ");
+        sb.append(catalogue.getName());
+        sb.append(" (");
+        sb.append(catalogue.getLecture() );
+        sb.append(" @ ");
+        sb.append(catalogue.getSemester() );
+        sb.append(")");
+        controlledStage.setTitle(sb.toString());
+    }
+
 }

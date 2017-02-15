@@ -25,6 +25,7 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
     public CataloguePropertiesScene(Catalogue catalogue){
         this();
         this.catalogue = catalogue;
+        loadCatalogue();
     }
 
     private Catalogue catalogue = null;
@@ -52,8 +53,6 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         Label lblDescription = new Label("Description");
         // Milestones and Labels added via different scene
         Label lblSemester = new Label("Semester");
-
-        loadCatalogue();
 
         SaveCancelPane buttonWrapper = new SaveCancelPane();
 

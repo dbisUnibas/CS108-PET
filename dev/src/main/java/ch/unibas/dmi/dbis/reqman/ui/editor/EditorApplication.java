@@ -24,7 +24,7 @@ import javafx.stage.Stage;
  */
 public class EditorApplication extends Application {
 
-    private EditorController controller = new EditorController();
+    private EditorController controller;
 
     private ModifiableListView<Requirement> reqView;
     private ModifiableListView<Milestone> msView;
@@ -37,6 +37,16 @@ public class EditorApplication extends Application {
         System.out.println("Type: "+event.getEventType().getName()+", Source: "+event.getSource().toString() );
     }
 
+    private void handleQuit(ActionEvent event){
+        stop();
+    }
+
+    @Override
+    public void stop(){
+        // Ask if sure, unsaved changes blabla
+        System.exit(0);
+    }
+
     private MenuBar createMenuBar(){
         MenuBar bar = new MenuBar();
 
@@ -45,7 +55,7 @@ public class EditorApplication extends Application {
         Menu menuFile = new Menu("File");
 
         MenuItem itemNewCat = new MenuItem("New Catalogue");
-        itemNewCat.setOnAction(this::printDebugEvent);
+        itemNewCat.setOnAction(controller::handleNewCatalogue);
         MenuItem itemOpenCat = new MenuItem("Open Catalogue");
         itemOpenCat.setOnAction(this::printDebugEvent);
         MenuItem itemSaveCat = new MenuItem("Save Catalogue");
@@ -53,7 +63,7 @@ public class EditorApplication extends Application {
         MenuItem itemExportCat = new MenuItem("Export Catalogue");
         itemExportCat.setOnAction(this::printDebugEvent);
         MenuItem itemNewReq = new MenuItem("New Requirement");
-        itemNewReq.setOnAction(this::printDebugEvent);
+        itemNewReq.setOnAction(controller::handleAddRequirement);
         MenuItem itemNewMS = new MenuItem("New Milestone");
         itemNewMS.setOnAction(this::printDebugEvent);
         MenuItem itemQuit = new MenuItem("Quit");
@@ -64,6 +74,10 @@ public class EditorApplication extends Application {
 
         // Menu Edit
         Menu menuEdit = new Menu("Edit");
+        MenuItem itemModifyCat = new MenuItem("Modify Catalogue");
+        itemModifyCat.setOnAction(controller::handleModifyCatalogue);
+
+        menuEdit.getItems().addAll(itemModifyCat);
 
         Menu menuView = new Menu("View");
 
@@ -119,7 +133,8 @@ public class EditorApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.setTitle("Editor");
+        controller = new EditorController(primaryStage);
+        primaryStage.setTitle("ReqMan: Editor");
         Scene scene = new Scene(wrapperPane, 800, 600);
 
         initUI(scene);

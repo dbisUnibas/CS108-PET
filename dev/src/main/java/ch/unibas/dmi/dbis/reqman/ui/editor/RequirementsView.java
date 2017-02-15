@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
-import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListController;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListHandler;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.scene.control.ListCell;
@@ -26,12 +25,12 @@ public class RequirementsView extends ModifiableListView<Requirement> implements
 
     @Override
     public void onRemove(RemoveEvent<Requirement> event) {
-        controller.requestRemoveRequirement(event);
+        controller.handleRemoveRequirement(event);
     }
 
     @Override
     public void onAdd(AddEvent<Requirement> event) {
-        controller.requestAddRequirement(event);
+        controller.handleAddRequirement(event);
 
     }
 

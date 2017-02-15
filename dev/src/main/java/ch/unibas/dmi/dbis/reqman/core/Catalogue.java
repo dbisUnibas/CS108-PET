@@ -1,6 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import com.sun.org.apache.regexp.internal.RE;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
@@ -126,4 +129,11 @@ public class Catalogue {
         return new ArrayList<>(requirements);
     }
 
+    public void addAllRequirements(Requirement... requirements){
+        this.requirements.addAll(Arrays.asList(requirements));
+    }
+
+    public void addAllMilestones(Milestone...milestones){
+        this.milestones.addAll(Arrays.asList(milestones));
+    }
 }
