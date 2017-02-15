@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
@@ -8,9 +9,13 @@ import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import sun.nio.ch.IOUtil;
 
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -120,7 +125,23 @@ public class EditorController  {
     }
 
     public void handleSaveCatalogue(ActionEvent event){
+        FileChooser saveChooser = createCatalogueFileChooser("Save");
+        File file = saveChooser.showSaveDialog(controlledStage);
+        try {
+            JSONUtils.writeToJSONFile(getCatalogue(), file); // Important to use getCatalogue as the reqs and ms are set there
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    private FileChooser createCatalogueFileChooser(String action){
+        FileChooser fc = new FileChooser();
+        fc.setTitle(action+" Catalogue");
+        fc.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("JSON", "*.json"),
+                new FileChooser.ExtensionFilter("Any", "*.*")
+        );
+        return fc;
     }
 
     public void handleExportCatalogue(ActionEvent event){
@@ -128,6 +149,13 @@ public class EditorController  {
     }
 
     public void handleOpenCatalogue(ActionEvent event){
+        FileChooser openChooser = createCatalogueFileChooser("Open");
+        File f = openChooser.showOpenDialog(controlledStage);
+        try {
+            setCatalogue(JSONUtils.readCatalogueJSONFile(f));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         editor.enableAll();
     }
 
@@ -143,5 +171,7 @@ public class EditorController  {
         sb.append(")");
         controlledStage.setTitle(sb.toString());
     }
+
+
 
 }

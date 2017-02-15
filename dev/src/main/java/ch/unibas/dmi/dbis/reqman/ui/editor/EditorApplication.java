@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -55,10 +56,13 @@ public class EditorApplication extends Application {
 
         MenuItem itemNewCat = new MenuItem("New Catalogue");
         itemNewCat.setOnAction(controller::handleNewCatalogue);
+        itemNewCat.setAccelerator(KeyCombination.keyCombination("Ctrl+N"));
         MenuItem itemOpenCat = new MenuItem("Open Catalogue");
         itemOpenCat.setOnAction(controller::handleOpenCatalogue);
+        itemOpenCat.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
         MenuItem itemSaveCat = new MenuItem("Save Catalogue");
         itemSaveCat.setOnAction(controller::handleSaveCatalogue);
+        itemSaveCat.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         MenuItem itemExportCat = new MenuItem("Export Catalogue");
         itemExportCat.setOnAction(controller::handleExportCatalogue);
         MenuItem itemNewReq = new MenuItem("New Requirement");
