@@ -1,7 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
-import com.sun.org.apache.regexp.internal.RE;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
