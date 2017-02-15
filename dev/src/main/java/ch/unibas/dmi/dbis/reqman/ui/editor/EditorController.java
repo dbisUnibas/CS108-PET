@@ -173,4 +173,21 @@ public class EditorController  {
     }
 
 
+    public void handleModifyRequirement(Requirement sel) {
+        Requirement update = EditorPromptFactory.promptRequirement(this, sel);
+        int index = observableReqs.indexOf(sel);
+        if(update != null){
+            observableReqs.remove(index);
+            observableReqs.add(index, update);
+        }
+    }
+
+    public void handleModifyMilestone(Milestone sel){
+        Milestone update = EditorPromptFactory.promptMilestone(sel);
+        int index = observableMs.indexOf(sel);
+        if(update != null){
+            observableMs.remove(index);
+            observableMs.add(index, update);
+        }
+    }
 }

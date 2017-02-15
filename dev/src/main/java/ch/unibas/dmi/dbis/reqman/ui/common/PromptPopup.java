@@ -20,7 +20,6 @@ public class PromptPopup<T> {
     }
 
     private void handleEscape(KeyEvent event){
-        System.out.println("Bump"+event.getCode().toString());
         if(KeyCode.ESCAPE.equals(event.getCode() ) ){
             stage.hide();
         }

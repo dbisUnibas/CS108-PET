@@ -89,6 +89,13 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         newMaxMS.setOnAction(this::handleNewMaxMS);
         maxMSBox.getChildren().addAll(cbMaxMS, newMaxMS);
         cbMinMS.setCellFactory((ListView<Milestone> l) -> new MilestonesView.MilestoneCell());
+        cbMinMS.setOnAction(event -> {
+            // Make so that the maxMS is set to the same value as this one. (initially as soon as this one is set)
+            Milestone selected = cbMinMS.getSelectionModel().getSelectedItem();
+            if(selected != null){
+                cbMaxMS.getSelectionModel().select(selected);
+            }
+        });
         cbMinMS.setButtonCell(new MilestonesView.MilestoneCell());
         cbMaxMS.setCellFactory((ListView<Milestone> lv) -> new MilestonesView.MilestoneCell());
         cbMaxMS.setButtonCell(new MilestonesView.MilestoneCell());

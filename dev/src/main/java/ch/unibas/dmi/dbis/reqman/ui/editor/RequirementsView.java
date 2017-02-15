@@ -5,6 +5,8 @@ import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListHandler;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  * TODO: write JavaDoc
@@ -21,6 +23,14 @@ public class RequirementsView extends ModifiableListView<Requirement> implements
         listView.setItems(controller.getObservableRequirements() );
         addHandler(this);
         listView.setCellFactory((ListView<Requirement> l) -> new RequirementCell());
+        listView.setOnMouseClicked(this::handleModifyRequest);
+    }
+
+    private void handleModifyRequest(MouseEvent mouseEvent) {
+        if(MouseButton.SECONDARY.equals(mouseEvent.getButton() ) ){
+            Requirement sel = listView.getSelectionModel().getSelectedItem();
+            controller.handleModifyRequirement(sel);
+        }
     }
 
     @Override

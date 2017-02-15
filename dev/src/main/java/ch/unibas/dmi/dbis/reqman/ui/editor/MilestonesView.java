@@ -6,6 +6,8 @@ import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListHandler;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  * TODO: write JavaDoc
@@ -21,6 +23,7 @@ public class MilestonesView extends ModifiableListView<Milestone> implements Mod
         listView.setItems(controller.getObservableMilestones() );
         addHandler(this);
         listView.setCellFactory((ListView<Milestone> l) -> new MilestoneCell());
+        listView.setOnMouseClicked(this::handleModifyRequest);
     }
 
     @Override
@@ -44,6 +47,13 @@ public class MilestonesView extends ModifiableListView<Milestone> implements Mod
             }else{
                 setText("");
             }
+        }
+    }
+
+    private void handleModifyRequest(MouseEvent mouseEvent) {
+        if(MouseButton.SECONDARY.equals(mouseEvent.getButton() ) ){
+            Milestone sel = listView.getSelectionModel().getSelectedItem();
+            controller.handleModifyMilestone(sel);
         }
     }
 }
