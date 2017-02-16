@@ -45,6 +45,7 @@ public class EditorController  {
         observableMs = FXCollections.observableArrayList(catalogue.getMilestones() );
         editor.passRequirementsToView(observableReqs);
         editor.passMilestonesToView(observableMs);
+        updateTitle();
     }
 
     public Catalogue getCatalogue(){
