@@ -37,7 +37,10 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone>{
         if(milestone != null){
             // TODO Add proper handling if values exist!
             tfName.setText(milestone.getName() );
-            inputDate.setValue(milestone.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() );
+            // milestone.getDate might be null. handle this
+            if(milestone.getDate() != null){
+                inputDate.setValue(milestone.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() );
+            }
         }
     }
 
