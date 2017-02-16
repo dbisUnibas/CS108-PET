@@ -6,6 +6,8 @@ import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import j2html.tags.Tag;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static j2html.TagCreator.*;
 
@@ -50,10 +52,55 @@ public class SimpleCatalogueExporter {
         return prependDoctype(page.render() );
     }
 
+    private Comparator<Requirement> reqMinMSComparator = (r1, r2) -> {
+        if(!checkNoArgNull(r1, r2) ){
+            throw new NullPointerException("[Requirement MinMS Comparator] Cannot compare requirements if one is null");
+        }
+        return Integer.compare(r1.getMinMilestoneOrdinal(), r2.getMinMilestoneOrdinal());
+    };
+
+    private Comparator<Requirement> reqMaxMSComparator = (r1, r2) -> {
+        if(!checkNoArgNull(r1, r2) ){
+            throw new NullPointerException("[Requirement MaxMS Comparator] Cannot compare requirements if one is null");
+        }
+        return Integer.compare(r1.getMaxMilestoneOrdinal(), r2.getMaxMilestoneOrdinal());
+    };
+
+    private Comparator<Requirement> reqBonusComparator = (r1, r2) -> {
+        if(!checkNoArgNull(r1, r2) ){
+            throw new NullPointerException("[Requirement Bonus Comparator] Cannot compare requirements if one is null");
+        }
+        return Boolean.compare(!r1.isMandatory(), !r2.isMandatory() );// !mandatory == bonus
+    };
+
+    private Comparator<Requirement> reqNameComparator = (r1, r2) -> {
+        if(!checkNoArgNull(r1, r2) ){
+            throw new NullPointerException("[Requirement Name Comparator] Cannot compare requirements if one is null");
+        }
+        return r1.getName().compareTo(r2.getName());
+    };
+
+
+    private boolean checkNoArgNull(Object o1, Object o2){
+        return o1 != null && o2 != null;
+    }
+
     private Tag[] parseRequirement(){
         ArrayList<Tag> tags = new ArrayList<>();
 
-        catalogue.getRequirements().forEach(req -> {
+        List<Requirement> reqs = new ArrayList<>(catalogue.getRequirements());
+
+        // GROUP BY milestone -> GROUP BY bonus -> GROUP BY name
+        /*
+         * Firstly, create a comparator for requirements which compares the ints return by the provided method.
+         * Then compare according a custom comparator, since the isMandatory returns the INVERSE of isBonus
+         * Then compare lexicographically based on the string.
+         */
+        reqs.sort(Comparator.comparingInt(Requirement::getMinMilestoneOrdinal)
+                .thenComparing(Requirement::isMandatory,(b1, b2) -> Boolean.compare(!b1, !b2))
+                .thenComparing(Requirement::getName));
+
+        reqs.forEach(req -> {
             tags.add(achievementConatiner(req));
         });
 

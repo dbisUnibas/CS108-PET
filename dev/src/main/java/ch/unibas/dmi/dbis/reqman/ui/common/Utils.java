@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.common;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 
 /**
@@ -49,6 +50,18 @@ public class Utils {
 
     public static void showWarningDialog(String header, String content){
         showWarningDialog("Warning", header, content);
+    }
+
+    public static Button createArrowUpButton(){
+        Button b = new Button("\u25b2");
+        b.setStyle("-fx-text-fill: dimgray;");
+        return b;
+    }
+
+    public static Button createArrowDownButton(){
+        Button b = new Button("\u25bc");
+        b.setStyle("-fx-text-fill: dimgray;");
+        return b;
     }
 
 }
