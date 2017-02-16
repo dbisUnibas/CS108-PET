@@ -126,11 +126,25 @@ public class EditorController  {
         }
     }
 
-    public void handleSaveCatalogue(ActionEvent event){
-        FileChooser saveChooser = createCatalogueFileChooser("Save");
-        File file = saveChooser.showSaveDialog(controlledStage);
+    private File catalogueFile = null;
+
+    public void handleSaveAsCatalogue(ActionEvent event){
+        FileChooser saveChooser = createCatalogueFileChooser("Save As");
+        catalogueFile = saveChooser.showSaveDialog(controlledStage);
         try {
-            JSONUtils.writeToJSONFile(getCatalogue(), file); // Important to use getCatalogue as the reqs and ms are set there
+            JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile); // Important to use getCatalogue as the reqs and ms are set there
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void handleSaveCatalogue(ActionEvent event){
+        if(catalogueFile == null){
+            handleSaveAsCatalogue(event);
+        }
+
+        try {
+            JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -163,9 +177,9 @@ public class EditorController  {
 
     public void handleOpenCatalogue(ActionEvent event){
         FileChooser openChooser = createCatalogueFileChooser("Open");
-        File f = openChooser.showOpenDialog(controlledStage);
+        catalogueFile = openChooser.showOpenDialog(controlledStage);
         try {
-            openCatalogue(JSONUtils.readCatalogueJSONFile(f));
+            openCatalogue(JSONUtils.readCatalogueJSONFile(catalogueFile));
         } catch (IOException e) {
             e.printStackTrace();
         }
