@@ -112,4 +112,5 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         getWindow().hide();
 
     }
+
 }

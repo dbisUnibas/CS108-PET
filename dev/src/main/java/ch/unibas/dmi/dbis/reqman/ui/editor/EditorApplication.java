@@ -108,7 +108,7 @@ public class EditorApplication extends Application {
         wrapperPane.setTop(createMenuBar());
 
         // Setting the main node.
-        wrapperPane.setCenter(main);
+        //wrapperPane.setCenter(main);
 
         initReqView();
         initMSView();
@@ -121,7 +121,9 @@ public class EditorApplication extends Application {
         VBox box = new VBox();
         box.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
         box.getChildren().addAll(reqView, msView);
-        main.add(box,0,0);
+        //main.add(box,0,0);
+        wrapperPane.setCenter(box);
+
         /*
         // Got removed since other space not used yet
         main.add(reqView, 0,0, 2, 1);
