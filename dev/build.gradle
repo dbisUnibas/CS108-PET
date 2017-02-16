@@ -60,9 +60,7 @@ sourceSets{
 }
 
 jar{
-    manifest{
-        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication'
-    }
+
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
@@ -185,5 +183,8 @@ gradle.taskGraph.whenReady{
     taskGraph ->
         if(taskGraph.hasTask(deployEditor)){
             jar.appendix = 'editor'
+            jar.manifest {
+                attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication'
+            }
         }
 }
