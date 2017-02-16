@@ -227,7 +227,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         setRoot(scrollPane);
     }
 
-    private void handleSaving(ActionEvent event) {
+    public void handleSaving(ActionEvent event) {
         String name = tfName.getText();
         Milestone min = cbMinMS.getValue();
         double maxPoints = (double) spinnerPoints.getValue();

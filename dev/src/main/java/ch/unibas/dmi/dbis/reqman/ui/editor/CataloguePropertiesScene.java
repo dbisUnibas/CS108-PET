@@ -95,7 +95,7 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         return "Catalogue Properties";
     }
 
-    private void handleSaving(ActionEvent event) {
+    public void handleSaving(ActionEvent event) {
         String name = tfName.getText();
         String lecture = tfLecture.getText();
 

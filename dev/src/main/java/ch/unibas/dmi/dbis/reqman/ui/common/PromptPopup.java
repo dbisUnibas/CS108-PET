@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
+import javafx.event.ActionEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
@@ -16,12 +17,14 @@ public class PromptPopup<T> {
     public PromptPopup(AbstractVisualCreator creator){
         this.creator = creator;
         stage = new PopupStage(creator.getPromptTitle(), creator);
-        creator.getRoot().setOnKeyReleased(this::handleEscape);
+        creator.getRoot().setOnKeyReleased(this::handleKeyEvent);
     }
 
-    private void handleEscape(KeyEvent event){
+    private void handleKeyEvent(KeyEvent event){
         if(KeyCode.ESCAPE.equals(event.getCode() ) ){
             stage.hide();
+        }else if(KeyCode.ENTER.equals(event.getCode() )){
+            creator.handleSaving(new ActionEvent(event.getSource(), event.getTarget())); // Create own event?
         }
     }
 
@@ -32,6 +35,14 @@ public class PromptPopup<T> {
      */
     public T prompt(){
         stage.showAndWait();
+        return getCreation();
+    }
+
+    /**
+     * Returns a new instance of which was created by the Creator.
+     * @return the created instance OR null, if the user canceled the prompt.
+     */
+    public T getCreation(){
         if(creator.isCreatorReady() ){
             return creator.create();
         }else{

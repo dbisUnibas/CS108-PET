@@ -44,7 +44,7 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone>{
     private TextField tfName = new TextField();
     private DatePicker inputDate = new DatePicker();
 
-    private void handleSaving(ActionEvent event){
+    public void handleSaving(ActionEvent event){
         String name = (tfName.getText() == null || tfName.getText().isEmpty() )? "Milestone" : tfName.getText(); // Default name
         Date d = null;
         if(inputDate.getValue() != null){
