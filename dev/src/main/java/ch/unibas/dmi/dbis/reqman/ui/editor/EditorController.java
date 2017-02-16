@@ -204,7 +204,7 @@ public class EditorController  {
         }
     }
 
-    public Milestone findMilestoneForOrdinal(int ordinal) {
+    public Milestone getMilestoneByOrdinal(int ordinal) {
         Milestone result = null;
         for(Milestone ms : observableMs){
             if(ms.getOrdinal() == ordinal){

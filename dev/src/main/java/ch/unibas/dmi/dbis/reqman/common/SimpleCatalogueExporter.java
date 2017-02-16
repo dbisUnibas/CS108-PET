@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
+import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import j2html.tags.Tag;
 
@@ -20,11 +21,6 @@ public class SimpleCatalogueExporter {
     @Deprecated
     public SimpleCatalogueExporter(){
 
-    }
-
-    public static void main(String[] args){
-        Requirement r = new Requirement("Name", "Desc", "Milestone:1", "Milestone:2", 3, true, false, false);
-        System.out.println(achievementConatiner(r).render());
     }
 
     public SimpleCatalogueExporter(Catalogue cat){
@@ -82,7 +78,7 @@ public class SimpleCatalogueExporter {
         );
     }
 
-    public static Tag achievementConatiner(Requirement requirement){
+    public Tag achievementConatiner(Requirement requirement){
         StringBuilder containerClass = new StringBuilder("achievement z-depth-2 hoverable");
         if(!requirement.isMandatory() ){
             containerClass.append(" bonus");
@@ -91,28 +87,19 @@ public class SimpleCatalogueExporter {
         if(requirement.isMalus() ){
             points.insert(0, "-");
         }
+        Milestone miS = catalogue.getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal());
+        String ms = miS != null ? miS.getName() + " ("+miS.getOrdinal()+")" : "N/A";
         return div().withClass(containerClass.toString()).with(
                 div().withClass("achievement-img-container").with(img().withSrc("img/placeholder.png")),
                 div().withClass("achievement-content-container").with(
                         div().withClass("achievement-header").with(
                                 span(requirement.getName()).withClass("achievement-title"),
                                 span(points.toString()).withClass("achievement-points"),
-                                span(toHumanReadable(requirement.getMinMilestone())).withClass("achievement-date")
+                                span(ms).withClass("achievement-date")
                         ),
                         span(requirement.getDescription() ).withClass("achievement-description")
                 )
         );
     }
-
-    public static String toHumanReadable(String milestoneFromRequirement){
-        StringBuilder sb = new StringBuilder();
-        int delimIndex = milestoneFromRequirement.indexOf(":");
-        sb.append(milestoneFromRequirement.substring(0, delimIndex) );
-        sb.append(" ");
-        sb.append(milestoneFromRequirement.substring(delimIndex+1));
-        return sb.toString();
-    }
-
-
 
 }

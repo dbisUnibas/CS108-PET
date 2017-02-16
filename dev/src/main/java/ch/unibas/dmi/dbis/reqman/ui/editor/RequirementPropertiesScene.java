@@ -58,8 +58,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         if (requirement != null) {
             tfName.setText(requirement.getName() );
             taDesc.setText(requirement.getDescription());
-            cbMinMS.getSelectionModel().select(getMilestoneFromString(requirement.getMinMilestone()));
-            cbMaxMS.getSelectionModel().select(getMilestoneFromString(requirement.getMaxMilestone() ) );
+            cbMinMS.getSelectionModel().select(getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal()));
+            cbMaxMS.getSelectionModel().select(getMilestoneByOrdinal(requirement.getMaxMilestoneOrdinal() ) );
             spinnerPoints.getValueFactory().setValue(requirement.getMaxPoints());
 
             binaryYes.setSelected(requirement.isBinary());
@@ -75,10 +75,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         }
     }
 
-    private Milestone getMilestoneFromString(String milestone){
-        String ordinalStr = milestone.substring(milestone.indexOf(":")+1);
-        int ordinal = Integer.parseInt(ordinalStr);
-        return controller.findMilestoneForOrdinal(ordinal);
+    private Milestone getMilestoneByOrdinal(int ordinal){
+        return controller.getMilestoneByOrdinal(ordinal);
     }
 
     private void loadPredecessors(){
@@ -241,8 +239,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         requirement = new Requirement(
                 name,
                 taDesc.getText(),
-                min.getName()+":"+min.getOrdinal(),
-                max.getName()+":"+max.getOrdinal(),
+                min.getOrdinal(),
+                max.getOrdinal(),
                 maxPoints,
                 binaryYes.isSelected(),
                 mandatoryYes.isSelected(),
