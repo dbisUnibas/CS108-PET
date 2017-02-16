@@ -174,7 +174,12 @@ task setupVersion{
     }
 }
 
-task deployEditor(dependsOn: [clean, build, jar])
+task deployEditor(dependsOn: [build, jar]){
+    doLast{
+        println('Deployed Editor version '+project.version)
+    }
+
+}
 
 gradle.taskGraph.whenReady{
     taskGraph ->

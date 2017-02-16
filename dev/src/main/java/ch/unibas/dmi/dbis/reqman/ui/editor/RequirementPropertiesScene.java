@@ -140,6 +140,12 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         spinnerPoints.setEditable(true);
         // TODO add spinner-handler
+        // Solution by: http://stackoverflow.com/a/39380146
+        spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue){
+                spinnerPoints.increment(0);
+            }
+        });
 
         BorderPane inputPredecessors = createPredecessorChoice();
 
