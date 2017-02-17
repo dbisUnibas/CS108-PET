@@ -17,7 +17,8 @@ public class PromptPopup<T> {
     public PromptPopup(AbstractVisualCreator creator){
         this.creator = creator;
         stage = new PopupStage(creator.getPromptTitle(), creator);
-        creator.getRoot().setOnKeyReleased(this::handleKeyEvent);
+
+        //creator.getRoot().setOnKeyReleased(this::handleKeyEvent);
 
     }
 

@@ -105,10 +105,22 @@ public class SaveCancelPane extends AnchorPane {
         }
     }
 
+    public Button getSaveButton() {
+        return saveButton;
+    }
+
+    public Button getCancelButton() {
+        return cancelButton;
+    }
+
     /**
      * Initializes the components.
      */
     protected void initComponents() {
+        // Declare roles
+        saveButton.setDefaultButton(true);
+        cancelButton.setCancelButton(true);
+
         // Init behavior
         saveButton.setOnAction(event -> {
             handleSave(event);

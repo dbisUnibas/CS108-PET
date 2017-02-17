@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 
 /**
  * TODO: write JavaDoc
@@ -36,6 +37,7 @@ public class MetaKeyValuePairScene extends AbstractVisualCreator<RequirementProp
         }
         getWindow().hide();
     }
+
 
     @Override
     public RequirementPropertiesScene.MetaKeyValuePair create() throws IllegalStateException {

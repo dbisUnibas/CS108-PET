@@ -15,6 +15,7 @@ import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -336,6 +337,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         getWindow().hide();
     }
 
+
     private BorderPane createPredecessorChoice() {
         BorderPane pane = new BorderPane();
         HBox upper = new HBox();
@@ -482,6 +484,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
             setMetaListOnlyEmpty();
         }
     }
+
+
 
     public static class MetaKeyValuePair {
         private final SimpleStringProperty key;
