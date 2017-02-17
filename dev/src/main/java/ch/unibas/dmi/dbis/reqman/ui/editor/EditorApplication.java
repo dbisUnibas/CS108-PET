@@ -3,18 +3,17 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
-import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListController;
-import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -64,17 +63,24 @@ public class EditorApplication extends Application {
         MenuItem itemSaveCat = new MenuItem("Save Catalogue");
         itemSaveCat.setOnAction(controller::handleSaveCatalogue);
         itemSaveCat.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
+        MenuItem itemSaveAsCat = new MenuItem("Save As Catalogue");
+        itemSaveAsCat.setOnAction(controller::handleSaveAsCatalogue);
+        itemSaveAsCat.setAccelerator(KeyCombination.keyCombination("Ctrl+Shift+S"));
         MenuItem itemExportCat = new MenuItem("Export Catalogue");
         itemExportCat.setOnAction(controller::handleExportCatalogue);
+        itemExportCat.setAccelerator(KeyCombination.keyCombination("Ctrl+E"));
         MenuItem itemNewReq = new MenuItem("New Requirement");
         itemNewReq.setOnAction(controller::handleAddRequirement);
+        itemNewReq.setAccelerator(KeyCombination.keyCombination("Ctrl+R"));
         MenuItem itemNewMS = new MenuItem("New Milestone");
         itemNewMS.setOnAction(controller::handleAddMilestone);
+        itemNewMS.setAccelerator(KeyCombination.keyCombination("Ctrl+M"));
         MenuItem itemQuit = new MenuItem("Quit");
         itemQuit.setOnAction(this::handleQuit);
+        itemQuit.setAccelerator(KeyCombination.keyCombination("Ctrl+Q"));
 
         // Order matters
-        menuFile.getItems().addAll(itemNewCat, itemNewReq, itemNewMS, new SeparatorMenuItem(), itemOpenCat, itemSaveCat, itemExportCat, new SeparatorMenuItem(), itemQuit);
+        menuFile.getItems().addAll(itemNewCat, itemNewReq, itemNewMS, new SeparatorMenuItem(), itemOpenCat, itemSaveCat, itemSaveAsCat, itemExportCat, new SeparatorMenuItem(), itemQuit);
 
         // Menu Edit
         Menu menuEdit = new Menu("Edit");
@@ -108,7 +114,7 @@ public class EditorApplication extends Application {
         wrapperPane.setTop(createMenuBar());
 
         // Setting the main node.
-        wrapperPane.setCenter(main);
+        //wrapperPane.setCenter(main);
 
         initReqView();
         initMSView();
@@ -121,7 +127,9 @@ public class EditorApplication extends Application {
         VBox box = new VBox();
         box.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
         box.getChildren().addAll(reqView, msView);
-        main.add(box,0,0);
+        //main.add(box,0,0);
+        wrapperPane.setCenter(box);
+
         /*
         // Got removed since other space not used yet
         main.add(reqView, 0,0, 2, 1);

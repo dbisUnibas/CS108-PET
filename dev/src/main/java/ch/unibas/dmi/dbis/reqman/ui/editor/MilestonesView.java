@@ -43,7 +43,7 @@ public class MilestonesView extends ModifiableListView<Milestone> implements Mod
         public void updateItem(Milestone item, boolean empty){
             super.updateItem(item, empty);
             if(!empty){
-                setText(item.getName() + " " + item.getOrdinal() );
+                setText(item.getName() + " (" + item.getOrdinal()+")" );
             }else{
                 setText("");
             }

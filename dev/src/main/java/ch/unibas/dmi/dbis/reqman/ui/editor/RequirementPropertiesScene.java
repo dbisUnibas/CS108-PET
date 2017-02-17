@@ -58,8 +58,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         if (requirement != null) {
             tfName.setText(requirement.getName() );
             taDesc.setText(requirement.getDescription());
-            cbMinMS.getSelectionModel().select(getMilestoneFromString(requirement.getMinMilestone()));
-            cbMaxMS.getSelectionModel().select(getMilestoneFromString(requirement.getMaxMilestone() ) );
+            cbMinMS.getSelectionModel().select(getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal()));
+            cbMaxMS.getSelectionModel().select(getMilestoneByOrdinal(requirement.getMaxMilestoneOrdinal() ) );
             spinnerPoints.getValueFactory().setValue(requirement.getMaxPoints());
 
             binaryYes.setSelected(requirement.isBinary());
@@ -75,10 +75,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         }
     }
 
-    private Milestone getMilestoneFromString(String milestone){
-        String ordinalStr = milestone.substring(milestone.indexOf(":")+1);
-        int ordinal = Integer.parseInt(ordinalStr);
-        return controller.findMilestoneForOrdinal(ordinal);
+    private Milestone getMilestoneByOrdinal(int ordinal){
+        return controller.getMilestoneByOrdinal(ordinal);
     }
 
     private void loadPredecessors(){
@@ -98,7 +96,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         Label lblDesc = new Label("Description");
         Label lblMinMS = new Label("Minimal Milestone*");
         Label lblMaxMS = new Label("Maximal Milestone");
-        Label lblMaxPoints = new Label("Maximal Points*");
+        Label lblMaxPoints = new Label("Maximal Points");
         Label lblBinary = new Label("Binary");
         Label lblMandatory = new Label("Mandatory");
         Label lblMalus = new Label("Malus");
@@ -140,6 +138,12 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         spinnerPoints.setEditable(true);
         // TODO add spinner-handler
+        // Solution by: http://stackoverflow.com/a/39380146
+        spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if(!newValue){
+                spinnerPoints.increment(0);
+            }
+        });
 
         BorderPane inputPredecessors = createPredecessorChoice();
 
@@ -221,13 +225,13 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         setRoot(scrollPane);
     }
 
-    private void handleSaving(ActionEvent event) {
+    public void handleSaving(ActionEvent event) {
         String name = tfName.getText();
         Milestone min = cbMinMS.getValue();
         double maxPoints = (double) spinnerPoints.getValue();
 
-        if((name == null || name.isEmpty()) || min == null || Double.compare(0.0,maxPoints)==0){
-            throw new IllegalArgumentException("[Requirement] Name, Minimal Milestone and Max Points are mandatory fields");
+        if((name == null || name.isEmpty()) || min == null ){
+            throw new IllegalArgumentException("[Requirement] Name and Minimal Milestone are mandatory fields");
         }
 
         Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
@@ -235,8 +239,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         requirement = new Requirement(
                 name,
                 taDesc.getText(),
-                min.getName()+":"+min.getOrdinal(),
-                max.getName()+":"+max.getOrdinal(),
+                min.getOrdinal(),
+                max.getOrdinal(),
                 maxPoints,
                 binaryYes.isSelected(),
                 mandatoryYes.isSelected(),

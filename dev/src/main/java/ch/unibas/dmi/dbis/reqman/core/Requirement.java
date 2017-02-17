@@ -18,13 +18,13 @@ public class Requirement {
      */
     private String description;
     /**
-     * The minimal milestone name this requirement firstly occurs
+     * The minimal milestone ordinal this requirement firstly occurs
      */
-    private String minMilestone;
+    private int minMilestoneOrdinal;
     /**
-     * The maximal milestone name this requirement must be met
+     * The maximal milestone ordinal this requirement must be met
      */
-    private String maxMilestone;
+    private int maxMilestoneOrdinal;
     /**
      * The maximal amount of points received upon meeting this requirement
      */
@@ -66,20 +66,20 @@ public class Requirement {
      *
      * @param name             The name of the requirement which shall be short, descriptive and unique
      * @param description      A description of this requirement.
-     * @param minMilestone The name of the {@link Milestone} upon this requirement is active
-     * @param maxMilestone The name of the {@link Milestone} this requirement is active up to
+     * @param minMilestoneOrdinal The ordinal of the {@link Milestone} upon this requirement is active
+     * @param maxMilestoneOrdinal The ordinal of the {@link Milestone} this requirement is active up to
      * @param maxPoints        The absolute, maximal amount of points this requirement can generate.
      * @param binary           Whether this requirement is binary (achieved: yes/no or partial).
      * @param mandatory        Whether this requirement is mandatory
      * @param malus            Whether this requirement has to be considered as a malus.
      */
-    public Requirement(String name, String description, String minMilestone, String maxMilestone, double maxPoints, boolean binary, boolean mandatory, boolean malus) {
+    public Requirement(String name, String description, int minMilestoneOrdinal, int maxMilestoneOrdinal, double maxPoints, boolean binary, boolean mandatory, boolean malus) {
         this();
 
         this.name = name;
         this.description = description;
-        this.minMilestone = minMilestone;
-        this.maxMilestone = maxMilestone;
+        this.minMilestoneOrdinal = minMilestoneOrdinal;
+        this.maxMilestoneOrdinal = maxMilestoneOrdinal;
         this.maxPoints = maxPoints;
         this.binary = binary;
         this.mandatory = mandatory;
@@ -154,6 +154,12 @@ public class Requirement {
 
         Requirement that = (Requirement) o;
 
+        if (getMinMilestoneOrdinal() != that.getMinMilestoneOrdinal()) {
+            return false;
+        }
+        if (getMaxMilestoneOrdinal() != that.getMaxMilestoneOrdinal()) {
+            return false;
+        }
         if (Double.compare(that.getMaxPoints(), getMaxPoints()) != 0) {
             return false;
         }
@@ -172,12 +178,6 @@ public class Requirement {
         if (getDescription() != null ? !getDescription().equals(that.getDescription()) : that.getDescription() != null) {
             return false;
         }
-        if (getMinMilestone() != null ? !getMinMilestone().equals(that.getMinMilestone()) : that.getMinMilestone() != null) {
-            return false;
-        }
-        if (getMaxMilestone() != null ? !getMaxMilestone().equals(that.getMaxMilestone()) : that.getMaxMilestone() != null) {
-            return false;
-        }
         if (getPredecessorNames() != null ? !getPredecessorNames().equals(that.getPredecessorNames()) : that.getPredecessorNames() != null) {
             return false;
         }
@@ -190,8 +190,8 @@ public class Requirement {
         long temp;
         result = getName() != null ? getName().hashCode() : 0;
         result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
-        result = 31 * result + (getMinMilestone() != null ? getMinMilestone().hashCode() : 0);
-        result = 31 * result + (getMaxMilestone() != null ? getMaxMilestone().hashCode() : 0);
+        result = 31 * result + getMinMilestoneOrdinal();
+        result = 31 * result + getMaxMilestoneOrdinal();
         temp = Double.doubleToLongBits(getMaxPoints());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         result = 31 * result + (isBinary() ? 1 : 0);
@@ -219,20 +219,20 @@ public class Requirement {
         this.description = description;
     }
 
-    public String getMinMilestone() {
-        return minMilestone;
+    public int getMinMilestoneOrdinal() {
+        return minMilestoneOrdinal;
     }
 
-    public void setMinMilestone(String minMilestone) {
-        this.minMilestone = minMilestone;
+    public void setMinMilestoneOrdinal(int minMilestoneOrdinal) {
+        this.minMilestoneOrdinal = minMilestoneOrdinal;
     }
 
-    public String getMaxMilestone() {
-        return maxMilestone;
+    public int getMaxMilestoneOrdinal() {
+        return maxMilestoneOrdinal;
     }
 
-    public void setMaxMilestone(String maxMilestone) {
-        this.maxMilestone = maxMilestone;
+    public void setMaxMilestoneOrdinal(int maxMilestoneOrdinal) {
+        this.maxMilestoneOrdinal = maxMilestoneOrdinal;
     }
 
     public double getMaxPoints() {
