@@ -4,17 +4,23 @@ import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import com.sun.rowset.internal.Row;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * TODO: write JavaDoc
@@ -38,6 +44,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     private RadioButton malusYes = new RadioButton("Yes");
     private RadioButton malusNo = new RadioButton("No");
 
+    private TableView<MetaKeyValuePair> table = createPropertiesTable();
+
     private EditorController controller;
 
     public RequirementPropertiesScene(EditorController controller) {
@@ -56,10 +64,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     private void loadRequirement() {
         if (requirement != null) {
-            tfName.setText(requirement.getName() );
+            tfName.setText(requirement.getName());
             taDesc.setText(requirement.getDescription());
             cbMinMS.getSelectionModel().select(getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal()));
-            cbMaxMS.getSelectionModel().select(getMilestoneByOrdinal(requirement.getMaxMilestoneOrdinal() ) );
+            cbMaxMS.getSelectionModel().select(getMilestoneByOrdinal(requirement.getMaxMilestoneOrdinal()));
             spinnerPoints.getValueFactory().setValue(requirement.getMaxPoints());
 
             binaryYes.setSelected(requirement.isBinary());
@@ -72,17 +80,52 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
             malusNo.setSelected(!requirement.isMalus());
 
             loadPredecessors();
+            loadProperties();
         }
     }
 
-    private Milestone getMilestoneByOrdinal(int ordinal){
+    private ObservableList<MetaKeyValuePair> tableData = FXCollections.observableArrayList(new MetaKeyValuePair("", ""));
+
+    private void loadProperties() {
+        if (requirement != null) {
+            tableData = convertFromMap(requirement.getPropertiesMap());
+        }
+    }
+
+    private void saveProperties() {
+        requirement.setPropertiesMap(convertFromMetaKeyValuePairList(tableData));
+    }
+
+    private ObservableList<MetaKeyValuePair> convertFromMap(Map<String, String> props) {
+        ObservableList<MetaKeyValuePair> list = FXCollections.observableArrayList();
+
+        if (!props.isEmpty()) {
+            props.forEach((key, value) -> {
+                list.add(new MetaKeyValuePair(key, value));
+            });
+        }
+
+        return list;
+    }
+
+    private Map<String, String> convertFromMetaKeyValuePairList(List<MetaKeyValuePair> list) {
+        Map<String, String> map = new HashMap<>();
+
+        if (!list.isEmpty()) {
+            list.forEach(item -> map.put(item.getKey(), item.getValue()));
+        }
+
+        return map;
+    }
+
+    private Milestone getMilestoneByOrdinal(int ordinal) {
         return controller.getMilestoneByOrdinal(ordinal);
     }
 
-    private void loadPredecessors(){
+    private void loadPredecessors() {
         requirement.getPredecessorNames().forEach(name -> {
             Requirement r = controller.findRequirementByName(name);
-            if(r != null){
+            if (r != null) {
                 predecessors.add(r);
             }
         });
@@ -101,11 +144,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         Label lblMandatory = new Label("Mandatory");
         Label lblMalus = new Label("Malus");
         Label lblPredecessors = new Label("Predecessors");
-        Label lblProps = new Label("Properties");
+        Label lblProps = new Label("Meta Data");
 
         loadRequirement();
-
-        // TODO Proper MS choice
+        loadProperties();
 
         loadMilestoneNames();
         HBox minMSBox = new HBox();
@@ -124,7 +166,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
             // Make so that the maxMS is set to the same value as this one. (initially as soon as this one is set)
             Milestone selected = cbMinMS.getSelectionModel().getSelectedItem();
             Milestone target = cbMaxMS.getSelectionModel().getSelectedItem();
-            if(selected != null && target == null){
+            if (selected != null && target == null) {
                 cbMaxMS.getSelectionModel().select(selected);
             }
         });
@@ -140,12 +182,13 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         // TODO add spinner-handler
         // Solution by: http://stackoverflow.com/a/39380146
         spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if(!newValue){
+            if (!newValue) {
                 spinnerPoints.increment(0);
             }
         });
 
         BorderPane inputPredecessors = createPredecessorChoice();
+
 
         SaveCancelPane buttonWrapper = new SaveCancelPane();
 
@@ -190,36 +233,49 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         int rowIndex = 0;
 
+        // First pair of columns
+
         grid.add(lblName, 0, rowIndex);
         grid.add(tfName, 1, rowIndex++);
 
         grid.add(lblDesc, 0, rowIndex);
         grid.add(taDesc, 1, rowIndex, 1, 2);
-        rowIndex += 2;
-        // Skip two rows
+        rowIndex += 2; // Skip two rows
+
+        grid.add(lblMaxPoints, 0, rowIndex);
+        grid.add(spinnerPoints, 1, rowIndex++);
+
         grid.add(lblMinMS, 0, rowIndex);
         grid.add(minMSBox, 1, rowIndex++);
 
         grid.add(lblMaxMS, 0, rowIndex);
         grid.add(maxMSBox, 1, rowIndex++);
 
-        grid.add(lblMaxPoints, 0, rowIndex);
-        grid.add(spinnerPoints, 1, rowIndex++);
+        int lastRowIndexCol1 = rowIndex;
+        rowIndex = 0;
+        // second pair of columns: one column gap
+        // Predecessor list
+        grid.add(lblPredecessors, 3, rowIndex);
+        grid.add(inputPredecessors, 4, rowIndex, 1, 3);
+        rowIndex += 3;
+
+        grid.add(lblProps, 3, rowIndex);
+        grid.add(table, 4, rowIndex, 1, 3);
+        rowIndex += 3;
+
+
         // separator
-        grid.add(new Separator(), 0, rowIndex++, 2, 1);
+        grid.add(new Separator(), 0, lastRowIndexCol1++, 5, 1);
         // RadioButton groups
-        grid.add(groupWrapper, 0, rowIndex++, 2, 1);
+        grid.add(groupWrapper, 0, lastRowIndexCol1++, 5, 1);
         GridPane.setHgrow(groupWrapper, Priority.ALWAYS);
         // Separator
-        grid.add(new Separator(), 0, rowIndex++, 2, 1);
+        grid.add(new Separator(), 0, lastRowIndexCol1++, 5, 1);
 
-        // Predecessor list
-        grid.add(lblPredecessors, 0, rowIndex);
-        grid.add(inputPredecessors, 1, rowIndex++, 1, 1);
-        rowIndex += 2;
 
         // Buttons, last row
-        grid.add(buttonWrapper, 1, ++rowIndex, 2, 1);
+        grid.add(buttonWrapper, 1, ++lastRowIndexCol1, 5, 1);
+
 
         scrollPane.setContent(grid);
         setRoot(scrollPane);
@@ -230,7 +286,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         Milestone min = cbMinMS.getValue();
         double maxPoints = (double) spinnerPoints.getValue();
 
-        if((name == null || name.isEmpty()) || min == null ){
+        if ((name == null || name.isEmpty()) || min == null) {
             throw new IllegalArgumentException("[Requirement] Name and Minimal Milestone are mandatory fields");
         }
 
@@ -247,7 +303,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
                 malusYes.isSelected()
         );
 
-        if(!predecessors.isEmpty() ){
+        if (!predecessors.isEmpty()) {
             ArrayList<String> names = new ArrayList<>();
             predecessors.forEach(pred -> names.add(pred.getName()));
             requirement.setPredecessorNames(names);
@@ -258,19 +314,19 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     private ObservableList<Requirement> predecessors = FXCollections.observableArrayList();
 
-    private BorderPane createPredecessorChoice(){
+    private BorderPane createPredecessorChoice() {
         BorderPane pane = new BorderPane();
         HBox upper = new HBox();
-        Button addPred = new Button("+");
-        Button rmPred = new Button("-");
+        Button addPred = Utils.createPlusButton();
+        Button rmPred = Utils.createMinusButton();
 
         ListView<Requirement> predList = new ListView<>();
         predList.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
         predList.setItems(predecessors);
         ComboBox<Requirement> reqBox = new ComboBox<>();
-        reqBox.setButtonCell(new RequirementsView.RequirementCell() );
+        reqBox.setButtonCell(new RequirementsView.RequirementCell());
         reqBox.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
-        reqBox.setItems(controller.getObservableRequirements() );
+        reqBox.setItems(controller.getObservableRequirements());
 
         upper.getChildren().addAll(reqBox, addPred, rmPred);
 
@@ -282,16 +338,16 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         rmPred.setOnAction(event -> {
             int index = predList.getSelectionModel().getSelectedIndex();
             Requirement selected = predList.getSelectionModel().getSelectedItem();
-            if(selected == null){
+            if (selected == null) {
                 return; // Do not remove when nothing is selected
-            }else{
+            } else {
                 predecessors.remove(index);
             }
         });
 
         addPred.setOnAction(event -> {
             Requirement selected = reqBox.getSelectionModel().getSelectedItem();
-            if(selected == null){
+            if (selected == null) {
                 return;
             }
             predecessors.add(selected);
@@ -334,6 +390,97 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     private void loadMilestoneNames() {
         milestoneList = controller.getObservableMilestones();
+    }
+
+    private ObservableList<MetaKeyValuePair> metaData;
+
+
+    private TableView<MetaKeyValuePair> createPropertiesTable() {
+        TableView<MetaKeyValuePair> table = new TableView<>();
+        table.setEditable(true);
+
+        TableColumn<MetaKeyValuePair, String> firstCol = new TableColumn<>("Key");
+        firstCol.setCellValueFactory(
+                new PropertyValueFactory<>("key")
+        );
+        firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        firstCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
+            t.getTableView().getItems().get(t.getTablePosition().getRow()).setKey(t.getNewValue());
+        });
+        TableColumn<MetaKeyValuePair, String> secondCol = new TableColumn<>("Value");
+        secondCol.setCellValueFactory(
+                new PropertyValueFactory<>("value")
+        );
+        secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        secondCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
+            t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
+        });
+
+        table.setItems(tableData);
+        table.getColumns().addAll(firstCol, secondCol);
+
+        // ContextMenu
+        ContextMenu cm = new ContextMenu();
+        MenuItem addMeta = new MenuItem("Add Row");
+        addMeta.setOnAction(this::handleAddMetaRow);
+        MenuItem rmMeta = new MenuItem("Remove current row");
+        rmMeta.setOnAction(this::handleRemoveMetaRow);
+        cm.getItems().addAll(addMeta, rmMeta);
+
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setOnMouseClicked(event -> {
+            if (MouseButton.SECONDARY.equals(event.getButton())) {
+                cm.show(table, event.getScreenX(), event.getScreenY());
+            }
+        });
+        return table;
+    }
+
+    private void handleAddMetaRow(ActionEvent event) {
+        tableData.add(new MetaKeyValuePair("", ""));// MUST be with empty strings, so user can edit it in the table
+    }
+
+    private void handleRemoveMetaRow(ActionEvent event) {
+        int index = table.getSelectionModel().getSelectedIndex();
+        MetaKeyValuePair item = table.getSelectionModel().getSelectedItem();
+        if (item != null) {
+            tableData.remove(index);
+        }
+    }
+
+    public static class MetaKeyValuePair {
+        private final SimpleStringProperty key;
+
+        public MetaKeyValuePair(String key, String value) {
+            this.key = new SimpleStringProperty(key);
+            this.value = new SimpleStringProperty(value);
+        }
+
+        public String getKey() {
+            return key.get();
+        }
+
+        public SimpleStringProperty keyProperty() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key.set(key);
+        }
+
+        public String getValue() {
+            return value.get();
+        }
+
+        public SimpleStringProperty valueProperty() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value.set(value);
+        }
+
+        private final SimpleStringProperty value;
     }
 
 }

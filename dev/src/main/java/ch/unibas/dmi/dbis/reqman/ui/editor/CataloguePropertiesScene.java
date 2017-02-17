@@ -49,7 +49,7 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
     @Override
     protected void populateScene() {
         Label lblLecture = new Label("Lecture");
-        Label lblName = new Label("Name");
+        Label lblName = new Label("Name*");
         Label lblDescription = new Label("Description");
         // Milestones and Labels added via different scene
         Label lblSemester = new Label("Semester");
@@ -99,8 +99,8 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         String name = tfName.getText();
         String lecture = tfLecture.getText();
 
-        if(name == null && lecture == null){
-            throw new IllegalArgumentException("[Catalogue] Name and Lecture MUST not be null");
+        if(name == null){
+            throw new IllegalArgumentException("[Catalogue] Name MUST not be null");
         }
 
         catalogue = new Catalogue(

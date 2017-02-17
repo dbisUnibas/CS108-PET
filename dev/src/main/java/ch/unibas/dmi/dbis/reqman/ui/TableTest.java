@@ -58,6 +58,7 @@ public class TableTest extends Application {
         table.getColumns().addAll(firstCol,secondCol);
 
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
         pane.setCenter(table);
 
 

@@ -64,4 +64,12 @@ public class Utils {
         return b;
     }
 
+    public static Button createPlusButton(){
+        return new Button("\u2795"); // Unicode: heavy plus sign
+    }
+
+    public static Button createMinusButton(){
+        return new Button("\u2212"); // Unicode: heavy minus sign
+    }
+
 }

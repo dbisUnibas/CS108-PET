@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListHandler;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 
@@ -24,6 +25,7 @@ public class MilestonesView extends ModifiableListView<Milestone> implements Mod
         addHandler(this);
         listView.setCellFactory((ListView<Milestone> l) -> new MilestoneCell());
         listView.setOnMouseClicked(this::handleModifyRequest);
+
     }
 
     @Override
