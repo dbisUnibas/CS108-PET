@@ -23,7 +23,6 @@ public class Utils {
     }
 
     public static void applyDefaultGridSetup(GridPane grid){
-        grid.setAlignment(Pos.CENTER);
         grid.setStyle("-fx-padding: 10px; -fx-spacing: 10px; -fx-hgap: 10px;-fx-vgap: 10px");
     }
 
@@ -62,6 +61,14 @@ public class Utils {
         Button b = new Button("\u25bc");
         b.setStyle("-fx-text-fill: dimgray;");
         return b;
+    }
+
+    public static Button createPlusButton(){
+        return new Button("\u2795"); // Unicode: heavy plus sign
+    }
+
+    public static Button createMinusButton(){
+        return new Button("\u2212"); // Unicode: heavy minus sign
     }
 
 }

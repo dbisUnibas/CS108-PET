@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 /**
@@ -37,7 +38,6 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
 
     private void loadCatalogue() {
         if (catalogue != null) {
-            // TODO: Proper check if value exists
             tfLecture.setText(catalogue.getLecture());
             tfName.setText(catalogue.getName());
             taDesc.setText(catalogue.getDescription());
@@ -49,8 +49,9 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
     @Override
     protected void populateScene() {
         Label lblLecture = new Label("Lecture");
-        Label lblName = new Label("Name");
+        Label lblName = new Label("Name*");
         Label lblDescription = new Label("Description");
+
         // Milestones and Labels added via different scene
         Label lblSemester = new Label("Semester");
 
@@ -99,8 +100,8 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         String name = tfName.getText();
         String lecture = tfLecture.getText();
 
-        if(name == null && lecture == null){
-            throw new IllegalArgumentException("[Catalogue] Name and Lecture MUST not be null");
+        if(name == null){
+            throw new IllegalArgumentException("[Catalogue] Name MUST not be null");
         }
 
         catalogue = new Catalogue(

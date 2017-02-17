@@ -31,7 +31,7 @@ public class ModifiableListView<T> extends BorderPane {
         super();
         initComponents(title, listView);
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-
+        listView.setTooltip(new Tooltip("Right click on a item to modify it"));
     }
 
     public ModifiableListView(String title, ModifiableListController<T> controller) {
@@ -99,14 +99,15 @@ public class ModifiableListView<T> extends BorderPane {
         buttons.setPadding(new Insets(10));
         buttons.setSpacing(10);
 
-        Button buttonAdd = new Button("+");
+        Button buttonAdd = Utils.createPlusButton();
         buttonAdd.setOnAction(this::setOnAddAction);
-        Button buttonRemove = new Button("-");
+        Button buttonRemove = Utils.createMinusButton();
         buttonRemove.setOnAction(this::setOnRemoveAction);
 
-        Font fontButton = Font.font("sans-serif", FontWeight.EXTRA_BOLD, 12);
+        /*Font fontButton = Font.font("sans-serif", FontWeight.EXTRA_BOLD, 12);
         buttonAdd.setFont(fontButton);
-        buttonRemove.setFont(fontButton);
+        buttonRemove.setFont(fontButton);*/
+
         buttons.getChildren().addAll(buttonAdd, buttonRemove);
 
         // Title

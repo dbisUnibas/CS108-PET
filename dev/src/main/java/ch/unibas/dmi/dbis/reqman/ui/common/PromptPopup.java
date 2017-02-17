@@ -17,14 +17,21 @@ public class PromptPopup<T> {
     public PromptPopup(AbstractVisualCreator creator){
         this.creator = creator;
         stage = new PopupStage(creator.getPromptTitle(), creator);
-        creator.getRoot().setOnKeyReleased(this::handleKeyEvent);
+
+        //creator.getRoot().setOnKeyReleased(this::handleKeyEvent);
+
     }
 
     private void handleKeyEvent(KeyEvent event){
+        // TODO Move to abstract visual creator and filter
         if(KeyCode.ESCAPE.equals(event.getCode() ) ){
             stage.hide();
         }else if(KeyCode.ENTER.equals(event.getCode() )){
-            creator.handleSaving(new ActionEvent(event.getSource(), event.getTarget())); // Create own event?
+            System.out.println("Source: "+event.getSource().toString());
+            if(event.getTarget() == this){
+                creator.handleSaving(new ActionEvent(event.getSource(), event.getTarget())); // Create own event?
+            }
+
         }
     }
 

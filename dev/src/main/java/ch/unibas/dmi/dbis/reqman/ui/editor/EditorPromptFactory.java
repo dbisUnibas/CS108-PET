@@ -4,6 +4,12 @@ import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.PromptPopup;
+import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 
 /**
  * TODO: write JavaDoc
@@ -43,6 +49,11 @@ public class EditorPromptFactory {
 
     public static Milestone promptMilestone(Milestone milestone){
         PromptPopup<Milestone> popup = new PromptPopup<>(new MilestonePropertiesScene(milestone));
+        return popup.prompt();
+    }
+
+    public static RequirementPropertiesScene.MetaKeyValuePair promptMetaKeyValuePair(){
+        PromptPopup<RequirementPropertiesScene.MetaKeyValuePair> popup = new PromptPopup<>(new MetaKeyValuePairScene());
         return popup.prompt();
     }
 }

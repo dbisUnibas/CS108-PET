@@ -63,6 +63,9 @@ public class EditorController  {
     }
 
     public void handleAddRequirement(ActionEvent event){
+        if(!isCatalogueSet() ){
+            return; // Prevent open prompt from accelerator even if no catalogue is set
+        }
         Requirement r = EditorPromptFactory.promptNewRequirement(this);
         if(r != null){ // user may cancelled the prompt
             observableReqs.add(r );
@@ -78,11 +81,18 @@ public class EditorController  {
     }
 
     public void handleAddMilestone(ActionEvent event){
+        if(!isCatalogueSet() ){
+            return; // Prevent open prompt from accelerator even if no catalogue is set
+        }
         Milestone m = EditorPromptFactory.promptNewMilestone();
         if(m != null){
             m.setOrdinal(getNextMsOrdinal() );
             observableMs.add(m);
         }
+    }
+
+    private boolean isCatalogueSet(){
+        return catalogue != null;
     }
 
     private int getNextMsOrdinal(){
