@@ -33,7 +33,7 @@ public class SimpleCatalogueExporter {
         Tag[] achievements = parseRequirement();
         Tag page = html().with(
                 head().with(
-                        title("TEMPLATE TEST"),
+                        title("Overview - "+catalogue.getName()),
                         link().withRel("stylesheet").withHref("http://fonts.googleapis.com/icon?family=Material+Icons"),
                         link().withType("text/css").withRel("stylesheet").withHref("css/materialize.min.css"),//MEDIA is missing!
                         link().withType("text/css").withRel("stylesheet").withHref("css/achievements.css"),
@@ -97,7 +97,15 @@ public class SimpleCatalogueExporter {
          * Then compare lexicographically based on the string.
          */
         reqs.sort(Comparator.comparingInt(Requirement::getMinMilestoneOrdinal)
-                .thenComparing(Requirement::isMandatory,(b1, b2) -> Boolean.compare(!b1, !b2))
+                .thenComparing(Requirement::isMandatory,(b1, b2) -> {
+                    if(b1 && !b2){
+                        return -1;
+                    }else if(b1 && b2){
+                        return 0;
+                    }else{
+                        return 1;
+                    }
+                })
                 .thenComparing(Requirement::getName));
 
         reqs.forEach(req -> {
