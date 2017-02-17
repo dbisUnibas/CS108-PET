@@ -97,15 +97,16 @@ public class SimpleCatalogueExporter {
          * Then compare lexicographically based on the string.
          */
         reqs.sort(Comparator.comparingInt(Requirement::getMinMilestoneOrdinal)
-                .thenComparing(Requirement::isMandatory,(b1, b2) -> {
-                    if(b1 && !b2){
-                        return -1;
-                    }else if(b1 && b2){
+			.thenComparing(Requirement::isMandatory,(b1, b2) -> {
+                    if(b1 == b2){
                         return 0;
+                    }else if(b1){
+                        return -1;
                     }else{
                         return 1;
                     }
                 })
+
                 .thenComparing(Requirement::getName));
 
         reqs.forEach(req -> {
