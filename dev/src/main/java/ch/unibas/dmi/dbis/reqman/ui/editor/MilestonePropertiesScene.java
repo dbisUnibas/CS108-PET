@@ -16,42 +16,40 @@ import java.util.Date;
  *
  * @author loris.sauter
  */
-public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone>{
+public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
 
-    public MilestonePropertiesScene(){
+    private Milestone milestone = null;
+    private TextField tfName = new TextField("Milestone"); // Default name
+    private Label lblOrdinal = new Label("N/A");
+    private DatePicker inputDate = new DatePicker();
+
+    public MilestonePropertiesScene() {
         super();
         populateScene();
     }
-
-    public MilestonePropertiesScene(Milestone milestone){
+    public MilestonePropertiesScene(Milestone milestone) {
         this();
         this.milestone = milestone;
         loadMilestone();
     }
 
-    private Milestone milestone = null;
-
-    private void loadMilestone(){
-        if(milestone != null){
-            if(milestone.getName() != null && !milestone.getName().isEmpty() ){
-                tfName.setText(milestone.getName() );
+    private void loadMilestone() {
+        if (milestone != null) {
+            if (milestone.getName() != null && !milestone.getName().isEmpty()) {
+                tfName.setText(milestone.getName());
             }
-            if(milestone.getDate() != null){
-                inputDate.setValue(milestone.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate() );
+            if (milestone.getDate() != null) {
+                inputDate.setValue(milestone.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
-            lblOrdinal.setText(String.valueOf(milestone.getOrdinal()) );
+            lblOrdinal.setText(String.valueOf(milestone.getOrdinal()));
         }
     }
 
-    private TextField tfName = new TextField("Milestone"); // Default name
-    private Label lblOrdinal = new Label("N/A");
-    private DatePicker inputDate = new DatePicker();
-
-    public void handleSaving(ActionEvent event){
-        String name = (tfName.getText() == null || tfName.getText().isEmpty() )? "Milestone" : tfName.getText(); // Default name
+    public void handleSaving(ActionEvent event) {
+        String name = (tfName.getText() == null || tfName.getText().isEmpty()) ? "Milestone" : tfName.getText(); // Default name
         Date d = null;
-        if(inputDate.getValue() != null){
-            d = Date.from(inputDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant() );
+        if (inputDate.getValue() != null) {
+            d = Date.from(inputDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
         }
 
         milestone = new Milestone(name, 0, d);// ordinal is handled later
@@ -88,7 +86,7 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone>{
 
     @Override
     public Milestone create() throws IllegalStateException {
-        if(!isCreatorReady() ){
+        if (!isCreatorReady()) {
             throw new IllegalStateException("Creation of Milestone failed: Creator not ready");
         }
         return milestone;

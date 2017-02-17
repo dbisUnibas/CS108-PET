@@ -22,10 +22,15 @@ public class PromptPopup<T> {
     }
 
     private void handleKeyEvent(KeyEvent event){
+        // TODO Move to abstract visual creator and filter
         if(KeyCode.ESCAPE.equals(event.getCode() ) ){
             stage.hide();
         }else if(KeyCode.ENTER.equals(event.getCode() )){
-            creator.handleSaving(new ActionEvent(event.getSource(), event.getTarget())); // Create own event?
+            System.out.println("Source: "+event.getSource().toString());
+            if(event.getTarget() == this){
+                creator.handleSaving(new ActionEvent(event.getSource(), event.getTarget())); // Create own event?
+            }
+
         }
     }
 

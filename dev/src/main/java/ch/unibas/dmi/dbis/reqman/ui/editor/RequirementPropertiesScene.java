@@ -5,7 +5,6 @@ import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
-import com.sun.rowset.internal.Row;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +16,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,32 +33,31 @@ import java.util.Map;
  */
 public class RequirementPropertiesScene extends AbstractVisualCreator<Requirement> {
 
+    private final static MetaKeyValuePair PLACEHOLDER = new MetaKeyValuePair("key", "value");
     private TextField tfName = new TextField();
     private TextArea taDesc = new TextArea();
     private ComboBox<Milestone> cbMinMS = new ComboBox<>();
     private ComboBox<Milestone> cbMaxMS = new ComboBox<>();
     private Spinner spinnerPoints = new Spinner(0d, Double.MAX_VALUE, 0.0);
-
     private RadioButton binaryYes = new RadioButton("Yes");
     private RadioButton binaryNo = new RadioButton("No");
-
     private RadioButton mandatoryYes = new RadioButton("Yes");
     private RadioButton mandatoryNo = new RadioButton("No");
-
     private RadioButton malusYes = new RadioButton("Yes");
     private RadioButton malusNo = new RadioButton("No");
-
-    private TableView<MetaKeyValuePair> table = createPropertiesTable();
-
     private EditorController controller;
+    private Requirement requirement = null;
+    private ObservableList<MetaKeyValuePair> tableData;
+    private TableView<MetaKeyValuePair> table = createPropertiesTable();
+    private ObservableList<Requirement> predecessors = FXCollections.observableArrayList();
+    private ObservableList<Milestone> milestoneList;
+    private ObservableList<MetaKeyValuePair> metaData;
 
     public RequirementPropertiesScene(EditorController controller) {
         super();
         this.controller = controller;
         populateScene();
     }
-
-    private Requirement requirement = null;
 
     public RequirementPropertiesScene(EditorController controller, Requirement requirement) {
         this(controller);
@@ -86,24 +87,17 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         }
     }
 
-    private ObservableList<MetaKeyValuePair> tableData = FXCollections.observableArrayList(PLACEHOLDER);
-
     private void loadProperties() {
         if (requirement != null) {
             tableData = convertFromMap(requirement.getPropertiesMap());
-        }else{
-            tableData = FXCollections.observableArrayList(PLACEHOLDER);
+        } else {
+            tableData = FXCollections.observableArrayList(new MetaKeyValuePair("",""));
         }
+        table.setItems(tableData);
     }
 
-    private final static MetaKeyValuePair PLACEHOLDER = new MetaKeyValuePair("key", "value");
-
     private void saveProperties() {
-        tableData.remove(PLACEHOLDER);
         requirement.setPropertiesMap(convertFromMetaKeyValuePairList(tableData));
-        if(tableData.isEmpty()){
-            tableData.add(PLACEHOLDER);
-        }
     }
 
     private ObservableList<MetaKeyValuePair> convertFromMap(Map<String, String> props) {
@@ -141,7 +135,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         });
     }
 
-
     @Override
     protected void populateScene() {
         ScrollPane scrollPane = new ScrollPane();
@@ -158,8 +151,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         loadRequirement();
         loadProperties();
-
         loadMilestoneNames();
+
         HBox minMSBox = new HBox();
         minMSBox.setStyle("-fx-spacing: 10px;");
         Button newMinMS = new Button("New ...");
@@ -198,7 +191,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         });
 
         BorderPane inputPredecessors = createPredecessorChoice();
-        inputPredecessors.setPrefSize(300,300);
+        inputPredecessors.setPrefSize(300, 300);
 
         SaveCancelPane buttonWrapper = new SaveCancelPane();
 
@@ -250,7 +243,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         grid.add(lblDesc, 0, leftColsRow);
         grid.add(taDesc, 1, leftColsRow, 1, 2);
-        taDesc.setPrefSize(300,200); // in relation to other pref size settings
+        taDesc.setPrefSize(300, 200); // in relation to other pref size settings
         leftColsRow += 2; // Skip two rows
 
         grid.add(lblMaxPoints, 0, leftColsRow);
@@ -263,7 +256,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         grid.add(maxMSBox, 1, leftColsRow++);
 
         GridPane.setValignment(lblMaxMS, VPos.TOP);
-        lblMaxMS.setPadding(new Insets(5,0,0,0));// makes it appear like the others
+        lblMaxMS.setPadding(new Insets(5, 0, 0, 0));// makes it appear like the others
 
         // second pair of columns: one column gap
         // Predecessor list
@@ -277,7 +270,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
 
         // Sets the pref size of the table - this is rather an experimental value, but it smallers the size of the grid.
-        table.setPrefSize(300,300);
+        table.setPrefSize(300, 300);
 
         // separator
         grid.add(new Separator(), 0, leftColsRow++, 5, 1);
@@ -327,10 +320,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
             requirement.setPredecessorNames(names);
         }
 
+        saveProperties();
+
         getWindow().hide();
     }
-
-    private ObservableList<Requirement> predecessors = FXCollections.observableArrayList();
 
     private BorderPane createPredecessorChoice() {
         BorderPane pane = new BorderPane();
@@ -404,14 +397,9 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         return "Requirement Properties";
     }
 
-    private ObservableList<Milestone> milestoneList;
-
     private void loadMilestoneNames() {
         milestoneList = controller.getObservableMilestones();
     }
-
-    private ObservableList<MetaKeyValuePair> metaData;
-
 
     private TableView<MetaKeyValuePair> createPropertiesTable() {
         TableView<MetaKeyValuePair> table = new TableView<>();
@@ -434,7 +422,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
             t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
         });
 
-        table.setItems(tableData);
         table.getColumns().addAll(firstCol, secondCol);
 
         // ContextMenu
@@ -451,11 +438,19 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
                 cm.show(table, event.getScreenX(), event.getScreenY());
             }
         });
+        table.setItems(tableData);
         return table;
     }
 
     private void handleAddMetaRow(ActionEvent event) {
-        tableData.add(new MetaKeyValuePair("", ""));// MUST be with empty strings, so user can edit it in the table
+        MetaKeyValuePair pair = EditorPromptFactory.promptMetaKeyValuePair();
+        if(pair != null){
+            // not working
+            table.getItems().add(pair);
+        }else{
+            // Working. Probably pair prompt not working
+            table.getItems().add(new MetaKeyValuePair("ELSE","ELSE"));
+        }
     }
 
     private void handleRemoveMetaRow(ActionEvent event) {
@@ -464,10 +459,19 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         if (item != null) {
             tableData.remove(index);
         }
+        if(tableData.isEmpty()){
+            // Working
+            tableData.add(new MetaKeyValuePair("",""));
+        }
     }
 
     public static class MetaKeyValuePair {
         private final SimpleStringProperty key;
+        private final SimpleStringProperty value;
+
+        public boolean isEmpty(){
+            return key.getValue().isEmpty() && value.getValue().isEmpty();
+        }
 
         public MetaKeyValuePair(String key, String value) {
             this.key = new SimpleStringProperty(key);
@@ -478,27 +482,25 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
             return key.get();
         }
 
-        public SimpleStringProperty keyProperty() {
-            return key;
-        }
-
         public void setKey(String key) {
             this.key.set(key);
+        }
+
+        public SimpleStringProperty keyProperty() {
+            return key;
         }
 
         public String getValue() {
             return value.get();
         }
 
-        public SimpleStringProperty valueProperty() {
-            return value;
-        }
-
         public void setValue(String value) {
             this.value.set(value);
         }
 
-        private final SimpleStringProperty value;
+        public SimpleStringProperty valueProperty() {
+            return value;
+        }
     }
 
 }
