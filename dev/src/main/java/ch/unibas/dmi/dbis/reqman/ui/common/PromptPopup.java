@@ -18,6 +18,7 @@ public class PromptPopup<T> {
         this.creator = creator;
         stage = new PopupStage(creator.getPromptTitle(), creator);
         creator.getRoot().setOnKeyReleased(this::handleKeyEvent);
+
     }
 
     private void handleKeyEvent(KeyEvent event){

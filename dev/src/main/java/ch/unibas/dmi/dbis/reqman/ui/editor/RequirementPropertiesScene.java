@@ -11,6 +11,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
@@ -84,16 +86,24 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         }
     }
 
-    private ObservableList<MetaKeyValuePair> tableData = FXCollections.observableArrayList(new MetaKeyValuePair("", ""));
+    private ObservableList<MetaKeyValuePair> tableData = FXCollections.observableArrayList(PLACEHOLDER);
 
     private void loadProperties() {
         if (requirement != null) {
             tableData = convertFromMap(requirement.getPropertiesMap());
+        }else{
+            tableData = FXCollections.observableArrayList(PLACEHOLDER);
         }
     }
 
+    private final static MetaKeyValuePair PLACEHOLDER = new MetaKeyValuePair("key", "value");
+
     private void saveProperties() {
+        tableData.remove(PLACEHOLDER);
         requirement.setPropertiesMap(convertFromMetaKeyValuePairList(tableData));
+        if(tableData.isEmpty()){
+            tableData.add(PLACEHOLDER);
+        }
     }
 
     private ObservableList<MetaKeyValuePair> convertFromMap(Map<String, String> props) {
@@ -188,7 +198,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         });
 
         BorderPane inputPredecessors = createPredecessorChoice();
-
+        inputPredecessors.setPrefSize(300,300);
 
         SaveCancelPane buttonWrapper = new SaveCancelPane();
 
@@ -231,54 +241,62 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         groupWrapper.add(malusGroup, 2, 0);
         GridPane.setHgrow(malusGroup, Priority.ALWAYS);
 
-        int rowIndex = 0;
-
+        int leftColsRow = 0;
+        int rightColsRow = 0;
         // First pair of columns
 
-        grid.add(lblName, 0, rowIndex);
-        grid.add(tfName, 1, rowIndex++);
+        grid.add(lblName, 0, leftColsRow);
+        grid.add(tfName, 1, leftColsRow++);
 
-        grid.add(lblDesc, 0, rowIndex);
-        grid.add(taDesc, 1, rowIndex, 1, 2);
-        rowIndex += 2; // Skip two rows
+        grid.add(lblDesc, 0, leftColsRow);
+        grid.add(taDesc, 1, leftColsRow, 1, 2);
+        taDesc.setPrefSize(300,200); // in relation to other pref size settings
+        leftColsRow += 2; // Skip two rows
 
-        grid.add(lblMaxPoints, 0, rowIndex);
-        grid.add(spinnerPoints, 1, rowIndex++);
+        grid.add(lblMaxPoints, 0, leftColsRow);
+        grid.add(spinnerPoints, 1, leftColsRow++);
 
-        grid.add(lblMinMS, 0, rowIndex);
-        grid.add(minMSBox, 1, rowIndex++);
+        grid.add(lblMinMS, 0, leftColsRow);
+        grid.add(minMSBox, 1, leftColsRow++);
 
-        grid.add(lblMaxMS, 0, rowIndex);
-        grid.add(maxMSBox, 1, rowIndex++);
+        grid.add(lblMaxMS, 0, leftColsRow);
+        grid.add(maxMSBox, 1, leftColsRow++);
 
-        int lastRowIndexCol1 = rowIndex;
-        rowIndex = 0;
+        GridPane.setValignment(lblMaxMS, VPos.TOP);
+        lblMaxMS.setPadding(new Insets(5,0,0,0));// makes it appear like the others
+
         // second pair of columns: one column gap
         // Predecessor list
-        grid.add(lblPredecessors, 3, rowIndex);
-        grid.add(inputPredecessors, 4, rowIndex, 1, 3);
-        rowIndex += 3;
+        grid.add(lblPredecessors, 3, rightColsRow);
+        grid.add(inputPredecessors, 4, rightColsRow, 1, 3);
+        rightColsRow += 3;
 
-        grid.add(lblProps, 3, rowIndex);
-        grid.add(table, 4, rowIndex, 1, 3);
-        rowIndex += 3;
+        grid.add(lblProps, 3, rightColsRow);
+        grid.add(table, 4, rightColsRow, 1, 3);
+        rightColsRow += 3;
 
+
+        // Sets the pref size of the table - this is rather an experimental value, but it smallers the size of the grid.
+        table.setPrefSize(300,300);
 
         // separator
-        grid.add(new Separator(), 0, lastRowIndexCol1++, 5, 1);
+        grid.add(new Separator(), 0, leftColsRow++, 5, 1);
         // RadioButton groups
-        grid.add(groupWrapper, 0, lastRowIndexCol1++, 5, 1);
+        grid.add(groupWrapper, 0, leftColsRow++, 5, 1);
         GridPane.setHgrow(groupWrapper, Priority.ALWAYS);
         // Separator
-        grid.add(new Separator(), 0, lastRowIndexCol1++, 5, 1);
+        grid.add(new Separator(), 0, leftColsRow++, 5, 1);
 
 
         // Buttons, last row
-        grid.add(buttonWrapper, 1, ++lastRowIndexCol1, 5, 1);
+        grid.add(buttonWrapper, 1, leftColsRow, 5, 1);
 
 
         scrollPane.setContent(grid);
         setRoot(scrollPane);
+
+        grid.setPrefHeight(700); // Hacky solution, due to strangely incresed height.
+        grid.setAlignment(Pos.CENTER);
     }
 
     public void handleSaving(ActionEvent event) {

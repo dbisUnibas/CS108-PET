@@ -37,7 +37,6 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
 
     private void loadCatalogue() {
         if (catalogue != null) {
-            // TODO: Proper check if value exists
             tfLecture.setText(catalogue.getLecture());
             tfName.setText(catalogue.getName());
             taDesc.setText(catalogue.getDescription());
@@ -51,6 +50,7 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         Label lblLecture = new Label("Lecture");
         Label lblName = new Label("Name*");
         Label lblDescription = new Label("Description");
+
         // Milestones and Labels added via different scene
         Label lblSemester = new Label("Semester");
 

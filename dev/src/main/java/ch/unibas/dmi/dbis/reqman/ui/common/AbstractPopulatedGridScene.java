@@ -23,7 +23,6 @@ public abstract class AbstractPopulatedGridScene extends Scene {
     public AbstractPopulatedGridScene() {
         super(new Region());
         setRoot(grid);
-
     }
 
     /**
