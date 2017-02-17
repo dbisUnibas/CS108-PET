@@ -39,7 +39,7 @@ public class MetaKeyValuePairScene extends AbstractVisualCreator<RequirementProp
 
     @Override
     public RequirementPropertiesScene.MetaKeyValuePair create() throws IllegalStateException {
-        return null;
+        return pair;
     }
 
     @Override

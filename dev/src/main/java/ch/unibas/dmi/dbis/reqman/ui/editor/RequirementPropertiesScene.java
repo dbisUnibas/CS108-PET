@@ -87,17 +87,28 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         }
     }
 
+    private void setMetaListOnlyEmpty(){
+        tableData = FXCollections.observableArrayList(new MetaKeyValuePair("",""));
+    }
+
     private void loadProperties() {
         if (requirement != null) {
-            tableData = convertFromMap(requirement.getPropertiesMap());
+            if(requirement.getPropertiesMap().isEmpty()){
+                setMetaListOnlyEmpty();
+            }else{
+                tableData = convertFromMap(requirement.getPropertiesMap());
+            }
+
         } else {
-            tableData = FXCollections.observableArrayList(new MetaKeyValuePair("",""));
+            setMetaListOnlyEmpty();
         }
         table.setItems(tableData);
     }
 
     private void saveProperties() {
-        requirement.setPropertiesMap(convertFromMetaKeyValuePairList(tableData));
+        if(!isMetaListOnlyEmpty() ){
+            requirement.setPropertiesMap(convertFromMetaKeyValuePairList(tableData));
+        }
     }
 
     private ObservableList<MetaKeyValuePair> convertFromMap(Map<String, String> props) {
@@ -445,12 +456,20 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     private void handleAddMetaRow(ActionEvent event) {
         MetaKeyValuePair pair = EditorPromptFactory.promptMetaKeyValuePair();
         if(pair != null){
-            // not working
-            table.getItems().add(pair);
-        }else{
-            // Working. Probably pair prompt not working
-            table.getItems().add(new MetaKeyValuePair("ELSE","ELSE"));
+            // Check if the list contains only the empty one. If so replace empty one with new one.
+            if(isMetaListOnlyEmpty() ){
+                tableData.remove(0);
+            }
+            tableData.add(pair);
         }
+    }
+
+    private boolean isMetaListOnlyEmpty(){
+        if(tableData.size() > 1){
+            return false;
+        }
+        MetaKeyValuePair first = tableData.get(0);
+        return first.isEmpty();
     }
 
     private void handleRemoveMetaRow(ActionEvent event) {
@@ -460,8 +479,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
             tableData.remove(index);
         }
         if(tableData.isEmpty()){
-            // Working
-            tableData.add(new MetaKeyValuePair("",""));
+            setMetaListOnlyEmpty();
         }
     }
 
@@ -469,6 +487,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         private final SimpleStringProperty key;
         private final SimpleStringProperty value;
 
+        /**
+         * Returns if this {@link MetaKeyValuePair} consits of an empty key AND empty value.
+         * @return TRUE if key and value are empty strings, FALSE otherwise
+         */
         public boolean isEmpty(){
             return key.getValue().isEmpty() && value.getValue().isEmpty();
         }
