@@ -96,7 +96,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         Label lblDesc = new Label("Description");
         Label lblMinMS = new Label("Minimal Milestone*");
         Label lblMaxMS = new Label("Maximal Milestone");
-        Label lblMaxPoints = new Label("Maximal Points*");
+        Label lblMaxPoints = new Label("Maximal Points");
         Label lblBinary = new Label("Binary");
         Label lblMandatory = new Label("Mandatory");
         Label lblMalus = new Label("Malus");
@@ -230,8 +230,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         Milestone min = cbMinMS.getValue();
         double maxPoints = (double) spinnerPoints.getValue();
 
-        if((name == null || name.isEmpty()) || min == null || Double.compare(0.0,maxPoints)==0){
-            throw new IllegalArgumentException("[Requirement] Name, Minimal Milestone and Max Points are mandatory fields");
+        if((name == null || name.isEmpty()) || min == null ){
+            throw new IllegalArgumentException("[Requirement] Name and Minimal Milestone are mandatory fields");
         }
 
         Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
