@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -90,7 +91,9 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
 
     public void handleSaving(ActionEvent event) {
         if(!checkMandatoryFields() ){
-            throw new IllegalArgumentException("[Catalogue] Name MUST not be null nor empty");
+            Utils.showWarningDialog("Mandatory field(s) missing", "A catalogue must have at least a name.");
+            return;
+            //throw new IllegalArgumentException("[Catalogue] Name MUST not be null nor empty");
         }
         catalogue = new Catalogue(
                 tfName.getText(),

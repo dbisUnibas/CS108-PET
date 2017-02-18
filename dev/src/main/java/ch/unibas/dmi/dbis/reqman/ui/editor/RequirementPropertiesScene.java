@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
@@ -302,8 +303,12 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         Milestone min = cbMinMS.getValue();
         double maxPoints = (double) spinnerPoints.getValue();
 
-        if ((name == null || name.isEmpty()) || min == null) {
-            throw new IllegalArgumentException("[Requirement] Name and Minimal Milestone are mandatory fields");
+        boolean nameMissing = StringUtils.isNullOrEmpty(name);
+        boolean minMSMissing = min == null;
+
+        if(nameMissing || minMSMissing){
+            Utils.showWarningDialog("Missing field(s)", createMissingMessage(nameMissing, minMSMissing));
+            return;
         }
 
         Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
@@ -591,6 +596,20 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         public String getString() {
             return getItem() == null ? "" : getItem();
         }
+    }
+
+    private String createMissingMessage(boolean nameMissing, boolean minMSMissing){
+        String missingName = "The requirement must have a name";
+        String missingMinMS = "A requirement must be attached to a minimal Milestone";
+        String msg = "";
+        if(nameMissing && !minMSMissing){
+            msg = missingName;
+        }else if(nameMissing && minMSMissing){
+            msg = missingName + "\n" + missingMinMS;
+        }else{
+            msg = missingMinMS;
+        }
+        return msg;
     }
 
 }
