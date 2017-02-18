@@ -17,6 +17,9 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 /**
  * TODO: write JavaDoc
  *
@@ -30,6 +33,12 @@ public class EditorApplication extends Application {
     private MilestonesView msView;
 
     public static void main(String[] args) {
+        try {
+            System.out.print("Code source: ");
+            System.out.println(URLDecoder.decode(EditorApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         launch(args);
     }
 
