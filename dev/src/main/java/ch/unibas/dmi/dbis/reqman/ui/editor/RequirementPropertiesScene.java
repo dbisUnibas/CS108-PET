@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -14,13 +15,12 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.util.Callback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,15 +88,15 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         }
     }
 
-    private void setMetaListOnlyEmpty(){
-        tableData = FXCollections.observableArrayList(new MetaKeyValuePair("",""));
+    private void setMetaListOnlyEmpty() {
+        tableData = FXCollections.observableArrayList(new MetaKeyValuePair("", ""));
     }
 
     private void loadProperties() {
         if (requirement != null) {
-            if(requirement.getPropertiesMap().isEmpty()){
+            if (requirement.getPropertiesMap().isEmpty()) {
                 setMetaListOnlyEmpty();
-            }else{
+            } else {
                 tableData = convertFromMap(requirement.getPropertiesMap());
             }
 
@@ -107,7 +107,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     }
 
     private void saveProperties() {
-        if(!isMetaListOnlyEmpty() ){
+        if (!isMetaListOnlyEmpty()) {
             requirement.setPropertiesMap(convertFromMetaKeyValuePairList(tableData));
         }
     }
@@ -414,15 +414,18 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         milestoneList = controller.getObservableMilestones();
     }
 
+
     private TableView<MetaKeyValuePair> createPropertiesTable() {
         TableView<MetaKeyValuePair> table = new TableView<>();
         table.setEditable(true);
+
+        Callback<TableColumn<MetaKeyValuePair, String>, TableCell<MetaKeyValuePair, String>> cellFactory = (TableColumn<MetaKeyValuePair, String> c)->new UpdatingCell();
 
         TableColumn<MetaKeyValuePair, String> firstCol = new TableColumn<>("Key");
         firstCol.setCellValueFactory(
                 new PropertyValueFactory<>("key")
         );
-        firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        firstCol.setCellFactory(cellFactory);
         firstCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
             t.getTableView().getItems().get(t.getTablePosition().getRow()).setKey(t.getNewValue());
         });
@@ -430,7 +433,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         secondCol.setCellValueFactory(
                 new PropertyValueFactory<>("value")
         );
-        secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        secondCol.setCellFactory(cellFactory);
         secondCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
             t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
         });
@@ -457,17 +460,17 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
     private void handleAddMetaRow(ActionEvent event) {
         MetaKeyValuePair pair = EditorPromptFactory.promptMetaKeyValuePair();
-        if(pair != null){
+        if (pair != null) {
             // Check if the list contains only the empty one. If so replace empty one with new one.
-            if(isMetaListOnlyEmpty() ){
+            if (isMetaListOnlyEmpty()) {
                 tableData.remove(0);
             }
             tableData.add(pair);
         }
     }
 
-    private boolean isMetaListOnlyEmpty(){
-        if(tableData.size() > 1){
+    private boolean isMetaListOnlyEmpty() {
+        if (tableData.size() > 1) {
             return false;
         }
         MetaKeyValuePair first = tableData.get(0);
@@ -480,28 +483,28 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         if (item != null) {
             tableData.remove(index);
         }
-        if(tableData.isEmpty()){
+        if (tableData.isEmpty()) {
             setMetaListOnlyEmpty();
         }
     }
-
 
 
     public static class MetaKeyValuePair {
         private final SimpleStringProperty key;
         private final SimpleStringProperty value;
 
-        /**
-         * Returns if this {@link MetaKeyValuePair} consits of an empty key AND empty value.
-         * @return TRUE if key and value are empty strings, FALSE otherwise
-         */
-        public boolean isEmpty(){
-            return key.getValue().isEmpty() && value.getValue().isEmpty();
-        }
-
         public MetaKeyValuePair(String key, String value) {
             this.key = new SimpleStringProperty(key);
             this.value = new SimpleStringProperty(value);
+        }
+
+        /**
+         * Returns if this {@link MetaKeyValuePair} consits of an empty key AND empty value.
+         *
+         * @return TRUE if key and value are empty strings, FALSE otherwise
+         */
+        public boolean isEmpty() {
+            return key.getValue().isEmpty() && value.getValue().isEmpty();
         }
 
         public String getKey() {
@@ -526,6 +529,74 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         public SimpleStringProperty valueProperty() {
             return value;
+        }
+    }
+
+    /*
+     * Solution from Oracle Documentation: http://docs.oracle.com/javase/8/javafx/user-interface-tutorial/table-view.htm#CJAGAAEE
+     */
+
+    private static class UpdatingCell extends TableCell<MetaKeyValuePair, String> {
+        private TextField textField;
+
+        public UpdatingCell() {
+
+        }
+
+        @Override
+        public void startEdit() {
+            if (!isEmpty()) {
+                super.startEdit();
+                createTextField();
+                setText(null);
+                setGraphic(textField);
+                textField.selectAll();
+                ;
+            }
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+
+            setText(getItem());
+            setGraphic(null);
+        }
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            if (isEmpty()) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                if (isEditing()) {
+                    if (textField != null) {
+                        textField.setText(getString());
+                    }
+                    setText(null);
+                    setGraphic(textField);
+                } else {
+                    setText(getString());
+                    setGraphic(null);
+                }
+            }
+
+        }
+
+
+        private void createTextField() {
+            textField = new TextField(getString());
+            textField.setMinWidth(this.getWidth()-this.getGraphicTextGap()*2);
+            textField.focusedProperty().addListener((ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue)->{
+                if(!newValue){
+                    commitEdit(textField.getText());
+                }
+            });
+        }
+
+        public String getString() {
+            return getItem() == null ? "" : getItem();
         }
     }
 
