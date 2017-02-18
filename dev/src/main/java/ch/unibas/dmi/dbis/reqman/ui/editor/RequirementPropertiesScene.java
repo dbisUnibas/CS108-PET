@@ -3,7 +3,6 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
-import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
@@ -205,12 +204,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         BorderPane inputPredecessors = createPredecessorChoice();
         inputPredecessors.setPrefSize(300, 300);
 
-        SaveCancelPane buttonWrapper = new SaveCancelPane();
-
-        buttonWrapper.setOnSave(this::handleSaving);
-
-        buttonWrapper.setOnCancel(event -> getWindow().hide());
-
         HBox binaryGroup = new HBox();
         binaryGroup.setStyle("-fx-spacing: 10px");
         ToggleGroup binaryButtons = new ToggleGroup();
@@ -294,7 +287,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
 
         // Buttons, last row
-        grid.add(buttonWrapper, 1, leftColsRow, 5, 1);
+        grid.add(buttons, 1, leftColsRow, 5, 1);
 
 
         scrollPane.setContent(grid);

@@ -1,13 +1,12 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.ui.common.*;
+import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
-import javafx.stage.Stage;
 
 /**
  * A scene which contains all of the properties a catalogue needs to have.
@@ -55,13 +54,6 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         // Milestones and Labels added via different scene
         Label lblSemester = new Label("Semester");
 
-        SaveCancelPane buttonWrapper = new SaveCancelPane();
-
-        buttonWrapper.setOnCancel(event -> {
-            getWindow().hide();
-        });
-
-        buttonWrapper.setOnSave(this::handleSaving);
 
         int rowIndex = 0;
 
@@ -74,7 +66,7 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         grid.add(lblDescription, 0, rowIndex);
         grid.add(taDesc, 1, rowIndex, 1, 3);
         rowIndex += 3;
-        grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
+        grid.add(buttons, 0, ++rowIndex, 2, 1);
     }
 
     @Override
@@ -97,21 +89,27 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
     }
 
     public void handleSaving(ActionEvent event) {
-        String name = tfName.getText();
-        String lecture = tfLecture.getText();
-
-        if(name == null){
-            throw new IllegalArgumentException("[Catalogue] Name MUST not be null");
+        if(!checkMandatoryFields() ){
+            throw new IllegalArgumentException("[Catalogue] Name MUST not be null nor empty");
         }
-
         catalogue = new Catalogue(
-                name,
-                lecture,
+                tfName.getText(),
+                tfLecture.getText(),
                 taDesc.getText(),
                 tfSemester.getText()
         );
-        getWindow().hide();
+        dismiss();
+    }
 
+    /**
+     * Checks whether the mandatory fields are filled in.$
+     *
+     * This method checks whether the catalogue has a name.
+     *
+     * @return true iff all mandatory fields have been edited.
+     */
+    private boolean checkMandatoryFields(){
+        return !StringUtils.isNullOrEmpty(tfName.getText() );
     }
 
 }

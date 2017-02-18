@@ -1,11 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
-import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 
 /**
  * TODO: write JavaDoc
@@ -63,10 +61,6 @@ public class MetaKeyValuePairScene extends AbstractVisualCreator<RequirementProp
         grid.add(tfKey, 1, 0);
         grid.add(lblValue, 0, 1);
         grid.add(tfValue, 1, 1);
-
-        SaveCancelPane buttons = new SaveCancelPane();
-        buttons.setOnCancel(event -> getWindow().hide() );
-        buttons.setOnSave(this::handleSaving);
 
         grid.add(buttons, 0, 3, 2,1);
         setRoot(grid);
