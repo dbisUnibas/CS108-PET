@@ -51,19 +51,59 @@ sourceSets{
     }
     test {
         java{
-            srcDir 'test/java'
+            srcDir 'src/test/java'
         }
         resources{
-            srcDir 'test/resources'
+            srcDir 'src/test/resources'
         }
     }
 }
 
 jar{
-    manifest{
-        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication'
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 
+}
+
+
+
+task incrementTest {
+    doLast{
+        Properties p = new Properties()
+        File pF = new File('version.properties')
+        p.load(pF.newDataInputStream() )
+        Integer fix = (p.getProperty('artifactFixVersion') as Integer)
+        logger.debug('fix version: '+fix.toString() )
+        Integer nextFix = fix + 1
+        logger.debug('next fix version: '+nextFix.toString() )
+        p.setProperty('artifactFixVersion', nextFix.toString() )
+        p.store(pF.newWriter(), null)
+        p.load(pF.newDataInputStream() )
+    }
+}
+
+
+task deployEditor(dependsOn: [build, jar]){
+    doLast{
+        println('Deployed Editor version '+project.version)
+    }
+
+}
+
+/*
+ * Goal: filter in Version.java @v@ and replace with actual version. Then comiple with it.
+ * by : http://stackoverflow.com/a/33475075
+ */
+
+
+gradle.taskGraph.whenReady{
+    taskGraph ->
+        if(taskGraph.hasTask(deployEditor)){
+            jar.appendix = 'editor'
+            jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication')
+        }
 }
 
 /**
@@ -125,21 +165,6 @@ build.doLast{
     incrementVersion('BuildNumber')
 }
 
-task incrementTest {
-    doLast{
-        Properties p = new Properties()
-        File pF = new File('version.properties')
-        p.load(pF.newDataInputStream() )
-        Integer fix = (p.getProperty('artifactFixVersion') as Integer)
-        logger.debug('fix version: '+fix.toString() )
-        Integer nextFix = fix + 1
-        logger.debug('next fix version: '+nextFix.toString() )
-        p.setProperty('artifactFixVersion', nextFix.toString() )
-        p.store(pF.newWriter(), null)
-        p.load(pF.newDataInputStream() )
-    }
-}
-
 /**
  * Reads the version.properties file with its artifact version numbers and concatenats these numbers
  * to the version in format M.m.F-bB where M is the artifactMajorVersion, m is the artifactMinorVersion
@@ -169,13 +194,4 @@ task setupVersion{
         String v = readVersion()
         setVersion(v)
     }
-}
-
-task deployEditor(dependsOn: [build, jar])
-
-gradle.taskGraph.whenReady{
-    taskGraph ->
-        if(taskGraph.hasTask(deployEditor)){
-            jar.appendix = 'editor'
-        }
 }

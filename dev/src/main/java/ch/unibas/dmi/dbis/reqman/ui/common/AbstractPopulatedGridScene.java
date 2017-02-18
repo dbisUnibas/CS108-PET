@@ -14,7 +14,7 @@ public abstract class AbstractPopulatedGridScene extends Scene {
     /**
      * The {@link GridPane} which manages the layout of this scene.
      */
-    protected GridPane grid = UIUtilities.generateDefaultGridPane();
+    protected GridPane grid = Utils.generateDefaultGridPane();
 
     /**
      * Creates a new {@link AbstractPopulatedGridScene}.
@@ -23,7 +23,6 @@ public abstract class AbstractPopulatedGridScene extends Scene {
     public AbstractPopulatedGridScene() {
         super(new Region());
         setRoot(grid);
-
     }
 
     /**

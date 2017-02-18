@@ -45,6 +45,7 @@ public class EditorController  {
         observableMs = FXCollections.observableArrayList(catalogue.getMilestones() );
         editor.passRequirementsToView(observableReqs);
         editor.passMilestonesToView(observableMs);
+        updateTitle();
     }
 
     public Catalogue getCatalogue(){
@@ -62,6 +63,9 @@ public class EditorController  {
     }
 
     public void handleAddRequirement(ActionEvent event){
+        if(!isCatalogueSet() ){
+            return; // Prevent open prompt from accelerator even if no catalogue is set
+        }
         Requirement r = EditorPromptFactory.promptNewRequirement(this);
         if(r != null){ // user may cancelled the prompt
             observableReqs.add(r );
@@ -77,11 +81,18 @@ public class EditorController  {
     }
 
     public void handleAddMilestone(ActionEvent event){
+        if(!isCatalogueSet() ){
+            return; // Prevent open prompt from accelerator even if no catalogue is set
+        }
         Milestone m = EditorPromptFactory.promptNewMilestone();
         if(m != null){
             m.setOrdinal(getNextMsOrdinal() );
             observableMs.add(m);
         }
+    }
+
+    private boolean isCatalogueSet(){
+        return catalogue != null;
     }
 
     private int getNextMsOrdinal(){
@@ -126,11 +137,25 @@ public class EditorController  {
         }
     }
 
-    public void handleSaveCatalogue(ActionEvent event){
-        FileChooser saveChooser = createCatalogueFileChooser("Save");
-        File file = saveChooser.showSaveDialog(controlledStage);
+    private File catalogueFile = null;
+
+    public void handleSaveAsCatalogue(ActionEvent event){
+        FileChooser saveChooser = createCatalogueFileChooser("Save As");
+        catalogueFile = saveChooser.showSaveDialog(controlledStage);
         try {
-            JSONUtils.writeToJSONFile(getCatalogue(), file); // Important to use getCatalogue as the reqs and ms are set there
+            JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile); // Important to use getCatalogue as the reqs and ms are set there
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void handleSaveCatalogue(ActionEvent event){
+        if(catalogueFile == null){
+            handleSaveAsCatalogue(event);
+        }
+
+        try {
+            JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -163,9 +188,9 @@ public class EditorController  {
 
     public void handleOpenCatalogue(ActionEvent event){
         FileChooser openChooser = createCatalogueFileChooser("Open");
-        File f = openChooser.showOpenDialog(controlledStage);
+        catalogueFile = openChooser.showOpenDialog(controlledStage);
         try {
-            openCatalogue(JSONUtils.readCatalogueJSONFile(f));
+            openCatalogue(JSONUtils.readCatalogueJSONFile(catalogueFile));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -204,7 +229,7 @@ public class EditorController  {
         }
     }
 
-    public Milestone findMilestoneForOrdinal(int ordinal) {
+    public Milestone getMilestoneByOrdinal(int ordinal) {
         Milestone result = null;
         for(Milestone ms : observableMs){
             if(ms.getOrdinal() == ordinal){

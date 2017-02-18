@@ -150,4 +150,14 @@ public class Catalogue {
     public void addAllMilestones(Milestone...milestones){
         this.milestones.addAll(Arrays.asList(milestones));
     }
+
+    public Milestone getMilestoneByOrdinal(int ordinal) {
+        Milestone result = null;
+        for(Milestone ms : milestones){
+            if(ms.getOrdinal() == ordinal){
+                result = ms;
+            }
+        }
+        return result;
+    }
 }
