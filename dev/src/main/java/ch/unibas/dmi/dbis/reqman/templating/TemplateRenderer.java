@@ -34,10 +34,11 @@ public class TemplateRenderer {
         fields.forEach((variable, field)->{
             System.out.println(variable+": "+field.render(instance));
             Pattern p = Pattern.compile(variable);
-            Matcher m = p.matcher(template);
+            Matcher m = p.matcher(out.toString());
             while(m.find() ){
                 int b = m.start();
                 int e = m.end();
+                System.out.println("Start: "+b+", end: "+e+", length: "+(e-b));
                 out.replace(m.start(), m.end(), field.render(instance));
             }
         });
