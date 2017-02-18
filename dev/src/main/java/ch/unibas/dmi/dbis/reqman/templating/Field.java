@@ -73,7 +73,7 @@ import java.util.function.Function;
  * }
  *
  * }</pre>
- *
+ * <p>
  * Since the attribute {@code name} of the class {@code Person} is an instance of {@code Name} on its own, one must provide a {@code renderer}:
  * <pre>
  *     Function<Name, String> nameRenderer = name -> name.getFirst() + " " + name.getLast();
@@ -83,6 +83,7 @@ import java.util.function.Function;
  *
  * @param <E> The type of the entity this field belongs to
  * @param <T> The type of the field this {@link Field} represents.
+ * @author loris.sauter
  */
 public class Field<E, T> {
 
@@ -125,25 +126,6 @@ public class Field<E, T> {
     }
 
     /**
-     * Renders the instance's field.
-     * Be aware that this method returns null if the type is {@link Type#ENTITY}
-     * @param instance The instance from where the getter gets its resulting value.
-     * @return Either the rendered field or null, if the type is {@link Type#ENTITY}
-     */
-    public String render(E instance){
-        T value = getter.apply(instance);
-        switch(type){
-            case RAW:
-                return String.valueOf(value);
-            case OBJECT:
-                return renderer.apply(value);
-            case ENTITY:
-            default:
-                return null;
-        }
-    }
-
-    /**
      * Constructs a new {@link Field} with specified properties and with a renderer provided.
      * <p>
      * This constructor is intended to use if the field's type is of type {@link Type#OBJECT}.
@@ -165,8 +147,28 @@ public class Field<E, T> {
     }
 
     /**
-     * Checks if the given object equals this instance.
+     * Renders the instance's field.
+     * Be aware that this method returns null if the type is {@link Type#ENTITY}
      *
+     * @param instance The instance from where the getter gets its resulting value.
+     * @return Either the rendered field or null, if the type is {@link Type#ENTITY}
+     */
+    public String render(E instance) {
+        T value = getter.apply(instance);
+        switch (type) {
+            case RAW:
+                return String.valueOf(value);
+            case OBJECT:
+                return renderer.apply(value);
+            case ENTITY:
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Checks if the given object equals this instance.
+     * <p>
      * <i>IntelliJ generated</i>
      *
      * @param obj The other object to compare on equality.
@@ -195,7 +197,7 @@ public class Field<E, T> {
 
     /**
      * Returns the hashCode of this instance.
-     *
+     * <p>
      * <i>IntelliJ generated</i>
      *
      * @return The hash code of this instance.
@@ -210,6 +212,7 @@ public class Field<E, T> {
 
     /**
      * Returns the name of the field.
+     *
      * @return The name of the field
      */
     public String getName() {
@@ -218,6 +221,7 @@ public class Field<E, T> {
 
     /**
      * Sets the name of the field.
+     *
      * @param name The name of this field.
      */
     public void setName(String name) {
@@ -226,6 +230,7 @@ public class Field<E, T> {
 
     /**
      * Returns the type of this field.
+     *
      * @return The type of this field
      */
     public Type getType() {
@@ -234,6 +239,7 @@ public class Field<E, T> {
 
     /**
      * Sets the type of this field
+     *
      * @param type The type of this field
      */
     public void setType(Type type) {
@@ -242,6 +248,7 @@ public class Field<E, T> {
 
     /**
      * Returns the getter, used to get the value of the field this field is representing.
+     *
      * @return The getter, as a {@link Function}
      */
     public Function<E, T> getGetter() {
@@ -250,6 +257,7 @@ public class Field<E, T> {
 
     /**
      * Sets the getter
+     *
      * @param getter The getter as a {@link Function}
      */
     public void setGetter(Function<E, T> getter) {
@@ -262,12 +270,12 @@ public class Field<E, T> {
     public static enum Type {
         /**
          * States that the {@link Field} with this type represents a field who's type is a raw data type.
-         *
+         * <p>
          * Some raw data types are:
          * <ul>
-         *     <li>String</li><li>boolean</li><li>int</li><li>double</li><li>...</li>
+         * <li>String</li><li>boolean</li><li>int</li><li>double</li><li>...</li>
          * </ul>
-         *
+         * <p>
          * An arbitrary class is not a raw type.
          */
         RAW,
