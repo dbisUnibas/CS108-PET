@@ -265,6 +265,24 @@ public class Field<E, T> {
     }
 
     /**
+     * Returns a string representation of this field.
+     *
+     * <i>IntelliJ generated</i>
+     *
+     * @return Returns a string representation of this field.
+     */
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Field{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", type=").append(type);
+        sb.append(", getter=").append(getter);
+        sb.append(", renderer=").append(renderer);
+        sb.append('}');
+        return sb.toString();
+    }
+
+    /**
      * The enumeration {@link Type} is used to differentiate between different types of {@link Field}s.
      */
     public static enum Type {

@@ -35,5 +35,9 @@ public class ParserSandbox {
 
         System.out.println(renderer.render(msTemplate, ms, map));
 
+        parser.setupFor(parser.REQUIREMENT_ENTITY);
+        Map<String, Field<Requirement, ?>> reqMap = parser.parse(reqTemplate);
+
+        System.out.println(renderer.render(reqTemplate, r, reqMap));
     }
 }

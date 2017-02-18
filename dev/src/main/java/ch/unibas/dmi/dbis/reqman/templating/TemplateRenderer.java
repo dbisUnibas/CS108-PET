@@ -11,35 +11,32 @@ import java.util.regex.Pattern;
  */
 public class TemplateRenderer {
 
+
     public TemplateRenderer(){
 
     }
 
+    /**
+     * MAP must have the REGEX escaped value in it!
+     * @param template
+     * @param instance
+     * @param fields
+     * @param <E>
+     * @return
+     */
     public <E> String render(String template, E instance, Map<String, Field<E, ?>> fields){
-
-        /*
-        // Not working ?!
-        String[] targets = fields.keySet().toArray(new String[0]);
-        ArrayList<String> replacements = new ArrayList<>(targets.length);
-        fields.entrySet().forEach(entry -> {
-            Field<E, ?> field = entry.getValue();
-            replacements.add(field.render(instance));
-            System.out.println(field.getName()+": "+field.render(instance));
-        });
-
-        return StringUtils.replaceEach(template, targets, replacements.toArray(new String[0]));
-        */
 
         StringBuilder out = new StringBuilder(template);
         fields.forEach((variable, field)->{
-            System.out.println(variable+": "+field.render(instance));
             Pattern p = Pattern.compile(variable);
             Matcher m = p.matcher(out.toString());
             while(m.find() ){
-                int b = m.start();
-                int e = m.end();
-                System.out.println("Start: "+b+", end: "+e+", length: "+(e-b));
-                out.replace(m.start(), m.end(), field.render(instance));
+                if(field.getType() == Field.Type.ENTITY){
+                    
+
+                }else{
+                    out.replace(m.start(), m.end(), field.render(instance));
+                }
             }
         });
         return out.toString();
