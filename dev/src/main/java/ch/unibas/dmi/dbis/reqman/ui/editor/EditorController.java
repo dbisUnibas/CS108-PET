@@ -141,9 +141,13 @@ public class EditorController  {
 
     public void handleSaveAsCatalogue(ActionEvent event){
         FileChooser saveChooser = createCatalogueFileChooser("Save As");
-        catalogueFile = saveChooser.showSaveDialog(controlledStage);
+        File catalogueFile = saveChooser.showSaveDialog(controlledStage);
+        if(catalogueFile == null){
+            return; // No file was selected
+        }
         try {
             JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile); // Important to use getCatalogue as the reqs and ms are set there
+            this.catalogueFile = catalogueFile; // Only when saving was done
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -153,7 +157,6 @@ public class EditorController  {
         if(catalogueFile == null){
             handleSaveAsCatalogue(event);
         }
-
         try {
             JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile);
         } catch (IOException e) {
@@ -176,6 +179,9 @@ public class EditorController  {
         fc.setTitle("Export Catalogue");
         fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
         File f = fc.showSaveDialog(controlledStage);
+        if(f == null){
+            return; // no file was selected
+        }
         SimpleCatalogueExporter exporter = new SimpleCatalogueExporter(getCatalogue() );
         String html = exporter.exportHTML();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
@@ -188,7 +194,11 @@ public class EditorController  {
 
     public void handleOpenCatalogue(ActionEvent event){
         FileChooser openChooser = createCatalogueFileChooser("Open");
-        catalogueFile = openChooser.showOpenDialog(controlledStage);
+        File catalogueFile = openChooser.showOpenDialog(controlledStage);
+        if(catalogueFile == null){
+            return; // No file selected
+        }
+        this.catalogueFile = catalogueFile;
         try {
             openCatalogue(JSONUtils.readCatalogueJSONFile(catalogueFile));
         } catch (IOException e) {
