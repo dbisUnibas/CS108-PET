@@ -3,12 +3,11 @@ package ch.unibas.dmi.dbis.reqman.templating;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,11 +33,15 @@ public class TemplateParser{
     public static final String OPTION_OPENING = "[";
     public static final String OPTION_CLOSING = "]";
 
+    private static final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
+
     private Entity entity;
 
+    @Deprecated
     private String searchOpen;
 
     private Pattern pattern;
+    private String regexEntity;
 
     private Catalogue catalogue;
     // TODO: TemplateParser for Groups will need Group AND Catalogue.
@@ -49,21 +52,98 @@ public class TemplateParser{
 
     public void setupFor(Entity entity){
         this.entity = entity;
-        searchOpen = INDICATOR_REGEX + this.entity.getIndicatorName() + FIELD_DELIMETER_REGEX + NAME_REGEX ;
+        searchOpen = INDICATOR_REGEX + this.entity.getEntityName() + FIELD_DELIMETER_REGEX + NAME_REGEX ;
         pattern = Pattern.compile(searchOpen + CLOSING_REGEX);
+        regexEntity = INDICATOR_REGEX + entity.getEntityName();
+    }
+
+    // TODO: Define visibility
+    <E> List<Replacement<E>> parseReplacements(String template){
+        LOGGER.trace("parseReplacements");
+        ArrayList<Replacement<E>> list = new ArrayList();
+        Pattern patternField = Pattern.compile(regexEntity+FIELD_DELIMETER_REGEX+NAME_REGEX);
+        LOGGER.debug(String.format("[parseRep] Field regex: %s", patternField.pattern()));
+        Matcher matcherField = patternField.matcher(template);
+        while(matcherField.find() ){
+            String expression = template.substring(matcherField.start(), matcherField.end() );
+            String successor = template.substring(matcherField.end(), matcherField.end()+1);
+            LOGGER.debug("[parseRep] Expression: "+expression);
+            LOGGER.debug("[parseRep] Expression region: "+matcherField.start()+", "+matcherField.end() );
+            LOGGER.debug("[parseRep] Sucessor: "+successor);
+            switch (successor){
+                case CLOSING:
+                    // normal field
+                    Field<E, ?> field = parseNormalField(expression+CLOSING);
+                    Replacement<E> repl = new Replacement<E>(field,matcherField.start(), matcherField.end(), regexEntity+FIELD_DELIMETER_REGEX+field.getName()+CLOSING_REGEX, expression+CLOSING);
+                    list.add(repl);
+                    LOGGER.debug(String.format("Repalcement: %s", repl.toString()));
+                    break;
+                case FIELD_DELIMETER:
+                    // subentity field
+                    int end = template.indexOf(CLOSING, matcherField.end());
+                    SubEntityField<E, ?> subField = parseSubField(patternField.pattern(),  template.substring(matcherField.start(), end+1));
+
+                    break;
+                case OPTION_OPENING:
+                    // conditional OR advanced
+                    break;
+                default:
+                    // something went wrong
+                    break;
+            }
+        }
+
+        return list;
+    }
+
+    private <E> SubEntityField<E, ?> parseSubField(String regexField, String expression){
+        LOGGER.debug("[parseSubEntity] Expression: "+expression);
+        Pattern patternSub = Pattern.compile(regexField+FIELD_DELIMETER_REGEX+NAME_REGEX);
+        LOGGER.debug("[parseSubEntity] Sub rexeg: "+patternSub.pattern());
+        Matcher matcherSub = patternSub.matcher(expression);
+        while(matcherSub.find() ){
+            String found = expression.substring(matcherSub.start(), matcherSub.end() );
+            LOGGER.debug("[parseSubEntity] Found: "+found);
+            int firstFieldDelim = found.indexOf(FIELD_DELIMETER);
+            int nextFieldDelim = found.indexOf(FIELD_DELIMETER, firstFieldDelim+1);
+            LOGGER.debug("First delim: "+firstFieldDelim+", next: "+nextFieldDelim);
+            String entityFieldName = found.substring(firstFieldDelim+1, nextFieldDelim);
+            String subFieldName = found.substring(nextFieldDelim+1, matcherSub.end());
+            String successor = expression.substring(matcherSub.end(), matcherSub.end() +1);
+            LOGGER.debug("[parseSubEntity] entityFieldName: "+entityFieldName);
+            LOGGER.debug("[parseSubEntity] subFieldName: "+subFieldName);
+            LOGGER.debug("[parseSubEntity] successor: "+successor);
+            if(CLOSING.equals(successor)){
+                // Done
+                SubEntityField<E, ?> subField = (SubEntityField<E,?>)entity.getFieldForName(entityFieldName);
+                subField.setSubFieldName(subFieldName);
+                return subField;
+            }else{
+                // parse options?
+                // TODO: implement
+                throw new UnsupportedOperationException("Parsing on such a deep level not yet supported");
+            }
+        }
+        return null;
     }
 
 
-    public <E> Map<String, Field<E, ?>> parse(String template){
+
+
+
+
+
+    @Deprecated
+    public <E> Map<String, Field<E, ?>> oldParse(String template){
         // DIRECT FIELDS
         Map<String, Field<E, ?>> map = new TreeMap<>();
         Matcher matcher = pattern.matcher(template);
         while(matcher.find() ){
             String variable = template.substring(matcher.start(), matcher.end() );
 
-            Field<E, ?> field = parseField(variable);
+            Field<E, ?> field = parseNormalField(variable);
 
-            String currentPatternOpen = INDICATOR_REGEX +entity.getIndicatorName()+ FIELD_DELIMETER_REGEX +field.getName();
+            String currentPatternOpen = INDICATOR_REGEX +entity.getEntityName()+ FIELD_DELIMETER_REGEX +field.getName();
             map.put(currentPatternOpen+ CLOSING_REGEX, field); // need to escape regex predifned dollar symbol
             //map.put(variable, field);
 
@@ -78,53 +158,75 @@ public class TemplateParser{
             int nextDelim = completeVariable.indexOf(FIELD_DELIMETER, firstDelim+1);
             String first = completeVariable.substring(firstDelim+1, nextDelim);
             String next = completeVariable.substring(nextDelim+1, completeVariable.lastIndexOf(CLOSING));
-            Field<E, ?> f = parseField(INDICATOR+entity.getIndicatorName()+FIELD_DELIMETER+first+CLOSING);
+            Field<E, ?> f = parseNormalField(INDICATOR+entity.getEntityName()+FIELD_DELIMETER+first+CLOSING);
+            /*
             if(f.getType() == Field.Type.SUB_ENTITY){
                 Entity sub = f.getSubEntity();
                 if(sub.hasField(next)){
                     f.setSubFieldName(next);
-                    map.put(INDICATOR_REGEX+entity.getIndicatorName()+FIELD_DELIMETER_REGEX+first+FIELD_DELIMETER_REGEX+next+CLOSING,f);
+                    map.put(INDICATOR_REGEX+entity.getEntityName()+FIELD_DELIMETER_REGEX+first+FIELD_DELIMETER_REGEX+next+CLOSING,f);
                 }
             }
+            */
         }
 
 
         return map;
     }
 
-    private <E> Field<E, ?> parseField(String field){
+    private <E> Field<E, ?> parseNormalField(String expression){
         Pattern p = Pattern.compile(FIELD_DELIMETER_REGEX +NAME_REGEX+ CLOSING_REGEX);
-        Matcher matcher = p.matcher(field);
+        LOGGER.debug("[parseNormal] Field regex: "+p.pattern() );
+        Matcher matcher = p.matcher(expression);
         if(matcher.find() ){
-            String name = field.substring(matcher.start()+1, matcher.end()-1);
+            String name = expression.substring(matcher.start()+1, matcher.end()-1);
+            LOGGER.debug("[parseNormal] Name: "+name);
             if(entity.hasField(name)){
                 return entity.getFieldForName(name);
             }else{
-                throw new RuntimeException("Entity ("+entity.getIndicatorName()+") has no field with name "+name+" registered");// TODO write own exception (for better handling)
+                throw new ParseException("Entity ("+entity.getEntityName()+") has no field with name "+name+" registered");// TODO write own exception (for better handling)
             }
         }
-        return null; // Severe error
+        throw new ParseException("Found undefined expression: "+expression);
+    }
+
+    public static class ParseException extends RuntimeException{
+        public ParseException() {
+        }
+
+        public ParseException(String message) {
+            super(message);
+        }
+
+        public ParseException(String message, Throwable cause) {
+            super(message, cause);
+        }
+
+        public ParseException(Throwable cause) {
+            super(cause);
+        }
+
+        public ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+            super(message, cause, enableSuppression, writableStackTrace);
+        }
     }
 
     public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
-            new Field<Milestone, String>("name", Field.Type.RAW, Milestone::getName),
+            new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
             new Field<Milestone, Date>("date", Field.Type.OBJECT, Milestone::getDate, date -> {
                 SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
                 return format.format(date);
             }),
-            new Field<Milestone, Integer>("ordinal", Field.Type.RAW, Milestone::getOrdinal)
+            new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal)
     );
 
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
-            new Field<Requirement, String>("name", Field.Type.RAW, Requirement::getName),
-            new Field<Requirement, String>("description", Field.Type.RAW, Requirement::getDescription),
-            new Field<Requirement, Double>("maxPoints", Field.Type.RAW, Requirement::getMaxPoints),
-            new Field<Requirement, Milestone>("minMS", Field.Type.SUB_ENTITY, req -> {
-                return catalogue.getMilestoneByOrdinal(req.getMinMilestoneOrdinal());
-            }, MILESTONE_ENTITY),
-            new Field<Requirement, Milestone>("maxMS", Field.Type.SUB_ENTITY, req -> {
-                return catalogue.getMilestoneByOrdinal(req.getMaxMilestoneOrdinal() );
-            }, MILESTONE_ENTITY),
+            new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
+            new Field<Requirement, String>("description", Field.Type.NORMAL, Requirement::getDescription),
+            new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPoints),
+            new SubEntityField<Requirement, Milestone>("minMS", (requirement -> {
+                return catalogue.getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal());
+            }), MILESTONE_ENTITY),
             new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, Requirement::getPredecessorNames, list -> {
                 StringBuilder sb = new StringBuilder();
                 list.forEach(str -> {

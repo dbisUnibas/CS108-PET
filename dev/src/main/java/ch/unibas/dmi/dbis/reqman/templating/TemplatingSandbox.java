@@ -13,7 +13,7 @@ public class TemplatingSandbox {
 
         Function<Integer, String> renderer = String::valueOf;
 
-        Field<Person, Integer> strAge = new Field<>("age", Field.Type.RAW, Person::getAge, renderer);
+        Field<Person, Integer> strAge = new Field<>("age", Field.Type.NORMAL, Person::getAge, renderer);
 
         Function<Name, String> nameRenderer = name -> name.getFirst() + " " + name.getLast();
 

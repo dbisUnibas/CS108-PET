@@ -8,7 +8,7 @@ import java.util.TreeMap;
  *
  * @author loris.sauter
  */
-class Entity<E> implements Parsable {
+class Entity<E> {
 
 
     private Map<String, Field<E, ?>> fields = new TreeMap<>();
@@ -32,8 +32,7 @@ class Entity<E> implements Parsable {
         return fields.get(name);
     }
 
-    @Override
-    public String getIndicatorName(){
+    public String getEntityName(){
         return name;
     }
 

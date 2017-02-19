@@ -34,11 +34,13 @@ public class TemplateRenderer {
             Matcher m = p.matcher(out.toString());
             while(m.find() ){
                 if(field.getType() == Field.Type.SUB_ENTITY){
+                    /*
                     Entity sub = field.getSubEntity();
                     Field f = sub.getFieldForName(field.getSubFieldName() );
                     Object o = field.getGetter().apply(instance);
                     System.out.println(o);
                     out.replace(m.start(), m.end(), f.render(field.getGetter().apply(instance)));
+                    */
                 }else{
                     out.replace(m.start(), m.end(), field.render(instance));
                 }

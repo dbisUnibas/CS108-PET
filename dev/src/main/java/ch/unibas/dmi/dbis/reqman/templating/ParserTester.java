@@ -5,15 +5,13 @@ import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * TODO: Write JavaDoc
  *
  * @author loris.sauter
  */
-public class ParserSandbox {
-
+public class ParserTester {
     public static void main(String[] args){
         Milestone ms = new Milestone("Milestone", 0, new Date() );
         Requirement r = new Requirement("first","desc",ms.getOrdinal(),ms.getOrdinal(),3,true,true,false);
@@ -31,23 +29,7 @@ public class ParserSandbox {
         String msTem2 = "${milestone.ordinal} @ OTHER";
 
         TemplateParser parser = new TemplateParser(cat);
-        parser.setupFor(parser.MILESTONE_ENTITY);
-        Map<String, Field<Milestone, ?>> map = parser.oldParse(msTemplate); // Would be in template
-
-
-        TemplateRenderer renderer = new TemplateRenderer(parser);
-
-        System.out.println(renderer.render(msTemplate, ms, map));
-
         parser.setupFor(parser.REQUIREMENT_ENTITY);
-        Map<String, Field<Requirement, ?>> reqMap = parser.oldParse(reqTemplate);
-
-        /*
-        reqMap.forEach((key, field) -> {
-            System.out.println("Key: "+key+", field: "+field);
-        });
-        */
-
-        System.out.println(renderer.render(reqTemplate, r, reqMap));
+        parser.parseReplacements(reqTemplate);
     }
 }

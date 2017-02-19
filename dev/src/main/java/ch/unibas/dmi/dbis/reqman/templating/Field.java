@@ -31,8 +31,8 @@ import java.util.function.Function;
  * <p>
  * The class could be seen as an entity with the following fields:
  * <pre>
- *     Field<Person, String> nameField = new Filed<>("name", Field.Type.RAW, Field::getName);
- *     Field<Person, Integer> ageField = new Field<>("age", Field.Type.RAW, Field::getAge);
+ *     Field<Person, String> nameField = new Filed<>("name", Field.Type.NORMAL, Field::getName);
+ *     Field<Person, Integer> ageField = new Field<>("age", Field.Type.NORMAL, Field::getAge);
  * </pre>
  * <p>
  * <h2>Example for a field with type OBJECT</h2>
@@ -102,13 +102,13 @@ public class Field<E, T> {
     /**
      * The renderer for the field, if the field's type is {@link Type#OBJECT}
      */
-    protected Function<T, String> renderer;
-    private Entity<T> subEntity = null;
+    protected Function<T, String> renderer = null;
+
 
     /**
      * Constructor for a new {@link Field} with specified properties.
      * <p>
-     * This constructor is intended to when instantiating fields with either type {@link Type#RAW} or {@link Type#SUB_ENTITY}
+     * This constructor is intended to when instantiating fields with either type {@link Type#NORMAL} or {@link Type#SUB_ENTITY}
      * if the type would be {@link Type#OBJECT}, an {@link IllegalArgumentException} will be thrown. Use {@link Field#Field(String, Type, Function, Function, Entity)} instead.
      *
      * @param name   The name of the field
@@ -116,7 +116,7 @@ public class Field<E, T> {
      * @param getter The getter used to get the field's value.
      * @throws IllegalArgumentException If the type is {@link Type#OBJECT}
      */
-    public Field(String name, Type type, Function<E, T> getter) throws IllegalArgumentException {
+    protected Field(String name, Type type, Function<E, T> getter) throws IllegalArgumentException {
         if (type == Type.OBJECT) {
             throw new IllegalArgumentException("If this field's type is Type.OBJECT, an appropriate *renderer must be provided*. See the docs for more information");
         }
@@ -140,41 +140,48 @@ public class Field<E, T> {
      * @param getter   The getter used to get the field's value
      * @param renderer The renderer which renders this field.
      */
-    public Field(String name, Type type, Function<E, T> getter, Function<T, String> renderer) {
+    protected Field(String name, Type type, Function<E, T> getter, Function<T, String> renderer) {
         this.name = name;
         this.type = type;
         this.getter = getter;
         this.renderer = renderer;
     }
 
-    // TODO Write factory methods for all types!
+    /**
+     * Creates a new {@link Field} with specified properties.
+     * <p>
+     * This creates a normal {@link Field}.
+     *
+     * @param name   The name of the field
+     * @param getter The getter used to get the field's value.
+     * @param <E> The type of the entity this {@link Field} is for
+     * @param <T> The type of the field this {@link Field} represents
+     * @return A new {@link Field}.
+     */
+    public static <E,T> Field<E, T> createNormalField(String name, Function<E,T> getter){
+        return new Field<>(name, Type.NORMAL, getter);
+    }
 
     /**
+     * Creates a new {@link Field} with specified properties and with a renderer provided.
+     * <p>
+     * The {@link Field} then must know how to render itself and thus needs to have a {@code renderer} specified.
+     * <p>
+     * A a {@code renderer} is any arbitrary {@link Function} which returns a {@link String} when given an object
+     * of this {@link Field}'s type. Refer to the classes introduction to understand why and how a renderer is provided.
      *
-     * @param name
-     * @param type
-     * @param getter
-     * @param subEntity The sub entity.
-     *
+     * @param name     The name of the field
+     * @param getter   The getter used to get the field's value
+     * @param renderer The renderer which renders this field.
+     * @param <E> The type of the enitity this {@link Field} is for
+     * @param <T> The type of the field this {@link Field} represents
+     * @return
      */
-    @Deprecated
-    public Field(String name, Type type, Function<E, T> getter, Entity<T> subEntity) {
-        this.name = name;
-        this.type = type;
-        this.getter = getter;
-        this.subEntity = subEntity;
+    public static <E,T> Field<E,T> createObjectField(String name, Function<E,T> getter, Function<T, String> renderer){
+        return new Field<>(name, Type.OBJECT, getter, renderer);
     }
 
-    @Deprecated // MOVE TO SUBCLASS
-    private String subFieldName;
-    @Deprecated // MOVE TO SUBCLASS
-    public String getSubFieldName(){
-        return subFieldName;
-    }
-    @Deprecated // MOVE TO SUBCLASS
-    public void setSubFieldName(String name){
-        subFieldName = name;
-    }
+    // TODO Write factory methods for all types!
 
     /**
      * Renders the instance's field.
@@ -186,7 +193,7 @@ public class Field<E, T> {
     public String render(E instance) {
         T value = getter.apply(instance);
         switch (type) {
-            case RAW:
+            case NORMAL:
                 return String.valueOf(value);
             case OBJECT:
                 return renderer.apply(value);
@@ -194,6 +201,10 @@ public class Field<E, T> {
             default:
                 return null;
         }
+    }
+
+    protected Function<T, String> getRenderer(){
+        return renderer;
     }
 
     /**
@@ -240,15 +251,6 @@ public class Field<E, T> {
         return result;
     }
 
-    /**
-     * Returns the sub entity if this {@link Field } is of {@link Type#SUB_ENTITY}.
-     *
-     * @return
-     */
-    @Deprecated // MOVE TO SUBCLASS
-    public Entity<T> getSubEntity() {
-        return subEntity;
-    }
 
     /**
      * Returns the name of the field.
@@ -336,7 +338,7 @@ public class Field<E, T> {
          * <p>
          * An arbitrary class is not a raw type.
          */
-        RAW,
+        NORMAL,
         /**
          * States that the {@link Field} with this type represents a field who's type is any arbitrary class.
          */
