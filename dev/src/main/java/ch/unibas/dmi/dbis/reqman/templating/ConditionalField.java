@@ -9,18 +9,23 @@ import java.util.function.Function;
  */
 public class ConditionalField<E> extends  Field<E,Boolean> {
 
+    /**
+     * On runtime, this will contain the parsed false-string
+     * e.g given expression: <code>${requirement.mandatory[mandatory][bonus]}</code>
+     * this will return <code>bonus</code> during runtime.
+     */
     private Function<Boolean, String> falseRenderer = null;
 
     /**
      *
      * @param name
      * @param getter
-     * @param trueRenderer It is ensured, that the passed object to render is TRUE
-     * @param falseRenderer It is ensured, that the passed object to render is FALSE
+     * @param defaultTrueRenderer It is ensured, that the passed object to render is TRUE. WILL BE ASSIGNED ON RUNTIME with real value.
+     * @param defaultFalseRenderer It is ensured, that the passed object to render is FALSE. WILL BE ASSIGNED ON RUNTIME with real value.
      */
-    public ConditionalField(String name, Function<E,Boolean> getter, Function<Boolean,String> trueRenderer, Function<Boolean, String> falseRenderer){
-        super(name, Type.CONDITIONAL, getter, trueRenderer);
-        this.falseRenderer = falseRenderer;
+    public ConditionalField(String name, Function<E,Boolean> getter, Function<Boolean,String> defaultTrueRenderer, Function<Boolean, String> defaultFalseRenderer){
+        super(name, Type.CONDITIONAL, getter, defaultTrueRenderer);
+        this.falseRenderer = defaultFalseRenderer;
     }
 
     public Function<Boolean, String> getTrueRenderer(){
@@ -29,6 +34,14 @@ public class ConditionalField<E> extends  Field<E,Boolean> {
 
     public Function<Boolean, String> getFalseRenderer(){
         return falseRenderer;
+    }
+
+    public void setTrueRenderer(Function<Boolean, String> trueRenderer){
+        setRenderer(trueRenderer);
+    }
+
+    public void setFalseRenderer(Function<Boolean, String> falseRenderer) {
+        this.falseRenderer = falseRenderer;
     }
 
     @Override

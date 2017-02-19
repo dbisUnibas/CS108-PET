@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.List;
 
 /**
  * Represents a template file as a java object.
@@ -13,8 +12,27 @@ public class Template<E> {
 
     private String template;
 
-    private Map<String, Field<E,?>> fields = new TreeMap<>();
+    private List<Replacement<E>> replacements;
 
+    private E entity;
 
+    public Template(String template, List<Replacement<E>> replacements, E entity) {
+        this.template = template;
+        this.replacements = replacements;
+        this.entity = entity;
+    }
 
+    
+
+    public String getTemplate() {
+        return template;
+    }
+
+    public List<Replacement<E>> getReplacements() {
+        return replacements;
+    }
+
+    public E getEntity() {
+        return entity;
+    }
 }

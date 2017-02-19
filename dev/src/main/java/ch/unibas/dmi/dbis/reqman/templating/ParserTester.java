@@ -22,7 +22,8 @@ public class ParserTester {
         String reqTemplate = "Name: ${requirement.name}\n" +
                 "Desc: ${requirement.description}\n" +
                 "Milestone MIN: ${requirement.minMS.name}\n" +
-                "Another: ${requirement.maxPoints}";
+                "Another: ${requirement.malus[-][]}${requirement.maxPoints}\n" +
+                "This requirement is ${requirement.mandatory[mandatory][optional]}.";
 
         String msTemplate = "Name: ${milestone.name} (${milestone.ordinal}) @ ${milestone.date}";
         String msTem1 = "${milestone.ordinal}";

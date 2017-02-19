@@ -10,6 +10,7 @@ public class Replacement<E> implements Renderer<E> {
     private Field<E, ?> field;
     private int start;
     private int end;
+    @Deprecated
     private String targetRegex;
     private String targetExpression;
 

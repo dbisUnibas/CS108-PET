@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -57,6 +58,11 @@ public class TemplateParser{
         regexEntity = INDICATOR_REGEX + entity.getEntityName();
     }
 
+    public <E>Template<E> parseTemplate(String template){
+        List<Replacement<E>> list = parseReplacements(template);
+        return new Template<E>();
+    }
+
     // TODO: Define visibility
     <E> List<Replacement<E>> parseReplacements(String template){
         LOGGER.trace("parseReplacements");
@@ -70,30 +76,32 @@ public class TemplateParser{
             LOGGER.debug("[parseRep] Expression: "+expression);
             LOGGER.debug("[parseRep] Expression region: "+matcherField.start()+", "+matcherField.end() );
             LOGGER.debug("[parseRep] Sucessor: "+successor);
+            int end = template.indexOf(CLOSING, matcherField.end());
+            String subExpression = template.substring(matcherField.start(), end+1);
             switch (successor){
                 case CLOSING:
                     // normal field
                     Field<E, ?> field = parseNormalField(expression+CLOSING);
                     Replacement<E> repl = new Replacement<E>(field,matcherField.start(), matcherField.end(), regexEntity+FIELD_DELIMETER_REGEX+field.getName()+CLOSING_REGEX, expression+CLOSING);
                     list.add(repl);
-                    LOGGER.debug(String.format("[parseRep] Replacement: %s", repl.toString()));
                     break;
                 case FIELD_DELIMETER:
                     // subentity field
-                    int end = template.indexOf(CLOSING, matcherField.end());
-                    String subExpression = template.substring(matcherField.start(), end+1);
                     SubEntityField<E, ?> subField = parseSubField(patternField.pattern(),  subExpression);
                     Replacement<E> subRepl = new Replacement<E>(subField, matcherField.start(), end+1, regexEntity+FIELD_DELIMETER_REGEX+subField.getName()+FIELD_DELIMETER_REGEX+subField.getSubFieldName()+CLOSING_REGEX, subExpression);
                     list.add(subRepl);
-                    LOGGER.debug(String.format("[parseRep] Replacement: %s", subRepl.toString() ) );
                     break;
                 case OPTION_OPENING:
-                    // conditional OR advanced
+                    // CONDITIONAL or PARAMETRIZED
+                    Field<E, ?> paramField = parseParametrizedField(patternField.pattern(), subExpression);
+                    Replacement<E> paramRepl = new Replacement<E>(paramField, matcherField.start(), end+1, "", subExpression);
+                    list.add(paramRepl);
                     break;
                 default:
                     // something went wrong
                     break;
             }
+            LOGGER.debug(String.format("[parseRep] Replacement: %s", list.get(list.size()-1).toString()));
         }
 
         return list;
@@ -130,6 +138,66 @@ public class TemplateParser{
         return null;
     }
 
+    /**
+     * Used to EITHER parse CONDITIONAL and PARAMETRIZED fields.
+     * @param regexField
+     * @param expression
+     * @param <E>
+     * @return
+     */
+    private <E> Field<E, ?> parseParametrizedField(String regexField, String expression){
+        LOGGER.debug("[parseParametrized] Expression: "+expression);
+        Pattern patternSub = Pattern.compile(regexField);
+        LOGGER.debug("[parseParametrized] Field rexeg: "+patternSub.pattern());
+        Matcher matcherSub = patternSub.matcher(expression);
+        while(matcherSub.find() ){
+            String found = expression.substring(matcherSub.start(), matcherSub.end() );
+            LOGGER.debug("[parseParametrized] Found: "+found);
+            String fieldName = found.substring(found.indexOf(FIELD_DELIMETER)+1);
+            LOGGER.debug("[parseParametrized] FieldName: "+fieldName);
+            if(entity.hasField(fieldName ) ){
+                Field<E,?> field = entity.getFieldForName(fieldName);
+                // TODO Handle ParametrizedField AFTER ConditionalField (and make ConditionalField derive from Para)
+                if(field instanceof ConditionalField){
+                    // CASE Missing option_closing:
+                    int firstClosing = expression.indexOf(OPTION_CLOSING);
+                    if(firstClosing == -1){
+                        throw new ParseException("Missing "+OPTION_CLOSING+" near: "+expression);
+                    }
+                    // CASE parameter1 provided
+                    int firstOpening = expression.indexOf(OPTION_OPENING);
+                    String param1 = expression.substring(firstOpening+1, firstClosing);
+                    LOGGER.debug("[parseParametrized] Found param1: "+param1);
+                    Function<Boolean, String> trueRenderer = b -> param1;
+                    // CASE NO parameter2 provided
+                    int secondClosing = expression.lastIndexOf(OPTION_CLOSING);
+                    Function<Boolean, String> falseRenderer = b->"";
+                    if(secondClosing == firstClosing){
+                        LOGGER.warn("No secondary parameter provided. The falseRenderer will render an empty string. Expression: "+expression);
+                    }
+                    int secondOpening = expression.lastIndexOf(OPTION_OPENING);
+                    if(secondOpening == -1){
+                        throw new ParseException("Missing "+OPTION_OPENING+" near: "+expression);
+                    }
+                    String param2 = expression.substring(secondOpening+1,secondClosing);
+                    LOGGER.debug("[parseParametrized] Found param2: "+param2);
+                    falseRenderer = b->param2;
+                    ConditionalField<E> condField = (ConditionalField)field;
+                    condField.setTrueRenderer(trueRenderer);
+                    condField.setFalseRenderer(falseRenderer);
+                    return condField;
+                }else{
+                    LOGGER.warn(String.format("Field [%s] of entity [%s] is not parametrized. Ignoring those parameters.", fieldName, entity.getEntityName() ));
+                    return field; // Has parameter even no parameters are allowed: Ignore those parameters.
+                }
+            }else{
+                throwNoSuchField(found);
+            }
+        }
+
+
+        return null;
+    }
 
 
 
@@ -187,10 +255,14 @@ public class TemplateParser{
             if(entity.hasField(name)){
                 return entity.getFieldForName(name);
             }else{
-                throw new ParseException("Entity ("+entity.getEntityName()+") has no field with name "+name+" registered");// TODO write own exception (for better handling)
+                throwNoSuchField(name);
             }
         }
         throw new ParseException("Found undefined expression: "+expression);
+    }
+
+    private void throwNoSuchField(String name) throws ParseException{
+        throw new ParseException("Entity ("+entity.getEntityName()+") has no field with name "+name+" registered");
     }
 
     public static class ParseException extends RuntimeException{
@@ -241,7 +313,10 @@ public class TemplateParser{
                     return out.substring(0, out.lastIndexOf(", "));
                 }
                 return out;
-            })
+            }),
+            new ConditionalField<Requirement>("binary", Requirement::isBinary, b-> "BINARY", b-> "PARTIAL"),
+            new ConditionalField<Requirement>("mandatory",Requirement::isMandatory, b->"MANDATORY", b->"BONUS"),
+            new ConditionalField<Requirement>("malus",Requirement::isMalus, b->"-",b->"")
     );
 
 

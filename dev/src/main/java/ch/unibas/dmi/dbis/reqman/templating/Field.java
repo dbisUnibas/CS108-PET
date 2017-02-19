@@ -207,6 +207,10 @@ public class Field<E, T> {
         return renderer;
     }
 
+    protected void setRenderer(Function<T, String> renderer){
+        this.renderer = renderer;
+    }
+
     /**
      * Checks if the given object equals this instance.
      * <p>
@@ -357,6 +361,6 @@ public class Field<E, T> {
         /**
          * WIP: To indicate fields that have options
          */
-        ADVANCED
+        PARAMETRIZED
     }
 }
