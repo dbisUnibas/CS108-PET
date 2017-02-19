@@ -160,7 +160,6 @@ public class TemplateParser{
             LOGGER.debug("[parseParametrized] FieldName: "+fieldName);
             if(entity.hasField(fieldName ) ){
                 Field<E,?> field = entity.getFieldForName(fieldName);
-                // TODO Handle ParametrizedField AFTER ConditionalField (and make ConditionalField derive from Para)
                 if(field instanceof ConditionalField){
                     // CASE Missing option_closing:
                     int firstClosing = expression.indexOf(OPTION_CLOSING);
@@ -189,9 +188,22 @@ public class TemplateParser{
                     condField.setTrueRenderer(trueRenderer);
                     condField.setFalseRenderer(falseRenderer);
                     return condField;
+                }else if(field instanceof ParametrizedField) {
+                    // CASE Missing option_closing:
+                    int firstClosing = expression.indexOf(OPTION_CLOSING);
+                    if(firstClosing == -1){
+                        throw new ParseException("Missing "+OPTION_CLOSING+" near: "+expression);
+                    }
+                    // CASE parameter1 provided
+                    int firstOpening = expression.indexOf(OPTION_OPENING);
+                    String param = expression.substring(firstOpening+1, firstClosing);
+                    LOGGER.debug("[parseParametrized] Found param: "+param);
+                    ParametrizedField parField = (ParametrizedField)field;
+                    parField.setParameter(param);
+                    return parField;
                 }else{
-                    LOGGER.warn(String.format("Field [%s] of entity [%s] is not parametrized. Ignoring those parameters.", fieldName, entity.getEntityName() ));
-                    return field; // Has parameter even no parameters are allowed: Ignore those parameters.
+                        LOGGER.warn(String.format("Field [%s] of entity [%s] is not parametrized. Ignoring those parameters.", fieldName, entity.getEntityName() ));
+                        return field; // Has parameter even no parameters are allowed: Ignore those parameters.
                 }
             }else{
                 throwNoSuchField(found);
@@ -319,7 +331,26 @@ public class TemplateParser{
             }),
             new ConditionalField<Requirement>("binary", Requirement::isBinary, b-> "BINARY", b-> "PARTIAL"),
             new ConditionalField<Requirement>("mandatory",Requirement::isMandatory, b->"MANDATORY", b->"BONUS"),
-            new ConditionalField<Requirement>("malus",Requirement::isMalus, b->"-",b->"")
+            new ConditionalField<Requirement>("malus",Requirement::isMalus, b->"-",b->"+"),
+            new ParametrizedField<Requirement, Map<String,String>>("meta", Requirement::getPropertiesMap){
+                //private final Logger LOGGER = LogManager.getLogger(TemplateParser.class.getName().replace("TemplateParser", "MetaParser"));
+                private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
+
+                @Override
+                public String render(Requirement instance) {
+                    Map<String, String> map = getGetter().apply(instance);
+                    if(!map.containsKey(getParameter())){
+                        LOGGER.error(String.format("Error while parsing meta of requirement [name=%s]: There is no meta with name: %s", instance.getName(), getParameter() ));
+                        return "";
+                    }
+                    String value = map.get(getParameter() );
+                    if(value != null){
+                        return value;
+                    }else{
+                        return "";
+                    }
+                }
+            }
     );
 
 

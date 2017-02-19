@@ -7,7 +7,7 @@ import java.util.function.Function;
  *
  * @author loris.sauter
  */
-public class ConditionalField<E> extends  Field<E,Boolean> {
+public class ConditionalField<E> extends  ParametrizedField<E,Boolean> {
 
     /**
      * On runtime, this will contain the parsed false-string
@@ -57,7 +57,8 @@ public class ConditionalField<E> extends  Field<E,Boolean> {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ConditionalField{");
-        sb.append("falseRenderer=").append(falseRenderer);
+        sb.append("name='").append(name).append('\'');
+        sb.append(", falseRenderer=").append(falseRenderer);
         sb.append(", trueRenderer=").append(getTrueRenderer());
         sb.append(", type='").append(getType()).append('\'');
         sb.append(", getter='").append(getGetter() ).append('\'');

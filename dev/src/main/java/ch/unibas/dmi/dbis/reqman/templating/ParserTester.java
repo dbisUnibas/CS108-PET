@@ -15,6 +15,7 @@ public class ParserTester {
     public static void main(String[] args){
         Milestone ms = new Milestone("Milestone", 0, new Date() );
         Requirement r = new Requirement("first","desc",ms.getOrdinal(),ms.getOrdinal(),3,true,true,false);
+
         Catalogue cat = new Catalogue("Lecture","name","desc","fs");
         cat.addAllMilestones(ms);
         cat.addRequirement(r);

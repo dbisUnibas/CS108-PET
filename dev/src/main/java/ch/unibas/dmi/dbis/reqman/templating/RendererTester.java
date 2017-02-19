@@ -16,6 +16,11 @@ public class RendererTester {
     public static void main(String[] args){
         Milestone ms = new Milestone("Milestone", 0, new Date() );
         Requirement r = new Requirement("first","desc",ms.getOrdinal(),ms.getOrdinal(),3,true,true,false);
+
+        Requirement r2 = new Requirement("optional", "This is a) not binary and second not mandatory.", ms.getOrdinal(), ms.getOrdinal(), 10, false, false, false);
+
+        r.addProperty("img", "path/to/some/image");
+
         Catalogue cat = new Catalogue("Lecture","name","desc","fs");
         cat.addAllMilestones(ms);
         cat.addRequirement(r);
@@ -24,7 +29,8 @@ public class RendererTester {
                 "Desc: ${requirement.description}\n" +
                 "Milestone MIN: ${requirement.minMS.name}\n" +
                 "Another: ${requirement.malus[-][+]}${requirement.maxPoints}\n" +
-                "This requirement is ${requirement.mandatory[mandatory][optional]}.";
+                "This requirement is ${requirement.mandatory[mandatory][optional]}.\n" +
+                "Path: ${requirement.meta[img]}";
 
         String msTemplate = "Name: ${milestone.name} (${milestone.ordinal}) @ ${milestone.date}";
         String msTem1 = "${milestone.ordinal}";
@@ -38,9 +44,13 @@ public class RendererTester {
         parser.setupFor(parser.REQUIREMENT_ENTITY);
         Template<Requirement> templateR = parser.parseTemplate(reqTemplate);
 
-        String renderedReq = renderer.render(templateR, r);
+        String renderedR1 = renderer.render(templateR, r);
+        String renderedR2 = renderer.render(templateR, r2);
 
         System.out.println("===");
-        System.out.println("Rendered Requirement: \n"+renderedReq);
+        System.out.println("Rendered Requirement: \n"+renderedR1);
+
+        System.out.println("===");
+        System.out.println(renderedR2);
     }
 }

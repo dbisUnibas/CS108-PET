@@ -18,6 +18,7 @@
       "logger":{
         "name":"ch.unibas.dmi.dbis.reqman.templating",
         "level":"debug",
+        "additivity":false,
         "appender-ref":{"ref":"console"}
       }
     }

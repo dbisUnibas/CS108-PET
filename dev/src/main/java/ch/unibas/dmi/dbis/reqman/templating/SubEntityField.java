@@ -31,6 +31,7 @@ public class SubEntityField<E, T> extends Field<E, T> {
     public String toString() {
         final StringBuffer sb = new StringBuffer("SubEntityField{");
         sb.append("subEntity=").append(subEntity!= null?subEntity.getEntityName():"null");
+        sb.append(", name='").append(name).append('\'');
         sb.append(", subFieldName='").append(subFieldName).append('\'');
         sb.append(", type='").append(getType()).append('\'');
         sb.append(", getter='").append(getGetter() ).append('\'');
