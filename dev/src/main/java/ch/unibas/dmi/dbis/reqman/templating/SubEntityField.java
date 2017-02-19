@@ -26,4 +26,44 @@ public class SubEntityField<E, T> extends Field<E, T> {
     public void setSubFieldName(String name){
         subFieldName = name;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("SubEntityField{");
+        sb.append("subEntity=").append(subEntity!= null?subEntity.getEntityName():"null");
+        sb.append(", subFieldName='").append(subFieldName).append('\'');
+        sb.append(", type='").append(getType()).append('\'');
+        sb.append(", getter='").append(getGetter() ).append('\'');
+        sb.append(", renderer='").append(getRenderer() ).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+
+        SubEntityField<?, ?> that = (SubEntityField<?, ?>) o;
+
+        if (subEntity != null ? !subEntity.equals(that.subEntity) : that.subEntity != null) {
+            return false;
+        }
+        return subFieldName != null ? subFieldName.equals(that.subFieldName) : that.subFieldName == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (subEntity != null ? subEntity.hashCode() : 0);
+        result = 31 * result + (subFieldName != null ? subFieldName.hashCode() : 0);
+        return result;
+    }
 }

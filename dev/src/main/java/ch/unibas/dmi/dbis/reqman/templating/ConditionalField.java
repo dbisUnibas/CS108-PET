@@ -40,4 +40,16 @@ public class ConditionalField<E> extends  Field<E,Boolean> {
             return getFalseRenderer().apply(fieldValue);
         }
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ConditionalField{");
+        sb.append("falseRenderer=").append(falseRenderer);
+        sb.append(", trueRenderer=").append(getTrueRenderer());
+        sb.append(", type='").append(getType()).append('\'');
+        sb.append(", getter='").append(getGetter() ).append('\'');
+        sb.append(", renderer='").append(getRenderer() ).append('\'');
+        sb.append('}');
+        return sb.toString();
+    }
 }

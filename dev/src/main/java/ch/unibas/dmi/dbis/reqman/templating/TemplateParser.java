@@ -76,13 +76,16 @@ public class TemplateParser{
                     Field<E, ?> field = parseNormalField(expression+CLOSING);
                     Replacement<E> repl = new Replacement<E>(field,matcherField.start(), matcherField.end(), regexEntity+FIELD_DELIMETER_REGEX+field.getName()+CLOSING_REGEX, expression+CLOSING);
                     list.add(repl);
-                    LOGGER.debug(String.format("Repalcement: %s", repl.toString()));
+                    LOGGER.debug(String.format("[parseRep] Replacement: %s", repl.toString()));
                     break;
                 case FIELD_DELIMETER:
                     // subentity field
                     int end = template.indexOf(CLOSING, matcherField.end());
-                    SubEntityField<E, ?> subField = parseSubField(patternField.pattern(),  template.substring(matcherField.start(), end+1));
-
+                    String subExpression = template.substring(matcherField.start(), end+1);
+                    SubEntityField<E, ?> subField = parseSubField(patternField.pattern(),  subExpression);
+                    Replacement<E> subRepl = new Replacement<E>(subField, matcherField.start(), end+1, regexEntity+FIELD_DELIMETER_REGEX+subField.getName()+FIELD_DELIMETER_REGEX+subField.getSubFieldName()+CLOSING_REGEX, subExpression);
+                    list.add(subRepl);
+                    LOGGER.debug(String.format("[parseRep] Replacement: %s", subRepl.toString() ) );
                     break;
                 case OPTION_OPENING:
                     // conditional OR advanced
@@ -106,7 +109,7 @@ public class TemplateParser{
             LOGGER.debug("[parseSubEntity] Found: "+found);
             int firstFieldDelim = found.indexOf(FIELD_DELIMETER);
             int nextFieldDelim = found.indexOf(FIELD_DELIMETER, firstFieldDelim+1);
-            LOGGER.debug("First delim: "+firstFieldDelim+", next: "+nextFieldDelim);
+            LOGGER.debug("[parseSubEntity] First delim: "+firstFieldDelim+", next: "+nextFieldDelim);
             String entityFieldName = found.substring(firstFieldDelim+1, nextFieldDelim);
             String subFieldName = found.substring(nextFieldDelim+1, matcherSub.end());
             String successor = expression.substring(matcherSub.end(), matcherSub.end() +1);

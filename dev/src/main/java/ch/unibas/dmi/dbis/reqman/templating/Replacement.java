@@ -24,7 +24,15 @@ public class Replacement<E> implements Renderer<E> {
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("Replacement{");
-        sb.append("field=").append(field!=null?field.getName():"N/A");
+        sb.append("field=");
+        if(field instanceof Field){
+            sb.append(field!=null?field.toString():"null");
+        }else if(field instanceof  SubEntityField){
+            SubEntityField subField = (SubEntityField)field;
+            sb.append(subField.toString() );
+        }else{
+            sb.append("null");
+        }
         sb.append(", start=").append(start);
         sb.append(", end=").append(end);
         sb.append(", targetRegex='").append(targetRegex).append('\'');
