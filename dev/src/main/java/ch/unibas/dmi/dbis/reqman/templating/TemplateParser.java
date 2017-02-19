@@ -24,10 +24,15 @@ public class TemplateParser{
     public static final String CLOSING_REGEX = "\\}";
     public static final String FIELD_DELIMETER_REGEX = "\\.";
     public static final String NAME_REGEX = "[a-zA-Z\\-]+";
+    public static final String OPTION_OPENING_REGEX = "\\[";
+    public static final String OPTION_CLOSING_REGEX = "\\]";
+
 
     public static final String INDICATOR = "${";
     public static final String CLOSING = "}";
     public static final String FIELD_DELIMETER = ".";
+    public static final String OPTION_OPENING = "[";
+    public static final String OPTION_CLOSING = "]";
 
     private Entity entity;
 

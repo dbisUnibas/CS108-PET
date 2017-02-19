@@ -90,19 +90,19 @@ public class Field<E, T> {
     /**
      * The name of the field, does not have to match the name of the representing field
      */
-    private String name;
+    protected String name;
     /**
      * The field's type
      */
-    private Type type;
+    protected Type type;
     /**
      * The getter for the field
      */
-    private Function<E, T> getter;
+    protected Function<E, T> getter;
     /**
      * The renderer for the field, if the field's type is {@link Type#OBJECT}
      */
-    private Function<T, String> renderer;
+    protected Function<T, String> renderer;
     private Entity<T> subEntity = null;
 
     /**
@@ -155,7 +155,9 @@ public class Field<E, T> {
      * @param type
      * @param getter
      * @param subEntity The sub entity.
+     *
      */
+    @Deprecated
     public Field(String name, Type type, Function<E, T> getter, Entity<T> subEntity) {
         this.name = name;
         this.type = type;
@@ -163,10 +165,13 @@ public class Field<E, T> {
         this.subEntity = subEntity;
     }
 
+    @Deprecated // MOVE TO SUBCLASS
     private String subFieldName;
+    @Deprecated // MOVE TO SUBCLASS
     public String getSubFieldName(){
         return subFieldName;
     }
+    @Deprecated // MOVE TO SUBCLASS
     public void setSubFieldName(String name){
         subFieldName = name;
     }
@@ -240,6 +245,7 @@ public class Field<E, T> {
      *
      * @return
      */
+    @Deprecated // MOVE TO SUBCLASS
     public Entity<T> getSubEntity() {
         return subEntity;
     }
