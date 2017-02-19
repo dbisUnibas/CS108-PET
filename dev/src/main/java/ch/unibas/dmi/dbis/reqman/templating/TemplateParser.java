@@ -69,7 +69,7 @@ public class TemplateParser{
     // TODO: Define visibility
     <E> List<Replacement<E>> parseReplacements(String template){
         LOGGER.trace("parseReplacements");
-        ArrayList<Replacement<E>> list = new ArrayList();
+        ArrayList<Replacement<E>> list = new ArrayList<>();
         Pattern patternField = Pattern.compile(regexEntity+FIELD_DELIMETER_REGEX+NAME_REGEX);
         LOGGER.debug(String.format("[parseRep] Field regex: %s", patternField.pattern()));
         Matcher matcherField = patternField.matcher(template);
@@ -353,6 +353,15 @@ public class TemplateParser{
             }
     );
 
+    public final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
+            new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
+            new Field<Catalogue, String>("description", Field.Type.NORMAL, Catalogue::getDescription),
+            new Field<Catalogue, String>("lecture", Field.Type.NORMAL, Catalogue::getLecture),
+            new Field<Catalogue, String>("semester", Field.Type.NORMAL, Catalogue::getSemester)
+
+            );
+
+    // TODO Implement TemplateManager which holds all templates (and entities), so that ${catalogue.requirements} is renderable
 
 
 

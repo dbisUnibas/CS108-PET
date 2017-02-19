@@ -16,6 +16,7 @@ public class TemplateRenderer {
 
     private static final Logger LOGGER = LogManager.getLogger(TemplateRenderer.class);
 
+    @Deprecated // Not used
     private TemplateParser parser = null;
 
     @Deprecated
@@ -90,4 +91,6 @@ public class TemplateRenderer {
         });
         return out.toString();
     }
+
+
 }
