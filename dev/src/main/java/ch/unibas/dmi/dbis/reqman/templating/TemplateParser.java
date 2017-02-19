@@ -20,15 +20,18 @@ import java.util.regex.Pattern;
 public class TemplateParser{
 
 
-    public static final String INDICATOR = "\\$\\{";
-    public static final String CLOSING = "\\}";
+    public static final String INDICATOR_REGEX = "\\$\\{";
+    public static final String CLOSING_REGEX = "\\}";
+    public static final String FIELD_DELIMETER_REGEX = "\\.";
+    public static final String NAME_REGEX = "[a-zA-Z\\-]+";
 
-    public static final String FIELD_DELIMETER = "\\.";
-    public static final String NAME_REGEX = "[a-z\\-]+";
+    public static final String INDICATOR = "${";
+    public static final String CLOSING = "}";
+    public static final String FIELD_DELIMETER = ".";
 
     private Entity entity;
 
-    private String searchRegex;
+    private String searchOpen;
 
     private Pattern pattern;
 
@@ -41,13 +44,13 @@ public class TemplateParser{
 
     public void setupFor(Entity entity){
         this.entity = entity;
-        searchRegex = INDICATOR + this.entity.getIndicatorName() + FIELD_DELIMETER + NAME_REGEX + CLOSING;
-        pattern = Pattern.compile(searchRegex);
-        System.out.println("REGEX: "+pattern.pattern());
+        searchOpen = INDICATOR_REGEX + this.entity.getIndicatorName() + FIELD_DELIMETER_REGEX + NAME_REGEX ;
+        pattern = Pattern.compile(searchOpen + CLOSING_REGEX);
     }
 
 
     public <E> Map<String, Field<E, ?>> parse(String template){
+        // DIRECT FIELDS
         Map<String, Field<E, ?>> map = new TreeMap<>();
         Matcher matcher = pattern.matcher(template);
         while(matcher.find() ){
@@ -55,15 +58,37 @@ public class TemplateParser{
 
             Field<E, ?> field = parseField(variable);
 
-            map.put(INDICATOR+entity.getIndicatorName()+FIELD_DELIMETER+field.getName()+CLOSING, field); // need to escape regex predifned dollar symbol
+            String currentPatternOpen = INDICATOR_REGEX +entity.getIndicatorName()+ FIELD_DELIMETER_REGEX +field.getName();
+            map.put(currentPatternOpen+ CLOSING_REGEX, field); // need to escape regex predifned dollar symbol
             //map.put(variable, field);
+
         }
+
+        // ENTITY FIELDS
+        Pattern p = Pattern.compile(searchOpen+ FIELD_DELIMETER_REGEX +NAME_REGEX+ CLOSING_REGEX);
+        Matcher m = p.matcher(template);
+        while(m.find() ){
+            String completeVariable = template.substring(m.start(), m.end());
+            int firstDelim = completeVariable.indexOf(FIELD_DELIMETER);
+            int nextDelim = completeVariable.indexOf(FIELD_DELIMETER, firstDelim+1);
+            String first = completeVariable.substring(firstDelim+1, nextDelim);
+            String next = completeVariable.substring(nextDelim+1, completeVariable.lastIndexOf(CLOSING));
+            Field<E, ?> f = parseField(INDICATOR+entity.getIndicatorName()+FIELD_DELIMETER+first+CLOSING);
+            if(f.getType() == Field.Type.ENTITY){
+                Entity sub = f.getSubEntity();
+                if(sub.hasField(next)){
+                    f.setSubFieldName(next);
+                    map.put(INDICATOR_REGEX+entity.getIndicatorName()+FIELD_DELIMETER_REGEX+first+FIELD_DELIMETER_REGEX+next+CLOSING,f);
+                }
+            }
+        }
+
 
         return map;
     }
 
     private <E> Field<E, ?> parseField(String field){
-        Pattern p = Pattern.compile(FIELD_DELIMETER+NAME_REGEX+CLOSING);
+        Pattern p = Pattern.compile(FIELD_DELIMETER_REGEX +NAME_REGEX+ CLOSING_REGEX);
         Matcher matcher = p.matcher(field);
         if(matcher.find() ){
             String name = field.substring(matcher.start()+1, matcher.end()-1);
@@ -76,17 +101,26 @@ public class TemplateParser{
         return null; // Severe error
     }
 
+    public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
+            new Field<Milestone, String>("name", Field.Type.RAW, Milestone::getName),
+            new Field<Milestone, Date>("date", Field.Type.OBJECT, Milestone::getDate, date -> {
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
+                return format.format(date);
+            }),
+            new Field<Milestone, Integer>("ordinal", Field.Type.RAW, Milestone::getOrdinal)
+    );
+
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
             new Field<Requirement, String>("name", Field.Type.RAW, Requirement::getName),
             new Field<Requirement, String>("description", Field.Type.RAW, Requirement::getDescription),
-            new Field<Requirement, Double>("max-points", Field.Type.RAW, Requirement::getMaxPoints),
-            new Field<Requirement, Milestone>("min-ms", Field.Type.ENTITY, req -> {
+            new Field<Requirement, Double>("maxPoints", Field.Type.RAW, Requirement::getMaxPoints),
+            new Field<Requirement, Milestone>("minMS", Field.Type.ENTITY, req -> {
                 return catalogue.getMilestoneByOrdinal(req.getMinMilestoneOrdinal());
-            }),
-            new Field<Requirement, Milestone>("max-ms", Field.Type.ENTITY, req -> {
+            }, MILESTONE_ENTITY),
+            new Field<Requirement, Milestone>("maxMS", Field.Type.ENTITY, req -> {
                 return catalogue.getMilestoneByOrdinal(req.getMaxMilestoneOrdinal() );
-            }),
-            new Field<Requirement, List<String>>("predecessor-names", Field.Type.OBJECT, Requirement::getPredecessorNames, list -> {
+            }, MILESTONE_ENTITY),
+            new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, Requirement::getPredecessorNames, list -> {
                 StringBuilder sb = new StringBuilder();
                 list.forEach(str -> {
                     sb.append(str);
@@ -100,14 +134,7 @@ public class TemplateParser{
             })
     );
 
-    public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
-            new Field<Milestone, String>("name", Field.Type.RAW, Milestone::getName),
-            new Field<Milestone, Date>("date", Field.Type.OBJECT, Milestone::getDate, date -> {
-                SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
-                return format.format(date);
-            }),
-            new Field<Milestone, Integer>("ordinal", Field.Type.RAW, Milestone::getOrdinal)
-    );
+
 
 
 

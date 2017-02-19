@@ -103,12 +103,13 @@ public class Field<E, T> {
      * The renderer for the field, if the field's type is {@link Type#OBJECT}
      */
     private Function<T, String> renderer;
+    private Entity<T> subEntity = null;
 
     /**
      * Constructor for a new {@link Field} with specified properties.
      * <p>
      * This constructor is intended to when instantiating fields with either type {@link Type#RAW} or {@link Type#ENTITY}
-     * if the type would be {@link Type#OBJECT}, an {@link IllegalArgumentException} will be thrown. Use {@link Field#Field(String, Type, Function, Function)} instead.
+     * if the type would be {@link Type#OBJECT}, an {@link IllegalArgumentException} will be thrown. Use {@link Field#Field(String, Type, Function, Function, Entity)} instead.
      *
      * @param name   The name of the field
      * @param type   The field's type.
@@ -144,6 +145,30 @@ public class Field<E, T> {
         this.type = type;
         this.getter = getter;
         this.renderer = renderer;
+    }
+
+    // TODO Write factory methods for all types!
+
+    /**
+     *
+     * @param name
+     * @param type
+     * @param getter
+     * @param subEntity The sub entity.
+     */
+    public Field(String name, Type type, Function<E, T> getter, Entity<T> subEntity) {
+        this.name = name;
+        this.type = type;
+        this.getter = getter;
+        this.subEntity = subEntity;
+    }
+
+    private String subFieldName;
+    public String getSubFieldName(){
+        return subFieldName;
+    }
+    public void setSubFieldName(String name){
+        subFieldName = name;
     }
 
     /**
@@ -211,6 +236,15 @@ public class Field<E, T> {
     }
 
     /**
+     * Returns the sub entity if this {@link Field } is of {@link Type#ENTITY}.
+     *
+     * @return
+     */
+    public Entity<T> getSubEntity() {
+        return subEntity;
+    }
+
+    /**
      * Returns the name of the field.
      *
      * @return The name of the field
@@ -266,7 +300,7 @@ public class Field<E, T> {
 
     /**
      * Returns a string representation of this field.
-     *
+     * <p>
      * <i>IntelliJ generated</i>
      *
      * @return Returns a string representation of this field.
@@ -305,6 +339,11 @@ public class Field<E, T> {
          * States that the {@link Field} with this type represents a field who's type is an entity.
          * This states, that there are {@link Field}s existing for the fields of that class / object.
          */
-        ENTITY;
+        ENTITY,
+
+        /**
+         * WIP: To indicate boolean fields
+         */
+        CONDITIONAL
     }
 }

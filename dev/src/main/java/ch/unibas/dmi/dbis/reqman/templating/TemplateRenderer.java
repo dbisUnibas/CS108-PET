@@ -12,8 +12,10 @@ import java.util.regex.Pattern;
 public class TemplateRenderer {
 
 
-    public TemplateRenderer(){
+    private TemplateParser parser;
 
+    public TemplateRenderer(TemplateParser parser){
+        this.parser = parser;
     }
 
     /**
@@ -32,8 +34,11 @@ public class TemplateRenderer {
             Matcher m = p.matcher(out.toString());
             while(m.find() ){
                 if(field.getType() == Field.Type.ENTITY){
-                    
-
+                    Entity sub = field.getSubEntity();
+                    Field f = sub.getFieldForName(field.getSubFieldName() );
+                    Object o = field.getGetter().apply(instance);
+                    System.out.println(o);
+                    out.replace(m.start(), m.end(), f.render(field.getGetter().apply(instance)));
                 }else{
                     out.replace(m.start(), m.end(), field.render(instance));
                 }

@@ -18,9 +18,13 @@ public class ParserSandbox {
         Milestone ms = new Milestone("Milestone", 0, new Date() );
         Requirement r = new Requirement("first","desc",ms.getOrdinal(),ms.getOrdinal(),3,true,true,false);
         Catalogue cat = new Catalogue("Lecture","name","desc","fs");
+        cat.addAllMilestones(ms);
+        cat.addRequirement(r);
 
         String reqTemplate = "Name: ${requirement.name}\n" +
-                "Desc: ${requirement.description}";
+                "Desc: ${requirement.description}\n" +
+                "Milestone MIN: ${requirement.minMS.name}\n" +
+                "Another: ${requirement.maxPoints}";
 
         String msTemplate = "Name: ${milestone.name} (${milestone.ordinal}) @ ${milestone.date}";
         String msTem1 = "${milestone.ordinal}";
@@ -28,15 +32,21 @@ public class ParserSandbox {
 
         TemplateParser parser = new TemplateParser(cat);
         parser.setupFor(parser.MILESTONE_ENTITY);
-        Map<String, Field<Milestone, ?>> map = parser.parse(msTemplate);
+        Map<String, Field<Milestone, ?>> map = parser.parse(msTemplate); // Would be in template
 
 
-        TemplateRenderer renderer = new TemplateRenderer();
+        TemplateRenderer renderer = new TemplateRenderer(parser);
 
         System.out.println(renderer.render(msTemplate, ms, map));
 
         parser.setupFor(parser.REQUIREMENT_ENTITY);
         Map<String, Field<Requirement, ?>> reqMap = parser.parse(reqTemplate);
+
+        /*
+        reqMap.forEach((key, field) -> {
+            System.out.println("Key: "+key+", field: "+field);
+        });
+        */
 
         System.out.println(renderer.render(reqTemplate, r, reqMap));
     }
