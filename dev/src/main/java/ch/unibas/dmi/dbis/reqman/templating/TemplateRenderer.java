@@ -33,7 +33,7 @@ public class TemplateRenderer {
             Pattern p = Pattern.compile(variable);
             Matcher m = p.matcher(out.toString());
             while(m.find() ){
-                if(field.getType() == Field.Type.ENTITY){
+                if(field.getType() == Field.Type.SUB_ENTITY){
                     Entity sub = field.getSubEntity();
                     Field f = sub.getFieldForName(field.getSubFieldName() );
                     Object o = field.getGetter().apply(instance);

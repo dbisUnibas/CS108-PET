@@ -64,7 +64,7 @@ public class TemplateParser{
 
         }
 
-        // ENTITY FIELDS
+        // SUB_ENTITY FIELDS
         Pattern p = Pattern.compile(searchOpen+ FIELD_DELIMETER_REGEX +NAME_REGEX+ CLOSING_REGEX);
         Matcher m = p.matcher(template);
         while(m.find() ){
@@ -74,7 +74,7 @@ public class TemplateParser{
             String first = completeVariable.substring(firstDelim+1, nextDelim);
             String next = completeVariable.substring(nextDelim+1, completeVariable.lastIndexOf(CLOSING));
             Field<E, ?> f = parseField(INDICATOR+entity.getIndicatorName()+FIELD_DELIMETER+first+CLOSING);
-            if(f.getType() == Field.Type.ENTITY){
+            if(f.getType() == Field.Type.SUB_ENTITY){
                 Entity sub = f.getSubEntity();
                 if(sub.hasField(next)){
                     f.setSubFieldName(next);
@@ -114,10 +114,10 @@ public class TemplateParser{
             new Field<Requirement, String>("name", Field.Type.RAW, Requirement::getName),
             new Field<Requirement, String>("description", Field.Type.RAW, Requirement::getDescription),
             new Field<Requirement, Double>("maxPoints", Field.Type.RAW, Requirement::getMaxPoints),
-            new Field<Requirement, Milestone>("minMS", Field.Type.ENTITY, req -> {
+            new Field<Requirement, Milestone>("minMS", Field.Type.SUB_ENTITY, req -> {
                 return catalogue.getMilestoneByOrdinal(req.getMinMilestoneOrdinal());
             }, MILESTONE_ENTITY),
-            new Field<Requirement, Milestone>("maxMS", Field.Type.ENTITY, req -> {
+            new Field<Requirement, Milestone>("maxMS", Field.Type.SUB_ENTITY, req -> {
                 return catalogue.getMilestoneByOrdinal(req.getMaxMilestoneOrdinal() );
             }, MILESTONE_ENTITY),
             new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, Requirement::getPredecessorNames, list -> {

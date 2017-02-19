@@ -108,7 +108,7 @@ public class Field<E, T> {
     /**
      * Constructor for a new {@link Field} with specified properties.
      * <p>
-     * This constructor is intended to when instantiating fields with either type {@link Type#RAW} or {@link Type#ENTITY}
+     * This constructor is intended to when instantiating fields with either type {@link Type#RAW} or {@link Type#SUB_ENTITY}
      * if the type would be {@link Type#OBJECT}, an {@link IllegalArgumentException} will be thrown. Use {@link Field#Field(String, Type, Function, Function, Entity)} instead.
      *
      * @param name   The name of the field
@@ -173,10 +173,10 @@ public class Field<E, T> {
 
     /**
      * Renders the instance's field.
-     * Be aware that this method returns null if the type is {@link Type#ENTITY}
+     * Be aware that this method returns null if the type is {@link Type#SUB_ENTITY}
      *
      * @param instance The instance from where the getter gets its resulting value.
-     * @return Either the rendered field or null, if the type is {@link Type#ENTITY}
+     * @return Either the rendered field or null, if the type is {@link Type#SUB_ENTITY}
      */
     public String render(E instance) {
         T value = getter.apply(instance);
@@ -185,7 +185,7 @@ public class Field<E, T> {
                 return String.valueOf(value);
             case OBJECT:
                 return renderer.apply(value);
-            case ENTITY:
+            case SUB_ENTITY:
             default:
                 return null;
         }
@@ -236,7 +236,7 @@ public class Field<E, T> {
     }
 
     /**
-     * Returns the sub entity if this {@link Field } is of {@link Type#ENTITY}.
+     * Returns the sub entity if this {@link Field } is of {@link Type#SUB_ENTITY}.
      *
      * @return
      */
@@ -319,7 +319,7 @@ public class Field<E, T> {
     /**
      * The enumeration {@link Type} is used to differentiate between different types of {@link Field}s.
      */
-    public static enum Type {
+    public enum Type {
         /**
          * States that the {@link Field} with this type represents a field who's type is a raw data type.
          * <p>
@@ -339,11 +339,16 @@ public class Field<E, T> {
          * States that the {@link Field} with this type represents a field who's type is an entity.
          * This states, that there are {@link Field}s existing for the fields of that class / object.
          */
-        ENTITY,
+        SUB_ENTITY,
 
         /**
          * WIP: To indicate boolean fields
          */
-        CONDITIONAL
+        CONDITIONAL,
+
+        /**
+         * WIP: To indicate fields that have options
+         */
+        ADVANCED
     }
 }
