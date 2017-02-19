@@ -1,9 +1,13 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
+import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Date;
 
 /**
@@ -13,7 +17,7 @@ import java.util.Date;
  */
 public class TemplatingTester {
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws IOException {
         Milestone ms = new Milestone("Milestone", 0, new Date() );
         Requirement r = new Requirement("first","desc",ms.getOrdinal(),ms.getOrdinal(),3,true,true,false);
 
@@ -55,6 +59,8 @@ public class TemplatingTester {
                 "    <body>\n" +
                 "\t\n" +
                 "\t<br><br><br>\n" +
+                "\t<h1>Points: ${catalogue.sumTotal}</h1>\n" +
+                "\t<h2>Points MS1: ${catalogue.sumMS[1]}</h2>" +
                 "\t\n" +
                 "\t<div class=\"container\">\n" +
                 "        \n" +
@@ -67,28 +73,35 @@ public class TemplatingTester {
                 "    </body>\n" +
                 "  </html>";
 
-        String reqHTML = "<div class=\"achievement ${requirement.mandatory[][bonus]} z-depth-2 hoverable\">\n" +
+        String reqHTML = "<div class=\"achievement ${requirement.meta[category]} ${requirement.mandatory[][bonus]} z-depth-2 hoverable\">\n" +
                 "\t<div class=\"achievement-img-container\">\n" +
-                "\t\t<img src=\"img/placeholder.png\">\n" +
+                "\t\t<img src=\"img/${requirement.meta[image]}\">\n" +
                 "\t</div>\n" +
                 "\t<div class=\"achievement-content-container\">\n" +
                 "\t\t<div class=\"achievement-header\">\n" +
                 "\t\t\t<span class=\"achievement-title\">${requirement.name}</span>\n" +
-                "\t\t\t<span class=\"achievement-points\">${requirement.maxPoints}</span>\n" +
+                "\t\t\t<span class=\"achievement-points\">${requirement.malus[-][]}${requirement.maxPoints}</span>\n" +
                 "\t\t\t<span class=\"achievement-date\">${requirement.minMS.name}</span>\n" +
                 "\t\t</div>\n" +
                 "\t\t<span class=\"achievement-description\">${requirement.description}</span>\n" +
                 "\t</div>\n" +
                 "</div>";
 
-        RenderManager manager = new RenderManager(cat);
 
-        manager.parseCatalogueTemplate(catTemplate);
-        manager.parseMilestoneTemplate(msTemplate);
-        manager.parseRequirementTemplate(reqTemplate);
+
+
+        Catalogue cs108 = JSONUtils.readCatalogueJSONFile( new File("C:\\Users\\Loris\\uni\\08_fs17\\learningcontract\\reqman\\CS108.json"));
+        RenderManager manager = new RenderManager(cs108);
+
+        manager.parseCatalogueTemplate(catHTML);
+        //manager.parseMilestoneTemplate(msTemplate);
+        manager.parseRequirementTemplate(reqHTML);
 
         String export = manager.renderCatalogue();
 
-        System.out.println("====\n"+export);
+        PrintWriter pw = new PrintWriter(new File("export.html"));
+        pw.write(export);
+        pw.flush();
+        pw.close();
     }
 }

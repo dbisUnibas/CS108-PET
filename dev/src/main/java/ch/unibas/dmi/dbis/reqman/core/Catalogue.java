@@ -1,9 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.*;
+import java.util.stream.DoubleStream;
 
 /**
  * TODO: write JavaDoc
@@ -19,6 +19,9 @@ public class Catalogue {
 
     private List<Milestone> milestones = new Vector<Milestone>();
     private List<Requirement> requirements = new Vector<Requirement>();
+
+    @JsonIgnore
+    private Map<Integer, List<Requirement>> reqsPerMinMS = new TreeMap<>();
 
     public Catalogue() {
 
@@ -65,6 +68,15 @@ public class Catalogue {
 
     public void setRequirements(List<Requirement> requirements) {
         this.requirements = requirements;
+        requirements.forEach(requirement -> {
+            int ordinal = requirement.getMinMilestoneOrdinal();
+            if(reqsPerMinMS.get(ordinal) != null ){
+                reqsPerMinMS.get(ordinal).add(requirement);
+
+            }else{
+                reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement)));
+            }
+        });
     }
 
     public void clearMilestones(){
@@ -132,11 +144,22 @@ public class Catalogue {
     }
 
     public boolean addRequirement(Requirement requirement) {
+
+        if(reqsPerMinMS.get(requirement.getMinMilestoneOrdinal() ) != null){
+            reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).add(requirement);
+        }else{
+            List<Requirement> list = new ArrayList<>(Arrays.asList(requirement));
+            reqsPerMinMS.put(requirement.getMinMilestoneOrdinal(), list);
+        }
         return requirements.add(requirement);
     }
 
     public boolean removeRequirement(Requirement requirement) {
+        if(reqsPerMinMS.get(requirement.getMinMilestoneOrdinal() ) != null){
+            reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).remove(requirement);
+        }
         return requirements.remove(requirement);
+
     }
 
     public List<Requirement> getRequirements(){
@@ -144,7 +167,20 @@ public class Catalogue {
     }
 
     public void addAllRequirements(Requirement... requirements){
-        this.requirements.addAll(Arrays.asList(requirements));
+        List<Requirement> list = new ArrayList<>(Arrays.asList(requirements));
+
+        this.requirements.addAll(list);
+
+        list.forEach(requirement -> {
+            int ordinal = requirement.getMinMilestoneOrdinal();
+            if(reqsPerMinMS.get(ordinal) != null ){
+                reqsPerMinMS.get(ordinal).add(requirement);
+
+            }else{
+                reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement )));
+            }
+        });
+
     }
 
     public void addAllMilestones(Milestone...milestones){
@@ -159,5 +195,24 @@ public class Catalogue {
             }
         }
         return result;
+    }
+
+    public double getSum(int msOrdinal){
+        List<Requirement> reqs = reqsPerMinMS.get(msOrdinal);
+        if(reqs == null){
+            return 0;
+        }else{
+            List<Double> points = new ArrayList<>();
+            reqs.forEach(req -> points.add(req.isMalus() ? 0 :req.getMaxPoints()));
+            return points.stream().mapToDouble(Double::doubleValue).sum();
+        }
+    }
+
+    public double getSum(){
+        List<Double> points = new ArrayList<>();
+        reqsPerMinMS.keySet().forEach(ordinal ->{
+            points.add(getSum(ordinal));
+        });
+        return points.stream().mapToDouble(Double::doubleValue).sum();
     }
 }

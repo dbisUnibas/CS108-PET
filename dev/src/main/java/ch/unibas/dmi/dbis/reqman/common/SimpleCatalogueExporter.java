@@ -107,7 +107,15 @@ public class SimpleCatalogueExporter {
                     }
                 })
 
-                .thenComparing(Requirement::getName));
+                .thenComparing(Requirement::isMalus,(b1, b2) -> {
+                    if(b1 == b2){
+                        return 0;
+                    }else if(b1){
+                        return 1;
+                    }else{
+                        return -1;
+                    }
+                }).thenComparing(Requirement::getName));
 
         reqs.forEach(req -> {
             tags.add(achievementConatiner(req));
