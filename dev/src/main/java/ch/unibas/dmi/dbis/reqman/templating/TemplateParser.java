@@ -59,8 +59,11 @@ public class TemplateParser{
     }
 
     public <E>Template<E> parseTemplate(String template){
+        if(entity == null){
+            throw new IllegalStateException("Parser not set up. One must invoke TemplateParser.setupFor(Entity) before parsing a template.");
+        }
         List<Replacement<E>> list = parseReplacements(template);
-        return new Template<E>();
+        return new Template<E>(template, list, entity);
     }
 
     // TODO: Define visibility
@@ -82,7 +85,7 @@ public class TemplateParser{
                 case CLOSING:
                     // normal field
                     Field<E, ?> field = parseNormalField(expression+CLOSING);
-                    Replacement<E> repl = new Replacement<E>(field,matcherField.start(), matcherField.end(), regexEntity+FIELD_DELIMETER_REGEX+field.getName()+CLOSING_REGEX, expression+CLOSING);
+                    Replacement<E> repl = new Replacement<E>(field,matcherField.start(), matcherField.end()+1, regexEntity+FIELD_DELIMETER_REGEX+field.getName()+CLOSING_REGEX, expression+CLOSING);
                     list.add(repl);
                     break;
                 case FIELD_DELIMETER:
@@ -173,7 +176,7 @@ public class TemplateParser{
                     int secondClosing = expression.lastIndexOf(OPTION_CLOSING);
                     Function<Boolean, String> falseRenderer = b->"";
                     if(secondClosing == firstClosing){
-                        LOGGER.warn("No secondary parameter provided. The falseRenderer will render an empty string. Expression: "+expression);
+                        LOGGER.warn("No secondary parameter provided. The falseRenderer will oldRender an empty string. Expression: "+expression);
                     }
                     int secondOpening = expression.lastIndexOf(OPTION_OPENING);
                     if(secondOpening == -1){

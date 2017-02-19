@@ -1,5 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,12 +14,50 @@ import java.util.regex.Pattern;
  */
 public class TemplateRenderer {
 
+    private static final Logger LOGGER = LogManager.getLogger(TemplateRenderer.class);
 
-    private TemplateParser parser;
+    private TemplateParser parser = null;
 
+    @Deprecated
     public TemplateRenderer(TemplateParser parser){
         this.parser = parser;
     }
+
+    public TemplateRenderer() {
+    }
+
+    public <E> String render(Template<E> template, E instance){
+        LOGGER.debug("Rendering template for instance: "+instance.toString() );
+        LOGGER.debug("Render template: "+template.getTemplate() );
+        StringBuilder out = new StringBuilder(template.getTemplate() );
+
+        template.getReplacements().forEach(replacement -> {
+            Field<E, ?> field = replacement.getField();
+            LOGGER.debug("Rendering: ");
+            LOGGER.debug("Region: <"+replacement.getStart()+","+replacement.getEnd()+">");
+            int calcStart = out.indexOf(replacement.getTargetExpression() );
+            int calcEnd = calcStart+replacement.getTargetExpression().length();
+            LOGGER.debug("Calculated region: <"+calcStart+","+calcEnd+">");
+            LOGGER.debug("Target expression: "+replacement.getTargetExpression() );
+            LOGGER.debug("PreReplacement: "+out.toString());
+            out.replace(calcStart, calcEnd, field.render(instance));
+            LOGGER.debug("PostReplacement: "+out.toString());
+
+            /*
+            // Below code not needed, child classes of Field do override render
+            if(field instanceof  SubEntityField){
+                SubEntityField sub = (SubEntityField)field;
+
+            }else if(field instanceof ConditionalField){
+                ConditionalField cond = (ConditionalField)field;
+            }else{
+                out.replace(replacement.getStart(), replacement.getEnd(), field.render(instance));
+            }*/
+        });
+
+        return out.toString();
+    }
+
 
     /**
      * MAP must have the REGEX escaped value in it!
@@ -26,7 +67,8 @@ public class TemplateRenderer {
      * @param <E>
      * @return
      */
-    public <E> String render(String template, E instance, Map<String, Field<E, ?>> fields){
+    @Deprecated
+    public <E> String oldRender(String template, E instance, Map<String, Field<E, ?>> fields){
 
         StringBuilder out = new StringBuilder(template);
         fields.forEach((variable, field)->{
@@ -39,7 +81,7 @@ public class TemplateRenderer {
                     Field f = sub.getFieldForName(field.getSubFieldName() );
                     Object o = field.getGetter().apply(instance);
                     System.out.println(o);
-                    out.replace(m.start(), m.end(), f.render(field.getGetter().apply(instance)));
+                    out.replace(m.start(), m.end(), f.oldRender(field.getGetter().apply(instance)));
                     */
                 }else{
                     out.replace(m.start(), m.end(), field.render(instance));

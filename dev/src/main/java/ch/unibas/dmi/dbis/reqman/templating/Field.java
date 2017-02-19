@@ -4,7 +4,7 @@ import java.util.function.Function;
 
 /**
  * The class {@link Field} represents a field (property, attribute) of the related entity.
- * This class is used to define renderer / to render fields in a later stage.
+ * This class is used to define renderer / to oldRender fields in a later stage.
  * <p>
  * <p>
  * <p>
@@ -130,7 +130,7 @@ public class Field<E, T> {
      * Constructs a new {@link Field} with specified properties and with a renderer provided.
      * <p>
      * This constructor is intended to use if the field's type is of type {@link Type#OBJECT}.
-     * The field then must know how to render itself and thus needs to have a {@code renderer} specified.
+     * The field then must know how to oldRender itself and thus needs to have a {@code renderer} specified.
      * <p>
      * A a {@code renderer} is any arbitrary {@link Function} which returns a {@link String} when given an object
      * of this field's type. Refer to the classes introduction to understand why and how a renderer is provided.
@@ -165,7 +165,7 @@ public class Field<E, T> {
     /**
      * Creates a new {@link Field} with specified properties and with a renderer provided.
      * <p>
-     * The {@link Field} then must know how to render itself and thus needs to have a {@code renderer} specified.
+     * The {@link Field} then must know how to oldRender itself and thus needs to have a {@code renderer} specified.
      * <p>
      * A a {@code renderer} is any arbitrary {@link Function} which returns a {@link String} when given an object
      * of this {@link Field}'s type. Refer to the classes introduction to understand why and how a renderer is provided.

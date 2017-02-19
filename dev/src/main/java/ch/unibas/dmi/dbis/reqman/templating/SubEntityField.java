@@ -66,4 +66,10 @@ public class SubEntityField<E, T> extends Field<E, T> {
         result = 31 * result + (subFieldName != null ? subFieldName.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String render(E instance){
+        Field subField = subEntity.getFieldForName(subFieldName);
+        return subField.render(getter.apply(instance));
+    }
 }

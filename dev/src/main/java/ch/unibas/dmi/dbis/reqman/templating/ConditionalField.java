@@ -3,7 +3,7 @@ package ch.unibas.dmi.dbis.reqman.templating;
 import java.util.function.Function;
 
 /**
- * Class to use for boolean fields and then depending on the value of the boolean either render something or something else.
+ * Class to use for boolean fields and then depending on the value of the boolean either oldRender something or something else.
  *
  * @author loris.sauter
  */
@@ -20,8 +20,8 @@ public class ConditionalField<E> extends  Field<E,Boolean> {
      *
      * @param name
      * @param getter
-     * @param defaultTrueRenderer It is ensured, that the passed object to render is TRUE. WILL BE ASSIGNED ON RUNTIME with real value.
-     * @param defaultFalseRenderer It is ensured, that the passed object to render is FALSE. WILL BE ASSIGNED ON RUNTIME with real value.
+     * @param defaultTrueRenderer It is ensured, that the passed object to oldRender is TRUE. WILL BE ASSIGNED ON RUNTIME with real value.
+     * @param defaultFalseRenderer It is ensured, that the passed object to oldRender is FALSE. WILL BE ASSIGNED ON RUNTIME with real value.
      */
     public ConditionalField(String name, Function<E,Boolean> getter, Function<Boolean,String> defaultTrueRenderer, Function<Boolean, String> defaultFalseRenderer){
         super(name, Type.CONDITIONAL, getter, defaultTrueRenderer);

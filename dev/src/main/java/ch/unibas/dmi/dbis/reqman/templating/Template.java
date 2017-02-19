@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Represents a template file as a java object.
- * It parses the fields used to easily render the provided entity then.
+ * It parses the fields used to easily oldRender the provided entity then.
  *
  * @param <E> The entity this template is for
  */
@@ -14,15 +14,15 @@ public class Template<E> {
 
     private List<Replacement<E>> replacements;
 
-    private E entity;
+    private Entity entity;
 
-    public Template(String template, List<Replacement<E>> replacements, E entity) {
+    public Template(String template, List<Replacement<E>> replacements, Entity entity) {
         this.template = template;
         this.replacements = replacements;
         this.entity = entity;
     }
 
-    
+
 
     public String getTemplate() {
         return template;
@@ -32,7 +32,7 @@ public class Template<E> {
         return replacements;
     }
 
-    public E getEntity() {
+    public Entity getEntity() {
         return entity;
     }
 }

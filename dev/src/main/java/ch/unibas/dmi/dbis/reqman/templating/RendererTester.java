@@ -5,14 +5,13 @@ import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * TODO: Write JavaDoc
  *
  * @author loris.sauter
  */
-public class ParserSandbox {
+public class RendererTester {
 
     public static void main(String[] args){
         Milestone ms = new Milestone("Milestone", 0, new Date() );
@@ -24,7 +23,8 @@ public class ParserSandbox {
         String reqTemplate = "Name: ${requirement.name}\n" +
                 "Desc: ${requirement.description}\n" +
                 "Milestone MIN: ${requirement.minMS.name}\n" +
-                "Another: ${requirement.maxPoints}";
+                "Another: ${requirement.malus[-][+]}${requirement.maxPoints}\n" +
+                "This requirement is ${requirement.mandatory[mandatory][optional]}.";
 
         String msTemplate = "Name: ${milestone.name} (${milestone.ordinal}) @ ${milestone.date}";
         String msTem1 = "${milestone.ordinal}";
@@ -32,22 +32,15 @@ public class ParserSandbox {
 
         TemplateParser parser = new TemplateParser(cat);
         parser.setupFor(parser.MILESTONE_ENTITY);
-        Map<String, Field<Milestone, ?>> map = parser.oldParse(msTemplate); // Would be in template
-
-
-        TemplateRenderer renderer = new TemplateRenderer(parser);
-
-        System.out.println(renderer.oldRender(msTemplate, ms, map));
-
+        Template<Milestone> templateMS = parser.parseTemplate(msTemplate);
+        TemplateRenderer renderer = new TemplateRenderer();
+        System.out.println("Rendered Milestone: \n"+renderer.render(templateMS, ms));
         parser.setupFor(parser.REQUIREMENT_ENTITY);
-        Map<String, Field<Requirement, ?>> reqMap = parser.oldParse(reqTemplate);
+        Template<Requirement> templateR = parser.parseTemplate(reqTemplate);
 
-        /*
-        reqMap.forEach((key, field) -> {
-            System.out.println("Key: "+key+", field: "+field);
-        });
-        */
+        String renderedReq = renderer.render(templateR, r);
 
-        System.out.println(renderer.oldRender(reqTemplate, r, reqMap));
+        System.out.println("===");
+        System.out.println("Rendered Requirement: \n"+renderedReq);
     }
 }
