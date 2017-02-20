@@ -199,6 +199,7 @@ public class Field<E, T> {
                 return String.valueOf(value);
             case OBJECT:
             case LIST:
+            case PARAMETRIZED:
                 return renderer.apply(value);
             case SUB_ENTITY:
                 return null;

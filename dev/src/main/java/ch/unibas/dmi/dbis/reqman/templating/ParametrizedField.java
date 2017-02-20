@@ -40,22 +40,17 @@ public abstract class ParametrizedField<E, T> extends Field<E,T> {
     }
 
     @Override
-    public abstract String render(E instance);
-
-    public Function<E, String> getParametrizedRender(){
-        return this::render;
+    public String render(E instance){
+        return renderCarefully(instance, parameter);
     }
 
-    public String renderCarefully(E instance, String parameter){
-        this.parameter = parameter;
-        return render(instance);
-    };
+    public abstract  String renderCarefully(E instance, String parameter);
 
     public static <E,T> ParametrizedField<E,T> copy(ParametrizedField<E,T> source){
         ParametrizedField<E,T> copy = new ParametrizedField<E, T>(source.getName(), source.getGetter()) {
             @Override
-            public String render(E instance) {
-                return source.getParametrizedRender().apply(instance);
+            public String renderCarefully(E instance, String parameter) {
+                return source.renderCarefully(instance, parameter);
             }
         };
 

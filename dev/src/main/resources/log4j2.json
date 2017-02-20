@@ -15,12 +15,30 @@
         "level":"error",
         "appender-ref":{"ref":"console", "level":"error"}
       },
-      "logger":{
-        "name":"ch.unibas.dmi.dbis.reqman.templating",
-        "level":"debug",
-        "additivity":false,
-        "appender-ref":{"ref":"console"}
-      }
+      "logger":[
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.templating",
+          "level":"debug",
+          "additivity":false,
+          "appender-ref":{"ref":"console"}
+        },
+        {
+          "name": "ch.unibas.dmi.dbis.reqman.templating.TemplateParser",
+          "level": "info",
+          "additivity": false,
+          "appender-ref": {
+            "ref": "console"
+          }
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.templating.RenderManager",
+          "level":"trace",
+          "additivity":false,
+          "appender-ref":{
+            "ref":"console"
+          }
+        }
+      ]
     }
   }
 

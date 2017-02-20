@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
-import ch.unibas.dmi.dbis.reqman.common.SimpleCatalogueExporter;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
@@ -13,7 +12,10 @@ import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
@@ -268,7 +270,7 @@ public class EditorController  {
     }
 
     private void hardcodeExport(File f) throws FileNotFoundException {
-        RenderManager manager = new RenderManager(catalogue);
+        RenderManager manager = new RenderManager(getCatalogue());//get catalogue assembles the catalogue
         String catHTML = "  <!DOCTYPE html>\n" +
                 "  <html>\n" +
                 "\t<head>\n" +

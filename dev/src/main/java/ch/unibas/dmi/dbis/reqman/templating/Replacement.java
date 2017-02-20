@@ -8,7 +8,9 @@ package ch.unibas.dmi.dbis.reqman.templating;
 public class Replacement<E> implements Renderer<E> {
 
     private Field<E, ?> field;
+    @Deprecated
     private int start;
+    @Deprecated
     private int end;
     @Deprecated
     private String targetRegex;
@@ -32,7 +34,7 @@ public class Replacement<E> implements Renderer<E> {
             SubEntityField subField = (SubEntityField)field;
             sb.append(subField.toString() );
         }else{
-            sb.append("null");
+            sb.append(field != null ? field.toString(): "null");
         }
         sb.append(", start=").append(start);
         sb.append(", end=").append(end);
@@ -50,6 +52,7 @@ public class Replacement<E> implements Renderer<E> {
         this.field = field;
     }
 
+    @Deprecated
     public int getStart() {
         return start;
     }
@@ -58,6 +61,7 @@ public class Replacement<E> implements Renderer<E> {
         this.start = start;
     }
 
+    @Deprecated
     public int getEnd() {
         return end;
     }

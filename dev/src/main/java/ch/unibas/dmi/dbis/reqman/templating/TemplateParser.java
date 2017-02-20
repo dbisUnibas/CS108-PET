@@ -1,13 +1,13 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -104,7 +104,7 @@ public class TemplateParser{
                     // something went wrong
                     break;
             }
-            LOGGER.debug(String.format("[parseRep] Replacement: %s", list.get(list.size()-1).toString()));
+            LOGGER.debug(String.format("[parseRep] Added replacement: %s", list.get(list.size()-1).toString()));
         }
 
         return list;
@@ -199,7 +199,6 @@ public class TemplateParser{
                     String param = expression.substring(firstOpening+1, firstClosing);
                     LOGGER.debug("[parseParametrized] Found param: "+param);
                     ParametrizedField parField = (ParametrizedField)field;
-                    parField.setParameter(param);
                     ParametrizedField copy = ParametrizedField.copy(parField);
                     copy.setParameter(param);
                     // TODO somehow not passing the parameter correctly

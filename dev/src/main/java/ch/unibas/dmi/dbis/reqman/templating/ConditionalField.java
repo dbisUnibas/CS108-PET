@@ -54,6 +54,17 @@ public class ConditionalField<E> extends  ParametrizedField<E,Boolean> {
         }
     }
 
+    /**
+     * Passed directly to {@link ConditionalField#render(Object)}
+     * @param instance
+     * @param param
+     * @return
+     */
+    @Override
+    public String renderCarefully(E instance, String param){
+        return render(instance);
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("ConditionalField{");

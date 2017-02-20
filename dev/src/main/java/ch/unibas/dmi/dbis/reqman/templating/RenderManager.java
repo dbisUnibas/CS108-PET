@@ -29,9 +29,9 @@ public class RenderManager {
                 private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
 
                 @Override
-                public String render(Milestone instance) {
+                public String renderCarefully(Milestone instance, String parameter) {
                     try {
-                        SimpleDateFormat format = new SimpleDateFormat(getParameter());
+                        SimpleDateFormat format = new SimpleDateFormat(parameter);
                         return format.format(getGetter().apply(instance));
                     } catch (IllegalArgumentException iae) {
                         LOGGER.error("The specified pattern is not compliant with java.text.SimpleDateFormat.", iae);
@@ -88,18 +88,21 @@ public class RenderManager {
             new Field<Catalogue, Double>("sumTotal", Field.Type.NORMAL, Catalogue::getSum),
             new ParametrizedField<Catalogue, Double>("sumMS", Catalogue::getSum) {
                 @Override
-                public String render(Catalogue instance) {
-                    return String.valueOf(instance.getSum(Integer.valueOf(getParameter())));
+                public String renderCarefully(Catalogue instance, String parameter) {
+                    return String.valueOf(instance.getSum(Integer.valueOf(parameter)));
                 }
             },
             new ParametrizedField<Catalogue, Milestone>("milestoneName", null) {
                 @Override
-                public String render(Catalogue instance) {
-                    Milestone ms = instance.getMilestoneByOrdinal(Integer.valueOf(getParameter() ));
-                    return ms != null ? ms.getName() : "null ("+getParameter()+")";
+                public String renderCarefully(Catalogue instance, String parameter) {
+                    Milestone ms = instance.getMilestoneByOrdinal(Integer.valueOf(parameter ));
+                    return ms != null ? ms.getName() : "null ("+parameter+")";
                 }
             }
     );
+
+    private static final Logger LOG = LogManager.getLogger(RenderManager.class);
+
     private Catalogue catalogue = null;
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
             new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
@@ -128,13 +131,13 @@ public class RenderManager {
                 private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
 
                 @Override
-                public String render(Requirement instance) {
+                public String renderCarefully(Requirement instance,String parameter) {
                     Map<String, String> map = getGetter().apply(instance);
-                    if (!map.containsKey(getParameter())) {
-                        LOGGER.error(String.format("Error while parsing meta of requirement [name=%s]: There is no meta with name: %s", instance.getName(), getParameter()));
+                    if (!map.containsKey(parameter)) {
+                        LOGGER.error(String.format("Error while parsing meta of requirement [name=%s]: There is no meta with name: %s", instance.getName(), parameter));
                         return "";
                     }
-                    String value = map.get(getParameter());
+                    String value = map.get(parameter);
                     if (value != null) {
                         return value;
                     } else {

@@ -29,19 +29,21 @@ public class TemplateRenderer {
 
     public <E> String render(Template<E> template, E instance){
         LOGGER.debug("Rendering template for instance: "+instance.toString() );
-        LOGGER.debug("Render template: "+template.getTemplate() );
+        LOGGER.trace("Render template: "+template.getTemplate() );
         StringBuilder out = new StringBuilder(template.getTemplate() );
 
         template.getReplacements().forEach(replacement -> {
             Field<E, ?> field = replacement.getField();
-            LOGGER.debug("Rendering: ");
-            LOGGER.debug("Region: <"+replacement.getStart()+","+replacement.getEnd()+">");
+            LOGGER.debug("Replacement: "+replacement.toString());
             int calcStart = out.indexOf(replacement.getTargetExpression() );
             int calcEnd = calcStart+replacement.getTargetExpression().length();
             LOGGER.debug("Calculated region: <"+calcStart+","+calcEnd+">");
-            LOGGER.debug("Target expression: "+replacement.getTargetExpression() );
             LOGGER.trace("PreReplacement: "+out.toString());
-            out.replace(calcStart, calcEnd, field.render(instance));
+            String repl = field.render(instance);
+            if(field instanceof ParametrizedField){
+                repl = ((ParametrizedField) field).renderCarefully(instance, ((ParametrizedField) field).getParameter());
+            }
+            out.replace(calcStart, calcEnd, repl);
 
             LOGGER.trace("PostReplacement: "+out.toString());
 
