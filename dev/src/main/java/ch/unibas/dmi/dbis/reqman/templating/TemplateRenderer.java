@@ -40,9 +40,10 @@ public class TemplateRenderer {
             int calcEnd = calcStart+replacement.getTargetExpression().length();
             LOGGER.debug("Calculated region: <"+calcStart+","+calcEnd+">");
             LOGGER.debug("Target expression: "+replacement.getTargetExpression() );
-            LOGGER.debug("PreReplacement: "+out.toString());
+            LOGGER.trace("PreReplacement: "+out.toString());
             out.replace(calcStart, calcEnd, field.render(instance));
-            LOGGER.debug("PostReplacement: "+out.toString());
+
+            LOGGER.trace("PostReplacement: "+out.toString());
 
             /*
             // Below code not needed, child classes of Field do override render

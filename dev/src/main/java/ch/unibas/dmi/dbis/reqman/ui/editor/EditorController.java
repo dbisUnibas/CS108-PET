@@ -202,6 +202,13 @@ public class EditorController  {
         catalogueFile = openChooser.showOpenDialog(controlledStage);
         try {
             openCatalogue(JSONUtils.readCatalogueJSONFile(catalogueFile));
+            System.out.println("===");
+            System.out.println(catalogue.getSum(1));
+            System.out.println(catalogue.getSum(2));
+            System.out.println(catalogue.getSum(3));
+            System.out.println(catalogue.getSum(4));
+            System.out.println(catalogue.getSum(5));
+            System.out.println(catalogue.getSum());
         } catch (IOException e) {
             e.printStackTrace();
         }

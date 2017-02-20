@@ -200,7 +200,10 @@ public class TemplateParser{
                     LOGGER.debug("[parseParametrized] Found param: "+param);
                     ParametrizedField parField = (ParametrizedField)field;
                     parField.setParameter(param);
-                    return ParametrizedField.copy(parField);
+                    ParametrizedField copy = ParametrizedField.copy(parField);
+                    copy.setParameter(param);
+                    // TODO somehow not passing the parameter correctly
+                    return copy;
                 }else{
                         LOGGER.warn(String.format("Field [%s] of entity [%s] is not parametrized. Ignoring those parameters.", fieldName, entity.getEntityName() ));
                         return field; // Has parameter even no parameters are allowed: Ignore those parameters.
