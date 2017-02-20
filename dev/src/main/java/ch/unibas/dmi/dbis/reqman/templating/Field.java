@@ -108,8 +108,6 @@ public class Field<E, T> {
     /**
      * Constructor for a new {@link Field} with specified properties.
      * <p>
-     * This constructor is intended to when instantiating fields with either type {@link Type#NORMAL} or {@link Type#SUB_ENTITY}
-     * if the type would be {@link Type#OBJECT}, an {@link IllegalArgumentException} will be thrown. Use {@link Field#Field(String, Type, Function, Function, Entity)} instead.
      *
      * @param name   The name of the field
      * @param type   The field's type.
@@ -117,8 +115,8 @@ public class Field<E, T> {
      * @throws IllegalArgumentException If the type is {@link Type#OBJECT}
      */
     protected Field(String name, Type type, Function<E, T> getter) throws IllegalArgumentException {
-        if (type == Type.OBJECT) {
-            throw new IllegalArgumentException("If this field's type is Type.OBJECT, an appropriate *renderer must be provided*. See the docs for more information");
+        if (type == Type.OBJECT || type == Type.LIST) {
+            throw new IllegalArgumentException("If this field's type is Type.OBJECT or Type.LIST, an appropriate *renderer must be provided*. See the docs for more information");
         }
         this.name = name;
         this.type = type;
@@ -181,6 +179,10 @@ public class Field<E, T> {
         return new Field<>(name, Type.OBJECT, getter, renderer);
     }
 
+    public static <E,T> Field<E,T> createListField(String name, Function<E,T> getter, Function<T, String> renderer){
+        return new Field<>(name, Type.LIST, getter, renderer);
+    }
+
     // TODO Write factory methods for all types!
 
     /**
@@ -196,10 +198,12 @@ public class Field<E, T> {
             case NORMAL:
                 return String.valueOf(value);
             case OBJECT:
+            case LIST:
                 return renderer.apply(value);
             case SUB_ENTITY:
-            default:
                 return null;
+            default:
+                throw new IllegalArgumentException("Cannot render a field of type: "+type.toString());
         }
     }
 
@@ -354,13 +358,17 @@ public class Field<E, T> {
         SUB_ENTITY,
 
         /**
-         * WIP: To indicate boolean fields
+         * To indicate boolean fields
          */
         CONDITIONAL,
 
         /**
-         * WIP: To indicate fields that have options
+         * To indicate fields that have options
          */
-        PARAMETRIZED
+        PARAMETRIZED,
+        /**
+         * To indicate that the field represented by the {@link Field} with this type is a list and therefore cannot be rendered.
+         */
+        LIST
     }
 }

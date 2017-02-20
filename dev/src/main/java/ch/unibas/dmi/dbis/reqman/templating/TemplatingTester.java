@@ -7,11 +7,11 @@ import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import java.util.Date;
 
 /**
- * TODO: Write JavaDoc
+ * TODO: write JavaDoc
  *
  * @author loris.sauter
  */
-public class RendererTester {
+public class TemplatingTester {
 
     public static void main(String[] args){
         Milestone ms = new Milestone("Milestone", 0, new Date() );
@@ -24,35 +24,34 @@ public class RendererTester {
         Catalogue cat = new Catalogue("Lecture","name","desc","fs");
         cat.addAllMilestones(ms);
         cat.addRequirement(r);
+        cat.addRequirement(r2);
 
         String reqTemplate = "Name: ${requirement.name}\n" +
                 "Desc: ${requirement.description}\n" +
                 "Milestone MIN: ${requirement.minMS.name}\n" +
                 "Another: ${requirement.malus[-][+]}${requirement.maxPoints}\n" +
                 "This requirement is ${requirement.mandatory[mandatory][optional]}.\n" +
-                "Path: ${requirement.meta[img]}";
+                "Path: ${requirement.meta[img]}\n";
 
-        String msTemplate = "Name: ${milestone.name} (${milestone.ordinal}) @ ${milestone.date}";
+        String msTemplate = "Name: ${milestone.name} (${milestone.ordinal}) @ ${milestone.date}\n";
         String msTem1 = "${milestone.ordinal}";
         String msTem2 = "${milestone.ordinal} @ OTHER";
 
-        RenderManager renderManager = new RenderManager(cat);
+        String catTemplate = "Name: ${catalogue.name}\n" +
+                "Description: ${catalogue.description}\n" +
+                "Lecture: ${catalogue.lecture}\n" +
+                "Semseter: ${catalogue.semester}\n\n" +
+                "Requirements:\n${catalogue.requirements}\n\n" +
+                "Milestones: \n${catalogue.milestones}";
 
-        TemplateParser parser = new TemplateParser(cat);
-        parser.setupFor(renderManager.MILESTONE_ENTITY);
-        Template<Milestone> templateMS = parser.parseTemplate(msTemplate);
-        TemplateRenderer renderer = new TemplateRenderer();
-        System.out.println("Rendered Milestone: \n"+renderer.render(templateMS, ms));
-        parser.setupFor(renderManager.REQUIREMENT_ENTITY);
-        Template<Requirement> templateR = parser.parseTemplate(reqTemplate);
+        RenderManager manager = new RenderManager(cat);
 
-        String renderedR1 = renderer.render(templateR, r);
-        String renderedR2 = renderer.render(templateR, r2);
+        manager.parseCatalogueTemplate(catTemplate);
+        manager.parseMilestoneTemplate(msTemplate);
+        manager.parseRequirementTemplate(reqTemplate);
 
-        System.out.println("===");
-        System.out.println("Rendered Requirement: \n"+renderedR1);
+        String export = manager.renderCatalogue();
 
-        System.out.println("===");
-        System.out.println(renderedR2);
+        System.out.println("====\n"+export);
     }
 }

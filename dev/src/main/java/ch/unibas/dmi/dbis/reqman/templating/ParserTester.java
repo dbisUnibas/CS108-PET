@@ -31,7 +31,8 @@ public class ParserTester {
         String msTem2 = "${milestone.ordinal} @ OTHER";
 
         TemplateParser parser = new TemplateParser(cat);
-        parser.setupFor(parser.REQUIREMENT_ENTITY);
+        RenderManager manager = new RenderManager(cat);
+        parser.setupFor(manager.REQUIREMENT_ENTITY);
         parser.parseReplacements(reqTemplate);
     }
 }

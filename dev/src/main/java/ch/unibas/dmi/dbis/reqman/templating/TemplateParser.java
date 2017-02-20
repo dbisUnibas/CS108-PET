@@ -301,65 +301,7 @@ public class TemplateParser{
         }
     }
 
-    public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
-            new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
-            new Field<Milestone, Date>("date", Field.Type.OBJECT, Milestone::getDate, date -> {
-                SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
-                return format.format(date);
-            }),
-            new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal)
-    );
 
-    public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
-            new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
-            new Field<Requirement, String>("description", Field.Type.NORMAL, Requirement::getDescription),
-            new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPoints),
-            new SubEntityField<Requirement, Milestone>("minMS", (requirement -> {
-                return catalogue.getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal());
-            }), MILESTONE_ENTITY),
-            new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, Requirement::getPredecessorNames, list -> {
-                StringBuilder sb = new StringBuilder();
-                list.forEach(str -> {
-                    sb.append(str);
-                    sb.append(", ");
-                });
-                String out = sb.toString();
-                if(out.charAt(out.length()-1) == ' '){
-                    return out.substring(0, out.lastIndexOf(", "));
-                }
-                return out;
-            }),
-            new ConditionalField<Requirement>("binary", Requirement::isBinary, b-> "BINARY", b-> "PARTIAL"),
-            new ConditionalField<Requirement>("mandatory",Requirement::isMandatory, b->"MANDATORY", b->"BONUS"),
-            new ConditionalField<Requirement>("malus",Requirement::isMalus, b->"-",b->"+"),
-            new ParametrizedField<Requirement, Map<String,String>>("meta", Requirement::getPropertiesMap){
-                //private final Logger LOGGER = LogManager.getLogger(TemplateParser.class.getName().replace("TemplateParser", "MetaParser"));
-                private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
-
-                @Override
-                public String render(Requirement instance) {
-                    Map<String, String> map = getGetter().apply(instance);
-                    if(!map.containsKey(getParameter())){
-                        LOGGER.error(String.format("Error while parsing meta of requirement [name=%s]: There is no meta with name: %s", instance.getName(), getParameter() ));
-                        return "";
-                    }
-                    String value = map.get(getParameter() );
-                    if(value != null){
-                        return value;
-                    }else{
-                        return "";
-                    }
-                }
-            }
-    );
-
-    public final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
-            new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
-            new Field<Catalogue, String>("description", Field.Type.NORMAL, Catalogue::getDescription),
-            new Field<Catalogue, String>("lecture", Field.Type.NORMAL, Catalogue::getLecture),
-            new Field<Catalogue, String>("semester", Field.Type.NORMAL, Catalogue::getSemester)
-
-            );
 
     // TODO Implement TemplateManager which holds all templates (and entities), so that ${catalogue.requirements} is renderable
 
