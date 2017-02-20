@@ -203,7 +203,7 @@ public class Catalogue {
             return 0;
         }else{
             List<Double> points = new ArrayList<>();
-            reqs.forEach(req -> points.add(req.isMalus() ? 0 :req.getMaxPoints()));
+            reqs.forEach(req -> points.add(!req.isMandatory() || req.isMalus() ? 0 :req.getMaxPoints()));
             return points.stream().mapToDouble(Double::doubleValue).sum();
         }
     }
