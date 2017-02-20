@@ -309,7 +309,6 @@ public class EditorController  {
                 "</tr>\n" +
                 "</tbody>\n" +
                 "</table>\n" +
-                "${catalogue.sumMS[1]}" +
                 "\t\n" +
                 "\t\n" +
                 "      <!--Import jQuery before materialize.js-->\n" +
