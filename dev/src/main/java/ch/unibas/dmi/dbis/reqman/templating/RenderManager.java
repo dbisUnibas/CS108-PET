@@ -17,6 +17,7 @@ import java.util.Map;
  * @author loris.sauter
  */
 public class RenderManager {
+    private static Logger LOGGER = LogManager.getLogger(RenderManager.class);
 
     private Template<Requirement> templateReq = null;
 
@@ -86,7 +87,7 @@ public class RenderManager {
             // Template Cat
             templateCat = parser.parseTemplate(template);
         }else{
-            throw new UnsupportedOperationException("Cannot parse a template for entity: "+entity.toString());
+            throw LOGGER.throwing( new UnsupportedOperationException("Cannot parse a template for entity: "+entity.toString()) );
         }
         return true;
     }
@@ -112,6 +113,19 @@ public class RenderManager {
                 SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
                 return format.format(date);
             }),
+            new ParametrizedField<Milestone, Date>("dateFormatted", Milestone::getDate) {
+                private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
+                @Override
+                public String render(Milestone instance) {
+                    try{
+                        SimpleDateFormat format = new SimpleDateFormat(getParameter() );
+                        return format.format(getGetter().apply(instance));
+                    }catch(IllegalArgumentException iae){
+                        LOGGER.error("The specified pattern is not compliant with java.text.SimpleDateFormat.", iae);
+                    }
+                    return "";
+                }
+            },
             new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal)
     );
 

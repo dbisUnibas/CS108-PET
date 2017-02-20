@@ -44,6 +44,43 @@ public class TemplatingTester {
                 "Requirements:\n${catalogue.requirements}\n\n" +
                 "Milestones: \n${catalogue.milestones}";
 
+        String catHTML = "  <!DOCTYPE html>\n" +
+                "  <html>\n" +
+                "\t<head>\n" +
+                "\t\t<link href=\"http://fonts.googleapis.com/icon?family=Material+Icons\" rel=\"stylesheet\">\n" +
+                "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"css/materialize.min.css\"  media=\"screen,projection\"/>\n" +
+                "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"css/achievements.css\"/>\n" +
+                "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n" +
+                "\t</head>\n" +
+                "    <body>\n" +
+                "\t\n" +
+                "\t<br><br><br>\n" +
+                "\t\n" +
+                "\t<div class=\"container\">\n" +
+                "        \n" +
+                "\t\t${catalogue.requirements}\n" +
+                "\t\n" +
+                "\t\n" +
+                "      <!--Import jQuery before materialize.js-->\n" +
+                "      <script type=\"text/javascript\" src=\"https://code.jquery.com/jquery-2.1.1.min.js\"></script>\n" +
+                "      <script type=\"text/javascript\" src=\"js/materialize.min.js\"></script>\n" +
+                "    </body>\n" +
+                "  </html>";
+
+        String reqHTML = "<div class=\"achievement ${requirement.mandatory[][bonus]} z-depth-2 hoverable\">\n" +
+                "\t<div class=\"achievement-img-container\">\n" +
+                "\t\t<img src=\"img/placeholder.png\">\n" +
+                "\t</div>\n" +
+                "\t<div class=\"achievement-content-container\">\n" +
+                "\t\t<div class=\"achievement-header\">\n" +
+                "\t\t\t<span class=\"achievement-title\">${requirement.name}</span>\n" +
+                "\t\t\t<span class=\"achievement-points\">${requirement.maxPoints}</span>\n" +
+                "\t\t\t<span class=\"achievement-date\">${requirement.minMS.name}</span>\n" +
+                "\t\t</div>\n" +
+                "\t\t<span class=\"achievement-description\">${requirement.description}</span>\n" +
+                "\t</div>\n" +
+                "</div>";
+
         RenderManager manager = new RenderManager(cat);
 
         manager.parseCatalogueTemplate(catTemplate);
