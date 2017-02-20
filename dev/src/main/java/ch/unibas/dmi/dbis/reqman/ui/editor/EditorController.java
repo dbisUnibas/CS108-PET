@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.common.SimpleCatalogueExporter;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.templating.RenderManager;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,10 +13,7 @@ import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -176,6 +174,17 @@ public class EditorController  {
         fc.setTitle("Export Catalogue");
         fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
         File f = fc.showSaveDialog(controlledStage);
+        if(f != null){
+            // user did not abort file choose
+            try {
+                hardcodeExport(f);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        /*
+        // OLD code:
         SimpleCatalogueExporter exporter = new SimpleCatalogueExporter(getCatalogue() );
         String html = exporter.exportHTML();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
@@ -184,6 +193,8 @@ public class EditorController  {
         } catch (IOException e) {
             e.printStackTrace();
         }
+         */
+
     }
 
     public void handleOpenCatalogue(ActionEvent event){
@@ -247,5 +258,79 @@ public class EditorController  {
             }
         }
         return result;
+    }
+
+    private void hardcodeExport(File f) throws FileNotFoundException {
+        RenderManager manager = new RenderManager(catalogue);
+        String catHTML = "  <!DOCTYPE html>\n" +
+                "  <html>\n" +
+                "\t<head>\n" +
+                "\t\t<link href=\"http://fonts.googleapis.com/icon?family=Material+Icons\" rel=\"stylesheet\">\n" +
+                "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"css/materialize.min.css\"  media=\"screen,projection\"/>\n" +
+                "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"css/achievements.css\"/>\n" +
+                "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n" +
+                "\t</head>\n" +
+                "    <body>\n" +
+                "\t\n" +
+                "\t<br><br><br>\n" +
+                "\t\n" +
+                "\t<div class=\"container\">\n" +
+                "        \n" +
+                "\t\t${catalogue.requirements}\n" +
+                "<br><br>\n" +
+                "<table class=\"bordered responsive-table\">\n" +
+                "<thead>\n" +
+                "<tr>\n" +
+                "<th>${catalogue.milestoneName[1]}</th>\n" +
+                "<th>${catalogue.milestoneName[2]}</th>\n" +
+                "<th>${catalogue.milestoneName[3]}</th>\n" +
+                "<th>${catalogue.milestoneName[4]}</th>\n" +
+                "<th>${catalogue.milestoneName[5]}</th>\n" +
+                "<th>Total</th>\n" +
+                "</tr>\n" +
+                "</thead>\n" +
+                "<tbody>\n" +
+                "<tr>\n" +
+                "<td>${catalogue.sumMS[1]}</td>\n" +
+                "<td>${catalogue.sumMS[2]}</td>\n" +
+                "<td>${catalogue.sumMS[3]}</td>\n" +
+                "<td>${catalogue.sumMS[4]}</td>\n" +
+                "<td>${catalogue.sumMS[5]}</td>\n" +
+                "<td>${catalogue.sumTotal}</td>\n" +
+                "</tr>\n" +
+                "</tbody>\n" +
+                "</table>\n" +
+                "${catalogue.sumMS[1]}" +
+                "\t\n" +
+                "\t\n" +
+                "      <!--Import jQuery before materialize.js-->\n" +
+                "      <script type=\"text/javascript\" src=\"https://code.jquery.com/jquery-2.1.1.min.js\"></script>\n" +
+                "      <script type=\"text/javascript\" src=\"js/materialize.min.js\"></script>\n" +
+                "    </body>\n" +
+                "  </html>";
+
+        String reqHTML = "<div class=\"achievement ${requirement.meta[category]} ${requirement.mandatory[][bonus]} z-depth-2 hoverable\">\n" +
+                "\t<div class=\"achievement-img-container\">\n" +
+                "\t\t<img src=\"img/${requirement.meta[image]}\">\n" +
+                "\t</div>\n" +
+                "\t<div class=\"achievement-content-container\">\n" +
+                "\t\t<div class=\"achievement-header\">\n" +
+                "\t\t\t<span class=\"achievement-title\">${requirement.name}</span>\n" +
+                "\t\t\t<span class=\"achievement-points\">${requirement.malus[-][]}${requirement.maxPoints}</span>\n" +
+                "\t\t\t<span class=\"achievement-date\">${requirement.minMS.name}</span>\n" +
+                "\t\t</div>\n" +
+                "\t\t<span class=\"achievement-description\">${requirement.description}</span>\n" +
+                "\t</div>\n" +
+                "</div>";
+
+        manager.parseRequirementTemplate(reqHTML);
+        manager.parseCatalogueTemplate(catHTML);
+
+        String export = manager.renderCatalogue();
+
+        PrintWriter pw = new PrintWriter(f);
+        pw.write(export);
+        pw.close();
+        pw.flush();
     }
 }

@@ -332,6 +332,11 @@ public class Field<E, T> {
         return sb.toString();
     }
 
+    public static <E,T> Field<E,T> copy(Field<E,T> source){
+        Field<E,T> copy = new Field<E, T>(source.getName(), source.getType(), source.getGetter(), source.getRenderer() );
+        return copy;
+    }
+
     /**
      * The enumeration {@link Type} is used to differentiate between different types of {@link Field}s.
      */

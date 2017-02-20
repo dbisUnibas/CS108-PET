@@ -7,7 +7,7 @@ import java.util.function.Function;
  *
  * @author loris.sauter
  */
-public class SubEntityField<E, T> extends Field<E, T> {
+public class SubEntityField<E, T> extends Field<E, T>{
 
     public SubEntityField(String name, Function<E, T> getter, Entity<T> subEntity) {
         super(name, Type.SUB_ENTITY, getter);
@@ -72,5 +72,11 @@ public class SubEntityField<E, T> extends Field<E, T> {
     public String render(E instance){
         Field subField = subEntity.getFieldForName(subFieldName);
         return subField.render(getter.apply(instance));
+    }
+
+    public static <E,T> SubEntityField<E,T> copy(SubEntityField<E,T> source){
+        SubEntityField<E,T> copy = new SubEntityField<E, T>(source.getName(), source.getGetter(), source.getSubEntity());
+        copy.setSubFieldName(source.getSubFieldName());
+        return copy;
     }
 }

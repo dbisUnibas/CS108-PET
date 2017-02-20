@@ -66,4 +66,9 @@ public class ConditionalField<E> extends  ParametrizedField<E,Boolean> {
         sb.append('}');
         return sb.toString();
     }
+
+    public static <E> ConditionalField<E> copy(ConditionalField<E> source){
+        ConditionalField<E> copy = new ConditionalField<E>(source.getName(), source.getGetter(), source.getTrueRenderer(), source.getFalseRenderer());
+        return copy;
+    }
 }

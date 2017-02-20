@@ -197,6 +197,7 @@ public class Catalogue {
         return result;
     }
 
+    @JsonIgnore
     public double getSum(int msOrdinal){
         List<Requirement> reqs = reqsPerMinMS.get(msOrdinal);
         if(reqs == null){
@@ -208,6 +209,7 @@ public class Catalogue {
         }
     }
 
+    @JsonIgnore
     public double getSum(){
         List<Double> points = new ArrayList<>();
         reqsPerMinMS.keySet().forEach(ordinal ->{

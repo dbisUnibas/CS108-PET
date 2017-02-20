@@ -95,7 +95,8 @@ public class RenderManager {
             new ParametrizedField<Catalogue, Milestone>("milestoneName", null) {
                 @Override
                 public String render(Catalogue instance) {
-                    return instance.getMilestoneByOrdinal(Integer.valueOf(getParameter())).getName() ;
+                    Milestone ms = instance.getMilestoneByOrdinal(Integer.valueOf(getParameter() ));
+                    return ms != null ? ms.getName() : "null ("+getParameter()+")";
                 }
             }
     );

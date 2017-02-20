@@ -131,7 +131,7 @@ public class TemplateParser{
                 // Done
                 SubEntityField<E, ?> subField = (SubEntityField<E,?>)entity.getFieldForName(entityFieldName);
                 subField.setSubFieldName(subFieldName);
-                return subField;
+                return SubEntityField.copy(subField);
             }else{
                 // parse options?
                 // TODO: implement
@@ -200,7 +200,7 @@ public class TemplateParser{
                     LOGGER.debug("[parseParametrized] Found param: "+param);
                     ParametrizedField parField = (ParametrizedField)field;
                     parField.setParameter(param);
-                    return parField;
+                    return ParametrizedField.copy(parField);
                 }else{
                         LOGGER.warn(String.format("Field [%s] of entity [%s] is not parametrized. Ignoring those parameters.", fieldName, entity.getEntityName() ));
                         return field; // Has parameter even no parameters are allowed: Ignore those parameters.
