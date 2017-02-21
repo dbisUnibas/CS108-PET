@@ -1,5 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
 import java.util.function.Function;
 
 /**
@@ -196,7 +199,20 @@ public class Field<E, T> {
         T value = getter.apply(instance);
         switch (type) {
             case NORMAL:
-                return String.valueOf(value);
+                if(getRenderer() == null){
+                    if(value instanceof Double){
+                        /*
+                        Algorithm by: http://stackoverflow.com/a/25308216
+                         */
+                        Double d = (Double)value;
+                        DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+                        df.setMaximumFractionDigits(340); //340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
+                        return df.format(d);
+                    }
+                    return String.valueOf(value);
+                }else{
+                    return renderer.apply(value);
+                }
             case OBJECT:
             case LIST:
             case PARAMETRIZED:
