@@ -68,6 +68,7 @@ public class Catalogue {
 
     public void setRequirements(List<Requirement> requirements) {
         this.requirements = requirements;
+        this. reqsPerMinMS = new TreeMap<>();
         requirements.forEach(requirement -> {
             int ordinal = requirement.getMinMilestoneOrdinal();
             if(reqsPerMinMS.get(ordinal) != null ){
