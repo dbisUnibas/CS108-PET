@@ -270,7 +270,8 @@ public class EditorController  {
     }
 
     private void hardcodeExport(File f) throws FileNotFoundException {
-        RenderManager manager = new RenderManager(getCatalogue());//get catalogue assembles the catalogue
+        //RenderManager manager = new RenderManager(getCatalogue());//get catalogue assembles the catalogue
+        RenderManager manager = new RenderManager(catalogue);
         String catHTML = "  <!DOCTYPE html>\n" +
                 "  <html>\n" +
                 "\t<head>\n" +
