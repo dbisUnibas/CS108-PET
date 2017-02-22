@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -18,7 +19,9 @@ public class EvaluatorScene extends Scene{
 
     private BorderPane root;
 
-    private SplitPane horizontalSplitter;
+    private SplitPane horizontalSplitter = new SplitPane();
+    private SplitPane verticalSplitter = new SplitPane();
+
     private HBox leftContent = new HBox();
     private HBox rightContent = new HBox();
 
@@ -36,22 +39,28 @@ public class EvaluatorScene extends Scene{
     }
 
     private void initComponents(){
-        horizontalSplitter = new SplitPane();
         horizontalSplitter.prefWidthProperty().bind(widthProperty() );
         horizontalSplitter.prefHeightProperty().bind(heightProperty() );
 
-        Button bleft = new Button("LEFT");
+
+        verticalSplitter.prefWidthProperty().bind(widthProperty());
+        verticalSplitter.prefHeightProperty().bind(heightProperty() );
+        verticalSplitter.setOrientation(Orientation.VERTICAL);
+
+        Button bup = new Button("UP");
+        Button bdown = new Button("DOWN");
         Button bright = new Button("RIGHT");
 
-        HBox hbox = new HBox();
-        hbox.getChildren().addAll(bleft);
+        verticalSplitter.getItems().addAll(bup, bdown);
+        verticalSplitter.setDividerPositions(0.3);
+
         VBox vbox = new VBox();
         vbox.getChildren().addAll(bright);
 
-        leftContent.getChildren().addAll(hbox);
+
         rightContent.getChildren().addAll(vbox);
 
-        horizontalSplitter.getItems().addAll(leftContent, rightContent);
+        horizontalSplitter.getItems().addAll(verticalSplitter, rightContent);
 
         root.setTop(createMenuBar() );
         root.setCenter(horizontalSplitter);
