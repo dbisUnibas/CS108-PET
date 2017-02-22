@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -17,7 +18,7 @@ import javafx.scene.layout.VBox;
  */
 public class ProgressView extends VBox {
 
-    // TODO Extract code for collapsible pane. Adjust content's size.
+    // TODO Extract code for collapsible pane. Adjust collapsible's size.
 
     private Progress progress;
     private Requirement requirement;
@@ -28,7 +29,7 @@ public class ProgressView extends VBox {
     private Spinner<Double> spinnerPoints;
     private CheckBox check;
 
-    private VBox content = new VBox();
+    private VBox collapsible = new VBox();
 
     public ProgressView(Progress progress, Requirement requirement){
         super();
@@ -42,37 +43,41 @@ public class ProgressView extends VBox {
 
     private void initCollapsible(){
         collapseButton.setOnAction(this::handleCollapse);
-        //content.setVisible(false);
-        content.setStyle("-fx-background-color: white;-fx-padding: 10px; -fx-spacing: 10px");
+        //collapsible.setVisible(false);
+        collapsible.setStyle("-fx-background-color: white;-fx-padding: 10px; -fx-spacing: 10px;-fx-border-width: 1px;-fx-border-color: silver");
+
     }
 
     private void handleCollapse(ActionEvent event){
         if(collapseButton.isSelected() ){
             collapseButton.setText(Utils.ARROW_UP);
-            getChildren().add(content);
-            //content.setVisible(true);
+            getChildren().add(collapsible);
+            //collapsible.setVisible(true);
         }else{
             collapseButton.setText(Utils.ARROW_DOWN);
 
-            getChildren().remove(content);
-            //content.setVisible(false);
+            getChildren().remove(collapsible);
+            //collapsible.setVisible(false);
         }
         event.consume();
     }
+
+    private AnchorPane content;
 
     private void initComponents(){
 
         lblTitle.setText(requirement.getName());
 
-        AnchorPane outer = new AnchorPane();
+        content = new AnchorPane();
 
         HBox title = new HBox();
 
-        title.setStyle("-fx-padding: 10px; -fx-spacing: 10px");
+        title.setStyle("-fx-spacing: 15px");
+        //title.setStyle("-fx-background-color: darkorange;"+title.getStyle() );
 
         title.getChildren().addAll(collapseButton, lblTitle);
 
-        outer.getChildren().add(title);
+        content.getChildren().add(title);
 
         Node control;
         if(requirement.isBinary() ){
@@ -83,20 +88,23 @@ public class ProgressView extends VBox {
             control = spinnerPoints;
         }
 
-        outer.getChildren().add(control);
+        content.getChildren().add(control);
 
-        outer.prefHeightProperty().bind(prefWidthProperty() );
+        content.prefHeightProperty().bind(prefWidthProperty() );
 
 
-        AnchorPane.setRightAnchor(control, 10d); // not handled by padding?
-        AnchorPane.setTopAnchor(control, 10d); // not handled by padding?
+        AnchorPane.setRightAnchor(control, 10d); // not affected by padding?
+        AnchorPane.setTopAnchor(control, 10d); // not affected by padding?
 
-        AnchorPane.setLeftAnchor(title, 0d); // handled by padding?
+        AnchorPane.setLeftAnchor(title, 0d); // affected by padding?
+        AnchorPane.setTopAnchor(title, 10d);// not affected by padding=
 
-        getChildren().add(outer);
-
-        content.getChildren().add(new Label("Collapsible"));
-        //getChildren().add(content);
+        getChildren().add(content);
+        collapsible.getChildren().add(new Label("Collapsible"));
+        //getChildren().add(collapsible);
+        content.setStyle("-fx-spacing: 10px;-fx-padding: 10px;-fx-border-color: silver;-fx-border-width: 1px;");
+        //content.setStyle("-fx-background-color: lime;"+ content.getStyle() );
+        //setStyle("-fx-background-color: crimson;");
     }
 
     public Requirement getRequirement() {

@@ -73,7 +73,7 @@ public class EvaluatorScene extends Scene{
 
         ProgressView pv2 = new ProgressView(null, partial);
 
-
+        rightContent.setStyle("-fx-padding: 10px;-fx-spacing: 10px;");
         rightContent.getChildren().addAll(pv1, pv2);
 
         horizontalSplitter.getItems().addAll(leftContent, rightContent);
