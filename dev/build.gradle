@@ -22,7 +22,8 @@ brief(er) description
  */
 apply plugin: 'java'
 
-sourceCompatibility = 1.5
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -32,7 +33,90 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.6'
 
+    compile group: 'com.j2html', name: 'j2html', version: '0.88'
+    // https://mvnrepository.com/artifact/commons-lang/commons-lang
+    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8'
+
     testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+compileJava.options.encoding = 'UTF-8'
+
+sourceSets{
+    main{
+        java{
+            srcDir 'src/main/java'
+        }
+        resources{
+            srcDir 'src/main/resources'
+        }
+    }
+    test {
+        java{
+            srcDir 'src/test/java'
+        }
+        resources{
+            srcDir 'src/test/resources'
+        }
+    }
+}
+
+jar{
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+}
+
+
+
+task incrementTest {
+    doLast{
+        Properties p = new Properties()
+        File pF = new File('version.properties')
+        p.load(pF.newDataInputStream() )
+        Integer fix = (p.getProperty('artifactFixVersion') as Integer)
+        logger.debug('fix version: '+fix.toString() )
+        Integer nextFix = fix + 1
+        logger.debug('next fix version: '+nextFix.toString() )
+        p.setProperty('artifactFixVersion', nextFix.toString() )
+        p.store(pF.newWriter(), null)
+        p.load(pF.newDataInputStream() )
+    }
+}
+
+
+task deployEditor(dependsOn: [build, jar]){
+    doLast{
+        println('Deployed Editor version '+project.version)
+    }
+}
+
+task applySnapshot(dependsOn: deployEditor){
+    doLast{
+        println('Finished: '+jar.archiveName)
+    }
+}
+
+
+/*
+ * Goal: filter in Version.java @v@ and replace with actual version. Then comiple with it.
+ * by : http://stackoverflow.com/a/33475075
+ */
+
+
+gradle.taskGraph.whenReady{
+    taskGraph ->
+        if(taskGraph.hasTask(deployEditor)){
+            jar.appendix = 'editor'
+            jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication')
+        }
+        if(taskGraph.hasTask(applySnapshot)){
+            jar.classifier = 'SNAPSHOT'
+        }
 }
 
 /**
@@ -92,21 +176,6 @@ task incrementBuildNumber(){
 
 build.doLast{
     incrementVersion('BuildNumber')
-}
-
-task incrementTest {
-    doLast{
-        Properties p = new Properties()
-        File pF = new File('version.properties')
-        p.load(pF.newDataInputStream() )
-        Integer fix = (p.getProperty('artifactFixVersion') as Integer)
-        logger.debug('fix version: '+fix.toString() )
-        Integer nextFix = fix + 1
-        logger.debug('next fix version: '+nextFix.toString() )
-        p.setProperty('artifactFixVersion', nextFix.toString() )
-        p.store(pF.newWriter(), null)
-        p.load(pF.newDataInputStream() )
-    }
 }
 
 /**
