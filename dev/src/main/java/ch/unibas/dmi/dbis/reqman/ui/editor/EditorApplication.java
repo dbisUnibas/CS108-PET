@@ -33,17 +33,23 @@ public class EditorApplication extends Application {
     private MilestonesView msView;
 
     public static void main(String[] args) {
+        /*
+        Workaround for:
+        https://issues.apache.org/jira/browse/LOG4J2-1799
+         */
+        System.getProperties().remove("sun.stdout.encoding");
+        System.getProperties().remove("sun.stderr.encoding");
+
         try {
+            /*
+            Test to see if executing jar name can be obtained
+             */
             System.out.print("Code source: ");
             System.out.println(URLDecoder.decode(EditorApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         launch(args);
-    }
-
-    private void printDebugEvent(ActionEvent event){
-        System.out.println("Type: "+event.getEventType().getName()+", Source: "+event.getSource().toString() );
     }
 
     private void handleQuit(ActionEvent event){
