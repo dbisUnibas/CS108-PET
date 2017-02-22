@@ -7,15 +7,17 @@ import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.apache.commons.lang.StringUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
  * TODO: write JavaDoc
@@ -30,11 +32,23 @@ public class EditorApplication extends Application {
     private MilestonesView msView;
 
     public static void main(String[] args) {
-        launch(args);
-    }
+        /*
+        Workaround for:
+        https://issues.apache.org/jira/browse/LOG4J2-1799
+         */
+        System.getProperties().remove("sun.stdout.encoding");
+        System.getProperties().remove("sun.stderr.encoding");
 
-    private void printDebugEvent(ActionEvent event){
-        System.out.println("Type: "+event.getEventType().getName()+", Source: "+event.getSource().toString() );
+        try {
+            /*
+            Test to see if executing jar name can be obtained
+             */
+            System.out.print("Code source: ");
+            System.out.println(URLDecoder.decode(EditorApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        launch(args);
     }
 
     private void handleQuit(ActionEvent event){
@@ -126,7 +140,7 @@ public class EditorApplication extends Application {
         // Looks nicer anyhow
         VBox box = new VBox();
         box.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
-        box.getChildren().addAll(reqView, msView);
+        box.getChildren().addAll(createCatalogueInfo(), reqView, msView);
         //main.add(box,0,0);
         wrapperPane.setCenter(box);
 
@@ -139,6 +153,31 @@ public class EditorApplication extends Application {
         GridPane.setVgrow(msView, Priority.SOMETIMES);
         GridPane.setFillWidth(msView, true);
         */
+    }
+
+    private Label lblName, lblLecture, lblSemester;
+
+    private HBox createCatalogueInfo(){
+        HBox box = new HBox();
+        box.setStyle("-fx-spacing: 10px; -fx-padding: 10px");
+        Label lblCatalogue = new Label("Catalgoue");
+        Label lblCatName = new Label("Name:");
+        Label lblCatLecture = new Label("Lecture:");
+        Label lblCatSemester = new Label("Semester:");
+
+        lblName = new Label();
+        lblLecture = new Label();
+        lblSemester = new Label();
+
+        box.getChildren().addAll(lblCatalogue, lblCatName, lblName, lblCatLecture, lblLecture, lblCatSemester, lblSemester);
+
+        return box;
+    }
+
+    public void updateCatalogueInfo(String name, String lecture, String semester){
+        lblName.setText(StringUtils.isNotEmpty(name)?name:"");
+        lblLecture.setText(StringUtils.isNotEmpty(lecture)?lecture:"");
+        lblSemester.setText(StringUtils.isNotEmpty(semester)?semester:"");
     }
 
     @Override

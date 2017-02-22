@@ -45,7 +45,7 @@ public class EditorController  {
         observableMs = FXCollections.observableArrayList(catalogue.getMilestones() );
         editor.passRequirementsToView(observableReqs);
         editor.passMilestonesToView(observableMs);
-        updateTitle();
+        updateCatalogueProperties();
     }
 
     public Catalogue getCatalogue(){
@@ -124,7 +124,7 @@ public class EditorController  {
         Catalogue cat = EditorPromptFactory.promptNewCatalogue();
         if(cat != null){
             this.catalogue = cat;
-            updateTitle();
+            updateCatalogueProperties();
             editor.enableAll();
         }
     }
@@ -133,7 +133,8 @@ public class EditorController  {
         Catalogue updated = EditorPromptFactory.promptCatalogue(catalogue);
         if(updated != null){
             this.catalogue = updated;
-            updateTitle();
+            updateCatalogueProperties();
+
         }
     }
 
@@ -141,13 +142,9 @@ public class EditorController  {
 
     public void handleSaveAsCatalogue(ActionEvent event){
         FileChooser saveChooser = createCatalogueFileChooser("Save As");
-        File catalogueFile = saveChooser.showSaveDialog(controlledStage);
-        if(catalogueFile == null){
-            return; // No file was selected
-        }
+        catalogueFile = saveChooser.showSaveDialog(controlledStage);
         try {
             JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile); // Important to use getCatalogue as the reqs and ms are set there
-            this.catalogueFile = catalogueFile; // Only when saving was done
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -157,6 +154,7 @@ public class EditorController  {
         if(catalogueFile == null){
             handleSaveAsCatalogue(event);
         }
+
         try {
             JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile);
         } catch (IOException e) {
@@ -175,13 +173,27 @@ public class EditorController  {
     }
 
     public void handleExportCatalogue(ActionEvent event){
+        if(!isCatalogueSet()){
+            return;
+        }
         FileChooser fc = new FileChooser();
         fc.setTitle("Export Catalogue");
         fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
         File f = fc.showSaveDialog(controlledStage);
-        if(f == null){
-            return; // no file was selected
+        if(f != null){
+            // user did not abort file choose
+            SimpleCatalogueExporter exporter = new SimpleCatalogueExporter(getCatalogue() );
+            String html = exporter.exportHTML();
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
+                bw.write(html);
+                bw.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
+        /*
+        // OLD code:
         SimpleCatalogueExporter exporter = new SimpleCatalogueExporter(getCatalogue() );
         String html = exporter.exportHTML();
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
@@ -190,25 +202,27 @@ public class EditorController  {
         } catch (IOException e) {
             e.printStackTrace();
         }
+         */
+
     }
 
     public void handleOpenCatalogue(ActionEvent event){
         FileChooser openChooser = createCatalogueFileChooser("Open");
-        File catalogueFile = openChooser.showOpenDialog(controlledStage);
-        if(catalogueFile == null){
-            return; // No file selected
+        File file = openChooser.showOpenDialog(controlledStage);
+        if(file != null){
+            try {
+                openCatalogue(JSONUtils.readCatalogueJSONFile(file));
+                catalogueFile = file;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            editor.enableAll();
         }
-        this.catalogueFile = catalogueFile;
-        try {
-            openCatalogue(JSONUtils.readCatalogueJSONFile(catalogueFile));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        editor.enableAll();
+
     }
 
 
-    private void updateTitle(){
+    private void updateCatalogueProperties(){
         StringBuffer sb = new StringBuffer("ReqMan: Editor");
         sb.append(" - ");
         sb.append(catalogue.getName() != null ? catalogue.getName() : "N/A");
@@ -218,6 +232,7 @@ public class EditorController  {
         sb.append(catalogue.getSemester() != null ? catalogue.getSemester() : "N/A" );
         sb.append(")");
         controlledStage.setTitle(sb.toString());
+        editor.updateCatalogueInfo(catalogue.getName(), catalogue.getLecture(), catalogue.getSemester());
     }
 
 
@@ -258,4 +273,5 @@ public class EditorController  {
         }
         return result;
     }
+
 }

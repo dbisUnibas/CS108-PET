@@ -2,10 +2,12 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
+import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.event.ActionEvent;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 
 import java.time.ZoneId;
 import java.util.Date;
@@ -63,6 +65,11 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
 
         loadMilestone();
 
+        SaveCancelPane buttonWrapper = new SaveCancelPane();
+
+        buttonWrapper.setOnSave(this::handleSaving);
+
+        buttonWrapper.setOnCancel(event -> getWindow().hide());
 
         int rowIndex = 0;
 
@@ -75,7 +82,7 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
         grid.add(lblDate, 0, rowIndex);
         grid.add(inputDate, 1, rowIndex++);
 
-        grid.add(buttons, 0, ++rowIndex, 2, 1);
+        grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
     }
 
     @Override
