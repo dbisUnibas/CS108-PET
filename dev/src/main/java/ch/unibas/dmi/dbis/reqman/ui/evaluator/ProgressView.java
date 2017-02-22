@@ -4,7 +4,6 @@ import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.event.ActionEvent;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -25,6 +24,7 @@ public class ProgressView extends VBox {
 
     private Label lblTitle = new Label();
     private ToggleButton collapseButton = new ToggleButton(Utils.ARROW_DOWN);
+    private TextArea taDesc = new TextArea();
 
     private Spinner<Double> spinnerPoints;
     private CheckBox check;
@@ -68,6 +68,8 @@ public class ProgressView extends VBox {
 
         lblTitle.setText(requirement.getName());
 
+        taDesc.setEditable(false);
+
         content = new AnchorPane();
 
         HBox title = new HBox();
@@ -100,7 +102,8 @@ public class ProgressView extends VBox {
         AnchorPane.setTopAnchor(title, 10d);// not affected by padding=
 
         getChildren().add(content);
-        collapsible.getChildren().add(new Label("Collapsible"));
+        taDesc.setText(requirement.getDescription());
+        collapsible.getChildren().add(taDesc);
         //getChildren().add(collapsible);
         content.setStyle("-fx-spacing: 10px;-fx-padding: 10px;-fx-border-color: silver;-fx-border-width: 1px;");
         //content.setStyle("-fx-background-color: lime;"+ content.getStyle() );

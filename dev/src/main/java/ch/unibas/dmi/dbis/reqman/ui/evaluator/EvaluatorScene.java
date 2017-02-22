@@ -50,11 +50,10 @@ public class EvaluatorScene extends Scene{
         verticalSplitter.prefHeightProperty().bind(heightProperty() );
 
 
-        Button bup = new Button("UP");
         Button bdown = new Button("DOWN");
 
         VBox upper = new VBox();
-        upper.getChildren().add(bup);
+        upper.getChildren().add(new CatalogueInfoView(null));
 
         VBox lower = new VBox();
         lower.getChildren().add(bdown);
