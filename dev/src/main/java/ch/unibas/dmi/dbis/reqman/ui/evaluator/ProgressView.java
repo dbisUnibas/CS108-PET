@@ -43,7 +43,7 @@ public class ProgressView extends VBox {
     private void initCollapsible(){
         collapseButton.setOnAction(this::handleCollapse);
         //content.setVisible(false);
-        content.setStyle("-fx-background-color: white");//TEST
+        content.setStyle("-fx-background-color: white;-fx-padding: 10px; -fx-spacing: 10px");
     }
 
     private void handleCollapse(ActionEvent event){
@@ -88,10 +88,10 @@ public class ProgressView extends VBox {
         outer.prefHeightProperty().bind(prefWidthProperty() );
 
 
-        AnchorPane.setRightAnchor(control, 10d);
-        AnchorPane.setTopAnchor(control, 10d);
+        AnchorPane.setRightAnchor(control, 10d); // not handled by padding?
+        AnchorPane.setTopAnchor(control, 10d); // not handled by padding?
 
-        AnchorPane.setLeftAnchor(title, 10d);
+        AnchorPane.setLeftAnchor(title, 0d); // handled by padding?
 
         getChildren().add(outer);
 
