@@ -1,8 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.*;
+import java.util.stream.DoubleStream;
 
 /**
  * TODO: write JavaDoc
@@ -16,8 +17,11 @@ public class Catalogue {
     private String description;
     private String semester;
 
-    private List<Milestone> milestones = new ArrayList<Milestone>();
-    private List<Requirement> requirements = new ArrayList<Requirement>();
+    private List<Milestone> milestones = new Vector<Milestone>();
+    private List<Requirement> requirements = new Vector<Requirement>();
+
+    @JsonIgnore
+    private Map<Integer, List<Requirement>> reqsPerMinMS = new TreeMap<>();
 
     public Catalogue() {
 
@@ -56,6 +60,32 @@ public class Catalogue {
 
     public String getSemester() {
         return semester;
+    }
+
+    public void setMilestones(List<Milestone> milestones) {
+        this.milestones = milestones;
+    }
+
+    public void setRequirements(List<Requirement> requirements) {
+        this.requirements = requirements;
+        this. reqsPerMinMS = new TreeMap<>();
+        requirements.forEach(requirement -> {
+            int ordinal = requirement.getMinMilestoneOrdinal();
+            if(reqsPerMinMS.get(ordinal) != null ){
+                reqsPerMinMS.get(ordinal).add(requirement);
+
+            }else{
+                reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement)));
+            }
+        });
+    }
+
+    public void clearMilestones(){
+        milestones = new ArrayList<>();
+    }
+
+    public void clearRequirements(){
+        requirements = new ArrayList<>();
     }
 
     @Override
@@ -110,12 +140,82 @@ public class Catalogue {
         return milestones.remove(milestone);
     }
 
+    public List<Milestone> getMilestones(){
+        return new ArrayList<>(milestones);
+    }
+
     public boolean addRequirement(Requirement requirement) {
+
+        if(reqsPerMinMS.get(requirement.getMinMilestoneOrdinal() ) != null){
+            reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).add(requirement);
+        }else{
+            List<Requirement> list = new ArrayList<>(Arrays.asList(requirement));
+            reqsPerMinMS.put(requirement.getMinMilestoneOrdinal(), list);
+        }
         return requirements.add(requirement);
     }
 
     public boolean removeRequirement(Requirement requirement) {
+        if(reqsPerMinMS.get(requirement.getMinMilestoneOrdinal() ) != null){
+            reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).remove(requirement);
+        }
         return requirements.remove(requirement);
+
     }
 
+    public List<Requirement> getRequirements(){
+        return new ArrayList<>(requirements);
+    }
+
+    public void addAllRequirements(Requirement... requirements){
+        List<Requirement> list = new ArrayList<>(Arrays.asList(requirements));
+
+        this.requirements.addAll(list);
+
+        list.forEach(requirement -> {
+            int ordinal = requirement.getMinMilestoneOrdinal();
+            if(reqsPerMinMS.get(ordinal) != null ){
+                reqsPerMinMS.get(ordinal).add(requirement);
+
+            }else{
+                reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement )));
+            }
+        });
+
+    }
+
+    public void addAllMilestones(Milestone...milestones){
+        this.milestones.addAll(Arrays.asList(milestones));
+    }
+
+    public Milestone getMilestoneByOrdinal(int ordinal) {
+        Milestone result = null;
+        for(Milestone ms : milestones){
+            if(ms.getOrdinal() == ordinal){
+                result = ms;
+            }
+        }
+        return result;
+    }
+
+    @JsonIgnore
+    public double getSum(int msOrdinal){
+        List<Requirement> reqs = reqsPerMinMS.get(msOrdinal);
+        if(reqs == null){
+            return 0;
+        }else{
+            List<Double> points = new ArrayList<>();
+            reqs.forEach(req -> points.add(!req.isMandatory() || req.isMalus() ? 0 :req.getMaxPoints()));
+            return points.stream().mapToDouble(Double::doubleValue).sum();
+        }
+    }
+
+    @JsonIgnore
+    public double getSum(){
+        List<Double> points = new ArrayList<>();
+        reqsPerMinMS.keySet().forEach(ordinal ->{
+            points.add(getSum(ordinal));
+        });
+        return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
 }
