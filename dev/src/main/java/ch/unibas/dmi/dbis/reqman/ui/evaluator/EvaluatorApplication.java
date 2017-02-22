@@ -17,7 +17,7 @@ public class EvaluatorApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
         EvaluatorScene scene = new EvaluatorScene(800, 600);
-        primaryStage.setTitle("Assessment");
+        primaryStage.setTitle(scene.getTitle());
         primaryStage.setScene(scene);
         primaryStage.show();
 
