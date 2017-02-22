@@ -59,8 +59,6 @@ public class EvaluatorScene extends Scene{
         VBox lower = new VBox();
         lower.getChildren().add(bdown);
 
-        Button bright = new Button("RIGHT");
-
         verticalSplitter.getItems().addAll(upper, lower);
 
         verticalSplitter.setDividerPositions(0.3);

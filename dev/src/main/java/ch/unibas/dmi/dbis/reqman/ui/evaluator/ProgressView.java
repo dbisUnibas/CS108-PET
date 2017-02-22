@@ -3,28 +3,32 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
-import javafx.geometry.Pos;
-import javafx.scene.Group;
+import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 /**
  * TODO: write JavaDoc
  *
  * @author loris.sauter
  */
-public class ProgressView extends AnchorPane {
+public class ProgressView extends VBox {
+
+    // TODO Extract code for collapsible pane. Adjust content's size.
 
     private Progress progress;
     private Requirement requirement;
 
     private Label lblTitle = new Label();
-    private ToggleButton collapsButton = new ToggleButton(Utils.ARROW_DOWN);
+    private ToggleButton collapseButton = new ToggleButton(Utils.ARROW_DOWN);
 
     private Spinner<Double> spinnerPoints;
     private CheckBox check;
+
+    private VBox content = new VBox();
 
     public ProgressView(Progress progress, Requirement requirement){
         super();
@@ -32,19 +36,43 @@ public class ProgressView extends AnchorPane {
         this.requirement = requirement;
 
         initComponents();
+        initCollapsible();
+    }
+
+
+    private void initCollapsible(){
+        collapseButton.setOnAction(this::handleCollapse);
+        //content.setVisible(false);
+        content.setStyle("-fx-background-color: white");//TEST
+    }
+
+    private void handleCollapse(ActionEvent event){
+        if(collapseButton.isSelected() ){
+            collapseButton.setText(Utils.ARROW_UP);
+            getChildren().add(content);
+            //content.setVisible(true);
+        }else{
+            collapseButton.setText(Utils.ARROW_DOWN);
+
+            getChildren().remove(content);
+            //content.setVisible(false);
+        }
+        event.consume();
     }
 
     private void initComponents(){
+
         lblTitle.setText(requirement.getName());
 
+        AnchorPane outer = new AnchorPane();
 
         HBox title = new HBox();
 
         title.setStyle("-fx-padding: 10px; -fx-spacing: 10px");
 
-        title.getChildren().addAll(collapsButton, lblTitle);
+        title.getChildren().addAll(collapseButton, lblTitle);
 
-        getChildren().add(title);
+        outer.getChildren().add(title);
 
         Node control;
         if(requirement.isBinary() ){
@@ -55,12 +83,20 @@ public class ProgressView extends AnchorPane {
             control = spinnerPoints;
         }
 
-        getChildren().add(control);
+        outer.getChildren().add(control);
+
+        outer.prefHeightProperty().bind(prefWidthProperty() );
+
+
         AnchorPane.setRightAnchor(control, 10d);
         AnchorPane.setTopAnchor(control, 10d);
 
         AnchorPane.setLeftAnchor(title, 10d);
 
+        getChildren().add(outer);
+
+        content.getChildren().add(new Label("Collapsible"));
+        //getChildren().add(content);
     }
 
     public Requirement getRequirement() {
