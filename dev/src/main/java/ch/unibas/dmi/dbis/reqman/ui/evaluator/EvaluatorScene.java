@@ -97,7 +97,7 @@ public class EvaluatorScene extends Scene{
         MenuItem itemNew = new MenuItem("New Group");
         MenuItem itemOpen = new MenuItem("Open Group");
         MenuItem itemSave = new MenuItem("Save Group");
-        MenuItem itemSaveAs = new MenuItem("Save As Group");
+        MenuItem itemSaveAs = new MenuItem("Save Group As");
         MenuItem itemExit = new MenuItem("Quit");
 
 
