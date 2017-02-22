@@ -45,7 +45,7 @@ public class EditorController  {
         observableMs = FXCollections.observableArrayList(catalogue.getMilestones() );
         editor.passRequirementsToView(observableReqs);
         editor.passMilestonesToView(observableMs);
-        updateTitle();
+        updateCatalogueProperties();
     }
 
     public Catalogue getCatalogue(){
@@ -124,7 +124,7 @@ public class EditorController  {
         Catalogue cat = EditorPromptFactory.promptNewCatalogue();
         if(cat != null){
             this.catalogue = cat;
-            updateTitle();
+            updateCatalogueProperties();
             editor.enableAll();
         }
     }
@@ -133,7 +133,8 @@ public class EditorController  {
         Catalogue updated = EditorPromptFactory.promptCatalogue(catalogue);
         if(updated != null){
             this.catalogue = updated;
-            updateTitle();
+            updateCatalogueProperties();
+
         }
     }
 
@@ -204,13 +205,6 @@ public class EditorController  {
         catalogueFile = openChooser.showOpenDialog(controlledStage);
         try {
             openCatalogue(JSONUtils.readCatalogueJSONFile(catalogueFile));
-            System.out.println("===");
-            System.out.println(catalogue.getSum(1));
-            System.out.println(catalogue.getSum(2));
-            System.out.println(catalogue.getSum(3));
-            System.out.println(catalogue.getSum(4));
-            System.out.println(catalogue.getSum(5));
-            System.out.println(catalogue.getSum());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -218,7 +212,7 @@ public class EditorController  {
     }
 
 
-    private void updateTitle(){
+    private void updateCatalogueProperties(){
         StringBuffer sb = new StringBuffer("ReqMan: Editor");
         sb.append(" - ");
         sb.append(catalogue.getName() != null ? catalogue.getName() : "N/A");
@@ -228,6 +222,7 @@ public class EditorController  {
         sb.append(catalogue.getSemester() != null ? catalogue.getSemester() : "N/A" );
         sb.append(")");
         controlledStage.setTitle(sb.toString());
+        editor.updateCatalogueInfo(catalogue.getName(), catalogue.getLecture(), catalogue.getSemester());
     }
 
 
