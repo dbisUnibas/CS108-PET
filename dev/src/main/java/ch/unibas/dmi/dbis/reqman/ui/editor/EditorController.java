@@ -173,6 +173,9 @@ public class EditorController  {
     }
 
     public void handleExportCatalogue(ActionEvent event){
+        if(!isCatalogueSet()){
+            return;
+        }
         FileChooser fc = new FileChooser();
         fc.setTitle("Export Catalogue");
         fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
@@ -202,13 +205,17 @@ public class EditorController  {
 
     public void handleOpenCatalogue(ActionEvent event){
         FileChooser openChooser = createCatalogueFileChooser("Open");
-        catalogueFile = openChooser.showOpenDialog(controlledStage);
-        try {
-            openCatalogue(JSONUtils.readCatalogueJSONFile(catalogueFile));
-        } catch (IOException e) {
-            e.printStackTrace();
+        File file = openChooser.showOpenDialog(controlledStage);
+        if(file != null){
+            try {
+                openCatalogue(JSONUtils.readCatalogueJSONFile(file));
+                catalogueFile = file;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            editor.enableAll();
         }
-        editor.enableAll();
+
     }
 
 
