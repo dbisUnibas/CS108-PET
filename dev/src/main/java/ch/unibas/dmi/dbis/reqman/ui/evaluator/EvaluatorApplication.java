@@ -1,13 +1,14 @@
-package ch.unibas.dmi.dbis.reqman.ui.evaluator;/**
+package ch.unibas.dmi.dbis.reqman.ui.evaluator;
+
+
+import javafx.application.Application;
+import javafx.stage.Stage;
+
+/**
  * TODO: write JavaDoc
  *
  * @author loris.sauter
  */
-
-import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorScene;
-import javafx.application.Application;
-import javafx.stage.Stage;
-
 public class EvaluatorApplication extends Application {
 
     public static void main(String[] args) {

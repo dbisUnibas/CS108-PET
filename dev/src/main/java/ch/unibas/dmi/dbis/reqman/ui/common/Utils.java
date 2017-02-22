@@ -12,6 +12,10 @@ import javafx.scene.layout.GridPane;
  */
 public class Utils {
 
+    public static final String ARROW_DOWN = "\u25bc";
+    public static final String HEAVY_PLUS = "\u2795";
+    public static final String HEAVY_MINUS = "\u2212";
+
     /**
      * Creates the widely used {@link GridPane} with its default styling.
      * @return
@@ -52,23 +56,25 @@ public class Utils {
     }
 
     public static Button createArrowUpButton(){
-        Button b = new Button("\u25b2");
+        Button b = new Button(ARROW_UP);
         b.setStyle("-fx-text-fill: dimgray;");
         return b;
     }
 
     public static Button createArrowDownButton(){
-        Button b = new Button("\u25bc");
+        Button b = new Button(ARROW_DOWN);
         b.setStyle("-fx-text-fill: dimgray;");
         return b;
     }
 
+    public static final String ARROW_UP = "\u25b2";
+
     public static Button createPlusButton(){
-        return new Button("\u2795"); // Unicode: heavy plus sign
+        return new Button(HEAVY_PLUS); // Unicode: heavy plus sign
     }
 
     public static Button createMinusButton(){
-        return new Button("\u2212"); // Unicode: heavy minus sign
+        return new Button(HEAVY_MINUS); // Unicode: heavy minus sign
     }
 
 }

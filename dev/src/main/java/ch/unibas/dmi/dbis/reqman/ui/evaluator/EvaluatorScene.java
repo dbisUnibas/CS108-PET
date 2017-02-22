@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.core.Progress;
+import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
@@ -23,7 +25,7 @@ public class EvaluatorScene extends Scene{
     private SplitPane verticalSplitter = new SplitPane();
 
     private HBox leftContent = new HBox();
-    private HBox rightContent = new HBox();
+    private VBox rightContent = new VBox();
 
     private String title = "Evaluator";
 
@@ -65,7 +67,16 @@ public class EvaluatorScene extends Scene{
 
         leftContent.getChildren().add(verticalSplitter);
 
-        rightContent.getChildren().addAll(bright);
+        // TEST CODE
+        Requirement binary = new Requirement("Requirement","Description", 0,0,10,true,true, false);
+        Requirement partial = new Requirement("Requierement","Description", 0,0,5,false,true,false);
+
+        ProgressView pv1 = new ProgressView(null, binary);
+
+        ProgressView pv2 = new ProgressView(null, partial);
+
+
+        rightContent.getChildren().addAll(pv1, pv2);
 
         horizontalSplitter.getItems().addAll(leftContent, rightContent);
 
@@ -82,13 +93,30 @@ public class EvaluatorScene extends Scene{
     private MenuBar createMenuBar(){
         MenuBar bar = new MenuBar();
 
-        Menu file = new Menu("File");
-        MenuItem itemLoad = new MenuItem("Load");
+        Menu menuFile = new Menu("File");
 
-        file.getItems().addAll(itemLoad);
+        MenuItem itemLoad = new MenuItem("Load Catalogue");
+        MenuItem itemNew = new MenuItem("New Group");
+        MenuItem itemOpen = new MenuItem("Open Group");
+        MenuItem itemSave = new MenuItem("Save Group");
+        MenuItem itemSaveAs = new MenuItem("Save As Group");
+        MenuItem itemExit = new MenuItem("Quit");
 
 
-        bar.getMenus().addAll(file);
+        menuFile.getItems().addAll(itemLoad, itemNew, itemOpen, itemSave, itemSaveAs, new SeparatorMenuItem(), itemExit);
+
+        Menu menuEdit = new Menu("Edit");
+        MenuItem itemModify = new MenuItem("Modify Group");
+
+        menuEdit.getItems().addAll(itemModify);
+
+        Menu menuView = new Menu("View");
+
+        Menu menuHelp = new Menu("Help");
+
+
+
+        bar.getMenus().addAll(menuFile, menuEdit, menuView, menuHelp);
         return bar;
     }
 
