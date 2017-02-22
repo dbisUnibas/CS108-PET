@@ -42,28 +42,39 @@ public class EvaluatorScene extends Scene{
         horizontalSplitter.prefWidthProperty().bind(widthProperty() );
         horizontalSplitter.prefHeightProperty().bind(heightProperty() );
 
+        verticalSplitter.setOrientation(Orientation.VERTICAL);
 
         verticalSplitter.prefWidthProperty().bind(widthProperty());
         verticalSplitter.prefHeightProperty().bind(heightProperty() );
-        verticalSplitter.setOrientation(Orientation.VERTICAL);
+
 
         Button bup = new Button("UP");
         Button bdown = new Button("DOWN");
+
+        VBox upper = new VBox();
+        upper.getChildren().add(bup);
+
+        VBox lower = new VBox();
+        lower.getChildren().add(bdown);
+
         Button bright = new Button("RIGHT");
 
-        verticalSplitter.getItems().addAll(bup, bdown);
+        verticalSplitter.getItems().addAll(upper, lower);
+
         verticalSplitter.setDividerPositions(0.3);
 
-        VBox vbox = new VBox();
-        vbox.getChildren().addAll(bright);
+        leftContent.getChildren().add(verticalSplitter);
 
+        rightContent.getChildren().addAll(bright);
 
-        rightContent.getChildren().addAll(vbox);
+        horizontalSplitter.getItems().addAll(leftContent, rightContent);
 
-        horizontalSplitter.getItems().addAll(verticalSplitter, rightContent);
 
         root.setTop(createMenuBar() );
-        root.setCenter(horizontalSplitter);
+
+        VBox box = new VBox();
+        box.getChildren().add(horizontalSplitter);
+        root.setCenter(box);
 
         horizontalSplitter.setDividerPositions(0.3);
     }
