@@ -15,8 +15,11 @@ import javafx.scene.layout.VBox;
  * @author loris.sauter
  */
 public class CollapsibleView extends VBox {
+
+    // TODO Fully write external class
+
     private ToggleButton collapseButton = new ToggleButton(Utils.ARROW_DOWN);
-    private Node collapsible;
+    private HBox collapsible;
     private HBox content;
 
     public CollapsibleView() {
@@ -52,8 +55,10 @@ public class CollapsibleView extends VBox {
 
     private void initComponents(){
         content = new HBox();
+        collapsible = new HBox();
 
         content.prefHeightProperty().bind(prefWidthProperty() );
+        collapsible.prefWidthProperty().bind(prefWidthProperty() );
 
         getChildren().add(content);
         content.setStyle("-fx-spacing: 10px;-fx-padding: 10px;-fx-border-color: silver;-fx-border-width: 1px;");
@@ -68,10 +73,10 @@ public class CollapsibleView extends VBox {
     }
 
     public void setCollapsible(Node node){
-        collapsible = node;
+        collapsible.getChildren().add(node);
     }
 
-    public void removeCollapsible(){
-        collapsible = null;
+    public void removeCollapsible(Node node){
+        collapsible.getChildren().remove(node);
     }
 }
