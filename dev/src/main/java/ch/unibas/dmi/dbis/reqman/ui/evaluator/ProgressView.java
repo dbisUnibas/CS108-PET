@@ -92,7 +92,7 @@ public class ProgressView extends VBox {
 
         content.getChildren().add(control);
 
-        content.prefHeightProperty().bind(prefWidthProperty() );
+        content.prefWidthProperty().bind(prefWidthProperty() );
 
 
         AnchorPane.setRightAnchor(control, 10d); // not affected by padding?
