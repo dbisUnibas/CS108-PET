@@ -30,7 +30,9 @@ public class CatalogueInfoView extends HBox{
 
         getChildren().add(root);
 
+        displayData();
     }
+    
 
     private void initComponents(){
         setStyle("-fx-padding: 10px; -fx-spacing: 10px");
