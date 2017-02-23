@@ -69,15 +69,7 @@ public class Catalogue {
     public void setRequirements(List<Requirement> requirements) {
         this.requirements = requirements;
         this. reqsPerMinMS = new TreeMap<>();
-        requirements.forEach(requirement -> {
-            int ordinal = requirement.getMinMilestoneOrdinal();
-            if(reqsPerMinMS.get(ordinal) != null ){
-                reqsPerMinMS.get(ordinal).add(requirement);
-
-            }else{
-                reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement)));
-            }
-        });
+        requirements.forEach(this::addRequirementToMSMap);
     }
 
     public void clearMilestones(){
@@ -172,16 +164,18 @@ public class Catalogue {
 
         this.requirements.addAll(list);
 
-        list.forEach(requirement -> {
-            int ordinal = requirement.getMinMilestoneOrdinal();
-            if(reqsPerMinMS.get(ordinal) != null ){
-                reqsPerMinMS.get(ordinal).add(requirement);
+        list.forEach(this::addRequirementToMSMap);
 
-            }else{
-                reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement )));
-            }
-        });
+    }
 
+    private void addRequirementToMSMap(Requirement requirement){
+        int ordinal = requirement.getMinMilestoneOrdinal();
+        if(reqsPerMinMS.get(ordinal) != null ){
+            reqsPerMinMS.get(ordinal).add(requirement);
+
+        }else{
+            reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement )));
+        }
     }
 
     public void addAllMilestones(Milestone...milestones){
@@ -196,6 +190,14 @@ public class Catalogue {
             }
         }
         return result;
+    }
+
+    public List<Requirement> getRequirementsByMilestone(int ordinal){
+        if(reqsPerMinMS.containsKey(ordinal)){
+            return new ArrayList<Requirement>(reqsPerMinMS.get(ordinal));
+        }else{
+            return null;
+        }
     }
 
     @JsonIgnore
