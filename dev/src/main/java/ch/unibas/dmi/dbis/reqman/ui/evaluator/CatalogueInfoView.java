@@ -15,6 +15,7 @@ public class CatalogueInfoView extends HBox{
 
     private GridPane root = new GridPane();
 
+
     private Label lblName, lblLecture, lblSemester, lblDescription, lblSum;
 
     private TextField tfName, tfLecture, tfSemester, tfSum;
@@ -32,7 +33,7 @@ public class CatalogueInfoView extends HBox{
 
         displayData();
     }
-    
+
 
     private void initComponents(){
         setStyle("-fx-padding: 10px; -fx-spacing: 10px");
