@@ -4,8 +4,7 @@ import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
 
 /**
  * TODO: write JavaDoc
@@ -56,15 +55,27 @@ public class CatalogueInfoView extends HBox{
         int rowIndex = 0;
 
         root.add(lblName, 0, rowIndex);
+        GridPane.setHgrow(lblName, Priority.ALWAYS);
         root.add(tfName, 1, rowIndex++);
         root.add(lblLecture, 0, rowIndex);
+        GridPane.setHgrow(lblLecture, Priority.ALWAYS);
         root.add(tfLecture, 1, rowIndex++);
         root.add(lblSemester, 0, rowIndex);
+        GridPane.setHgrow(lblSemester, Priority.ALWAYS);
         root.add(tfSemester, 1,rowIndex++);
         root.add(lblSum, 0, rowIndex);
+        GridPane.setHgrow(lblSum, Priority.ALWAYS);
         root.add(tfSum, 1, rowIndex++);
         root.add(lblDescription, 0, rowIndex);
+        GridPane.setHgrow(lblDescription, Priority.ALWAYS);
         root.add(taDesc, 1, rowIndex++);
+
+        ColumnConstraints col1 = new ColumnConstraints();
+        col1.setPercentWidth(50);
+        ColumnConstraints col2 = new ColumnConstraints();
+        col2.setPercentWidth(50);
+
+        root.getColumnConstraints().addAll(col1, col2);
     }
 
     public void displayData(){
@@ -73,10 +84,9 @@ public class CatalogueInfoView extends HBox{
             tfLecture.setText(catalogue.getLecture() );
             tfSemester.setText(catalogue.getSemester() );
             taDesc.setText(catalogue.getDescription() );
+
         }
     }
-
-
 
 
 
