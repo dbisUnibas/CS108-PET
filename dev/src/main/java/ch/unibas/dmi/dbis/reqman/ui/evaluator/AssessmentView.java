@@ -1,9 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import javafx.beans.property.DoubleProperty;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
+import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
@@ -27,12 +26,27 @@ public class AssessmentView extends BorderPane {
     private ScrollPane scrollPane;
 
 
+    private EvaluatorController controller;
 
+    @Deprecated
     public AssessmentView(){
         super();
 
         initComponents();
         layoutComponents();
+    }
+
+    private Group group;
+
+    public AssessmentView(EvaluatorController controller, Group active){
+        super();
+
+        this.controller = controller;
+        this.group = active;
+
+        initComponents();
+        layoutComponents();
+
     }
 
     private void initComponents(){
@@ -53,6 +67,12 @@ public class AssessmentView extends BorderPane {
     private void layoutComponents(){
         // Forge top aka title bar:
         titleBar.getChildren().addAll(lblChoice, cbMilestones, btnRefresh );
+
+        if(controller != null){
+            cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
+        }
+
+
         VBox titleWrapper = new VBox();
         Separator sep = new Separator();
         titleWrapper.getChildren().addAll(titleBar, sep);

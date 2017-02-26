@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.core.Group;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -24,6 +24,7 @@ public class EvaluatorScene extends Scene{
 
     private HBox leftContent = new HBox();
     private VBox rightContent = new VBox();
+    private TabPane tabPane = new TabPane();
 
     private String title = "Evaluator";
 
@@ -75,20 +76,10 @@ public class EvaluatorScene extends Scene{
 
         leftContent.getChildren().add(verticalSplitter);
 
-        // TEST CODE
-        Requirement binary = new Requirement("Requirement","Description", 0,0,10,true,true, false);
-        Requirement partial = new Requirement("Requierement","Description", 0,0,5,false,true,false);
-
-        ProgressView pv1 = new ProgressView(null, binary);
-
-        ProgressView pv2 = new ProgressView(null, partial);
 
         rightContent.setStyle("-fx-padding: 10px;-fx-spacing: 10px;");
-        AssessmentView av = new AssessmentView();
-        av.addProgressView(pv1);
-        av.addProgressView(pv2);
-        av.bindToParentSize(rightContent);
-        rightContent.getChildren().addAll(av);
+
+        rightContent.getChildren().addAll(tabPane);// TODO Iff no catalogue loaded: Plachoolder with info
 
         horizontalSplitter.getItems().addAll(leftContent, rightContent);
 
@@ -136,6 +127,13 @@ public class EvaluatorScene extends Scene{
 
         bar.getMenus().addAll(menuFile, menuEdit, menuView, menuHelp);
         return bar;
+    }
+
+    public void addGroupTab(Group active){
+        Tab tab = new Tab();
+        tab.setText(active.getName() );
+        tab.setContent(new AssessmentView(controller, active));
+        tabPane.getTabs().add(tab);
     }
 
 

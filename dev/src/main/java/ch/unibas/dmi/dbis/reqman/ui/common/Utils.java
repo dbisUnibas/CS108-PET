@@ -1,7 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
+import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListCell;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 
@@ -94,6 +96,19 @@ public class Utils {
         fc.setTitle(action+" Group");
         fc.getExtensionFilters().addAll(JSON_ANY_FILTER);
         return fc;
+    }
+
+    public static class MilestoneCell extends ListCell<Milestone> {
+
+        @Override
+        public void updateItem(Milestone item, boolean empty){
+            super.updateItem(item, empty);
+            if(!empty){
+                setText(item.getName() + " (" + item.getOrdinal()+")" );
+            }else{
+                setText("");
+            }
+        }
     }
 
 }
