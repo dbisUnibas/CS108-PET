@@ -27,16 +27,30 @@ public class EvaluatorScene extends Scene{
 
     private String title = "Evaluator";
 
+    private EvaluatorController controller;
+
+    private GroupView groupView;
+    private CatalogueInfoView catInfoView;
+
     public EvaluatorScene(String title, int width, int height){
         this(width, height);
         this.title = title;
+
     }
 
     public EvaluatorScene(int width, int height){
         super(new BorderPane(), width, height);
         root = (BorderPane) getRoot();
+        controller = new EvaluatorController(this);
+        groupView = new GroupView(controller);
+        catInfoView = new CatalogueInfoView();
         initComponents();
     }
+
+    public CatalogueInfoView getCatalogueInfoView(){
+        return catInfoView;
+    }
+
 
     private void initComponents(){
         horizontalSplitter.prefWidthProperty().bind(widthProperty() );
@@ -48,16 +62,12 @@ public class EvaluatorScene extends Scene{
         verticalSplitter.prefHeightProperty().bind(heightProperty() );
 
 
-        Button bdown = new Button("DOWN");
 
         VBox upper = new VBox();
-        upper.getChildren().add(new CatalogueInfoView(null));
+        upper.getChildren().add(catInfoView);
 
         VBox lower = new VBox();
-        lower.getChildren().add(bdown);
-        bdown.setOnAction(
-                e -> EvaluatorPromptFactory.promptNewGroup("CATALOGUE")
-        );
+        lower.getChildren().add(groupView);
 
         verticalSplitter.getItems().addAll(upper, lower);
 
@@ -98,10 +108,15 @@ public class EvaluatorScene extends Scene{
         Menu menuFile = new Menu("File");
 
         MenuItem itemLoad = new MenuItem("Load Catalogue");
+        itemLoad.setOnAction(controller::handleLoadCatalogue);
         MenuItem itemNew = new MenuItem("New Group");
+        itemNew.setOnAction(controller::handleAddGroup);
         MenuItem itemOpen = new MenuItem("Open Group");
+        itemOpen.setOnAction(controller::handleOpenGroup);
         MenuItem itemSave = new MenuItem("Save Group");
+        itemSave.setOnAction(controller::handleSaveGroup);
         MenuItem itemSaveAs = new MenuItem("Save Group As");
+        itemSaveAs.setOnAction(controller::handleSaveAsGroup);
         MenuItem itemExit = new MenuItem("Quit");
 
 
@@ -109,6 +124,7 @@ public class EvaluatorScene extends Scene{
 
         Menu menuEdit = new Menu("Edit");
         MenuItem itemModify = new MenuItem("Modify Group");
+        itemModify.setOnAction(controller::handleModifyGroup);
 
         menuEdit.getItems().addAll(itemModify);
 

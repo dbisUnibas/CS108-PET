@@ -23,6 +23,10 @@ public class CatalogueInfoView extends HBox{
 
     private Catalogue catalogue;
 
+    public CatalogueInfoView(){
+        this(null);
+    }
+
     public CatalogueInfoView(Catalogue catalogue){
         super();
         this.catalogue = catalogue;
@@ -32,6 +36,10 @@ public class CatalogueInfoView extends HBox{
         getChildren().add(root);
 
         displayData();
+    }
+
+    public void setCatalogue(Catalogue cat){
+        this.catalogue = cat;
     }
 
 
@@ -82,12 +90,16 @@ public class CatalogueInfoView extends HBox{
     }
 
     public void displayData(){
+        displayData(catalogue);
+    }
+
+    public void displayData(Catalogue catalogue){
         if(catalogue != null){
             tfName.setText(catalogue.getName());
             tfLecture.setText(catalogue.getLecture() );
             tfSemester.setText(catalogue.getSemester() );
             taDesc.setText(catalogue.getDescription() );
-
+            tfSum.setText(String.valueOf(catalogue.getSum()));
         }
     }
 

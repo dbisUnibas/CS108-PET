@@ -1,9 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
-import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 
 /**
  * TODO: write JavaDoc
@@ -75,6 +75,25 @@ public class Utils {
 
     public static Button createMinusButton(){
         return new Button(HEAVY_MINUS); // Unicode: heavy minus sign
+    }
+
+    public static FileChooser createCatalogueFileChooser(String action){
+        FileChooser fc = new FileChooser();
+        fc.setTitle(action+" Catalogue");
+        fc.getExtensionFilters().addAll(JSON_ANY_FILTER);
+        return fc;
+    }
+
+    public static final FileChooser.ExtensionFilter[] JSON_ANY_FILTER = new FileChooser.ExtensionFilter[]{
+            new FileChooser.ExtensionFilter("JSON", "*.json"),
+            new FileChooser.ExtensionFilter("Any", "*.*")
+    };
+
+    public static FileChooser createGroupFileChooser(String action){
+        FileChooser fc = new FileChooser();
+        fc.setTitle(action+" Group");
+        fc.getExtensionFilters().addAll(JSON_ANY_FILTER);
+        return fc;
     }
 
 }
