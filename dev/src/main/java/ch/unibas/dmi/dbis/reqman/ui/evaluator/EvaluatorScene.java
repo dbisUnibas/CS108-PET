@@ -1,8 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
-import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -57,6 +55,9 @@ public class EvaluatorScene extends Scene{
 
         VBox lower = new VBox();
         lower.getChildren().add(bdown);
+        bdown.setOnAction(
+                e -> EvaluatorPromptFactory.promptNewGroup("CATALOGUE")
+        );
 
         verticalSplitter.getItems().addAll(upper, lower);
 
