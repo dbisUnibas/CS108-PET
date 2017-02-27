@@ -123,13 +123,10 @@ gradle.taskGraph.whenReady{
         if(taskGraph.hasTask(applySnapshot)){
             jar.classifier = 'SNAPSHOT'
         }
-<<<<<<< HEAD
-=======
         if(taskGraph.hasTask(deployEvaluator)){
             jar.appendix = 'evaluator'
             jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorApplication')
         }
->>>>>>> assessment-exp
 }
 
 /**
