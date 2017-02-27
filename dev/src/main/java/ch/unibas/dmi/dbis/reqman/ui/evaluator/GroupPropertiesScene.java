@@ -27,6 +27,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
     private TextField tfName;
     private TextField tfProjectName;
+    private TextField tfExportFileName;
 
     private TableView<Member> table;
 
@@ -64,16 +65,16 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         String name = tfName.getText();
         String projectName = tfProjectName.getText();
 
-        if(StringUtils.isNotEmpty(name) && StringUtils.isNotEmpty(projectName ) ){
+        if(StringUtils.isNotEmpty(name)){
             group = new Group(name, projectName, memberToStringList(tableData), catalogueName);
+            if(StringUtils.isNotEmpty(tfExportFileName.getText())){
+                group.setExportFileName(tfExportFileName.getText());
+            }
             dismiss();
         }else{
             String msg = "";
             if(!StringUtils.isNotEmpty(name)){
                 msg += "Group name is missing.\n";
-            }
-            if(!StringUtils.isNotEmpty(projectName)){
-                msg+="Project name is missing.";
             }
             Utils.showWarningDialog("Mandatory field(s) missing", msg);
             return;
@@ -101,20 +102,26 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
     private void initComponents(){
         Label lblName = new Label("Group Name*");
-        Label lblProjectName = new Label("Project Name*");
+        Label lblProjectName = new Label("Project Name");
+        Label lblExportFileName = new Label("Export file name");
         Label lblMembers = new Label("Members");
 
         table = createTableView();
 
         tfName = new TextField();
         tfProjectName = new TextField();
+        tfExportFileName = new TextField();
 
         int rowIndex = 0;
 
         grid.add(lblName, 0,rowIndex);
         grid.add(tfName, 1, rowIndex++);
+
         grid.add(lblProjectName, 0, rowIndex);
         grid.add(tfProjectName, 1, rowIndex++);
+
+        grid.add(lblExportFileName, 0, rowIndex);
+        grid.add(tfExportFileName, 1, rowIndex++);
 
         grid.add(lblMembers, 0, rowIndex);
         grid.add(table, 1, rowIndex, 1, 2);

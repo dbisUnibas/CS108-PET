@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
-import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -18,6 +17,28 @@ public class Group {
     private String catalogueName;
     private List<Progress> progressList = new ArrayList<>();
     private List<ProgressSummary> progressSummaries = new ArrayList<>();
+
+    private String exportFileName;
+
+    public Group(String name, String projectName, List<String> members, String catalogueName) {
+
+        this.name = name;
+        this.projectName = projectName;
+        this.members = members;
+        this.catalogueName = catalogueName;
+    }
+
+    public Group() {
+
+    }
+
+    public String getExportFileName() {
+        return exportFileName;
+    }
+
+    public void setExportFileName(String exportFileName) {
+        this.exportFileName = exportFileName;
+    }
 
     public String getName() {
         return name;
@@ -83,18 +104,6 @@ public class Group {
         this.catalogueName = catalogueName;
     }
 
-    public Group(String name, String projectName, List<String> members, String catalogueName) {
-
-        this.name = name;
-        this.projectName = projectName;
-        this.members = members;
-        this.catalogueName = catalogueName;
-    }
-
-    public Group() {
-
-    }
-
     public boolean addMember(String name) {
         return members.add(name);
     }
@@ -115,6 +124,10 @@ public class Group {
         return new Vector<Progress>(progressList);
     }
 
+    public void setProgressList(List<Progress> progressList) {
+        this.progressList = progressList;
+    }
+
     public boolean removeProgress(Progress progress) {
         return progressList.remove(progress);
     }
@@ -129,10 +142,6 @@ public class Group {
 
     public boolean removeProgressSummary(ProgressSummary progressSummary) {
         return progressSummaries.remove(progressSummary);
-    }
-
-    public void setProgressList(List<Progress> progressList){
-        this.progressList = progressList;
     }
 
     public void setProgressSummaryList(List<ProgressSummary> progressSummaryList) {

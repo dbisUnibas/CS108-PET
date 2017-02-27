@@ -271,7 +271,6 @@ public class EditorController  {
         return result;
     }
 
-<<<<<<< HEAD
     private void hardcodeExport(File f) throws FileNotFoundException {
         RenderManager manager = new RenderManager(getCatalogue());//get catalogue assembles the catalogue
         //RenderManager manager = new RenderManager(catalogue);
@@ -345,6 +344,4 @@ public class EditorController  {
         pw.close();
         pw.flush();
     }
-=======
->>>>>>> assessment-exp
 }
