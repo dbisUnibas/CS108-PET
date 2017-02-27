@@ -100,8 +100,8 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
 
     private void initComponents(){
-        Label lblName = new Label("Group Name");
-        Label lblProjectName = new Label("Project Name");
+        Label lblName = new Label("Group Name*");
+        Label lblProjectName = new Label("Project Name*");
         Label lblMembers = new Label("Members");
 
         table = createTableView();
