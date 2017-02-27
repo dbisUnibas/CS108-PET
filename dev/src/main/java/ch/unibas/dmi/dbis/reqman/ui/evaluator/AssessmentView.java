@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -10,13 +11,15 @@ import javafx.scene.layout.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * TODO: write JavaDoc
  *
  * @author loris.sauter
  */
-public class AssessmentView extends BorderPane {
+public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     private HBox titleBar;
     private AnchorPane titleAnchor;
@@ -33,14 +36,6 @@ public class AssessmentView extends BorderPane {
 
     private EvaluatorController controller;
 
-    @Deprecated
-    public AssessmentView(){
-        super();
-
-        initComponents();
-        layoutComponents();
-    }
-
     private Group group;
 
     public AssessmentView(EvaluatorController controller, Group active){
@@ -51,7 +46,32 @@ public class AssessmentView extends BorderPane {
 
         initComponents();
         layoutComponents();
+        loadGroup();
 
+        updateProgressViews();
+    }
+
+    private void loadGroup() {
+        // TODO load group really
+        setupProgressMap();
+    }
+
+    /**
+     * Maps MS ordinal to a map of Req.name <-> Progress (obj)
+     */
+    private Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
+
+    /**
+     * Sets up the map as if the group was newly created
+     */
+    private void setupProgressMap() {
+        controller.getMilestones().forEach(ms -> {
+            TreeMap<String, Progress> reqProgMap = new TreeMap<String, Progress>();
+            controller.getRequirementsByMilestone(ms.getOrdinal()).forEach(r -> {
+                reqProgMap.put(r.getName(), new Progress(r.getName(), ms.getOrdinal(), 0));
+            });
+            progressMap.put(ms.getOrdinal(), reqProgMap);
+        });
     }
 
     private void initComponents(){
@@ -102,7 +122,7 @@ public class AssessmentView extends BorderPane {
         setBottom(statusBar);
 
         cbMilestones.getSelectionModel().select(0);
-        updateProgressViews();
+
     }
 
     private List<ProgressView> activeProgressViews = new ArrayList<>();
@@ -114,16 +134,29 @@ public class AssessmentView extends BorderPane {
         }
         activeProgressViews.clear();
         controller.getRequirementsByMilestone(activeMS.getOrdinal()).forEach(r ->{
-            activeProgressViews.add(new ProgressView(r));
+            Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
+            ProgressView pv = new ProgressView(p,r);
+            pv.addPointsChangeListener(this);
+            activeProgressViews.add(pv);
         });
-
 
     }
 
     private void updateProgressViews(){
         detachProgressViews();
+        tfSum.setText(String.valueOf(0));
         loadActiveProgressViews();
         attachProgressViews();
+        calcActiveSum();
+    }
+
+    private void calcActiveSum() {
+        ArrayList<Double> currentPoints = new ArrayList<>();
+        activeProgressViews.forEach(pv -> {
+            currentPoints.add(pv.getProgress().getPoints() );
+        });
+        double sum = currentPoints.stream().mapToDouble(Double::doubleValue).sum();
+        tfSum.setText(String.valueOf(sum));
     }
 
     private void updateProgressViews(ActionEvent event){
@@ -157,5 +190,10 @@ public class AssessmentView extends BorderPane {
     private void bindContent(){
         content.prefWidthProperty().bind(widthProperty());
         content.prefHeightProperty().bind(heightProperty());
+    }
+
+    @Override
+    public void pointsChanged(double newValue) {
+        calcActiveSum();
     }
 }
