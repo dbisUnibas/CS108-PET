@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -70,6 +71,7 @@ public class AssessmentView extends BorderPane {
 
         if(controller != null){
             cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
+            cbMilestones.setCellFactory(param -> new Utils.MilestoneCell());
         }
 
 

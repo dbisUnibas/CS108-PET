@@ -120,10 +120,6 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         grid.add(table, 1, rowIndex, 1, 2);
         rowIndex+=2;
 
-        // TODO Fix committing
-        Label warning = new Label("Table changes must be saved with hitting ENTER.\nEmails working only via the right-click menu.");
-        warning.setStyle("-fx-text-fill: red;-fx-font-weight: bold;");
-        grid.add(warning, 1, rowIndex++);
 
         grid.add(buttons, 0, ++rowIndex, 2, 1);
 
@@ -141,7 +137,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         firstCol.setCellValueFactory(
                 new PropertyValueFactory<>("name")
         );
-        firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        firstCol.setCellFactory(cellFactory);
         firstCol.setOnEditCommit((TableColumn.CellEditEvent<Member, String> t) -> {
             t.getTableView().getItems().get(t.getTablePosition().getRow()).setName(t.getNewValue());
         });
@@ -149,12 +145,13 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         secondCol.setCellValueFactory(
                 new PropertyValueFactory<>("surname")
         );
-        secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        secondCol.setCellFactory(cellFactory);
         secondCol.setOnEditCommit((TableColumn.CellEditEvent<Member, String> t) -> {
             t.getTableView().getItems().get(t.getTablePosition().getRow()).setSurname(t.getNewValue());
         });
         TableColumn<Member, String> thirdCol = new TableColumn<>("Email");
         thirdCol.setCellValueFactory(new PropertyValueFactory<>("email"));
+        thirdCol.setCellFactory(cellFactory);
         thirdCol.setOnEditCommit((TableColumn.CellEditEvent<Member, String> t)-> {
             t.getTableView().getItems().get(t.getTablePosition().getRow()).setEmail(t.getNewValue());
         });

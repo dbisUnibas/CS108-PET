@@ -64,8 +64,18 @@ public class EvaluatorController {
         Group group = EvaluatorPromptFactory.promptNewGroup(catalogue.getName());
         if (group != null) {
             groups.add(group);
-            evaluator.addGroupTab(group);
+            addGroupTab(group);
         }
+    }
+
+    public void addGroupTab(Group active){
+        if(evaluator.isGroupTabbed(active)){
+            // Dont add another tab of the same group
+        }else{
+            evaluator.addGroupTab(active);
+        }
+
+
     }
 
     public void handleRemoveGroup(ModifiableListView.RemoveEvent<Group> event) {

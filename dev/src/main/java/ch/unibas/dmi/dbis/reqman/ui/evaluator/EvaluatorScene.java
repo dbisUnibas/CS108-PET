@@ -79,7 +79,8 @@ public class EvaluatorScene extends Scene{
 
         rightContent.setStyle("-fx-padding: 10px;-fx-spacing: 10px;");
 
-        rightContent.getChildren().addAll(tabPane);// TODO Iff no catalogue loaded: Plachoolder with info
+        tabPane.setStyle("-fx-pading: 10px; -fx-spacing: 10px;");
+        rightContent.getChildren().addAll(tabPane);// TODO Iff no catalogue loaded / all tabs closed: Plachoolder with info
 
         horizontalSplitter.getItems().addAll(leftContent, rightContent);
 
@@ -134,6 +135,16 @@ public class EvaluatorScene extends Scene{
         tab.setText(active.getName() );
         tab.setContent(new AssessmentView(controller, active));
         tabPane.getTabs().add(tab);
+
+    }
+
+    public boolean isGroupTabbed(Group group){
+        for(Tab t : tabPane.getTabs() ){
+            if(t.getText().equals(group.getName() )){
+                return true;
+            }
+        }
+        return false;
     }
 
 

@@ -5,6 +5,8 @@ import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListHandler;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 
 /**
  * TODO: Write JavaDoc
@@ -21,7 +23,17 @@ public class GroupView extends ModifiableListView<Group> implements ModifiableLi
         this.controller = controller;
         addHandler(this);
         listView.setCellFactory((ListView<Group> lv) -> new GroupCell());
-        listView.setItems(controller.getObservableGroups() );
+        listView.setItems(controller.getObservableGroups());
+        listView.setOnMouseClicked(this::handleMouseClick);
+    }
+
+    private void handleMouseClick(MouseEvent event) {
+        if (MouseButton.PRIMARY.equals(event.getButton())) {
+            if (event.getClickCount() == 2) {
+                Group g = listView.getSelectionModel().getSelectedItem();
+                controller.addGroupTab(g);
+            }
+        }
     }
 
     @Override
@@ -36,11 +48,11 @@ public class GroupView extends ModifiableListView<Group> implements ModifiableLi
 
     public static class GroupCell extends ListCell<Group> {
         @Override
-        public void updateItem(Group item, boolean empty){
+        public void updateItem(Group item, boolean empty) {
             super.updateItem(item, empty);
-            if(!empty){
-                setText(item.getName() );
-            }else{
+            if (!empty) {
+                setText(item.getName());
+            } else {
                 setText("");
             }
         }
