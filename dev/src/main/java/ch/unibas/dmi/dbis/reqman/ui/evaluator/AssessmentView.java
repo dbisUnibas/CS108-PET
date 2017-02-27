@@ -196,4 +196,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     public void pointsChanged(double newValue) {
         calcActiveSum();
     }
+
+    public Group getActiveGroup(){
+        return group;
+    }
 }

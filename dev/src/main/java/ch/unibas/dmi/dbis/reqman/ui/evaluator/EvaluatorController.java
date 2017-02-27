@@ -15,6 +15,8 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * TODO: Write JavaDoc
@@ -64,20 +66,29 @@ public class EvaluatorController {
     public void handleAddGroup(ActionEvent event) {
         Group group = EvaluatorPromptFactory.promptNewGroup(catalogue.getName());
         if (group != null) {
-            groups.add(group);
+            addGroupToInternalStorage(group);
             addGroupTab(group);
         }
+    }
+
+    private Map<String, AssessmentView> groupAVMap = new TreeMap<>();
+
+    private void addGroupToInternalStorage(Group group){
+        groups.add(group);
+        groupAVMap.put(group.getName(), new AssessmentView(this, group));
     }
 
     public void addGroupTab(Group active){
         if(evaluator.isGroupTabbed(active)){
             // Dont add another tab of the same group
         }else{
-            evaluator.addGroupTab(active);
+            evaluator.addGroupTab(groupAVMap.get(active.getName()));
         }
 
 
     }
+
+
 
     public List<Requirement> getRequirementsByMilestone(int ordinal){
         return catalogue.getRequirementsByMilestone(ordinal);
