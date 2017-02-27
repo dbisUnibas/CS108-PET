@@ -133,7 +133,9 @@ public class EvaluatorScene extends Scene{
     public void addGroupTab(Group active){
         Tab tab = new Tab();
         tab.setText(active.getName() );
-        tab.setContent(new AssessmentView(controller, active));
+        AssessmentView av = new AssessmentView(controller, active);
+        av.bindToParentSize(rightContent);
+        tab.setContent(av);
         tabPane.getTabs().add(tab);
 
     }

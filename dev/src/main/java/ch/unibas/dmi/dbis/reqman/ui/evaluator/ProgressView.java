@@ -31,6 +31,10 @@ public class ProgressView extends VBox {
 
     private VBox collapsible = new VBox();
 
+    public ProgressView(Requirement requirement){
+        this(null, requirement);
+    }
+
     public ProgressView(Progress progress, Requirement requirement){
         super();
         this.progress = progress;

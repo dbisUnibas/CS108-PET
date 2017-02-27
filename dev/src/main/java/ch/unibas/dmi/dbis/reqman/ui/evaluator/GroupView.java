@@ -28,8 +28,8 @@ public class GroupView extends ModifiableListView<Group> implements ModifiableLi
     }
 
     private void handleMouseClick(MouseEvent event) {
-        if (MouseButton.PRIMARY.equals(event.getButton())) {
-            if (event.getClickCount() == 2) {
+        if (MouseButton.PRIMARY.equals(event.getButton())) {// 'left' mousebutton?
+            if (event.getClickCount() == 2) {// double click?
                 Group g = listView.getSelectionModel().getSelectedItem();
                 controller.addGroupTab(g);
             }

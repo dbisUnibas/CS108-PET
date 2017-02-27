@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
@@ -76,6 +77,10 @@ public class EvaluatorController {
         }
 
 
+    }
+
+    public List<Requirement> getRequirementsByMilestone(int ordinal){
+        return catalogue.getRequirementsByMilestone(ordinal);
     }
 
     public void handleRemoveGroup(ModifiableListView.RemoveEvent<Group> event) {

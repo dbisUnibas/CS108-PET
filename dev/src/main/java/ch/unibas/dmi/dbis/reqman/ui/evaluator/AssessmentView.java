@@ -4,8 +4,12 @@ import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * TODO: write JavaDoc
@@ -72,8 +76,12 @@ public class AssessmentView extends BorderPane {
         if(controller != null){
             cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
             cbMilestones.setCellFactory(param -> new Utils.MilestoneCell());
+            cbMilestones.setButtonCell(new Utils.MilestoneCell());
         }
 
+        if(controller!=null){
+            btnRefresh.setOnAction(this::updateProgressViews);
+        }
 
         VBox titleWrapper = new VBox();
         Separator sep = new Separator();
@@ -92,15 +100,52 @@ public class AssessmentView extends BorderPane {
         AnchorPane.setTopAnchor(sep2, 0d);
         AnchorPane.setRightAnchor(statusWrapper, 10d);
         setBottom(statusBar);
+
+        cbMilestones.getSelectionModel().select(0);
+        updateProgressViews();
     }
 
-    // DEBUG
-    public void addProgressView(ProgressView pv){
+    private List<ProgressView> activeProgressViews = new ArrayList<>();
+
+    private void loadActiveProgressViews(){
+        Milestone activeMS = cbMilestones.getSelectionModel().getSelectedItem();
+        if(activeMS == null){
+            return;
+        }
+        activeProgressViews.clear();
+        controller.getRequirementsByMilestone(activeMS.getOrdinal()).forEach(r ->{
+            activeProgressViews.add(new ProgressView(r));
+        });
+
+
+    }
+
+    private void updateProgressViews(){
+        detachProgressViews();
+        loadActiveProgressViews();
+        attachProgressViews();
+    }
+
+    private void updateProgressViews(ActionEvent event){
+        updateProgressViews();
+    }
+
+    private void attachProgressViews(){
+        activeProgressViews.forEach(pv -> {
+            addProgressView(pv);
+        });
+    }
+
+    private void detachProgressViews(){
+        activeProgressViews.forEach(pv -> removeProgressView(pv));
+    }
+
+    private void addProgressView(ProgressView pv){
         content.getChildren().add(pv);
         pv.prefWidthProperty().bind(scrollPane.widthProperty() );
     }
-    // DEBUG
-    public void removeProgressView(ProgressView pv){
+
+    private void removeProgressView(ProgressView pv){
         content.getChildren().remove(pv);
     }
 
