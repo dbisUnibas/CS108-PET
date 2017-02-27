@@ -47,7 +47,26 @@ public class RenderManager {
     private TemplateParser parser = null;
     private TemplateRenderer renderer = null;
 
-    //TODO Add Support for Group
+
+    /*
+    Target expressions:
+
+    progress.points
+    progressSummary.internal
+    progressSummary.external
+
+    group.name
+    group.project
+    group.progressList // Warning: Ordering must be respected (MS, BONUS; MALUS, NAME)
+        access to milestone and requirement
+    group.milestones
+        access to milestone entity
+
+    NOT SOLVED YET:
+        when to apply 'achieved'
+
+     */
+
     public final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
             new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
             new Field<Catalogue, String>("description", Field.Type.NORMAL, Catalogue::getDescription),
