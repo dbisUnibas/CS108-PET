@@ -200,4 +200,18 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     public Group getActiveGroup(){
         return group;
     }
+
+    /**
+     * ONLY if group has to be saved. Grabs ALL progress objects
+     * @return
+     */
+    public List<Progress> getProgressList(){
+        List<Progress> list = new ArrayList<>();
+
+        progressMap.values().forEach(consumer -> {
+            consumer.values().forEach(list::add);
+        });
+
+        return list;
+    }
 }

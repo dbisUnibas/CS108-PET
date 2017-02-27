@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.core.Group;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -146,6 +147,18 @@ public class EvaluatorScene extends Scene{
             }
         }
         return false;
+    }
+
+
+    public Group getActiveGroup(){
+        Tab selected = tabPane.getSelectionModel().getSelectedItem();
+        Node content = selected.getContent();
+        if(content instanceof AssessmentView ){
+            AssessmentView av = (AssessmentView)content;
+            return av.getActiveGroup();
+        }else{
+            throw new RuntimeException("This should definitively not happen (Non-AV-tab?)");
+        }
     }
 
 

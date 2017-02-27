@@ -101,20 +101,59 @@ public class EvaluatorController {
     }
 
     public void handleOpenGroup(ActionEvent event) {
-        // NEED TO GET THE ACTIVE GROUP
+        FileChooser fc = Utils.createGroupFileChooser("Open");
+        File f = fc.showOpenDialog(evaluator.getWindow() );
+        if(f != null){
+            try {
+                Group group = JSONUtils.readGroupJSONFile(f);
+                addGroupToInternalStorage(group);
+                groupFileMap.put(group.getName(), f);
+                addGroupTab(group);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
+    private Map<String, File> groupFileMap = new TreeMap<>();
+
     public void handleSaveGroup(ActionEvent event) {
+        Group active = evaluator.getActiveGroup();
+        AssessmentView av = groupAVMap.get(active.getName() );
+        File f = groupFileMap.get(active.getName() );
+        if(f == null){
+            handleSaveAsGroup(event);
+        }else{
+            try {
+                saveGroup(active, av, f);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void saveGroup(Group group, AssessmentView av, File f) throws IOException {
+        group.setProgressList(av.getProgressList());
+        JSONUtils.writeToJSONFile(group, f);
     }
 
     public void handleSaveAsGroup(ActionEvent event) {
+        Group active = evaluator.getActiveGroup();
+        AssessmentView av = groupAVMap.get(active.getName() );
+        FileChooser fc = Utils.createGroupFileChooser("Save As");
+        File f = fc.showSaveDialog(evaluator.getWindow());
+        if(f != null){
+            try {
+                saveGroup(active, av, f);
+                groupFileMap.put(active.getName(), f);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void handleModifyGroup(ActionEvent event) {
-    }
-
-    public void handleOpenAssessment(ActionEvent event) {
-
+        // NEED TO GET THE ACTIVE GROUP
     }
 
     public ObservableList<Group> getObservableGroups() {
