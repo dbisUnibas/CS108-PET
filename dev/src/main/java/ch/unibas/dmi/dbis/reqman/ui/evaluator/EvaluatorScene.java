@@ -5,6 +5,7 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -102,8 +103,10 @@ public class EvaluatorScene extends Scene{
 
         MenuItem itemLoad = new MenuItem("Load Catalogue");
         itemLoad.setOnAction(controller::handleLoadCatalogue);
+        itemLoad.setAccelerator(KeyCombination.keyCombination("Ctrl+L"));
         MenuItem itemNew = new MenuItem("New Group");
         itemNew.setOnAction(controller::handleAddGroup);
+        itemNew.setAccelerator(KeyCombination.keyCombination("Ctrl+G"));
         MenuItem itemOpen = new MenuItem("Open Group");
         itemOpen.setOnAction(controller::handleOpenGroup);
         MenuItem itemSave = new MenuItem("Save Group");
