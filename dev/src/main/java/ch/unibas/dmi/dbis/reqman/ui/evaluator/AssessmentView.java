@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Progress;
+import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -153,7 +154,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private void calcActiveSum() {
         ArrayList<Double> currentPoints = new ArrayList<>();
         activeProgressViews.forEach(pv -> {
-            currentPoints.add(pv.getProgress().getPoints() );
+            Requirement req = pv.getRequirement();
+            double factor = req.isMalus() ? -1.0 : 1.0;
+            currentPoints.add(pv.getProgress().getPoints() * factor);
         });
         double sum = currentPoints.stream().mapToDouble(Double::doubleValue).sum();
         tfSum.setText(String.valueOf(sum));
@@ -214,4 +217,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
         return list;
     }
+
+
 }

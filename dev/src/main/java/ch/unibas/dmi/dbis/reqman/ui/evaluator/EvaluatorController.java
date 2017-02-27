@@ -48,6 +48,16 @@ public class EvaluatorController {
     }
 
 
+    public Requirement getRequirementByName(String name){
+        Requirement r = null;
+        for(Requirement req : catalogue.getRequirements()){
+            if(req.getName().equals(name)){
+                r = req;
+            }
+        }
+        return r;
+    }
+
     public void handleLoadCatalogue(ActionEvent event) {
         FileChooser fc = Utils.createCatalogueFileChooser("Load");
         File f = fc.showOpenDialog(evaluator.getWindow());
