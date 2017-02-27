@@ -1,23 +1,19 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.core.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * TODO: write JavaDoc
  *
  * @author loris.sauter
  */
-public class RenderManager {
+public class RenderManager{
+    private static final Logger LOG = LogManager.getLogger(RenderManager.class);
     private static Logger LOGGER = LogManager.getLogger(RenderManager.class);
     public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
             new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
@@ -44,8 +40,10 @@ public class RenderManager {
     private Template<Requirement> templateReq = null;
     private Template<Milestone> templateMS = null;
     private Template<Catalogue> templateCat = null;
+    private Template<Milestone> templateGroupMS = null;
+    private Template<Group> templateGroup = null;
+    private Template<Progress> templateProg = null;
     private TemplateParser parser = null;
-    private TemplateRenderer renderer = null;
 
 
     /*
@@ -66,7 +64,7 @@ public class RenderManager {
         when to apply 'achieved'
 
      */
-
+    private TemplateRenderer renderer = null;
     public final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
             new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
             new Field<Catalogue, String>("description", Field.Type.NORMAL, Catalogue::getDescription),
@@ -114,14 +112,11 @@ public class RenderManager {
             new ParametrizedField<Catalogue, Milestone>("milestoneName", null) {
                 @Override
                 public String renderCarefully(Catalogue instance, String parameter) {
-                    Milestone ms = instance.getMilestoneByOrdinal(Integer.valueOf(parameter ));
-                    return ms != null ? ms.getName() : "null ("+parameter+")";
+                    Milestone ms = instance.getMilestoneByOrdinal(Integer.valueOf(parameter));
+                    return ms != null ? ms.getName() : "null (" + parameter + ")";
                 }
             }
     );
-
-    private static final Logger LOG = LogManager.getLogger(RenderManager.class);
-
     private Catalogue catalogue = null;
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
             new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
@@ -150,7 +145,7 @@ public class RenderManager {
                 private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
 
                 @Override
-                public String renderCarefully(Requirement instance,String parameter) {
+                public String renderCarefully(Requirement instance, String parameter) {
                     Map<String, String> map = getGetter().apply(instance);
                     if (!map.containsKey(parameter)) {
                         LOGGER.error(String.format("Error while parsing meta of requirement [name=%s]: There is no meta with name: %s", instance.getName(), parameter));
@@ -166,10 +161,108 @@ public class RenderManager {
             }
     );
 
+    public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
+            Field.createNormalField("points", Progress::getPoints)
+    );
+
+    /**
+     * Existing:
+     * group
+     *          .name
+     *          .project
+     *          .milestones
+     */
+    public final Entity<Group> GROUP_ENTITY = new Entity<Group>("group",
+            Field.createNormalField("name", Group::getName),
+            Field.createNormalField("project", Group::getProjectName),
+            new Field<Group, List<Milestone>>("milestones", Field.Type.LIST,this::getMilestonesForGroup, list -> {
+                StringBuilder sb = new StringBuilder();
+                list.forEach(ms -> sb.append(renderGroupMilestone(ms)));
+                return sb.toString();
+            })
+    );
+
+    /**
+     * Existing:
+     * groupMilestone
+     *                  .name
+     *                  .progressList
+     *                  .sum
+     */
+    public final Entity<Milestone> GROUP_MS_ENTITY = new Entity<Milestone>("groupMilestone",
+            Field.createNormalField("name", Milestone::getName),
+            new Field<Milestone, List<Progress>>("progressList", Field.Type.LIST, ms -> this.getProgressByMilestoneOrdinal(ms.getOrdinal()), list ->{
+                StringBuilder sb = new StringBuilder();
+
+                // TODO sort progress
+
+                list.forEach(p -> sb.append(renderProgress(p)));
+
+                return sb.toString();
+            }),
+            new Field<Milestone, Double>("sum", Field.Type.NORMAL, this::getSumForGroupMilestone)
+    );
+
+    private Requirement getRequirementForProgress(Progress progress){
+        return catalogue.getRequirementByName(progress.getRequirementName());
+    }
+
+    private Milestone getMilestoneForProgress(Progress progress){
+        return catalogue.getMilestoneByOrdinal(progress.getMilestoneOrdinal());
+    }
+
+    private List<Milestone> getMilestonesForGroup(Group group){
+        ArrayList<Milestone> list = new ArrayList<>();
+
+        for(Progress p : group.getProgressList()){
+            Milestone ms = getMilestoneForProgress(p);
+            if(!list.contains(ms)){
+                list.add(ms);
+            }else{
+                // Milestone already in list.
+            }
+        }
+
+        return list;
+    }
+
+    private double getSumForGroupMilestone(Milestone ms){
+        ArrayList<Double> points = new ArrayList<>();
+
+        getProgressByMilestoneOrdinal(ms.getOrdinal()).forEach(p -> {
+            Requirement req = getRequirementForProgress(p);
+            double factor = req.isMalus() ? -1.0 : 1.0;
+            points.add(factor*p.getPoints() );
+        });
+
+        return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    private List<Progress> getProgressByMilestoneOrdinal(int ordinal){
+        ArrayList<Progress> list = new ArrayList<>();
+        for(Progress p : group.getProgressList()){
+            if(p.getMilestoneOrdinal() == ordinal){
+                if(!list.contains(p)){
+                    list.add(p);
+                }else{
+                    // Progress already in list.
+                }
+            }
+        }
+        return list;
+    }
+
+    private Group group = null;
+
     public RenderManager(Catalogue catalogue) {
         this.catalogue = catalogue;
         parser = new TemplateParser(catalogue);
         renderer = new TemplateRenderer();
+    }
+
+    public RenderManager(Catalogue catalogue, Group group) {
+        this(catalogue);
+        this.group = group;
     }
 
     private static <E> String renderCarefully(TemplateRenderer renderer, Template<E> template, E instance) throws IllegalArgumentException, IllegalStateException {
@@ -185,6 +278,10 @@ public class RenderManager {
         } else {
             throw new IllegalStateException(String.format("Cannot render the instance [%s], if no template exists for.", instance));
         }
+    }
+
+    public boolean isGroupExportReady() {
+        return group != null;
     }
 
     public void setTemplateReq(Template<Requirement> templateReq) {
@@ -211,8 +308,25 @@ public class RenderManager {
         return renderCarefully(renderer, templateCat, catalogue);
     }
 
+    private String renderGroupMilestone(Milestone ms) {
+        return renderCarefully(renderer, templateGroupMS, ms);
+    }
+
+    private String renderProgress(Progress p){
+        return "";
+    }
+
+
+    private String renderGroup(Group g){
+        return "";
+    }
+
     public void parseRequirementTemplate(String reqTemplate) {
         parseTemplateCarefully(REQUIREMENT_ENTITY, reqTemplate);
+    }
+
+    public void parseGroupMilestoneTemplate(String groupMSTemplate){
+        parseTemplateCarefully(GROUP_MS_ENTITY, groupMSTemplate);
     }
 
     public void parseMilestoneTemplate(String msTemplate) {
@@ -234,7 +348,9 @@ public class RenderManager {
         } else if (CATALOGUE_ENTITY.getEntityName().equals(entity.getEntityName())) {
             // Template Cat
             templateCat = parser.parseTemplate(template);
-        } else {
+        } else if(GROUP_MS_ENTITY.getEntityName().equals(entity.getEntityName())) {
+            templateGroupMS = parser.parseTemplate(template);
+        }else{
             throw LOGGER.throwing(new UnsupportedOperationException("Cannot parse a template for entity: " + entity.toString()));
         }
         return true;

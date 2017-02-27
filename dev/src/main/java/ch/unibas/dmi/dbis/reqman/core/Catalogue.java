@@ -3,7 +3,6 @@ package ch.unibas.dmi.dbis.reqman.core;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.*;
-import java.util.stream.DoubleStream;
 
 /**
  * TODO: write JavaDoc
@@ -219,5 +218,25 @@ public class Catalogue {
             points.add(getSum(ordinal));
         });
         return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    @JsonIgnore
+    public Requirement getRequirementByName(String name){
+        for(Requirement r : requirements){
+            if(r.getName().equals(name)){
+                return r;
+            }
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public boolean containsRequirement(String name){
+        for(Requirement r : requirements){
+            if(r.getName().equals(name)){
+                return true;
+            }
+        }
+        return false;
     }
 }
