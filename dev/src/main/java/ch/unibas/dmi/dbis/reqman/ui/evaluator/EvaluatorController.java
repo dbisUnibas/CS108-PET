@@ -148,6 +148,7 @@ public class EvaluatorController {
 
     private void saveGroup(Group group, AssessmentView av, File f) throws IOException {
         group.setProgressList(av.getProgressList());
+        group.setProgressSummaryList(av.getSummaries() );
         JSONUtils.writeToJSONFile(group, f);
     }
 

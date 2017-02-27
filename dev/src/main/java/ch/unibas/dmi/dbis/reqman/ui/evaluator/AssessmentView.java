@@ -1,9 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.core.Group;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Progress;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -27,6 +24,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private Label lblChoice;
     private ComboBox<Milestone> cbMilestones;
     private Button btnRefresh;
+    private Button btnSummary;
     private HBox statusWrapper;
     private AnchorPane statusBar;
     private Label lblSum;
@@ -53,6 +51,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     }
 
     private void loadGroup() {
+        // TODO Load summary
+
         List<Progress> progressList = group.getProgressList();
         if(progressList == null || progressList.isEmpty() ){
             setupProgressMap();
@@ -108,6 +108,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         lblChoice = new Label("Current Milestone: ");
         cbMilestones = new ComboBox<>();
         btnRefresh = new Button("Update");
+        btnSummary = new Button("Comments");
         statusWrapper = new HBox();
         statusBar = new AnchorPane();
         lblSum = new Label("Sum:");
@@ -119,7 +120,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     private void layoutComponents(){
         // Forge top aka title bar:
-        titleBar.getChildren().addAll(lblChoice, cbMilestones, btnRefresh );
+        titleBar.getChildren().addAll(lblChoice, cbMilestones, btnRefresh, btnSummary );
+        titleBar.setStyle(titleBar.getStyle()+" -fx-spacing: 10px");
 
         if(controller != null){
             cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
@@ -129,6 +131,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
         if(controller!=null){
             btnRefresh.setOnAction(this::updateProgressViews);
+            btnSummary.setOnAction(this::handleComments);
         }
 
         VBox titleWrapper = new VBox();
@@ -151,6 +154,22 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
         cbMilestones.getSelectionModel().select(0);
 
+    }
+
+    private List<ProgressSummary> summaries = new ArrayList<>();
+
+    private void handleComments(ActionEvent event) {
+        Milestone ms = cbMilestones.getSelectionModel().getSelectedItem();
+        if(ms != null){
+            ProgressSummary ps = EvaluatorPromptFactory.promptSummary(ms, group.getName() );
+            if(ps != null){
+                summaries.add(ps);
+            }
+        }
+    }
+
+    public List<ProgressSummary> getSummaries(){
+        return summaries;
     }
 
     private List<ProgressView> activeProgressViews = new ArrayList<>();

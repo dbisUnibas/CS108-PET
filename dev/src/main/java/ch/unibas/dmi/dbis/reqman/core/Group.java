@@ -134,4 +134,8 @@ public class Group {
     public void setProgressList(List<Progress> progressList){
         this.progressList = progressList;
     }
+
+    public void setProgressSummaryList(List<ProgressSummary> progressSummaryList) {
+        this.progressSummaries = progressSummaryList;
+    }
 }
