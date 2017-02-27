@@ -8,7 +8,7 @@ package ch.unibas.dmi.dbis.reqman.core;
 public class Progress {
 
     private String requirementName;
-    private String milestoneName;
+    private int milestoneOrdinal;
     private double points;
 
 
@@ -26,13 +26,13 @@ public class Progress {
 
         Progress progress = (Progress) o;
 
+        if (getMilestoneOrdinal() != progress.getMilestoneOrdinal()) {
+            return false;
+        }
         if (Double.compare(progress.getPoints(), getPoints()) != 0) {
             return false;
         }
-        if (getRequirementName() != null ? !getRequirementName().equals(progress.getRequirementName()) : progress.getRequirementName() != null) {
-            return false;
-        }
-        return getMilestoneName() != null ? getMilestoneName().equals(progress.getMilestoneName()) : progress.getMilestoneName() == null;
+        return getRequirementName() != null ? getRequirementName().equals(progress.getRequirementName()) : progress.getRequirementName() == null;
     }
 
     @Override
@@ -40,16 +40,16 @@ public class Progress {
         int result;
         long temp;
         result = getRequirementName() != null ? getRequirementName().hashCode() : 0;
-        result = 31 * result + (getMilestoneName() != null ? getMilestoneName().hashCode() : 0);
+        result = 31 * result + getMilestoneOrdinal();
         temp = Double.doubleToLongBits(getPoints());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
-    public Progress(String requirementName, String milestoneName, double points) {
+    public Progress(String requirementName, int milestoneOrdinal, double points) {
 
         this.requirementName = requirementName;
-        this.milestoneName = milestoneName;
+        this.milestoneOrdinal = milestoneOrdinal;
         this.points = points;
     }
 
@@ -61,12 +61,12 @@ public class Progress {
         this.requirementName = requirementName;
     }
 
-    public String getMilestoneName() {
-        return milestoneName;
+    public int getMilestoneOrdinal() {
+        return milestoneOrdinal;
     }
 
-    public void setMilestoneName(String milestoneName) {
-        this.milestoneName = milestoneName;
+    public void setMilestoneOrdinal(int milestoneOrdinal) {
+        this.milestoneOrdinal = milestoneOrdinal;
     }
 
     public double getPoints() {

@@ -95,12 +95,18 @@ task deployEditor(dependsOn: [build, jar]){
     }
 }
 
+task deployEvaluator(dependsOn: [build, jar]){
+    doLast{
+        println('Deploayed Evaluator version ' +project.version)
+        println('Resulting jar: '+jar.getArchiveName() )
+    }
+}
+
 task applySnapshot(dependsOn: deployEditor){
     doLast{
         println('Finished: '+jar.archiveName)
     }
 }
-
 
 /*
  * Goal: filter in Version.java @v@ and replace with actual version. Then comiple with it.
@@ -117,6 +123,13 @@ gradle.taskGraph.whenReady{
         if(taskGraph.hasTask(applySnapshot)){
             jar.classifier = 'SNAPSHOT'
         }
+<<<<<<< HEAD
+=======
+        if(taskGraph.hasTask(deployEvaluator)){
+            jar.appendix = 'evaluator'
+            jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorApplication')
+        }
+>>>>>>> assessment-exp
 }
 
 /**
@@ -142,11 +155,27 @@ static void incrementVersion(String versionPart){
     p.load(pF.newDataInputStream() )
 }
 
+/**
+ * Sets the version number of given version part.
+ * @param versionPart
+ * @param number
+ */
+static void setVersionPart(String versionPart, int number){
+    String vKey = "artifact${versionPart}"
+    Properties p = new Properties()
+    File pF = new File('version.properties')
+    p.load(pF.newDataInputStream() )
+    p.setProperty(vKey, String.valueOf(number) )
+    p.store(pF.newWriter(), null)
+    p.load(pF.newDataInputStream() )
+}
+
 task incrementMajorVersion{
     group = 'versioning'
     description = 'Increments the majro version (so the M in M.m.F) number by 1. Only invoke when a major version update is appropriate.'
     doFirst{
         incrementVersion('MajorVersion')
+        setVersionPart('MinorVersion',0)
     }
 }
 
@@ -155,6 +184,7 @@ task incrementMinorVersion{
     description = 'Increments the minor version (so the m in M.m.F) number by 1. Only invoke when a minor version update is appropriate.'
     doFirst{
         incrementVersion('MinorVersion')
+        setVersionPart('FixVersion',0)
     }
 }
 

@@ -35,7 +35,7 @@ public class JSONUtils {
 
 
 
-    public static Group readFromJSONFile(File file) throws IOException {
+    public static Group readGroupJSONFile(File file) throws IOException {
         return (Group) readFromJSONFile(file, Group.class);
     }
 }

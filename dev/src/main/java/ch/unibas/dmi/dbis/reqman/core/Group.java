@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
 import java.lang.reflect.Member;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -15,8 +16,8 @@ public class Group {
     private String projectName;
     private List<String> members;
     private String catalogueName;
-    private List<Progress> progressList;
-    private List<ProgressSummary> progressSummaries;
+    private List<Progress> progressList = new ArrayList<>();
+    private List<ProgressSummary> progressSummaries = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -123,10 +124,18 @@ public class Group {
     }
 
     public List<ProgressSummary> getProgressSummaries() {
-        return new Vector<ProgressSummary>(progressSummaries);
+        return new ArrayList<ProgressSummary>(progressSummaries);
     }
 
     public boolean removeProgressSummary(ProgressSummary progressSummary) {
         return progressSummaries.remove(progressSummary);
+    }
+
+    public void setProgressList(List<Progress> progressList){
+        this.progressList = progressList;
+    }
+
+    public void setProgressSummaryList(List<ProgressSummary> progressSummaryList) {
+        this.progressSummaries = progressSummaryList;
     }
 }
