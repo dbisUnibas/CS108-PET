@@ -53,8 +53,35 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     }
 
     private void loadGroup() {
-        // TODO load group really
-        setupProgressMap();
+        List<Progress> progressList = group.getProgressList();
+        if(progressList == null || progressList.isEmpty() ){
+            setupProgressMap();
+        }else{
+            loadProgress(progressList);
+        }
+
+    }
+
+    private void loadProgress(List<Progress> list) {
+        for(Progress p : list){
+            int ordinal = p.getMilestoneOrdinal();
+            String reqName = p.getRequirementName();
+
+            if(progressMap.containsKey(ordinal) ){
+                // MS entry exists already
+                Map<String, Progress> rpMap = progressMap.get(ordinal);
+                if(rpMap == null || rpMap.containsKey(reqName) ){
+                    // no map, but ordinal OR requirement is already existing. THIS IS A SEVERE ERROR
+                }else{
+                    rpMap.put(reqName, p);
+                }
+            }else{
+                // FIRST time this MS occurs:
+                TreeMap<String, Progress> rpMap = new TreeMap<>();
+                rpMap.put(reqName, p);
+                progressMap.put(ordinal, rpMap);
+            }
+        }
     }
 
     /**

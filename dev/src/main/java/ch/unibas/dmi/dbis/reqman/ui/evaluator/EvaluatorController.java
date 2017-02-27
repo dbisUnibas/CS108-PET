@@ -116,6 +116,10 @@ public class EvaluatorController {
         if(f != null){
             try {
                 Group group = JSONUtils.readGroupJSONFile(f);
+                if(!group.getCatalogueName().equals(catalogue.getName())){
+                    Utils.showWarningDialog("Catalogue singature failrue", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: "+group.getCatalogueName()+", Currentl catalogue: "+catalogue.getName());
+                    return;
+                }
                 addGroupToInternalStorage(group);
                 groupFileMap.put(group.getName(), f);
                 addGroupTab(group);

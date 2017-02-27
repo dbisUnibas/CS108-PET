@@ -49,7 +49,7 @@ public class Progress {
     public Progress(String requirementName, int milestoneOrdinal, double points) {
 
         this.requirementName = requirementName;
-        this.milestoneOrdinal = this.milestoneOrdinal;
+        this.milestoneOrdinal = milestoneOrdinal;
         this.points = points;
     }
 
