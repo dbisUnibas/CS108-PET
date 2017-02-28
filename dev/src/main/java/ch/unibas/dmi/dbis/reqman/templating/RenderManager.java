@@ -384,4 +384,8 @@ public class RenderManager{
         }
         return true;
     }
+
+    public void setGroup(Group group) {
+        this.group = group;
+    }
 }

@@ -113,10 +113,12 @@ public class EvaluatorScene extends Scene{
         itemSave.setOnAction(controller::handleSaveGroup);
         MenuItem itemSaveAs = new MenuItem("Save Group As");
         itemSaveAs.setOnAction(controller::handleSaveAsGroup);
+        MenuItem itemExportGroup = new MenuItem("Export Group(s)");
+        itemExportGroup.setOnAction(controller::handleExportGroup);
         MenuItem itemExit = new MenuItem("Quit");
 
 
-        menuFile.getItems().addAll(itemLoad, itemNew, itemOpen, itemSave, itemSaveAs, new SeparatorMenuItem(), itemExit);
+        menuFile.getItems().addAll(itemLoad, itemNew, itemOpen, itemSave, itemSaveAs, new SeparatorMenuItem(), itemExportGroup, new SeparatorMenuItem(), itemExit);
 
         Menu menuEdit = new Menu("Edit");
         MenuItem itemModify = new MenuItem("Modify Group");
