@@ -10,14 +10,24 @@ to the respective groups.
 
 ## Table of Contents
 
- - Install
+ - Build
  - Usage
  - Contributors
  - License
 
-## Install
+## Build
 
-*coming soon*
+Currently the two modes (editor, evaluator) are separate applications.
+
+To build the *editor* run:
+
+
+```gradle deployEditor```
+
+To build the *evaluator* run:
+
+```gralde deployEvaluator```
+
 
 ## Usage
 
