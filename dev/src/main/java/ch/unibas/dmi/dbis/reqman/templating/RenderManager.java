@@ -12,7 +12,7 @@ import java.util.*;
  *
  * @author loris.sauter
  */
-public class RenderManager{
+public class RenderManager {
     private static final Logger LOG = LogManager.getLogger(RenderManager.class);
     private static Logger LOGGER = LogManager.getLogger(RenderManager.class);
     public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
@@ -37,6 +37,16 @@ public class RenderManager{
             },
             new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal)
     );
+    /**
+     * Existing:
+     * progress
+     * .points
+     * .hasPoints
+     */
+    public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
+            Field.createNormalField("points", Progress::getPoints),
+            new ConditionalField<Progress>("hasPoints", this::hasProgressPoints, b -> "POINTS EXISTING", b -> "NO POINTS")
+    );
     private Template<Requirement> templateReq = null;
     private Template<Milestone> templateMS = null;
     private Template<Catalogue> templateCat = null;
@@ -45,8 +55,6 @@ public class RenderManager{
     private Template<Progress> templateProg = null;
     private Template<Requirement> templateProgReq = null;
     private TemplateParser parser = null;
-
-
     /*
     Target expressions:
 
@@ -161,53 +169,37 @@ public class RenderManager{
                 }
             }
     );
-
-    /**
-     * Existing:
-     * progress
-     *          .points
-     *          .hasPoints
-     *
-     */
-    public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
-            Field.createNormalField("points", Progress::getPoints),
-            new ConditionalField<Progress>("hasPoints", this::hasProgressPoints, b-> "POINTS EXISTING", b->"NO POINTS")
-    );
-
-    private boolean hasProgressPoints(Progress progress){
-        return Double.compare(progress.getPoints(), 0d)!=0;
-    }
-
     /**
      * Existing:
      * group
-     *          .name
-     *          .project
-     *          .milestones
+     * .name
+     * .project
+     * .milestones
      */
     public final Entity<Group> GROUP_ENTITY = new Entity<Group>("group",
             Field.createNormalField("name", Group::getName),
             Field.createNormalField("project", Group::getProjectName),
-            new Field<Group, List<Milestone>>("milestones", Field.Type.LIST,this::getMilestonesForGroup, list -> {
+            new Field<Group, List<Milestone>>("milestones", Field.Type.LIST, this::getMilestonesForGroup, list -> {
                 StringBuilder sb = new StringBuilder();
                 list.forEach(ms -> sb.append(renderGroupMilestone(ms)));
                 return sb.toString();
             })
     );
-
+    private Group group = null;
     /**
      * Existing:
      * groupMilestone
-     *                  .name
-     *                  .progressList
-     *                  .sum
+     * .name
+     * .progressList
+     * .sum
      */
     public final Entity<Milestone> GROUP_MS_ENTITY = new Entity<Milestone>("groupMilestone",
             Field.createNormalField("name", Milestone::getName),
-            new Field<Milestone, List<Progress>>("progressList", Field.Type.LIST, ms -> this.getProgressByMilestoneOrdinal(ms.getOrdinal()), list ->{
+            new Field<Milestone, List<Progress>>("progressList", Field.Type.LIST, ms -> this.getProgressByMilestoneOrdinal(ms.getOrdinal()), list -> {
                 StringBuilder sb = new StringBuilder();
 
-                // TODO sort progress correctly (BONUS; MALUS; NAME)
+                sortProgressList(list);
+
 
                 list.forEach(p -> sb.append(renderProgress(p)));
 
@@ -215,57 +207,6 @@ public class RenderManager{
             }),
             new Field<Milestone, Double>("sum", Field.Type.NORMAL, this::getSumForGroupMilestone)
     );
-
-    private Requirement getRequirementForProgress(Progress progress){
-        return catalogue.getRequirementByName(progress.getRequirementName());
-    }
-
-    private Milestone getMilestoneForProgress(Progress progress){
-        return catalogue.getMilestoneByOrdinal(progress.getMilestoneOrdinal());
-    }
-
-    private List<Milestone> getMilestonesForGroup(Group group){
-        ArrayList<Milestone> list = new ArrayList<>();
-
-        for(Progress p : group.getProgressList()){
-            Milestone ms = getMilestoneForProgress(p);
-            if(!list.contains(ms)){
-                list.add(ms);
-            }else{
-                // Milestone already in list.
-            }
-        }
-
-        return list;
-    }
-
-    private double getSumForGroupMilestone(Milestone ms){
-        ArrayList<Double> points = new ArrayList<>();
-
-        getProgressByMilestoneOrdinal(ms.getOrdinal()).forEach(p -> {
-            Requirement req = getRequirementForProgress(p);
-            double factor = req.isMalus() ? -1.0 : 1.0;
-            points.add(factor*p.getPoints() );
-        });
-
-        return points.stream().mapToDouble(Double::doubleValue).sum();
-    }
-
-    private List<Progress> getProgressByMilestoneOrdinal(int ordinal){
-        ArrayList<Progress> list = new ArrayList<>();
-        for(Progress p : group.getProgressList()){
-            if(p.getMilestoneOrdinal() == ordinal){
-                if(!list.contains(p)){
-                    list.add(p);
-                }else{
-                    // Progress already in list.
-                }
-            }
-        }
-        return list;
-    }
-
-    private Group group = null;
 
     public RenderManager(Catalogue catalogue) {
         this.catalogue = catalogue;
@@ -291,6 +232,79 @@ public class RenderManager{
         } else {
             throw new IllegalStateException(String.format("Cannot render the instance [%s], if no template exists for.", instance));
         }
+    }
+
+    private boolean hasProgressPoints(Progress progress) {
+        return Double.compare(progress.getPoints(), 0d) != 0;
+    }
+
+    private void sortProgressList(List<Progress> list) {
+        list.sort(Comparator.comparing(this::getRequirementForProgress, Comparator.comparing(Requirement::isMandatory, (b1, b2) -> {
+            if (b1 == b2) {
+                return 0;
+            } else if (b1) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }).thenComparing(Requirement::isMalus, (b1, b2) -> {
+            if (b1 == b2) {
+                return 0;
+            } else if (b1) {
+                return 1;
+            } else {
+                return -1;
+            }
+        }).thenComparing(Requirement::getName)));
+    }
+
+    private Requirement getRequirementForProgress(Progress progress) {
+        return catalogue.getRequirementByName(progress.getRequirementName());
+    }
+
+    private Milestone getMilestoneForProgress(Progress progress) {
+        return catalogue.getMilestoneByOrdinal(progress.getMilestoneOrdinal());
+    }
+
+    private List<Milestone> getMilestonesForGroup(Group group) {
+        ArrayList<Milestone> list = new ArrayList<>();
+
+        for (Progress p : group.getProgressList()) {
+            Milestone ms = getMilestoneForProgress(p);
+            if (!list.contains(ms)) {
+                list.add(ms);
+            } else {
+                // Milestone already in list.
+            }
+        }
+
+        return list;
+    }
+
+    private double getSumForGroupMilestone(Milestone ms) {
+        ArrayList<Double> points = new ArrayList<>();
+
+        getProgressByMilestoneOrdinal(ms.getOrdinal()).forEach(p -> {
+            Requirement req = getRequirementForProgress(p);
+            double factor = req.isMalus() ? -1.0 : 1.0;
+            points.add(factor * p.getPoints());
+        });
+
+        return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    private List<Progress> getProgressByMilestoneOrdinal(int ordinal) {
+        ArrayList<Progress> list = new ArrayList<>();
+        for (Progress p : group.getProgressList()) {
+            if (p.getMilestoneOrdinal() == ordinal) {
+                if (!list.contains(p)) {
+                    list.add(p);
+                } else {
+                    // Progress already in list.
+                }
+            }
+        }
+        return list;
     }
 
     public boolean isGroupExportReady() {
@@ -325,7 +339,7 @@ public class RenderManager{
         return renderCarefully(renderer, templateGroupMS, ms);
     }
 
-    public String renderProgress(Progress p){
+    public String renderProgress(Progress p) {
         String progressRendered = renderCarefully(renderer, templateProg, p);
         Requirement r = getRequirementForProgress(p);
         parser.setupFor(REQUIREMENT_ENTITY);
@@ -333,12 +347,12 @@ public class RenderManager{
         return renderCarefully(renderer, templateProgReq, r);
     }
 
-    public void parseProgressTemplate(String template){
+    public void parseProgressTemplate(String template) {
         parseTemplateCarefully(PROGRESS_ENTITY, template);
     }
 
 
-    public String renderGroup(Group g){
+    public String renderGroup(Group g) {
         return renderCarefully(renderer, templateGroup, g);
     }
 
@@ -346,11 +360,11 @@ public class RenderManager{
         parseTemplateCarefully(REQUIREMENT_ENTITY, reqTemplate);
     }
 
-    public void parseGroupMilestoneTemplate(String groupMSTemplate){
+    public void parseGroupMilestoneTemplate(String groupMSTemplate) {
         parseTemplateCarefully(GROUP_MS_ENTITY, groupMSTemplate);
     }
 
-    public void parseGroupTemplate(String groupTemplate){
+    public void parseGroupTemplate(String groupTemplate) {
         parseTemplateCarefully(GROUP_ENTITY, groupTemplate);
     }
 
@@ -373,13 +387,13 @@ public class RenderManager{
         } else if (CATALOGUE_ENTITY.getEntityName().equals(entity.getEntityName())) {
             // Template Cat
             templateCat = parser.parseTemplate(template);
-        } else if(GROUP_MS_ENTITY.getEntityName().equals(entity.getEntityName())) {
+        } else if (GROUP_MS_ENTITY.getEntityName().equals(entity.getEntityName())) {
             templateGroupMS = parser.parseTemplate(template);
-        }else if(GROUP_ENTITY.getEntityName().equals(entity.getEntityName())) {
+        } else if (GROUP_ENTITY.getEntityName().equals(entity.getEntityName())) {
             templateGroup = parser.parseTemplate(template);
-        }else if(PROGRESS_ENTITY.getEntityName().equals(entity.getEntityName())) {
+        } else if (PROGRESS_ENTITY.getEntityName().equals(entity.getEntityName())) {
             templateProg = parser.parseTemplate(template);
-        }else{
+        } else {
             throw LOGGER.throwing(new UnsupportedOperationException("Cannot parse a template for entity: " + entity.toString()));
         }
         return true;
