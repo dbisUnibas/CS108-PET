@@ -157,19 +157,34 @@ public class EvaluatorController {
         JSONUtils.writeToJSONFile(group, f);
     }
 
+    private File lastLocation = null;
+
     public void handleSaveAsGroup(ActionEvent event) {
         Group active = evaluator.getActiveGroup();
         AssessmentView av = groupAVMap.get(active.getName() );
         FileChooser fc = Utils.createGroupFileChooser("Save As");
+        setupFileChooser(fc, active.getName());
         File f = fc.showSaveDialog(evaluator.getWindow());
         if(f != null){
             try {
                 saveGroup(active, av, f);
                 groupFileMap.put(active.getName(), f);
+                lastLocation = f.getParentFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private void setupLastLocation(FileChooser fc){
+        if(lastLocation != null){
+            fc.setInitialDirectory(lastLocation);
+        }
+    }
+
+    private void setupFileChooser(FileChooser fc, String proposedName){
+        setupLastLocation(fc);
+        fc.setInitialFileName(proposedName);
     }
 
     public void handleModifyGroup(ActionEvent event) {
