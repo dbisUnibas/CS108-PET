@@ -66,7 +66,6 @@ public class TemplateParser{
         return new Template<E>(template, list, entity);
     }
 
-    // TODO: Define visibility
     <E> List<Replacement<E>> parseReplacements(String template){
         LOGGER.trace("parseReplacements");
         ArrayList<Replacement<E>> list = new ArrayList<>();
@@ -102,6 +101,7 @@ public class TemplateParser{
                     break;
                 default:
                     // something went wrong
+                    LOGGER.error("FOUND something that is not handled: "+successor);
                     break;
             }
             LOGGER.debug(String.format("[parseRep] Added replacement: %s", list.get(list.size()-1).toString()));
@@ -135,7 +135,9 @@ public class TemplateParser{
             }else{
                 // parse options?
                 // TODO: implement
-                throw new UnsupportedOperationException("Parsing on such a deep level not yet supported");
+                UnsupportedOperationException uoe = new UnsupportedOperationException("Parsing on such a deep level not yet supported");
+                LOGGER.throwing(uoe);
+                throw uoe;
             }
         }
         return null;

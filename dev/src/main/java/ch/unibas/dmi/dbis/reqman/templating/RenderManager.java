@@ -43,6 +43,7 @@ public class RenderManager{
     private Template<Milestone> templateGroupMS = null;
     private Template<Group> templateGroup = null;
     private Template<Progress> templateProg = null;
+    private Template<Requirement> templateProgReq = null;
     private TemplateParser parser = null;
 
 
@@ -161,9 +162,21 @@ public class RenderManager{
             }
     );
 
+    /**
+     * Existing:
+     * progress
+     *          .points
+     *          .hasPoints
+     *
+     */
     public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
-            Field.createNormalField("points", Progress::getPoints)
+            Field.createNormalField("points", Progress::getPoints),
+            new ConditionalField<Progress>("hasPoints", this::hasProgressPoints, b-> "POINTS EXISTING", b->"NO POINTS")
     );
+
+    private boolean hasProgressPoints(Progress progress){
+        return Double.compare(progress.getPoints(), 0d)!=0;
+    }
 
     /**
      * Existing:
@@ -194,7 +207,7 @@ public class RenderManager{
             new Field<Milestone, List<Progress>>("progressList", Field.Type.LIST, ms -> this.getProgressByMilestoneOrdinal(ms.getOrdinal()), list ->{
                 StringBuilder sb = new StringBuilder();
 
-                // TODO sort progress
+                // TODO sort progress correctly (BONUS; MALUS; NAME)
 
                 list.forEach(p -> sb.append(renderProgress(p)));
 
@@ -308,17 +321,25 @@ public class RenderManager{
         return renderCarefully(renderer, templateCat, catalogue);
     }
 
-    private String renderGroupMilestone(Milestone ms) {
+    public String renderGroupMilestone(Milestone ms) {
         return renderCarefully(renderer, templateGroupMS, ms);
     }
 
-    private String renderProgress(Progress p){
-        return "";
+    public String renderProgress(Progress p){
+        String progressRendered = renderCarefully(renderer, templateProg, p);
+        Requirement r = getRequirementForProgress(p);
+        parser.setupFor(REQUIREMENT_ENTITY);
+        templateProgReq = parser.parseTemplate(progressRendered);
+        return renderCarefully(renderer, templateProgReq, r);
+    }
+
+    public void parseProgressTemplate(String template){
+        parseTemplateCarefully(PROGRESS_ENTITY, template);
     }
 
 
-    private String renderGroup(Group g){
-        return "";
+    public String renderGroup(Group g){
+        return renderCarefully(renderer, templateGroup, g);
     }
 
     public void parseRequirementTemplate(String reqTemplate) {
@@ -327,6 +348,10 @@ public class RenderManager{
 
     public void parseGroupMilestoneTemplate(String groupMSTemplate){
         parseTemplateCarefully(GROUP_MS_ENTITY, groupMSTemplate);
+    }
+
+    public void parseGroupTemplate(String groupTemplate){
+        parseTemplateCarefully(GROUP_ENTITY, groupTemplate);
     }
 
     public void parseMilestoneTemplate(String msTemplate) {
@@ -350,6 +375,10 @@ public class RenderManager{
             templateCat = parser.parseTemplate(template);
         } else if(GROUP_MS_ENTITY.getEntityName().equals(entity.getEntityName())) {
             templateGroupMS = parser.parseTemplate(template);
+        }else if(GROUP_ENTITY.getEntityName().equals(entity.getEntityName())) {
+            templateGroup = parser.parseTemplate(template);
+        }else if(PROGRESS_ENTITY.getEntityName().equals(entity.getEntityName())) {
+            templateProg = parser.parseTemplate(template);
         }else{
             throw LOGGER.throwing(new UnsupportedOperationException("Cannot parse a template for entity: " + entity.toString()));
         }
