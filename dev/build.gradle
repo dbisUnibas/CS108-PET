@@ -102,7 +102,13 @@ task deployEvaluator(dependsOn: [build, jar]){
     }
 }
 
-task applySnapshot(dependsOn: deployEditor){
+task applySnapshotEditor(dependsOn: deployEditor){
+    doLast{
+        println('Finished: '+jar.archiveName)
+    }
+}
+
+task applySnapshotEvaluator(dependsOn: deployEvaluator){
     doLast{
         println('Finished: '+jar.archiveName)
     }
@@ -120,7 +126,7 @@ gradle.taskGraph.whenReady{
             jar.appendix = 'editor'
             jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication')
         }
-        if(taskGraph.hasTask(applySnapshot)){
+        if(taskGraph.hasTask(applySnapshotEvaluator) || taskGraph.hasTask(applySnapshotEditor)){
             jar.classifier = 'SNAPSHOT'
         }
         if(taskGraph.hasTask(deployEvaluator)){
