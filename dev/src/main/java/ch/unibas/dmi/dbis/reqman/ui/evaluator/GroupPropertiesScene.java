@@ -10,7 +10,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.util.Callback;
 import org.apache.commons.lang.StringUtils;
@@ -36,11 +35,18 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
     private final String catalogueName;
 
-    public GroupPropertiesScene(String catalogueName){
-        this.catalogueName = catalogueName;
+    private final EvaluatorController controller;
+
+    public GroupPropertiesScene(EvaluatorController controller){
+        this.controller = controller;
+        this.catalogueName = controller.getActiveCatalogue().getName();
 
         populateScene();
+    }
 
+    public GroupPropertiesScene(EvaluatorController controller, Group group){
+        this(controller);
+        this.group = group;
     }
 
     @Override
@@ -51,7 +57,12 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     }
 
     private void loadGroup(){
-        // TODO load group properties
+        if(group != null){
+            tfName.setText(group.getName() );
+            tfProjectName.setText(group.getProjectName());
+            tfExportFileName.setText(group.getExportFileName());
+        }
+
         loadMembers();
     }
 
@@ -66,6 +77,11 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         String projectName = tfProjectName.getText();
 
         if(StringUtils.isNotEmpty(name)){
+            if(!controller.isGroupNameUnique(name)){
+                Utils.showWarningDialog("Invalid group name", "Group names must be unique. There is already another group with name: \n\n"+name);
+                return;
+            }
+
             group = new Group(name, projectName, memberToStringList(tableData), catalogueName);
             if(StringUtils.isNotEmpty(tfExportFileName.getText())){
                 group.setExportFileName(tfExportFileName.getText());
@@ -199,7 +215,14 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
     private void loadMembers() {
         if (group != null) {
-            // load members from group
+            group.getMembers().forEach(str -> {
+                Member member = Member.convertFromString(str);
+                if(member != null){
+                    tableData.add(member);
+                }else{
+                    // TODO Handle illegal member-string!
+                }
+            });
 
         } else {
             setMemberListOnlyEmpty();

@@ -35,6 +35,9 @@ public class EvaluatorController {
     private Catalogue catalogue;
 
     private ObservableList<Group> groups;
+    private Map<String, AssessmentView> groupAVMap = new TreeMap<>();
+    private Map<String, File> groupFileMap = new TreeMap<>();
+    private File lastLocation = null;
 
 
     public EvaluatorController(EvaluatorScene evaluator) {
@@ -42,20 +45,23 @@ public class EvaluatorController {
         init();
     }
 
+    public Catalogue getActiveCatalogue(){
+        return catalogue;
+    }
+
     private void init() {
         // groups etc
         groups = FXCollections.observableArrayList();
     }
 
-    public List<Milestone> getMilestones(){
+    public List<Milestone> getMilestones() {
         return catalogue.getMilestones();
     }
 
-
-    public Requirement getRequirementByName(String name){
+    public Requirement getRequirementByName(String name) {
         Requirement r = null;
-        for(Requirement req : catalogue.getRequirements()){
-            if(req.getName().equals(name)){
+        for (Requirement req : catalogue.getRequirements()) {
+            if (req.getName().equals(name)) {
                 r = req;
             }
         }
@@ -78,56 +84,64 @@ public class EvaluatorController {
     }
 
     public void handleAddGroup(ActionEvent event) {
-        if(!isCatalogueSet() ){
+        if (!isCatalogueSet()) {
             return;
         }
-        Group group = EvaluatorPromptFactory.promptNewGroup(catalogue.getName());
+        Group group = EvaluatorPromptFactory.promptNewGroup(this);
+
         if (group != null) {
             addGroupToInternalStorage(group);
             addGroupTab(group);
         }
     }
 
-    private Map<String, AssessmentView> groupAVMap = new TreeMap<>();
+    public boolean isGroupNameUnique(String name) {
+        for (Group g : groups) {
+            if (g.getName().equals(name)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-    private void addGroupToInternalStorage(Group group){
+    private void addGroupToInternalStorage(Group group) {
         groups.add(group);
         groupAVMap.put(group.getName(), new AssessmentView(this, group));
     }
 
-    public void addGroupTab(Group active){
-        if(evaluator.isGroupTabbed(active)){
+    public void addGroupTab(Group active) {
+        if (evaluator.isGroupTabbed(active)) {
             // Dont add another tab of the same group
-        }else{
+        } else {
             evaluator.addGroupTab(groupAVMap.get(active.getName()));
         }
 
 
     }
 
-
-
-    public List<Requirement> getRequirementsByMilestone(int ordinal){
+    public List<Requirement> getRequirementsByMilestone(int ordinal) {
         return catalogue.getRequirementsByMilestone(ordinal);
     }
 
     public void handleRemoveGroup(ModifiableListView.RemoveEvent<Group> event) {
-        if (event.getSelected() != null) {
-            groups.remove(event.getSelectedIndex());
+        Group selected = event.getSelected();
+        if (selected != null) {
+            groups.remove(selected);
+            evaluator.removeTab(selected);
         }
     }
 
     public void handleOpenGroup(ActionEvent event) {
-        if(!isCatalogueSet() ){
+        if (!isCatalogueSet()) {
             return;
         }
         FileChooser fc = Utils.createGroupFileChooser("Open");
-        File f = fc.showOpenDialog(evaluator.getWindow() );
-        if(f != null){
+        File f = fc.showOpenDialog(evaluator.getWindow());
+        if (f != null) {
             try {
                 Group group = JSONUtils.readGroupJSONFile(f);
-                if(!group.getCatalogueName().equals(catalogue.getName())){
-                    Utils.showWarningDialog("Catalogue signature failure", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: "+group.getCatalogueName()+", Currentl catalogue: "+catalogue.getName());
+                if (!group.getCatalogueName().equals(catalogue.getName())) {
+                    Utils.showWarningDialog("Catalogue signature failure", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: " + group.getCatalogueName() + ", Currentl catalogue: " + catalogue.getName());
                     return;
                 }
                 addGroupToInternalStorage(group);
@@ -139,18 +153,16 @@ public class EvaluatorController {
         }
     }
 
-    private Map<String, File> groupFileMap = new TreeMap<>();
-
     public void handleSaveGroup(ActionEvent event) {
-        if(!isCatalogueSet()){
+        if (!isCatalogueSet()) {
             return;
         }
         Group active = evaluator.getActiveGroup();
-        AssessmentView av = groupAVMap.get(active.getName() );
-        File f = groupFileMap.get(active.getName() );
-        if(f == null){
+        AssessmentView av = groupAVMap.get(active.getName());
+        File f = groupFileMap.get(active.getName());
+        if (f == null) {
             handleSaveAsGroup(event);
-        }else{
+        } else {
             try {
                 saveGroup(active, av, f);
             } catch (IOException e) {
@@ -161,22 +173,20 @@ public class EvaluatorController {
 
     private void saveGroup(Group group, AssessmentView av, File f) throws IOException {
         group.setProgressList(av.getProgressList());
-        group.setProgressSummaryList(av.getSummaries() );
+        group.setProgressSummaryList(av.getSummaries());
         JSONUtils.writeToJSONFile(group, f);
     }
 
-    private File lastLocation = null;
-
     public void handleSaveAsGroup(ActionEvent event) {
-        if(!isCatalogueSet() ){
+        if (!isCatalogueSet()) {
             return;
         }
         Group active = evaluator.getActiveGroup();
-        AssessmentView av = groupAVMap.get(active.getName() );
+        AssessmentView av = groupAVMap.get(active.getName());
         FileChooser fc = Utils.createGroupFileChooser("Save As");
         setupFileChooser(fc, active.getName());
         File f = fc.showSaveDialog(evaluator.getWindow());
-        if(f != null){
+        if (f != null) {
             try {
                 saveGroup(active, av, f);
                 groupFileMap.put(active.getName(), f);
@@ -187,19 +197,19 @@ public class EvaluatorController {
         }
     }
 
-    private void setupLastLocation(FileChooser fc){
-        if(lastLocation != null){
+    private void setupLastLocation(FileChooser fc) {
+        if (lastLocation != null) {
             fc.setInitialDirectory(lastLocation);
         }
     }
 
-    private void setupFileChooser(FileChooser fc, String proposedName){
+    private void setupFileChooser(FileChooser fc, String proposedName) {
         setupLastLocation(fc);
         fc.setInitialFileName(proposedName);
     }
 
     public void handleModifyGroup(ActionEvent event) {
-        if(!isCatalogueSet() ){
+        if (!isCatalogueSet()) {
             return;
         }
         // NEED TO GET THE ACTIVE GROUP
@@ -210,12 +220,12 @@ public class EvaluatorController {
     }
 
     public void handleExportGroup(ActionEvent event) {
-        if(!isCatalogueSet()){
+        if (!isCatalogueSet()) {
             return;
         }
-        for(Group g : groups){
-            if(!StringUtils.isNotEmpty(g.getExportFileName())){
-                g.setExportFileName(g.getName()+".html");// TODO Handle correctly, with warning or so
+        for (Group g : groups) {
+            if (!StringUtils.isNotEmpty(g.getExportFileName())) {
+                g.setExportFileName(g.getName() + ".html");// TODO Handle correctly, with warning or so
             }
         }
         DirectoryChooser dc = new DirectoryChooser();
@@ -224,16 +234,16 @@ public class EvaluatorController {
 
         RenderManager manager = createAndPrepareRenderManager();
 
-        for(Group g : groups){
+        for (Group g : groups) {
             manager.setGroup(g);
             String html = manager.renderGroup(g);
             try {
-                PrintWriter pw = new PrintWriter(dir.getPath()+System.getProperty("file.separator")+g.getExportFileName() );
+                PrintWriter pw = new PrintWriter(dir.getPath() + System.getProperty("file.separator") + g.getExportFileName());
                 pw.write(html);
                 pw.flush();
                 pw.close();
                 System.out.println("============================");
-                System.out.println(" FINISHED : "+g.getName());
+                System.out.println(" FINISHED : " + g.getName());
                 System.out.println("============================");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -241,7 +251,7 @@ public class EvaluatorController {
         }
     }
 
-    private RenderManager createAndPrepareRenderManager(){
+    private RenderManager createAndPrepareRenderManager() {
         RenderManager manager = new RenderManager(catalogue);
 
         String groupTempate = "<!DOCTYPE html>\n" +
@@ -301,7 +311,7 @@ public class EvaluatorController {
         return manager;
     }
 
-    public boolean isCatalogueSet(){
+    public boolean isCatalogueSet() {
         return catalogue != null;
     }
 }

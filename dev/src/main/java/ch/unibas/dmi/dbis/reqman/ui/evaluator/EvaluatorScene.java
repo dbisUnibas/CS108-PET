@@ -10,6 +10,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.ConcurrentModificationException;
+
 /**
  * The class {@link EvaluatorScene} is the class which is directly the scene of the assessment mode.
  *
@@ -165,6 +167,23 @@ public class EvaluatorScene extends Scene{
         }else{
             throw new RuntimeException("This should definitively not happen (Non-AV-tab?)");
         }
+    }
+
+    public void removeTab(Group group){
+        try{
+            for(Tab tab : tabPane.getTabs() ){
+                Node content = tab.getContent();
+                if(content instanceof AssessmentView){
+                    AssessmentView av = (AssessmentView)content;
+                    if(group.equals(av.getActiveGroup() )){
+                        tabPane.getTabs().remove(tab);
+                    }
+                }
+            }
+        }catch(ConcurrentModificationException ex){
+            // Silently catching this exception, since it occurs by design.
+        }
+
     }
 
 

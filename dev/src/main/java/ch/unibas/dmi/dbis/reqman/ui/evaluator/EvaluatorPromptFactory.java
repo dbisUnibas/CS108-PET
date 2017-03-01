@@ -21,9 +21,14 @@ public class EvaluatorPromptFactory {
         return popup.prompt();
     }
 
-    public static Group promptNewGroup(String catalogueName){
-        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(catalogueName));
+    public static Group promptNewGroup(EvaluatorController controller){
+        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(controller));
         return popup.prompt();
+    }
+
+    public static Group promptGroup(Group group, EvaluatorController controller){
+        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene( controller, group));
+        return null;
     }
 
     public static ProgressSummary promptSummary(Milestone ms, String groupName){
