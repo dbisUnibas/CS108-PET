@@ -4,15 +4,12 @@ import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +23,7 @@ public class ProgressView extends VBox {
     // TODO Extract code for collapsible pane. Adjust collapsible's size.
 
     private Progress progress;
-    private Requirement requirement;
+    private final Requirement requirement;
 
     private Label lblTitle = new Label();
     private ToggleButton collapseButton = new ToggleButton(Utils.ARROW_DOWN);
@@ -89,7 +86,7 @@ public class ProgressView extends VBox {
 
     private void initComponents(){
 
-        lblTitle.setText(requirement.getName());
+        lblTitle.setText(requirement.getName() + "\t("+requirement.getMaxPoints()+")");
 
         taDesc.setEditable(false);
 
@@ -138,7 +135,35 @@ public class ProgressView extends VBox {
 
         getChildren().add(content);
         taDesc.setText(requirement.getDescription());
-        collapsible.getChildren().add(taDesc);
+
+        // Builds the collapsible
+        GridPane grid = Utils.generateDefaultGridPane();
+        Label lblBinary = new Label("Binary:");
+        Label lblMandatory = new Label("Mandatory:");
+        Label lblMalus = new Label("Malus");
+        Label lblDesc = new Label("Description");
+
+        CheckBox cbBinary = new CheckBox();
+        cbBinary.setSelected(requirement.isBinary());
+        cbBinary.setDisable(true);
+        CheckBox cbMandatory = new CheckBox();
+        cbMandatory.setSelected(requirement.isMandatory());
+        cbMandatory.setDisable(true);
+        CheckBox cbMalus = new CheckBox();
+        cbMalus.setSelected(requirement.isMalus());
+        cbMalus.setDisable(true);
+
+        grid.add(lblBinary, 0,0);
+        grid.add(cbBinary, 1, 0);
+        grid.add(lblMandatory, 3,0);
+        grid.add(cbMandatory, 4,0);
+        grid.add(lblMalus, 6,0);
+        grid.add(cbMalus, 7, 0);
+
+        grid.add(lblDesc, 0, 1);
+        grid.add(taDesc, 1, 1, 6, 1);
+
+        collapsible.getChildren().add(grid);
         //getChildren().add(collapsible);
         content.setStyle("-fx-spacing: 10px;-fx-padding: 10px;-fx-border-color: silver;-fx-border-width: 1px;");
         //content.setStyle("-fx-background-color: lime;"+ content.getStyle() );
@@ -149,9 +174,6 @@ public class ProgressView extends VBox {
         return requirement;
     }
 
-    public void setRequirement(Requirement requirement) {
-        this.requirement = requirement;
-    }
 
     public Progress getProgress() {
         return progress;
