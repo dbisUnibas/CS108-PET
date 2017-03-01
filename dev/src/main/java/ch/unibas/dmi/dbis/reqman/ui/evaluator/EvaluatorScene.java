@@ -48,6 +48,7 @@ public class EvaluatorScene extends Scene{
         groupView = new GroupView(controller);
         catInfoView = new CatalogueInfoView();
         initComponents();
+        disableAll();
     }
 
     public CatalogueInfoView getCatalogueInfoView(){
@@ -173,5 +174,15 @@ public class EvaluatorScene extends Scene{
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void disableAll(){
+        groupView.setDisable(true);
+        catInfoView.setDisable(true);
+    }
+
+    public void enableAll(){
+        groupView.setDisable(false);
+        catInfoView.setDisable(false);
     }
 }

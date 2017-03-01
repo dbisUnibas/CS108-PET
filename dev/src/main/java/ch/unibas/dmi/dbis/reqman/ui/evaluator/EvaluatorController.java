@@ -32,7 +32,6 @@ public class EvaluatorController {
 
     private EvaluatorScene evaluator;
 
-
     private Catalogue catalogue;
 
     private ObservableList<Group> groups;
@@ -70,7 +69,7 @@ public class EvaluatorController {
             try {
                 catalogue = JSONUtils.readCatalogueJSONFile(f);
                 evaluator.getCatalogueInfoView().displayData(catalogue);
-                // TODO Enable group adding etc
+                evaluator.enableAll();
             } catch (IOException e) {
                 // TODO Handle exception
                 e.printStackTrace();
@@ -79,6 +78,9 @@ public class EvaluatorController {
     }
 
     public void handleAddGroup(ActionEvent event) {
+        if(!isCatalogueSet() ){
+            return;
+        }
         Group group = EvaluatorPromptFactory.promptNewGroup(catalogue.getName());
         if (group != null) {
             addGroupToInternalStorage(group);
@@ -116,13 +118,16 @@ public class EvaluatorController {
     }
 
     public void handleOpenGroup(ActionEvent event) {
+        if(!isCatalogueSet() ){
+            return;
+        }
         FileChooser fc = Utils.createGroupFileChooser("Open");
         File f = fc.showOpenDialog(evaluator.getWindow() );
         if(f != null){
             try {
                 Group group = JSONUtils.readGroupJSONFile(f);
                 if(!group.getCatalogueName().equals(catalogue.getName())){
-                    Utils.showWarningDialog("Catalogue singature failrue", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: "+group.getCatalogueName()+", Currentl catalogue: "+catalogue.getName());
+                    Utils.showWarningDialog("Catalogue signature failure", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: "+group.getCatalogueName()+", Currentl catalogue: "+catalogue.getName());
                     return;
                 }
                 addGroupToInternalStorage(group);
@@ -137,6 +142,9 @@ public class EvaluatorController {
     private Map<String, File> groupFileMap = new TreeMap<>();
 
     public void handleSaveGroup(ActionEvent event) {
+        if(!isCatalogueSet()){
+            return;
+        }
         Group active = evaluator.getActiveGroup();
         AssessmentView av = groupAVMap.get(active.getName() );
         File f = groupFileMap.get(active.getName() );
@@ -160,6 +168,9 @@ public class EvaluatorController {
     private File lastLocation = null;
 
     public void handleSaveAsGroup(ActionEvent event) {
+        if(!isCatalogueSet() ){
+            return;
+        }
         Group active = evaluator.getActiveGroup();
         AssessmentView av = groupAVMap.get(active.getName() );
         FileChooser fc = Utils.createGroupFileChooser("Save As");
@@ -188,6 +199,9 @@ public class EvaluatorController {
     }
 
     public void handleModifyGroup(ActionEvent event) {
+        if(!isCatalogueSet() ){
+            return;
+        }
         // NEED TO GET THE ACTIVE GROUP
     }
 
@@ -196,6 +210,9 @@ public class EvaluatorController {
     }
 
     public void handleExportGroup(ActionEvent event) {
+        if(!isCatalogueSet()){
+            return;
+        }
         for(Group g : groups){
             if(!StringUtils.isNotEmpty(g.getExportFileName())){
                 g.setExportFileName(g.getName()+".html");// TODO Handle correctly, with warning or so
@@ -282,5 +299,9 @@ public class EvaluatorController {
         manager.parseProgressTemplate(progressTemplate);
 
         return manager;
+    }
+
+    public boolean isCatalogueSet(){
+        return catalogue != null;
     }
 }
