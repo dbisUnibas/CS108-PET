@@ -86,7 +86,7 @@ public class ProgressView extends VBox {
 
     private void initComponents(){
 
-        lblTitle.setText(requirement.getName() + "\t("+requirement.getMaxPoints()+")");
+        lblTitle.setText(requirement.getName() + "\t("+ ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(requirement.getMaxPointsSensitive())+")"+(!requirement.isMandatory() ? "\t[BONUS]":""));
 
         taDesc.setEditable(false);
 

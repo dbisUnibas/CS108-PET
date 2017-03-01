@@ -1,5 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
 /**
  * TODO: Write JavaDoc
  *
@@ -12,12 +16,16 @@ public class StringUtils {
     }
 
     /**
-     * Checks if the provided String is {@code null} or empty.
-     *
-     * @param str The String to check
-     * @return {@code true} if and only if the given {@code str} equals {@code null} and {@link String#isEmpty()} returns {@code true} - returns {@code false} otherwise
+     * Pretty prints a double value (with maximal necessary precision or as integer, if so).
+     * @param value
+     * @return
      */
-    public static boolean isNullOrEmpty(String str) {
-        return str == null || str.isEmpty();
+    public static String prettyPrint(double value) {
+        /*
+        Algorithm by: http://stackoverflow.com/a/25308216
+         */
+        DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+        df.setMaximumFractionDigits(340); //340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
+        return df.format(value);
     }
 }
