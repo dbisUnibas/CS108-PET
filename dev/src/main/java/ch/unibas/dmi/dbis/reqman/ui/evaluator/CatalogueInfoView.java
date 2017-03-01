@@ -82,9 +82,9 @@ public class CatalogueInfoView extends HBox{
         root.add(taDesc, 1, rowIndex++);
 
         ColumnConstraints col1 = new ColumnConstraints();
-        col1.setPercentWidth(50);
+        col1.setPercentWidth(40);
         ColumnConstraints col2 = new ColumnConstraints();
-        col2.setPercentWidth(50);
+        col2.setPercentWidth(60);
 
         root.getColumnConstraints().addAll(col1, col2);
     }
