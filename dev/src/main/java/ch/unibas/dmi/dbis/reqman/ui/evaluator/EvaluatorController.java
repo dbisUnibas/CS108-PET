@@ -131,11 +131,18 @@ public class EvaluatorController {
         }
     }
 
+    private File lastOpenLocation = null;
+
+
+
     public void handleOpenGroup(ActionEvent event) {
         if (!isCatalogueSet()) {
             return;
         }
         FileChooser fc = Utils.createGroupFileChooser("Open");
+        if(lastOpenLocation != null){
+            fc.setInitialDirectory(lastOpenLocation);
+        }
         File f = fc.showOpenDialog(evaluator.getWindow());
         if (f != null) {
             try {
@@ -150,6 +157,7 @@ public class EvaluatorController {
                 }
                 addGroupToInternalStorage(group);
                 groupFileMap.put(group.getName(), f);
+                lastOpenLocation = f.getParentFile();
                 addGroupTab(group);
             } catch (IOException e) {
                 e.printStackTrace();
