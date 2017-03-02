@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.core.Group;
+import javafx.event.ActionEvent;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -11,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.ConcurrentModificationException;
+import java.util.TreeMap;
 
 /**
  * The class {@link EvaluatorScene} is the class which is directly the scene of the assessment mode.
@@ -133,11 +135,20 @@ public class EvaluatorScene extends Scene{
         Menu menuView = new Menu("View");
 
         Menu menuHelp = new Menu("Help");
+        MenuItem itemDebug = new MenuItem("DEBUG"); // DEBUG TODO Remove
+        itemDebug.setOnAction(this::handleDebug);
+        itemDebug.setAccelerator(KeyCombination.keyCombination("Ctrl+H"));
 
 
 
         bar.getMenus().addAll(menuFile, menuEdit, menuView, menuHelp);
         return bar;
+    }
+
+    private void handleDebug(ActionEvent event) {
+        Group active = getActiveGroup();
+        Tab tab = groupTabMap.get(active);
+        System.out.println(tab.getStyleClass());
     }
 
     public void addGroupTab(AssessmentView av){
@@ -146,8 +157,10 @@ public class EvaluatorScene extends Scene{
         av.bindToParentSize(rightContent);
         tab.setContent(av);
         tabPane.getTabs().add(tab);
-
+        groupTabMap.put(av.getActiveGroup(), tab);
     }
+
+    private TreeMap<Group, Tab> groupTabMap = new TreeMap<>();
 
     public boolean isGroupTabbed(Group group){
         for(Tab t : tabPane.getTabs() ){
@@ -178,6 +191,7 @@ public class EvaluatorScene extends Scene{
                     AssessmentView av = (AssessmentView)content;
                     if(group.equals(av.getActiveGroup() )){
                         tabPane.getTabs().remove(tab);
+                        groupTabMap.remove(av.getActiveGroup());
                     }
                 }
             }
@@ -204,5 +218,21 @@ public class EvaluatorScene extends Scene{
     public void enableAll(){
         groupView.setDisable(false);
         catInfoView.setDisable(false);
+    }
+
+    public void markDirty(Group modified) {
+        Tab tab = groupTabMap.get(modified);
+        tab.getStyleClass().add("modified");
+        if(tab.getText().indexOf("*")<0){
+            tab.setText(tab.getText()+"*");
+        }
+
+    }
+
+    public void unmarkDirty(Group modified){
+        Tab tab = groupTabMap.get(modified);
+        tab.getStyleClass().remove("modified");
+        String text = tab.getText().substring(0, tab.getText().indexOf("*"));
+        tab.setText(text);
     }
 }

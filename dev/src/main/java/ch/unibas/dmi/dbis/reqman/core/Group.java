@@ -9,7 +9,7 @@ import java.util.Vector;
  *
  * @author loris.sauter
  */
-public class Group {
+public class Group implements Comparable<Group>{
 
     private String name;
     private String projectName;
@@ -146,5 +146,10 @@ public class Group {
 
     public void setProgressSummaryList(List<ProgressSummary> progressSummaryList) {
         this.progressSummaries = progressSummaryList;
+    }
+
+    @Override
+    public int compareTo(Group o) {
+        return name.compareTo(o.getName());
     }
 }

@@ -244,6 +244,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     @Override
     public void pointsChanged(double newValue) {
         calcActiveSum();
+        controller.markDirty(getActiveGroup() );
     }
 
     public Group getActiveGroup(){

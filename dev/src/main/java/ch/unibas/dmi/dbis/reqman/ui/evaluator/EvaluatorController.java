@@ -187,6 +187,7 @@ public class EvaluatorController {
         group.setProgressList(av.getProgressList());
         group.setProgressSummaryList(av.getSummaries());
         JSONUtils.writeToJSONFile(group, f);
+        evaluator.unmarkDirty(group);
     }
 
     public void handleSaveAsGroup(ActionEvent event) {
@@ -325,5 +326,9 @@ public class EvaluatorController {
 
     public boolean isCatalogueSet() {
         return catalogue != null;
+    }
+
+    public void markDirty(Group modified) {
+        evaluator.markDirty(modified);
     }
 }
