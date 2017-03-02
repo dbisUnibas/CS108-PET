@@ -141,11 +141,11 @@ public class EvaluatorController {
             try {
                 Group group = JSONUtils.readGroupJSONFile(f);
                 if (!group.getCatalogueName().equals(catalogue.getName())) {
-                    Utils.showWarningDialog("Catalogue signature failure", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: " + group.getCatalogueName() + ", Currentl catalogue: " + catalogue.getName());
+                    Utils.showErrorDialog("Catalogue signature failure", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: " + group.getCatalogueName() + ", Currentl catalogue: " + catalogue.getName());
                     return;
                 }
                 if(!isGroupNameUnique(group.getName())){
-                    Utils.showWarningDialog("Opening group failed", "There already exists a group with name:\n\n"+group.getName()+"\n\nYou have to rename the group manually if both groups are needed.");
+                    Utils.showErrorDialog("Opening group failed", "There already exists a group with name:\n\n"+group.getName()+"\n\nYou have to rename the group manually if both groups are needed.");
                     return;
                 }
                 addGroupToInternalStorage(group);

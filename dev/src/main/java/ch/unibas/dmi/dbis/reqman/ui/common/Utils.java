@@ -57,6 +57,14 @@ public class Utils {
         showWarningDialog("Warning", header, content);
     }
 
+    public static void showErrorDialog(String title, String header, String content){
+        showDialog(Alert.AlertType.ERROR,  title, header, content);
+    }
+
+    public static void showErrorDialog(String header, String content){
+        showErrorDialog("Error", header, content);
+    }
+
     public static Button createArrowUpButton(){
         Button b = new Button(ARROW_UP);
         b.setStyle("-fx-text-fill: dimgray;");
