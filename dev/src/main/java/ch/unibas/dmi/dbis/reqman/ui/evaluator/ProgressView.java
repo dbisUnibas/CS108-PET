@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
@@ -117,6 +118,7 @@ public class ProgressView extends VBox {
             spinnerPoints.valueProperty().addListener((observable, oldValue, newValue) -> {
                 if(Double.compare(oldValue, newValue) != 0){ // Only if really new value
                     progress.setPoints(newValue);
+                    progress.setPercentage(progress.getPoints() / requirement.getMaxPoints());
                     notifyPointsListener();
                 }
             });
@@ -186,8 +188,10 @@ public class ProgressView extends VBox {
     private void handleAssessmentAction(ActionEvent event){
         if(check.isSelected() ){
             progress.setPoints(requirement.getMaxPoints());
+            progress.setPercentage(progress.getPoints() / requirement.getMaxPoints());
         }else{
             progress.setPoints(0);
+            progress.setPercentage(0d);
         }
         notifyPointsListener();
     }

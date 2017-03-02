@@ -131,7 +131,7 @@ public class RenderManager {
             Field.createNormalField("points", p -> {
                 return p.getPointsSensitive(catalogue);
             }),
-            new ConditionalField<Progress>("hasPoints", this::hasProgressPoints, b -> "POINTS EXISTING", b -> "NO POINTS")
+            new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS")
     );
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
             new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),

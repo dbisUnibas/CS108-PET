@@ -7,10 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * TODO: write JavaDoc
@@ -36,6 +33,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private EvaluatorController controller;
 
     private Group group;
+    private Milestone activeMS = null;
 
     public AssessmentView(EvaluatorController controller, Group active){
         super();
@@ -179,6 +177,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         if(activeMS == null){
             return;
         }
+        this.activeMS = activeMS;
+        visitedMilestones.add(activeMS);
         activeProgressViews.clear();
         controller.getRequirementsByMilestone(activeMS.getOrdinal()).forEach(r ->{
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
@@ -188,6 +188,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         });
 
     }
+
+    private Set<Milestone> visitedMilestones = new HashSet<>();
 
     private void updateProgressViews(){
         detachProgressViews();
@@ -253,14 +255,14 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     /**
      * ONLY if group has to be saved. Grabs ALL progress objects
+     *
+     * ALSO sets the percentage of ALL progress belonging to a VISITED milestone to 0, if it was -1 previously.
      * @return
      */
-    public List<Progress> getProgressList(){
+    public List<Progress> getProgressListForSaving(){
         List<Progress> list = new ArrayList<>();
 
-        progressMap.values().forEach(consumer -> {
-            consumer.values().forEach(list::add);
-        });
+        progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
 
         return list;
     }

@@ -2,6 +2,8 @@ package ch.unibas.dmi.dbis.reqman.core;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.DoubleSummaryStatistics;
+
 /**
  * TODO: write JavaDoc
  *
@@ -12,6 +14,16 @@ public class Progress {
     private String requirementName;
     private int milestoneOrdinal;
     private double points;
+
+    public double getPercentage() {
+        return percentage;
+    }
+
+    public void setPercentage(double percentage) {
+        this.percentage = percentage;
+    }
+
+    private double percentage = -1d;
 
 
     public Progress() {
@@ -86,4 +98,14 @@ public class Progress {
         return factor * points;
     }
 
+    @JsonIgnore
+    public boolean hasProgress(){
+        // TODO Re-think
+        return Double.compare(-1d, percentage)!=0;
+    }
+
+    @JsonIgnore
+    public boolean hasDefaultPercentage() {
+        return Double.compare(-1d, percentage)==0;
+    }
 }
