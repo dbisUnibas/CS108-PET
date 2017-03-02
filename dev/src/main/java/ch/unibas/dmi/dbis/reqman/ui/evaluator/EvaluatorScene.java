@@ -112,6 +112,7 @@ public class EvaluatorScene extends Scene{
         itemNew.setAccelerator(KeyCombination.keyCombination("Ctrl+G"));
         MenuItem itemOpen = new MenuItem("Open Group");
         itemOpen.setOnAction(controller::handleOpenGroup);
+        itemOpen.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
         MenuItem itemSave = new MenuItem("Save Group");
         itemSave.setOnAction(controller::handleSaveGroup);
         MenuItem itemSaveAs = new MenuItem("Save Group As");
