@@ -129,9 +129,13 @@ public class EvaluatorController {
     public void handleRemoveGroup(ModifiableListView.RemoveEvent<Group> event) {
         Group selected = event.getSelected();
         if (selected != null) {
-            groups.remove(selected);
-            evaluator.removeTab(selected);
+            removeGroup(selected);
         }
+    }
+
+    private void removeGroup(Group group){
+        groups.remove(group);
+        evaluator.removeTab(group);
     }
 
     private File lastOpenLocation = null;
@@ -230,7 +234,12 @@ public class EvaluatorController {
         if (!isCatalogueSet()) {
             return;
         }
-        // NEED TO GET THE ACTIVE GROUP
+    }
+
+    private void replaceGroup(Group oldGroup, Group newGroup) {
+        removeGroup(oldGroup);
+        addGroupTab(newGroup);
+        addGroupToInternalStorage(newGroup);
     }
 
     public ObservableList<Group> getObservableGroups() {

@@ -256,7 +256,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     /**
      * ONLY if group has to be saved. Grabs ALL progress objects
      *
-     * ALSO sets the percentage of ALL progress belonging to a VISITED milestone to 0, if it was -1 previously.
      * @return
      */
     public List<Progress> getProgressListForSaving(){
