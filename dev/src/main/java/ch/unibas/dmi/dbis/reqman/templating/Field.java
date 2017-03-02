@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
@@ -201,13 +203,7 @@ public class Field<E, T> {
             case NORMAL:
                 if(getRenderer() == null){
                     if(value instanceof Double){
-                        /*
-                        Algorithm by: http://stackoverflow.com/a/25308216
-                         */
-                        Double d = (Double)value;
-                        DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
-                        df.setMaximumFractionDigits(340); //340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
-                        return df.format(d);
+                        return StringUtils.prettyPrint((Double)value);
                     }
                     return String.valueOf(value);
                 }else{

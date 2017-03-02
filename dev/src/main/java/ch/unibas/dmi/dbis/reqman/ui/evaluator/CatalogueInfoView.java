@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
@@ -99,7 +100,7 @@ public class CatalogueInfoView extends HBox{
             tfLecture.setText(catalogue.getLecture() );
             tfSemester.setText(catalogue.getSemester() );
             taDesc.setText(catalogue.getDescription() );
-            tfSum.setText(String.valueOf(catalogue.getSum()));
+            tfSum.setText(StringUtils.prettyPrint(catalogue.getSum()));
         }
     }
 

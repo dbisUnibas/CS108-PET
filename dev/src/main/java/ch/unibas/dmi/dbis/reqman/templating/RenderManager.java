@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -115,7 +116,7 @@ public class RenderManager {
             new ParametrizedField<Catalogue, Double>("sumMS", Catalogue::getSum) {
                 @Override
                 public String renderCarefully(Catalogue instance, String parameter) {
-                    return String.valueOf(instance.getSum(Integer.valueOf(parameter)));
+                    return StringUtils.prettyPrint(instance.getSum(Integer.valueOf(parameter)));
                 }
             },
             new ParametrizedField<Catalogue, Milestone>("milestoneName", null) {

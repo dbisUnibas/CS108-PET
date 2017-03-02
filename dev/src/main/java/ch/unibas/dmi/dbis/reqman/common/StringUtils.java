@@ -22,6 +22,12 @@ public class StringUtils {
      */
     public static String prettyPrint(double value) {
         /*
+        To remove - sign if value is zero
+         */
+        if( Double.compare(-0d, value) == 0){
+            value *= -1d;
+        }
+        /*
         Algorithm by: http://stackoverflow.com/a/25308216
          */
         DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
