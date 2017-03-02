@@ -87,6 +87,7 @@ public class EvaluatorScene extends Scene{
         rightContent.setStyle("-fx-padding: 10px;-fx-spacing: 10px;");
 
         tabPane.setStyle("-fx-pading: 10px; -fx-spacing: 10px;");
+        tabPane.getStylesheets().add("style.css");
         rightContent.getChildren().addAll(tabPane);// TODO Iff no catalogue loaded / all tabs closed: Plachoolder with info
 
         horizontalSplitter.getItems().addAll(leftContent, rightContent);
@@ -139,6 +140,7 @@ public class EvaluatorScene extends Scene{
         itemDebug.setOnAction(this::handleDebug);
         itemDebug.setAccelerator(KeyCombination.keyCombination("Ctrl+H"));
 
+        menuHelp.getItems().add(itemDebug);
 
 
         bar.getMenus().addAll(menuFile, menuEdit, menuView, menuHelp);
@@ -222,9 +224,11 @@ public class EvaluatorScene extends Scene{
 
     public void markDirty(Group modified) {
         Tab tab = groupTabMap.get(modified);
-        tab.getStyleClass().add("modified");
         if(tab.getText().indexOf("*")<0){
             tab.setText(tab.getText()+"*");
+        }
+        if(!tab.getStyleClass().contains("modified")){
+            tab.getStyleClass().add("modified");
         }
 
     }
