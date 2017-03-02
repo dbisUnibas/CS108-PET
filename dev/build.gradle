@@ -179,6 +179,7 @@ task incrementMajorVersion{
     doFirst{
         incrementVersion('MajorVersion')
         setVersionPart('MinorVersion',0)
+        printVersion()
     }
 }
 
@@ -188,6 +189,7 @@ task incrementMinorVersion{
     doFirst{
         incrementVersion('MinorVersion')
         setVersionPart('FixVersion',0)
+        printVersion()
     }
 }
 
@@ -196,6 +198,7 @@ task incrementFixVersion{
     description = 'Increments the fix version (so the F in  M.m.F) number by 1. Only invoke when a bugfix is applied.'
     doFirst{
         incrementVersion('FixVersion')
+        printVersion()
     }
 }
 
@@ -227,6 +230,10 @@ static String readVersion(){
     Integer minor = (p.getProperty('artifactMinorVersion') as Integer)
     Integer major = (p.getProperty('artifactMajorVersion') as Integer)
     return major.toString()+'.'+minor+'.'+fix+'-b'+build.toString()
+}
+
+static void printVersion(){
+    println(project.version);
 }
 
 /**
