@@ -136,22 +136,12 @@ public class EvaluatorScene extends Scene{
         Menu menuView = new Menu("View");
 
         Menu menuHelp = new Menu("Help");
-        MenuItem itemDebug = new MenuItem("DEBUG"); // DEBUG TODO Remove
-        itemDebug.setOnAction(this::handleDebug);
-        itemDebug.setAccelerator(KeyCombination.keyCombination("Ctrl+H"));
-
-        menuHelp.getItems().add(itemDebug);
 
 
         bar.getMenus().addAll(menuFile, menuEdit, menuView, menuHelp);
         return bar;
     }
 
-    private void handleDebug(ActionEvent event) {
-        Group active = getActiveGroup();
-        Tab tab = groupTabMap.get(active);
-        System.out.println(tab.getStyleClass());
-    }
 
     public void addGroupTab(AssessmentView av){
         Tab tab = new Tab();

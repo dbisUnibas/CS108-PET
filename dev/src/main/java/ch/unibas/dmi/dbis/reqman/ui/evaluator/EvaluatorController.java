@@ -8,6 +8,7 @@ import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.templating.RenderManager;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -76,6 +77,8 @@ public class EvaluatorController {
                 catalogue = JSONUtils.readCatalogueJSONFile(f);
                 evaluator.getCatalogueInfoView().displayData(catalogue);
                 evaluator.enableAll();
+            } catch(UnrecognizedPropertyException ex){
+                Utils.showErrorDialog("Failed loading catalogue", "The provided file could not be read as a catalogue.\nTry again with a catalogue file.");
             } catch (IOException e) {
                 // TODO Handle exception
                 e.printStackTrace();
@@ -159,7 +162,9 @@ public class EvaluatorController {
                 groupFileMap.put(group.getName(), f);
                 lastOpenLocation = f.getParentFile();
                 addGroupTab(group);
-            } catch (IOException e) {
+            } catch(UnrecognizedPropertyException ex){
+                Utils.showErrorDialog("Failed opening group", "The provided file could not be read as a group.\nTry again with a group file.");
+            }  catch (IOException e) {
                 e.printStackTrace();
             }
         }
