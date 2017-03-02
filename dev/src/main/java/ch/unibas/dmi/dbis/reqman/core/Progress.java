@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * TODO: write JavaDoc
  *
@@ -76,4 +78,12 @@ public class Progress {
     public void setPoints(double points) {
         this.points = points;
     }
+
+    @JsonIgnore
+    public double getPointsSensitive(Catalogue catalogue){
+        Requirement r = catalogue.getRequirementByName(requirementName);
+        double factor = r.isMalus() ? -1d : 1d;
+        return factor * points;
+    }
+
 }

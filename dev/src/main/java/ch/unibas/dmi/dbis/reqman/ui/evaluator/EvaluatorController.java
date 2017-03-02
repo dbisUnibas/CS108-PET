@@ -286,7 +286,6 @@ public class EvaluatorController {
                 "<br><br><br>\n" +
                 "\n" +
                 "<h1>${group.name}</h1>\n" +
-                "<h2>${group.project}</h2>\n" +
                 "<div class=\"container\">\n" +
                 "\t\n" +
                 "\t${group.milestones}\n" +
@@ -307,14 +306,14 @@ public class EvaluatorController {
                 "\t\t<span class=\"milestone-points\">${groupMilestone.sum}</span>\n" +
                 "\t</div>\n" +
                 "</div>";
-        String progressTemplate = "<div class=\"achievement ${requirement.meta[category]} ${requirement.mandatory[][bonus]} ${progress.hasPoints[achieved][]} z-depth-2 hoverable\">\n" +
+        String progressTemplate = "<div class=\"achievement ${requirement.meta[category]} ${requirement.mandatory[][bonus]} ${progress.hasPoints[achieved][]} ${requirement.malus[malus][]}z-depth-2 hoverable\">\n" +
                 "\t<div class=\"achievement-img-container\">\n" +
                 "\t\t<img src=\"${requirement.meta[image]}\">\n" +
                 "\t</div>\n" +
                 "\t<div class=\"achievement-content-container\">\n" +
                 "\t\t<div class=\"achievement-header\">\n" +
                 "\t\t\t<span class=\"achievement-title\">${requirement.name}</span>\n" +
-                "\t\t\t<span class=\"achievement-points\">${requirement.malus[-][]}${progress.points} of ${requirement.malus[-][]}${requirement.maxPoints}</span>\n" +
+                "\t\t\t<span class=\"achievement-points\">${progress.points} of ${requirement.maxPoints}</span>\n" +
                 "\t\t\t<span class=\"achievement-date\">${requirement.minMS.name}</span>\n" +
                 "\t\t</div>\n" +
                 "\t\t<span class=\"achievement-description\">${requirement.description}</span>\n" +

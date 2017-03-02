@@ -38,16 +38,7 @@ public class RenderManager {
             },
             new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal)
     );
-    /**
-     * Existing:
-     * progress
-     * .points
-     * .hasPoints
-     */
-    public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
-            Field.createNormalField("points", Progress::getPoints),
-            new ConditionalField<Progress>("hasPoints", this::hasProgressPoints, b -> "POINTS EXISTING", b -> "NO POINTS")
-    );
+
     private Template<Requirement> templateReq = null;
     private Template<Milestone> templateMS = null;
     private Template<Catalogue> templateCat = null;
@@ -128,10 +119,22 @@ public class RenderManager {
             }
     );
     private Catalogue catalogue = null;
+    /**
+     * Existing:
+     * progress
+     * .points
+     * .hasPoints
+     */
+    public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
+            Field.createNormalField("points", p -> {
+                return p.getPointsSensitive(catalogue);
+            }),
+            new ConditionalField<Progress>("hasPoints", this::hasProgressPoints, b -> "POINTS EXISTING", b -> "NO POINTS")
+    );
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
             new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
             new Field<Requirement, String>("description", Field.Type.NORMAL, Requirement::getDescription),
-            new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPoints),
+            new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPointsSensitive),
             new SubEntityField<Requirement, Milestone>("minMS", (requirement -> {
                 return catalogue.getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal());
             }), MILESTONE_ENTITY),
