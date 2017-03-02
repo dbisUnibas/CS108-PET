@@ -16,28 +16,7 @@ import java.util.*;
 public class RenderManager {
     private static final Logger LOG = LogManager.getLogger(RenderManager.class);
     private static Logger LOGGER = LogManager.getLogger(RenderManager.class);
-    public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
-            new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
-            new Field<Milestone, Date>("date", Field.Type.OBJECT, Milestone::getDate, date -> {
-                SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
-                return format.format(date);
-            }),
-            new ParametrizedField<Milestone, Date>("dateFormatted", Milestone::getDate) {
-                private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
 
-                @Override
-                public String renderCarefully(Milestone instance, String parameter) {
-                    try {
-                        SimpleDateFormat format = new SimpleDateFormat(parameter);
-                        return format.format(getGetter().apply(instance));
-                    } catch (IllegalArgumentException iae) {
-                        LOGGER.error("The specified pattern is not compliant with java.text.SimpleDateFormat.", iae);
-                    }
-                    return "";
-                }
-            },
-            new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal)
-    );
 
     private Template<Requirement> templateReq = null;
     private Template<Milestone> templateMS = null;
@@ -119,6 +98,29 @@ public class RenderManager {
             }
     );
     private Catalogue catalogue = null;
+    public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
+            new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
+            new Field<Milestone, Date>("date", Field.Type.OBJECT, Milestone::getDate, date -> {
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
+                return format.format(date);
+            }),
+            new ParametrizedField<Milestone, Date>("dateFormatted", Milestone::getDate) {
+                private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
+
+                @Override
+                public String renderCarefully(Milestone instance, String parameter) {
+                    try {
+                        SimpleDateFormat format = new SimpleDateFormat(parameter);
+                        return format.format(getGetter().apply(instance));
+                    } catch (IllegalArgumentException iae) {
+                        LOGGER.error("The specified pattern is not compliant with java.text.SimpleDateFormat.", iae);
+                    }
+                    return "";
+                }
+            },
+            new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal),
+            new Field<Milestone, Double>("sumMax", Field.Type.NORMAL, ms -> catalogue.getSum(ms.getOrdinal()))
+    );
     /**
      * Existing:
      * progress
@@ -338,9 +340,13 @@ public class RenderManager {
     public String renderCatalogue() {
         return renderCarefully(renderer, templateCat, catalogue);
     }
+    private Template<Milestone> templateGroupMSms = null;
 
     public String renderGroupMilestone(Milestone ms) {
-        return renderCarefully(renderer, templateGroupMS, ms);
+        String renderedGroupMS= renderCarefully(renderer, templateGroupMS, ms);
+        parser.setupFor(MILESTONE_ENTITY);
+        templateGroupMSms = parser.parseTemplate(renderedGroupMS);
+        return renderCarefully(renderer, templateGroupMSms, ms);
     }
 
     public String renderProgress(Progress p) {
@@ -356,8 +362,16 @@ public class RenderManager {
     }
 
 
+    private Template<Catalogue> templateGroupCat = null;
+
+
+
     public String renderGroup(Group g) {
-        return renderCarefully(renderer, templateGroup, g);
+        String groupRendered = renderCarefully(renderer, templateGroup, g);
+
+        parser.setupFor(CATALOGUE_ENTITY);
+        templateGroupCat = parser.parseTemplate(groupRendered);
+        return renderCarefully(renderer, templateGroupCat, catalogue);
     }
 
     public void parseRequirementTemplate(String reqTemplate) {

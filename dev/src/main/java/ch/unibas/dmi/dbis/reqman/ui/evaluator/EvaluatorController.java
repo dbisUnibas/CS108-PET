@@ -290,7 +290,29 @@ public class EvaluatorController {
                 "\t\n" +
                 "\t${group.milestones}\n" +
                 "\n" +
-                "\n" +
+                "\n" +"<br><br>\n" +
+                "<table class=\"bordered responsive-table\">\n" +
+                "<thead>\n" +
+                "<tr>\n" +
+                "<th>${catalogue.milestoneName[1]}</th>\n" +
+                "<th>${catalogue.milestoneName[2]}</th>\n" +
+                "<th>${catalogue.milestoneName[3]}</th>\n" +
+                "<th>${catalogue.milestoneName[4]}</th>\n" +
+                "<th>${catalogue.milestoneName[5]}</th>\n" +
+                "<th>Total</th>\n" +
+                "</tr>\n" +
+                "</thead>\n" +
+                "<tbody>\n" +
+                "<tr>\n" +
+                "<td>${catalogue.sumMS[1]}</td>\n" +
+                "<td>${catalogue.sumMS[2]}</td>\n" +
+                "<td>${catalogue.sumMS[3]}</td>\n" +
+                "<td>${catalogue.sumMS[4]}</td>\n" +
+                "<td>${catalogue.sumMS[5]}</td>\n" +
+                "<td>${catalogue.sumTotal}</td>\n" +
+                "</tr>\n" +
+                "</tbody>\n" +
+                "</table>\n" +
                 "  <!--Import jQuery before materialize.js-->\n" +
                 "  <script type=\"text/javascript\" src=\"https://code.jquery.com/jquery-2.1.1.min.js\"></script>\n" +
                 "  <script type=\"text/javascript\" src=\"js/materialize.min.js\"></script>\n" +
