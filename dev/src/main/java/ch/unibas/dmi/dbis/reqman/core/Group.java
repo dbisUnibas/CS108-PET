@@ -152,4 +152,13 @@ public class Group implements Comparable<Group>{
     public int compareTo(Group o) {
         return name.compareTo(o.getName());
     }
+
+    public ProgressSummary getProgressSummaryForMilestone(Milestone ms) {
+        for(ProgressSummary ps : progressSummaries){
+            if(ps.getMilestoneOrdinal() == ms.getOrdinal()){
+                return ps;
+            }
+        }
+        return null;
+    }
 }

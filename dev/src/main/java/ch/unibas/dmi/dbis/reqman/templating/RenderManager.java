@@ -181,6 +181,8 @@ public class RenderManager {
      * .name
      * .project
      * .milestones
+     * .sumMS[]
+     * .sumTotal
      */
     public final Entity<Group> GROUP_ENTITY = new Entity<Group>("group",
             Field.createNormalField("name", Group::getName),
@@ -189,7 +191,16 @@ public class RenderManager {
                 StringBuilder sb = new StringBuilder();
                 list.forEach(ms -> sb.append(renderGroupMilestone(ms)));
                 return sb.toString();
-            })
+            }),
+            new Field<Group, Double>("sumTotal", Field.Type.NORMAL, this::getTotalSum),
+            new ParametrizedField<Group, Double>("sumMS", this::getTotalSum){
+
+                @Override
+                public String renderCarefully(Group instance, String parameter) {
+                    return StringUtils.prettyPrint(getSumForGroupMilestone(Integer.valueOf(parameter)));
+                }
+            }
+
     );
     private Group group = null;
     /**
@@ -211,7 +222,16 @@ public class RenderManager {
 
                 return sb.toString();
             }),
-            new Field<Milestone, Double>("sum", Field.Type.NORMAL, this::getSumForGroupMilestone)
+            new Field<Milestone, Double>("sum", Field.Type.NORMAL, this::getSumForGroupMilestone),
+            new Field<Milestone, Double>("percentage", Field.Type.NORMAL, ms -> (getSumForGroupMilestone(ms) / catalogue.getSum(ms.getOrdinal())) * 100.0),
+            new Field<Milestone, String>("comment", Field.Type.NORMAL, ms ->{
+                ProgressSummary ps = getProgressSummaryForMilestone(ms);
+                if(ps == null){
+                    return "";
+                }else{
+                    return ps.getExternalComment();
+                }
+            })
     );
 
     public RenderManager(Catalogue catalogue) {
@@ -288,15 +308,31 @@ public class RenderManager {
     }
 
     private double getSumForGroupMilestone(Milestone ms) {
+        return getSumForGroupMilestone(ms.getOrdinal());
+    }
+
+    private double getTotalSum(Group group){
+        ArrayList<Double> points = new ArrayList<>();
+        getMilestonesForGroup(group).forEach(ms -> {
+            points.add(getSumForGroupMilestone(ms.getOrdinal()));
+        });
+        return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    private double getSumForGroupMilestone(int ordinal){
         ArrayList<Double> points = new ArrayList<>();
 
-        getProgressByMilestoneOrdinal(ms.getOrdinal()).forEach(p -> {
+        getProgressByMilestoneOrdinal(ordinal).forEach(p -> {
             Requirement req = getRequirementForProgress(p);
-            double factor = req.isMalus() ? -1.0 : 1.0;
+            double factor = req.isMalus() ? -1.0 : 1.0; // TODO Refractor: use getPointsSensitive
             points.add(factor * p.getPoints());
         });
 
         return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    private ProgressSummary getProgressSummaryForMilestone(Milestone ms){
+        return group.getProgressSummaryForMilestone(ms);
     }
 
     private List<Progress> getProgressByMilestoneOrdinal(int ordinal) {

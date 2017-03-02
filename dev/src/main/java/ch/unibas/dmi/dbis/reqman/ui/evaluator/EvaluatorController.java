@@ -304,12 +304,12 @@ public class EvaluatorController {
                 "</thead>\n" +
                 "<tbody>\n" +
                 "<tr>\n" +
-                "<td>${catalogue.sumMS[1]}</td>\n" +
-                "<td>${catalogue.sumMS[2]}</td>\n" +
-                "<td>${catalogue.sumMS[3]}</td>\n" +
-                "<td>${catalogue.sumMS[4]}</td>\n" +
-                "<td>${catalogue.sumMS[5]}</td>\n" +
-                "<td>${catalogue.sumTotal}</td>\n" +
+                "<td>${group.sumMS[1]}</td>\n" +
+                "<td>${group.sumMS[2]}</td>\n" +
+                "<td>${group.sumMS[3]}</td>\n" +
+                "<td>${group.sumMS[4]}</td>\n" +
+                "<td>${group.sumMS[5]}</td>\n" +
+                "<td>${group.sumTotal}</td>\n" +
                 "</tr>\n" +
                 "</tbody>\n" +
                 "</table>\n" +
@@ -320,15 +320,24 @@ public class EvaluatorController {
                 "</html>";
 
         String groupMilestoneTemplate = "<div class=\"milestone-content-container\">\n" +
-                "\t<div class=\"milestone-header\">\n" +
-                "\t\t<span class=\"milestone-title\">${groupMilestone.name}</span>\n" +
-                "\t</div>\n" +
-                "\t<div class=\"milestone-content\">\n" +
+                "\t<div class=\"milestone-summary z-depth-3 hoverable\">\n" +
+                "\t\t<div class=\"milestone-summary-header\">${groupMilestone.name}: Summary</div>\n" +
+                "\t\t<div class=\"milestone-summary-text\">${groupMilestone.comment}</div>\n" +
+                "\t\t<div class=\"milestone-summary-progress\">\n" +
+                "\t\t\t<div class=\"milestone-summary-bar\">\n" +
+                "\t\t\t\t<div class=\"progress\">\n" +
+                "\t\t\t\t\t<div class=\"determinate\" style=\"width: ${groupMilestone.percentage}%\"></div>\n" +
+                "\t\t\t\t</div>\n" +
+                "\t\t\t</div><!-- .milestone-summary-bar -->\n" +
+                "\t\t\t<div class=\"milestone-summary-points\">${groupMilestone.sum} / ${milestone.sumMax}</div>\n" +
+                "\t\t</div>\n" +
+                "\t</div><!-- .milestone-summary -->\n" +
+                "\t<div class=\"milestone-achievements-list\">\n" +
                 "\t\t${groupMilestone.progressList}\n" +
-                "\t\t<span class=\"milestone-points\">${groupMilestone.sum}</span>\n" +
-                "\t</div>\n" +
-                "</div>";
-        String progressTemplate = "<div class=\"achievement ${requirement.meta[category]} ${requirement.mandatory[][bonus]} ${progress.hasPoints[achieved][]} ${requirement.malus[malus][]}z-depth-2 hoverable\">\n" +
+                "\t</div><!-- .milestone-achievements-list -->\n" +
+                "</div><!-- .milestone-content-container -->\n";
+
+        String progressTemplate = "<div class=\"achievement ${requirement.meta[category]} ${requirement.mandatory[][bonus]} ${progress.hasPoints[achieved][]} ${requirement.malus[malus][]} z-depth-2 hoverable\">\n" +
                 "\t<div class=\"achievement-img-container\">\n" +
                 "\t\t<img src=\"${requirement.meta[image]}\">\n" +
                 "\t</div>\n" +
@@ -337,10 +346,10 @@ public class EvaluatorController {
                 "\t\t\t<span class=\"achievement-title\">${requirement.name}</span>\n" +
                 "\t\t\t<span class=\"achievement-points\">${progress.points} of ${requirement.maxPoints}</span>\n" +
                 "\t\t\t<span class=\"achievement-date\">${requirement.minMS.name}</span>\n" +
-                "\t\t</div>\n" +
+                "\t\t</div><!-- achievement-header -->\n" +
                 "\t\t<span class=\"achievement-description\">${requirement.description}</span>\n" +
-                "\t</div>\n" +
-                "</div>";
+                "\t</div><!-- .achievement-content-container -->\n" +
+                "</div><!-- .achievement -->";
 
 
         manager.parseGroupMilestoneTemplate(groupMilestoneTemplate);
