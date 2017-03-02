@@ -232,7 +232,7 @@ static String readVersion(){
     return major.toString()+'.'+minor+'.'+fix+'-b'+build.toString()
 }
 
-static void printVersion(){
+void printVersion(){
     println(project.version);
 }
 
