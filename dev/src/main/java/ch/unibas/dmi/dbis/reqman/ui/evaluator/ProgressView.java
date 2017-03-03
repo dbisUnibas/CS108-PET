@@ -117,8 +117,7 @@ public class ProgressView extends VBox {
             });
             spinnerPoints.valueProperty().addListener((observable, oldValue, newValue) -> {
                 if(Double.compare(oldValue, newValue) != 0){ // Only if really new value
-                    progress.setPoints(newValue);
-                    progress.setPercentage(progress.getPoints() / requirement.getMaxPoints());
+                    progress.setPoints(newValue, requirement.getMaxPoints());
                     notifyPointsListener();
                 }
             });
@@ -187,15 +186,9 @@ public class ProgressView extends VBox {
 
     private void handleAssessmentAction(ActionEvent event){
         if(check.isSelected() ){
-            progress.setPoints(requirement.getMaxPoints());
-            if(Double.compare(0d, requirement.getMaxPoints())==0) {
-                progress.setPercentage(1d);
-            } else {
-                progress.setPercentage(progress.getPoints() / requirement.getMaxPoints());
-            }
+            progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
         }else{
-            progress.setPoints(0);
-            progress.setPercentage(-1d);
+            progress.setPoints(0, requirement.getMaxPoints());
         }
         notifyPointsListener();
     }

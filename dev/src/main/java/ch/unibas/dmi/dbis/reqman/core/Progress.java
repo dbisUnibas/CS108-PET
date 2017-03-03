@@ -19,6 +19,12 @@ public class Progress {
         return percentage;
     }
 
+    /**
+     *
+     * @param percentage
+     * @deprecated Since the percentage / fraction is calculated while setting the points.
+     */
+    @Deprecated
     public void setPercentage(double percentage) {
         this.percentage = percentage;
     }
@@ -87,8 +93,19 @@ public class Progress {
         return points;
     }
 
+    @Deprecated
     public void setPoints(double points) {
         this.points = points;
+    }
+
+    public void setPoints(double points, double max){
+        this.points = points;
+        if(Double.compare(0d, max) == 0 && Double.compare(0d, points)==0){
+            // if max points == points == 0 -> progress 100%
+            percentage = 1d;
+        }else{
+            percentage = points / max;
+        }
     }
 
     @JsonIgnore
@@ -100,11 +117,7 @@ public class Progress {
 
     @JsonIgnore
     public boolean hasProgress(){
-        // TODO Re-think
-        if(Double.isNaN(percentage)){
-            percentage = 0d;
-        }
-        return percentage >= 0;
+        return percentage > 0;
     }
 
     @JsonIgnore
