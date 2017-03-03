@@ -159,11 +159,47 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private void handleComments(ActionEvent event) {
         Milestone ms = cbMilestones.getSelectionModel().getSelectedItem();
         if(ms != null){
-            ProgressSummary ps = EvaluatorPromptFactory.promptSummary(ms, group.getName() );
+            ProgressSummary ps = null;
+            boolean replace = false;
+            if(hasSummaryForMilestone(ms)){
+                ps = EvaluatorPromptFactory.promptSummary(ms, group.getName(), getSummaryForMilestone(ms));
+                replace = true;
+            } else{
+                ps = EvaluatorPromptFactory.promptSummary(ms, group.getName() );
+            }
             if(ps != null){
+                if(replace){
+                    summaries.remove(getSummaryForMilestone(ms));
+                }
                 summaries.add(ps);
             }
         }
+    }
+
+    private boolean hasSummaryForMilestone(Milestone ms){
+        if(summaries.isEmpty() ){
+            return false;
+        }else{
+            for(ProgressSummary ps:summaries){
+                if(ps.getMilestoneOrdinal() == ms.getOrdinal()){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private ProgressSummary getSummaryForMilestone(Milestone ms){
+        if(summaries.isEmpty() ){
+            return null;
+        }else{
+            for(ProgressSummary ps:summaries){
+                if(ps.getMilestoneOrdinal() == ms.getOrdinal() ){
+                    return ps;
+                }
+            }
+        }
+        return null;
     }
 
     public List<ProgressSummary> getSummaries(){

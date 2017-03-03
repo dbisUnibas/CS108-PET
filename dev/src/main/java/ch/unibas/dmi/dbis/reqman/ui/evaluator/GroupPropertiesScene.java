@@ -47,6 +47,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     public GroupPropertiesScene(EvaluatorController controller, Group group){
         this(controller);
         this.group = group;
+        loadGroup();
     }
 
     @Override

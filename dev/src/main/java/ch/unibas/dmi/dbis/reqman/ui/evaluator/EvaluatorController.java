@@ -234,6 +234,13 @@ public class EvaluatorController {
         if (!isCatalogueSet()) {
             return;
         }
+        /*
+        Group active = evaluator.getActiveGroup();
+        Group newGroup = EvaluatorPromptFactory.promptGroup(active, this);
+        if(newGroup != null){
+            replaceGroup(active, newGroup);
+        }
+        */
     }
 
     private void replaceGroup(Group oldGroup, Group newGroup) {
@@ -329,6 +336,9 @@ public class EvaluatorController {
                 "</html>";
 
         String groupMilestoneTemplate = "<div class=\"milestone-content-container\">\n" +
+                "\t<div class=\"milestone-achievements-list\">\n" +
+                "\t\t${groupMilestone.progressList}\n" +
+                "\t</div><!-- .milestone-achievements-list -->\n" +
                 "\t<div class=\"milestone-summary z-depth-3 hoverable\">\n" +
                 "\t\t<div class=\"milestone-summary-header\">${groupMilestone.name}: Summary</div>\n" +
                 "\t\t<div class=\"milestone-summary-text\">${groupMilestone.comment}</div>\n" +
@@ -341,10 +351,7 @@ public class EvaluatorController {
                 "\t\t\t<div class=\"milestone-summary-points\">${groupMilestone.sum} / ${milestone.sumMax}</div>\n" +
                 "\t\t</div>\n" +
                 "\t</div><!-- .milestone-summary -->\n" +
-                "\t<div class=\"milestone-achievements-list\">\n" +
-                "\t\t${groupMilestone.progressList}\n" +
-                "\t</div><!-- .milestone-achievements-list -->\n" +
-                "</div><!-- .milestone-content-container -->\n";
+                "</div><!-- .milestone-content-container -->";
 
         String progressTemplate = "<div class=\"achievement ${requirement.meta[category]} ${requirement.mandatory[][bonus]} ${progress.hasPoints[achieved][]} ${requirement.malus[malus][]} z-depth-2 hoverable\">\n" +
                 "\t<div class=\"achievement-img-container\">\n" +

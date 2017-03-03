@@ -23,6 +23,8 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
     private Milestone milestone;
     private String groupName;
 
+
+
     public ProgressSummaryScene(Milestone milestone, String groupName){
         super();
         this.milestone = milestone;
@@ -30,6 +32,18 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
         populateScene();
     }
 
+    public ProgressSummaryScene(Milestone milestone, String groupName, ProgressSummary progressSummary){
+        this(milestone, groupName);
+        this.summary = progressSummary;
+        loadSummary();
+    }
+
+    private void loadSummary(){
+        if(summary != null){
+            taInternal.setText( summary.getInternalComment());
+            taExternal.setText( summary.getExternalComment());
+        }
+    }
 
 
     @Override
