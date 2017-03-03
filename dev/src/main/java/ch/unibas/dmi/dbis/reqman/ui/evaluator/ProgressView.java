@@ -51,7 +51,7 @@ public class ProgressView extends VBox {
 
     private void loadProgress() {
         if(progress != null){
-            if(progress.getPoints() > 0 ){
+            if(progress.hasProgress()){
                 if(requirement.isBinary() ){
                     check.setSelected(true);
                 }else{
