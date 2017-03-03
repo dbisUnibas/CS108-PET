@@ -199,10 +199,14 @@ public class EvaluatorController {
     }
 
     private void saveGroup(Group group, AssessmentView av, File f) throws IOException {
-        group.setProgressList(av.getProgressListForSaving());
-        group.setProgressSummaryList(av.getSummaries());
+        gatherGroupProperties(group, av);
         JSONUtils.writeToJSONFile(group, f);
         evaluator.unmarkDirty(group);
+    }
+
+    private void gatherGroupProperties(Group group, AssessmentView av){
+        group.setProgressList(av.getProgressListForSaving());
+        group.setProgressSummaryList(av.getSummaries());
     }
 
     public void handleSaveAsGroup(ActionEvent event) {
@@ -275,6 +279,8 @@ public class EvaluatorController {
         RenderManager manager = createAndPrepareRenderManager();
 
         for (Group g : groups) {
+            AssessmentView av = groupAVMap.get(g.getName());
+            gatherGroupProperties(g, av);
             manager.setGroup(g);
             String html = manager.renderGroup(g);
             try {
@@ -307,8 +313,9 @@ public class EvaluatorController {
                 "\n" +
                 "<br><br><br>\n" +
                 "\n" +
-                "<h1>${group.name}</h1>\n" +
+
                 "<div class=\"container\">\n" +
+                "<h1>${group.name}</h1>\n" +
                 "\t\n" +
                 "\t${group.milestones}\n" +
                 "\n" +

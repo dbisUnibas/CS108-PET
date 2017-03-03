@@ -145,7 +145,8 @@ public class Group implements Comparable<Group>{
     }
 
     public void setProgressSummaryList(List<ProgressSummary> progressSummaryList) {
-        this.progressSummaries = progressSummaryList;
+        this.progressSummaries.clear();
+        this.progressSummaries.addAll(progressSummaryList);
     }
 
     @Override

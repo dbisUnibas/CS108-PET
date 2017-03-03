@@ -49,18 +49,34 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     }
 
     private void loadGroup() {
-        // TODO Load summary
+        if(summaries != null){
+            summaries.addAll(group.getProgressSummaries());
+        }
 
         List<Progress> progressList = group.getProgressList();
         if(progressList == null || progressList.isEmpty() ){
-            setupProgressMap();
+            progressMap = setupProgressMap();
         }else{
-            loadProgress(progressList);
+            progressMap = loadProgress(progressList);
+            mergeCatalogueProgress(setupProgressMap(), progressMap);
         }
 
     }
 
-    private void loadProgress(List<Progress> list) {
+    private void mergeCatalogueProgress(Map<Integer, Map<String, Progress>> catalogueMap, Map<Integer, Map<String, Progress>> groupMap) {
+        catalogueMap.keySet().forEach(ordinal -> {
+            Map<String, Progress> groupProgress = groupMap.get(ordinal);
+            Map<String, Progress> catalogueProgress = catalogueMap.get(ordinal);
+            Set<String> tempSet = new HashSet<String>(catalogueProgress.keySet() );
+            tempSet.removeAll(groupProgress.keySet());
+            for(String reqName : tempSet){
+                progressMap.get(ordinal).put(reqName, catalogueProgress.get(reqName));
+            }
+        });
+    }
+
+    private Map<Integer, Map<String, Progress>> loadProgress(List<Progress> list) {
+        Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
         for(Progress p : list){
             int ordinal = p.getMilestoneOrdinal();
             String reqName = p.getRequirementName();
@@ -80,6 +96,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
                 progressMap.put(ordinal, rpMap);
             }
         }
+        return progressMap;
     }
 
     /**
@@ -90,7 +107,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     /**
      * Sets up the map as if the group was newly created
      */
-    private void setupProgressMap() {
+    private Map<Integer, Map<String, Progress>> setupProgressMap() {
+        Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
         controller.getMilestones().forEach(ms -> {
             TreeMap<String, Progress> reqProgMap = new TreeMap<String, Progress>();
             controller.getRequirementsByMilestone(ms.getOrdinal()).forEach(r -> {
@@ -98,6 +116,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
             });
             progressMap.put(ms.getOrdinal(), reqProgMap);
         });
+        return progressMap;
     }
 
     private void initComponents(){
