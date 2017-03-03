@@ -118,6 +118,7 @@ public class EvaluatorScene extends Scene{
         itemOpen.setAccelerator(KeyCombination.keyCombination("Ctrl+O"));
         MenuItem itemSave = new MenuItem("Save Group");
         itemSave.setOnAction(controller::handleSaveGroup);
+        itemSave.setAccelerator(KeyCombination.keyCombination("Ctrl+S"));
         MenuItem itemSaveAs = new MenuItem("Save Group As");
         itemSaveAs.setOnAction(controller::handleSaveAsGroup);
         MenuItem itemExportGroup = new MenuItem("Export Group(s)");
@@ -226,7 +227,10 @@ public class EvaluatorScene extends Scene{
     public void unmarkDirty(Group modified){
         Tab tab = groupTabMap.get(modified);
         tab.getStyleClass().remove("modified");
-        String text = tab.getText().substring(0, tab.getText().indexOf("*"));
-        tab.setText(text);
+        if(tab.getText().indexOf("*") >= 0){
+            String text = tab.getText().substring(0, tab.getText().indexOf("*"));
+            tab.setText(text);
+        }
+
     }
 }

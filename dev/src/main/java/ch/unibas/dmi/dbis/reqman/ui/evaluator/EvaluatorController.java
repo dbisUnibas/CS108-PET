@@ -150,28 +150,34 @@ public class EvaluatorController {
         if(lastOpenLocation != null){
             fc.setInitialDirectory(lastOpenLocation);
         }
-        File f = fc.showOpenDialog(evaluator.getWindow());
-        if (f != null) {
-            try {
-                Group group = JSONUtils.readGroupJSONFile(f);
-                if (!group.getCatalogueName().equals(catalogue.getName())) {
-                    Utils.showErrorDialog("Catalogue signature failure", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: " + group.getCatalogueName() + ", Currentl catalogue: " + catalogue.getName());
-                    return;
-                }
-                if(!isGroupNameUnique(group.getName())){
-                    Utils.showErrorDialog("Opening group failed", "There already exists a group with name:\n\n"+group.getName()+"\n\nYou have to rename the group manually if both groups are needed.");
-                    return;
-                }
-                addGroupToInternalStorage(group);
-                groupFileMap.put(group.getName(), f);
-                lastOpenLocation = f.getParentFile();
-                addGroupTab(group);
-            } catch(UnrecognizedPropertyException ex){
-                Utils.showErrorDialog("Failed opening group", "The provided file could not be read as a group.\nTry again with a group file.");
-            }  catch (IOException e) {
-                e.printStackTrace();
-            }
+        List<File> files = fc.showOpenMultipleDialog(evaluator.getWindow() );
+        if(files.isEmpty() ){
+            return;
         }
+        files.forEach(f -> {
+            if (f != null) {
+                try {
+                    Group group = JSONUtils.readGroupJSONFile(f);
+                    if (!group.getCatalogueName().equals(catalogue.getName())) {
+                        Utils.showErrorDialog("Catalogue signature failure", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: " + group.getCatalogueName() + ", Currentl catalogue: " + catalogue.getName());
+                        return;
+                    }
+                    if(!isGroupNameUnique(group.getName())){
+                        Utils.showErrorDialog("Opening group failed", "There already exists a group with name:\n\n"+group.getName()+"\n\nYou have to rename the group manually if both groups are needed.");
+                        return;
+                    }
+                    addGroupToInternalStorage(group);
+                    groupFileMap.put(group.getName(), f);
+                    lastOpenLocation = f.getParentFile();
+                    addGroupTab(group);
+                } catch(UnrecognizedPropertyException ex){
+                    Utils.showErrorDialog("Failed opening group", "The provided file could not be read as a group.\nTry again with a group file.");
+                }  catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
     public void handleSaveGroup(ActionEvent event) {
@@ -355,7 +361,7 @@ public class EvaluatorController {
 
         String progressTemplate = "<div class=\"achievement ${requirement.meta[category]} ${requirement.mandatory[][bonus]} ${progress.hasPoints[achieved][]} ${requirement.malus[malus][]} z-depth-2 hoverable\">\n" +
                 "\t<div class=\"achievement-img-container\">\n" +
-                "\t\t<img src=\"${requirement.meta[image]}\">\n" +
+                "\t\t<img src=\"img/${requirement.meta[image]}\">\n" +
                 "\t</div>\n" +
                 "\t<div class=\"achievement-content-container\">\n" +
                 "\t\t<div class=\"achievement-header\">\n" +

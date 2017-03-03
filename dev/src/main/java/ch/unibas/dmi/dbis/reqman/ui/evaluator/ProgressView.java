@@ -188,10 +188,14 @@ public class ProgressView extends VBox {
     private void handleAssessmentAction(ActionEvent event){
         if(check.isSelected() ){
             progress.setPoints(requirement.getMaxPoints());
-            progress.setPercentage(progress.getPoints() / requirement.getMaxPoints());
+            if(Double.compare(0d, requirement.getMaxPoints())==0) {
+                progress.setPercentage(1d);
+            } else {
+                progress.setPercentage(progress.getPoints() / requirement.getMaxPoints());
+            }
         }else{
             progress.setPoints(0);
-            progress.setPercentage(0d);
+            progress.setPercentage(-1d);
         }
         notifyPointsListener();
     }

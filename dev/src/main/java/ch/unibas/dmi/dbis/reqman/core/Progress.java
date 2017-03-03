@@ -101,7 +101,10 @@ public class Progress {
     @JsonIgnore
     public boolean hasProgress(){
         // TODO Re-think
-        return Double.compare(-1d, percentage)!=0;
+        if(Double.isNaN(percentage)){
+            percentage = 0d;
+        }
+        return percentage >= 0;
     }
 
     @JsonIgnore
