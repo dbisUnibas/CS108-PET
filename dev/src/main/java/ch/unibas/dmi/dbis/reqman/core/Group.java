@@ -1,7 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
-import ch.unibas.dmi.dbis.reqman.templating.RenderManager;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
