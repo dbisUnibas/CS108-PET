@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import ch.unibas.dmi.dbis.reqman.templating.RenderManager;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -30,6 +32,29 @@ public class Group implements Comparable<Group>{
 
     public Group() {
 
+    }
+
+    public double getSumForMilestone(Milestone ms, Catalogue catalogue) {
+        ArrayList<Double> points = new ArrayList<>();
+
+        getProgressByMilestoneOrdinal(ms.getOrdinal()).forEach(p -> points.add(p.getPointsSensitive(catalogue)));
+
+        return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    public List<Milestone> getMilestonesForGroup(Catalogue catalogue) {
+        ArrayList<Milestone> list = new ArrayList<>();
+
+        for (Progress p : getProgressList()) {
+            Milestone ms = catalogue.getMilestoneForProgress(p);
+            if (!list.contains(ms)) {
+                list.add(ms);
+            } else {
+                // Milestone already in list.
+            }
+        }
+
+        return list;
     }
 
     public String getExportFileName() {
@@ -162,4 +187,27 @@ public class Group implements Comparable<Group>{
         }
         return null;
     }
+
+    public List<Progress> getProgressByMilestoneOrdinal(int ordinal) {
+        ArrayList<Progress> list = new ArrayList<>();
+        for (Progress p : getProgressList()) {
+            if (p.getMilestoneOrdinal() == ordinal) {
+                if (!list.contains(p)) {
+                    list.add(p);
+                } else {
+                    // Progress already in list.
+                }
+            }
+        }
+        return list;
+    }
+
+    public double getTotalSum(Catalogue catalogue){
+        ArrayList<Double> points = new ArrayList<>();
+        getMilestonesForGroup(catalogue).forEach(ms -> {
+            points.add(getSumForMilestone(ms,catalogue ));
+        });
+        return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
 }

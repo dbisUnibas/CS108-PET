@@ -187,17 +187,18 @@ public class RenderManager {
     public final Entity<Group> GROUP_ENTITY = new Entity<Group>("group",
             Field.createNormalField("name", Group::getName),
             Field.createNormalField("project", Group::getProjectName),
-            new Field<Group, List<Milestone>>("milestones", Field.Type.LIST, this::getMilestonesForGroup, list -> {
+            new Field<Group, List<Milestone>>("milestones", Field.Type.LIST, g -> g.getMilestonesForGroup(catalogue), list -> {
                 StringBuilder sb = new StringBuilder();
                 list.forEach(ms -> sb.append(renderGroupMilestone(ms)));
                 return sb.toString();
             }),
-            new Field<Group, Double>("sumTotal", Field.Type.NORMAL, this::getTotalSum),
-            new ParametrizedField<Group, Double>("sumMS", this::getTotalSum){
+            new Field<Group, Double>("sumTotal", Field.Type.NORMAL, (group1) -> group1.getTotalSum(catalogue)),
+            new ParametrizedField<Group, Double>("sumMS", (group1) -> group1.getTotalSum(catalogue )){
 
                 @Override
                 public String renderCarefully(Group instance, String parameter) {
-                    return StringUtils.prettyPrint(getSumForGroupMilestone(Integer.valueOf(parameter)));
+                    Milestone ms = catalogue.getMilestoneByOrdinal(Integer.valueOf(parameter));
+                    return StringUtils.prettyPrint(group.getSumForMilestone(ms,catalogue ));
                 }
             }
 
@@ -212,7 +213,7 @@ public class RenderManager {
      */
     public final Entity<Milestone> GROUP_MS_ENTITY = new Entity<Milestone>("groupMilestone",
             Field.createNormalField("name", Milestone::getName),
-            new Field<Milestone, List<Progress>>("progressList", Field.Type.LIST, ms -> this.getProgressByMilestoneOrdinal(ms.getOrdinal()), list -> {
+            new Field<Milestone, List<Progress>>("progressList", Field.Type.LIST, ms -> this.group.getProgressByMilestoneOrdinal(ms.getOrdinal()), list -> {
                 StringBuilder sb = new StringBuilder();
 
                 sortProgressList(list);
@@ -222,10 +223,10 @@ public class RenderManager {
 
                 return sb.toString();
             }),
-            new Field<Milestone, Double>("sum", Field.Type.NORMAL, this::getSumForGroupMilestone),
-            new Field<Milestone, Double>("percentage", Field.Type.NORMAL, ms -> (getSumForGroupMilestone(ms) / catalogue.getSum(ms.getOrdinal())) * 100.0),
+            new Field<Milestone, Double>("sum", Field.Type.NORMAL, (ms) -> group.getSumForMilestone(ms,catalogue )),
+            new Field<Milestone, Double>("percentage", Field.Type.NORMAL, ms -> (group.getSumForMilestone(ms,catalogue ) / catalogue.getSum(ms.getOrdinal())) * 100.0),
             new Field<Milestone, String>("comment", Field.Type.NORMAL, ms ->{
-                ProgressSummary ps = getProgressSummaryForMilestone(ms);
+                ProgressSummary ps = group.getProgressSummaryForMilestone(ms);
                 if(ps == null){
                     return "";
                 }else{
@@ -260,12 +261,8 @@ public class RenderManager {
         }
     }
 
-    private boolean hasProgressPoints(Progress progress) {
-        return Double.compare(progress.getPoints(), 0d) != 0;
-    }
-
     private void sortProgressList(List<Progress> list) {
-        list.sort(Comparator.comparing(this::getRequirementForProgress, Comparator.comparing(Requirement::isMandatory, (b1, b2) -> {
+        list.sort(Comparator.comparing(catalogue::getRequirementForProgress, Comparator.comparing(Requirement::isMandatory, (b1, b2) -> {
             if (b1 == b2) {
                 return 0;
             } else if (b1) {
@@ -282,71 +279,6 @@ public class RenderManager {
                 return -1;
             }
         }).thenComparing(Requirement::getName)));
-    }
-
-    private Requirement getRequirementForProgress(Progress progress) {
-        return catalogue.getRequirementByName(progress.getRequirementName());
-    }
-
-    private Milestone getMilestoneForProgress(Progress progress) {
-        return catalogue.getMilestoneByOrdinal(progress.getMilestoneOrdinal());
-    }
-
-    private List<Milestone> getMilestonesForGroup(Group group) {
-        ArrayList<Milestone> list = new ArrayList<>();
-
-        for (Progress p : group.getProgressList()) {
-            Milestone ms = getMilestoneForProgress(p);
-            if (!list.contains(ms)) {
-                list.add(ms);
-            } else {
-                // Milestone already in list.
-            }
-        }
-
-        return list;
-    }
-
-    private double getSumForGroupMilestone(Milestone ms) {
-        return getSumForGroupMilestone(ms.getOrdinal());
-    }
-
-    private double getTotalSum(Group group){
-        ArrayList<Double> points = new ArrayList<>();
-        getMilestonesForGroup(group).forEach(ms -> {
-            points.add(getSumForGroupMilestone(ms.getOrdinal()));
-        });
-        return points.stream().mapToDouble(Double::doubleValue).sum();
-    }
-
-    private double getSumForGroupMilestone(int ordinal){
-        ArrayList<Double> points = new ArrayList<>();
-
-        getProgressByMilestoneOrdinal(ordinal).forEach(p -> {
-            Requirement req = getRequirementForProgress(p);
-            double factor = req.isMalus() ? -1.0 : 1.0; // TODO Refractor: use getPointsSensitive
-            points.add(factor * p.getPoints());
-        });
-
-        return points.stream().mapToDouble(Double::doubleValue).sum();
-    }
-
-    private ProgressSummary getProgressSummaryForMilestone(Milestone ms){
-        return group.getProgressSummaryForMilestone(ms);
-    }
-
-    private List<Progress> getProgressByMilestoneOrdinal(int ordinal) {
-        ArrayList<Progress> list = new ArrayList<>();
-        for (Progress p : group.getProgressList()) {
-            if (p.getMilestoneOrdinal() == ordinal) {
-                if (!list.contains(p)) {
-                    list.add(p);
-                } else {
-                    // Progress already in list.
-                }
-            }
-        }
-        return list;
     }
 
     public boolean isGroupExportReady() {
@@ -387,7 +319,7 @@ public class RenderManager {
 
     public String renderProgress(Progress p) {
         String progressRendered = renderCarefully(renderer, templateProg, p);
-        Requirement r = getRequirementForProgress(p);
+        Requirement r = catalogue.getRequirementForProgress(p);
         parser.setupFor(REQUIREMENT_ENTITY);
         templateProgReq = parser.parseTemplate(progressRendered);
         return renderCarefully(renderer, templateProgReq, r);
