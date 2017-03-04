@@ -14,7 +14,6 @@ import java.util.*;
  * @author loris.sauter
  */
 public class RenderManager {
-    private static final Logger LOG = LogManager.getLogger(RenderManager.class);
     private static Logger LOGGER = LogManager.getLogger(RenderManager.class);
 
 
@@ -23,8 +22,7 @@ public class RenderManager {
     private Template<Catalogue> templateCat = null;
     private Template<Milestone> templateGroupMS = null;
     private Template<Group> templateGroup = null;
-    private Template<Progress> templateProg = null;
-    private Template<Requirement> templateProgReq = null;
+    private Template<Progress> templateProgress = null;
     private TemplateParser parser = null;
     /*
     Target expressions:
@@ -45,7 +43,7 @@ public class RenderManager {
 
      */
     private TemplateRenderer renderer = null;
-    public final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
+    private final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
             new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
             new Field<Catalogue, String>("description", Field.Type.NORMAL, Catalogue::getDescription),
             new Field<Catalogue, String>("lecture", Field.Type.NORMAL, Catalogue::getLecture),
@@ -128,9 +126,7 @@ public class RenderManager {
      * .hasPoints
      */
     public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
-            Field.createNormalField("points", p -> {
-                return p.getPointsSensitive(catalogue);
-            }),
+            Field.createNormalField("points", p -> p.getPointsSensitive(catalogue)),
             new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS")
     );
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
@@ -318,11 +314,11 @@ public class RenderManager {
     }
 
     public String renderProgress(Progress p) {
-        String progressRendered = renderCarefully(renderer, templateProg, p);
+        String progressRendered = renderCarefully(renderer, templateProgress, p);
         Requirement r = catalogue.getRequirementForProgress(p);
         parser.setupFor(REQUIREMENT_ENTITY);
-        templateProgReq = parser.parseTemplate(progressRendered);
-        return renderCarefully(renderer, templateProgReq, r);
+        Template<Requirement> templateProgressRequirement = parser.parseTemplate(progressRendered);
+        return renderCarefully(renderer, templateProgressRequirement, r);
     }
 
     public void parseProgressTemplate(String template) {
@@ -378,7 +374,7 @@ public class RenderManager {
         } else if (GROUP_ENTITY.getEntityName().equals(entity.getEntityName())) {
             templateGroup = parser.parseTemplate(template);
         } else if (PROGRESS_ENTITY.getEntityName().equals(entity.getEntityName())) {
-            templateProg = parser.parseTemplate(template);
+            templateProgress = parser.parseTemplate(template);
         } else {
             throw LOGGER.throwing(new UnsupportedOperationException("Cannot parse a template for entity: " + entity.toString()));
         }
