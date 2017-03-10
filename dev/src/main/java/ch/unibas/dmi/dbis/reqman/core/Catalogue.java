@@ -239,4 +239,14 @@ public class Catalogue {
         }
         return false;
     }
+
+    @JsonIgnore
+    public Requirement getRequirementForProgress(Progress progress) {
+        return getRequirementByName(progress.getRequirementName());
+    }
+
+    @JsonIgnore
+    public Milestone getMilestoneForProgress(Progress progress) {
+        return getMilestoneByOrdinal(progress.getMilestoneOrdinal());
+    }
 }
