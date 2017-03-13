@@ -1,12 +1,16 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
+import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * TODO: write JavaDoc
@@ -24,25 +28,8 @@ public class RenderManager {
     private Template<Group> templateGroup = null;
     private Template<Progress> templateProgress = null;
     private TemplateParser parser = null;
-    /*
-    Target expressions:
-
-    progress.points
-    progressSummary.internal
-    progressSummary.external
-
-    group.name
-    group.project
-    group.progressList // Warning: Ordering must be respected (MS, BONUS; MALUS, NAME)
-        access to milestone and requirement
-    group.milestones
-        access to milestone entity
-
-    NOT SOLVED YET:
-        when to apply 'achieved'
-
-     */
     private TemplateRenderer renderer = null;
+
     private final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
             new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
             new Field<Catalogue, String>("description", Field.Type.NORMAL, Catalogue::getDescription),
@@ -50,26 +37,7 @@ public class RenderManager {
             new Field<Catalogue, String>("semester", Field.Type.NORMAL, Catalogue::getSemester),
             new Field<Catalogue, List<Requirement>>("requirements", Field.Type.LIST, Catalogue::getRequirements, (list) -> {
                 StringBuilder sb = new StringBuilder();
-                list.sort(Comparator.comparingInt(Requirement::getMinMilestoneOrdinal)
-                        .thenComparing(Requirement::isMandatory, (b1, b2) -> {
-                            if (b1 == b2) {
-                                return 0;
-                            } else if (b1) {
-                                return -1;
-                            } else {
-                                return 1;
-                            }
-                        })
-
-                        .thenComparing(Requirement::isMalus, (b1, b2) -> {
-                            if (b1 == b2) {
-                                return 0;
-                            } else if (b1) {
-                                return 1;
-                            } else {
-                                return -1;
-                            }
-                        }).thenComparing(Requirement::getName));
+                list.sort(SortingUtils.REQUIREMENT_COMPARATOR);
                 list.forEach(req -> {
                     sb.append(renderRequirement(req));
                 });
@@ -119,6 +87,7 @@ public class RenderManager {
             new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal),
             new Field<Milestone, Double>("sumMax", Field.Type.NORMAL, ms -> catalogue.getSum(ms.getOrdinal()))
     );
+
     /**
      * Existing:
      * progress
@@ -171,35 +140,8 @@ public class RenderManager {
                 }
             }
     );
-    /**
-     * Existing:
-     * group
-     * .name
-     * .project
-     * .milestones
-     * .sumMS[]
-     * .sumTotal
-     */
-    public final Entity<Group> GROUP_ENTITY = new Entity<Group>("group",
-            Field.createNormalField("name", Group::getName),
-            Field.createNormalField("project", Group::getProjectName),
-            new Field<Group, List<Milestone>>("milestones", Field.Type.LIST, g -> g.getMilestonesForGroup(catalogue), list -> {
-                StringBuilder sb = new StringBuilder();
-                list.forEach(ms -> sb.append(renderGroupMilestone(ms)));
-                return sb.toString();
-            }),
-            new Field<Group, Double>("sumTotal", Field.Type.NORMAL, (group1) -> group1.getTotalSum(catalogue)),
-            new ParametrizedField<Group, Double>("sumMS", (group1) -> group1.getTotalSum(catalogue )){
-
-                @Override
-                public String renderCarefully(Group instance, String parameter) {
-                    Milestone ms = catalogue.getMilestoneByOrdinal(Integer.valueOf(parameter));
-                    return StringUtils.prettyPrint(group.getSumForMilestone(ms,catalogue ));
-                }
-            }
-
-    );
     private Group group = null;
+    
     /**
      * Existing:
      * groupMilestone
@@ -219,17 +161,47 @@ public class RenderManager {
 
                 return sb.toString();
             }),
-            new Field<Milestone, Double>("sum", Field.Type.NORMAL, (ms) -> group.getSumForMilestone(ms,catalogue )),
-            new Field<Milestone, Double>("percentage", Field.Type.NORMAL, ms -> (group.getSumForMilestone(ms,catalogue ) / catalogue.getSum(ms.getOrdinal())) * 100.0),
-            new Field<Milestone, String>("comment", Field.Type.NORMAL, ms ->{
+            new Field<Milestone, Double>("sum", Field.Type.NORMAL, (ms) -> group.getSumForMilestone(ms, catalogue)),
+            new Field<Milestone, Double>("percentage", Field.Type.NORMAL, ms -> (group.getSumForMilestone(ms, catalogue) / catalogue.getSum(ms.getOrdinal())) * 100.0),
+            new Field<Milestone, String>("comment", Field.Type.NORMAL, ms -> {
                 ProgressSummary ps = group.getProgressSummaryForMilestone(ms);
-                if(ps == null){
+                if (ps == null) {
                     return "";
-                }else{
+                } else {
                     return ps.getExternalComment();
                 }
             })
     );
+    private Template<Milestone> templateGroupMSms = null;
+    /**
+     * Existing:
+     * group
+     * .name
+     * .project
+     * .milestones
+     * .sumMS[]
+     * .sumTotal
+     */
+    public final Entity<Group> GROUP_ENTITY = new Entity<Group>("group",
+            Field.createNormalField("name", Group::getName),
+            Field.createNormalField("project", Group::getProjectName),
+            new Field<Group, List<Milestone>>("milestones", Field.Type.LIST, g -> g.getMilestonesForGroup(catalogue), list -> {
+                StringBuilder sb = new StringBuilder();
+                list.forEach(ms -> sb.append(renderGroupMilestone(ms)));
+                return sb.toString();
+            }),
+            new Field<Group, Double>("sumTotal", Field.Type.NORMAL, (group1) -> group1.getTotalSum(catalogue)),
+            new ParametrizedField<Group, Double>("sumMS", (group1) -> group1.getTotalSum(catalogue)) {
+
+                @Override
+                public String renderCarefully(Group instance, String parameter) {
+                    Milestone ms = catalogue.getMilestoneByOrdinal(Integer.valueOf(parameter));
+                    return StringUtils.prettyPrint(group.getSumForMilestone(ms, catalogue));
+                }
+            }
+
+    );
+    private Template<Catalogue> templateGroupCat = null;
 
     public RenderManager(Catalogue catalogue) {
         this.catalogue = catalogue;
@@ -258,23 +230,7 @@ public class RenderManager {
     }
 
     private void sortProgressList(List<Progress> list) {
-        list.sort(Comparator.comparing(catalogue::getRequirementForProgress, Comparator.comparing(Requirement::isMandatory, (b1, b2) -> {
-            if (b1 == b2) {
-                return 0;
-            } else if (b1) {
-                return -1;
-            } else {
-                return 1;
-            }
-        }).thenComparing(Requirement::isMalus, (b1, b2) -> {
-            if (b1 == b2) {
-                return 0;
-            } else if (b1) {
-                return 1;
-            } else {
-                return -1;
-            }
-        }).thenComparing(Requirement::getName)));
+        list.sort(Comparator.comparing(catalogue::getRequirementForProgress, SortingUtils.REQUIREMENT_COMPARATOR));
     }
 
     public boolean isGroupExportReady() {
@@ -304,10 +260,9 @@ public class RenderManager {
     public String renderCatalogue() {
         return renderCarefully(renderer, templateCat, catalogue);
     }
-    private Template<Milestone> templateGroupMSms = null;
 
     public String renderGroupMilestone(Milestone ms) {
-        String renderedGroupMS= renderCarefully(renderer, templateGroupMS, ms);
+        String renderedGroupMS = renderCarefully(renderer, templateGroupMS, ms);
         parser.setupFor(MILESTONE_ENTITY);
         templateGroupMSms = parser.parseTemplate(renderedGroupMS);
         return renderCarefully(renderer, templateGroupMSms, ms);
@@ -324,11 +279,6 @@ public class RenderManager {
     public void parseProgressTemplate(String template) {
         parseTemplateCarefully(PROGRESS_ENTITY, template);
     }
-
-
-    private Template<Catalogue> templateGroupCat = null;
-
-
 
     public String renderGroup(Group g) {
         String groupRendered = renderCarefully(renderer, templateGroup, g);

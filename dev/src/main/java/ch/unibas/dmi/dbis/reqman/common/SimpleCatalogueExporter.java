@@ -96,26 +96,7 @@ public class SimpleCatalogueExporter {
          * Then compare according a custom comparator, since the isMandatory returns the INVERSE of isBonus
          * Then compare lexicographically based on the string.
          */
-        reqs.sort(Comparator.comparingInt(Requirement::getMinMilestoneOrdinal)
-			.thenComparing(Requirement::isMandatory,(b1, b2) -> {
-                    if(b1 == b2){
-                        return 0;
-                    }else if(b1){
-                        return -1;
-                    }else{
-                        return 1;
-                    }
-                })
-
-                .thenComparing(Requirement::isMalus,(b1, b2) -> {
-                    if(b1 == b2){
-                        return 0;
-                    }else if(b1){
-                        return 1;
-                    }else{
-                        return -1;
-                    }
-                }).thenComparing(Requirement::getName));
+        reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
 
         reqs.forEach(req -> {
             tags.add(achievementConatiner(req));
