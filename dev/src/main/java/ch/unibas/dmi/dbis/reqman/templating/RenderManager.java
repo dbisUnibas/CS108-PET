@@ -141,7 +141,7 @@ public class RenderManager {
             }
     );
     private Group group = null;
-    
+
     /**
      * Existing:
      * groupMilestone
