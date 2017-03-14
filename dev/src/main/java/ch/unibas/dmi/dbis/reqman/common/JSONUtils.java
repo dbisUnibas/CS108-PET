@@ -29,6 +29,10 @@ public class JSONUtils {
         return MAPPER.readValue(file, clazz);
     }
 
+    public static <T> T readFromString(String str, Class<T> clazz) throws IOException {
+        return MAPPER.readValue(str, clazz);
+    }
+
     public static Catalogue readCatalogueJSONFile(File file) throws IOException {
         return (Catalogue) readFromJSONFile(file, Catalogue.class);
     }
