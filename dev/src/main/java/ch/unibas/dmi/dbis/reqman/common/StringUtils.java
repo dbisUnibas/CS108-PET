@@ -34,4 +34,37 @@ public class StringUtils {
         df.setMaximumFractionDigits(340); //340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
         return df.format(value);
     }
+
+    /**
+     * Concatenates the given strings with the specified delimiter in between.
+     *
+     * This method is the reverse of {@link String#split(String)} as demonstrated by this example:
+     *
+     * <pre><code>String all = concatWithDelimiter("#", "foo", "bar", "alice", "bob"); // all equals: "foo#bar#alice#bob"
+     * String[] parts = all.split("#");// parts is similar to: new String[]{"foo", "bar", "alice"; "bob"}
+     * </code></pre>
+     *
+     * @param delimiter The delimiter with which separates the strings.
+     * @param strings The variable list of strings to concatenate.
+     * @return A single string with all the strings from the given variable list of strings, separated by the {@code delimiter}.
+     */
+    public static String concatWithDelimiter(String delimiter, String... strings){
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<strings.length-1;i++){
+            sb.append(strings[i]);
+            sb.append(delimiter);
+        }
+        sb.append(strings[strings.length-1]);
+        return sb.toString();
+    }
+
+    /**
+     * Concatenates the given strings with a period (.) as delimiter.
+     * @param strings The variable list of strings to concatenate
+     * @return A single string with the all elements of {@code strings}, separated by {@code .}
+     * @see StringUtils#concatWithDelimiter(String, String...)
+     */
+    public static String concatWithPeriodDelimeter(String... strings){
+        return concatWithDelimiter(".", strings);
+    }
 }
