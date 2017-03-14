@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.configuration;
 
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +12,7 @@ import java.util.Map;
  *
  * @author loris.sauter
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 class TemplatingConfiguration {
 
     private String extension;
@@ -99,6 +101,11 @@ class TemplatingConfiguration {
      * @return {@code true} if a fix was made, otherwise {@code false}
      */
     public boolean validateTemplatesAndFix(){
+        if(extension == null){
+            throw new IllegalArgumentException("Mandatory field is missing:\n\textension"); // TODO May replace with custom exception
+        }else if(extension.isEmpty() ){
+            throw new IllegalArgumentException("Mandatory field has no value: \n\textension"); // TODO May replace with custom exception
+        }
         int nbFixes = 0;
         if(templates.isEmpty() ){
             templates.putAll(generateDefaultTemplatesMap() );

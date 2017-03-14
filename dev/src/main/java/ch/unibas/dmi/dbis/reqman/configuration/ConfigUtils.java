@@ -9,6 +9,8 @@ import java.io.File;
  */
 public class ConfigUtils {
 
+    public static final String CONFIG_EXTENSION = "config";
+
     private ConfigUtils(){
         // No instance needed
     }
