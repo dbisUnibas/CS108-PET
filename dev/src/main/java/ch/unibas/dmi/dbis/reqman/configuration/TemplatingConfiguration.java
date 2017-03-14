@@ -56,7 +56,42 @@ class TemplatingConfiguration {
     }
 
     public Map<String, String> getTemplates() {
-        return templates;
+        return new HashMap<>(templates);
+    }
+
+    @JsonIgnore
+    public String getTemplatesEntry(String key){
+        return templates.get(key);
+    }
+
+    @JsonIgnore
+    public String getRequirementEntry(){
+        return getTemplatesEntry(REQUIREMENT);
+    }
+
+    @JsonIgnore
+    public String getMilestoneEntry(){
+        return getTemplatesEntry(MILESTONE);
+    }
+
+    @JsonIgnore
+    public String getCatalogueEntry(){
+        return getTemplatesEntry(CATALOGUE);
+    }
+
+    @JsonIgnore
+    public String getProgressEntry(){
+        return getTemplatesEntry(PROGRESS);
+    }
+
+    @JsonIgnore
+    public String getGroupMilestoneEntry(){
+        return getTemplatesEntry(GROUP_MILESTONE);
+    }
+
+    @JsonIgnore
+    public String getGroupEntry(){
+        return getTemplatesEntry(GROUP);
     }
 
     /**
