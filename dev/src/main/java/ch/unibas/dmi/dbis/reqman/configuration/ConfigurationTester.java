@@ -9,7 +9,7 @@ import java.io.IOException;
  *
  * @author loris.sauter
  */
-public class ConfigurationTest {
+public class ConfigurationTester {
 
     public static void main(String[] args) throws IOException {
         String complete = "{\n" +
