@@ -40,7 +40,6 @@ public class TemplatingConfigurationManager {
         return config;
     }
 
-    private IOException lastIOE = null;
 
     public void loadConfig(File config){
         TemplatingConfiguration cnfg = null;
@@ -56,11 +55,6 @@ public class TemplatingConfigurationManager {
         }catch (IOException ioe) {
             handleExceptionDuringLoading(ioe);
         }
-        if(cnfg != null){
-            setConfig(cnfg);
-        }else{
-            throw new RuntimeException("Exception while loading configuration: ", lastIOE);
-        }
     }
 
 
@@ -68,13 +62,12 @@ public class TemplatingConfigurationManager {
         if(e instanceof UnrecognizedPropertyException){
             LOGGER.warn("Read an unexpected property. Ignoring it.", e);
         }else if(e instanceof JsonParseException){
-            throw LOGGER.throwing(Level.ERROR, new RuntimeException("The config file could not be parsed",e));
+            throw LOGGER.throwing(Level.ERROR, new ConfigurationException("The config file could not be parsed",e));
         }else if(e instanceof JsonMappingException){
-            throw LOGGER.throwing(Level.ERROR, new RuntimeException("The config object is corrupt.", e) );
+            throw LOGGER.throwing(Level.ERROR, new ConfigurationException("The config object is corrupt.", e) );
         }else{
-            throw LOGGER.throwing(Level.ERROR, new RuntimeException("An error occurred while reading the configuration.", e));
+            throw LOGGER.throwing(Level.ERROR, new ConfigurationException("An error occurred while reading the configuration.", e));
         }
-        lastIOE = e;
     }
 
     private boolean setConfig(TemplatingConfiguration config){
