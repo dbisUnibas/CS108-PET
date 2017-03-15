@@ -21,6 +21,8 @@ public class TemplatingConfigurationManager {
 
     public static final String TEMPLATE_EXTENSION = "template";
 
+    public static final String IGNORE_TEMPLATE = "#";
+
     private final Logger LOGGER = LogManager.getLogger(TemplatingConfigurationManager.class);
     private Templates templates = null;
     private TemplatingConfiguration config;
@@ -99,7 +101,16 @@ public class TemplatingConfigurationManager {
         }
     }
 
+    /**
+     *
+     * @param file If the hash symbol is used for a file name, the template is set to be the empty string.
+     * @return
+     * @throws FileNotFoundException
+     */
     private String readTemplateFile(String file) throws FileNotFoundException {
+        if(IGNORE_TEMPLATE.equals(file)){
+            return "";
+        }
         BufferedReader br = new BufferedReader(new FileReader(buildTemplateFile(file)));
         StringBuilder sb = new StringBuilder();
         br.lines().forEach(line -> {
