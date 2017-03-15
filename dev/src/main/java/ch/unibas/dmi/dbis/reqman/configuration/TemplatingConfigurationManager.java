@@ -17,79 +17,89 @@ import java.io.*;
  */
 public class TemplatingConfigurationManager {
 
-    public static final String CONFIG_FILE_NAME = "templating"+"."+ ConfigUtils.CONFIG_EXTENSION;
+    public static final String CONFIG_FILE_NAME = "templating" + "." + ConfigUtils.CONFIG_EXTENSION;
 
     public static final String TEMPLATE_EXTENSION = "template";
 
     private final Logger LOGGER = LogManager.getLogger(TemplatingConfigurationManager.class);
-
+    private Templates templates = null;
     private TemplatingConfiguration config;
 
     public void loadConfig(String configJSON) {
         try {
-            setConfig(JSONUtils.readFromString(configJSON, TemplatingConfiguration.class) );
-        }catch (IOException ioe) {
-            ioe.printStackTrace();
+            setConfig(JSONUtils.readFromString(configJSON, TemplatingConfiguration.class));
+        } catch (IOException ioe) {
+            handleExceptionDuringLoading(ioe);
         }
+        loadTemplateConfig();
     }
 
-    public TemplatingConfiguration getConfig() {
-        if(config == null){
-            throw LOGGER.throwing(new IllegalStateException("Cannot provide a config which was not yet loaded") );
+    TemplatingConfiguration getConfig() {
+        if (config == null) {
+            throw LOGGER.throwing(new IllegalStateException("Cannot provide a config which was not yet loaded"));
         }
         return config;
     }
 
+    public Templates getTemplates() throws IllegalStateException {
+        if (templates == null) {
+            throw new IllegalStateException("Cannot provide the templates when configuration was not yet loaded");
+        }
+        return templates;
+    }
 
-    public void loadConfig(File config){
+    public void loadConfig(File config) {
         TemplatingConfiguration cnfg = null;
         try {
             cnfg = JSONUtils.readFromJSONFile(config, TemplatingConfiguration.class);
-            // UnrecognizedPropertyException thrown, when typo in name, unkown key used
-            // when extension field missing: no exception
-            // when templates field missing: no exception
-
-
-            // when empty object: no exception
-            // when no top-level object: no exception
-        }catch (IOException ioe) {
+            setConfig(cnfg);
+        } catch (IOException ioe) {
             handleExceptionDuringLoading(ioe);
+        }
+        loadTemplateConfig();
+    }
+
+    private void loadTemplateConfig() {
+        try {
+            templates = createTemplateConfig();
+        } catch (FileNotFoundException e) {
+            throw new ConfigurationException("Could not find template file: ", e);
         }
     }
 
 
     private void handleExceptionDuringLoading(IOException e) {
-        if(e instanceof UnrecognizedPropertyException){
+        if (e instanceof UnrecognizedPropertyException) {
             LOGGER.warn("Read an unexpected property. Ignoring it.", e);
-        }else if(e instanceof JsonParseException){
-            throw LOGGER.throwing(Level.ERROR, new ConfigurationException("The config file could not be parsed",e));
-        }else if(e instanceof JsonMappingException){
-            throw LOGGER.throwing(Level.ERROR, new ConfigurationException("The config object is corrupt.", e) );
-        }else{
+        } else if (e instanceof JsonParseException) {
+            throw LOGGER.throwing(Level.ERROR, new ConfigurationException("The config file could not be parsed", e));
+        } else if (e instanceof JsonMappingException) {
+            throw LOGGER.throwing(Level.ERROR, new ConfigurationException("The config object is corrupt.", e));
+        } else {
             throw LOGGER.throwing(Level.ERROR, new ConfigurationException("An error occurred while reading the configuration.", e));
         }
     }
 
-    private boolean setConfig(TemplatingConfiguration config){
+    private boolean setConfig(TemplatingConfiguration config) {
         boolean result = config.validateTemplatesAndFix();
         this.config = config;
         return result; // if true: had to fix the config.
     }
 
-    public void loadConfig(){
-        loadConfig(getConfigFile() );
+    public void loadConfig() {
+        loadConfig(getConfigFile());
     }
 
-    public File getConfigFile(){
-        if(!ConfigUtils.isJARexecuted()){
+    File getConfigFile() {
+        if (!ConfigUtils.isJARexecuted()) {
             return new File(getClass().getClassLoader().getResource(CONFIG_FILE_NAME).getPath());
-        }else{
+        } else {
             File dir = ConfigUtils.getCodeSourceLocation().getParentFile();
-            return new File(dir.getPath()+ConfigUtils.getFileSeparator()+CONFIG_FILE_NAME);
+            return new File(dir.getPath() + ConfigUtils.getFileSeparator() + CONFIG_FILE_NAME);
         }
     }
 
-    public String readTemplateFile(String file) throws FileNotFoundException {
+    private String readTemplateFile(String file) throws FileNotFoundException {
         BufferedReader br = new BufferedReader(new FileReader(buildTemplateFile(file)));
         StringBuilder sb = new StringBuilder();
         br.lines().forEach(line -> {
@@ -100,22 +110,36 @@ public class TemplatingConfigurationManager {
         return sb.toString();
     }
 
-    public File buildTemplateFile(String file){
+    private File buildTemplateFile(String file) {
         File template = new File(file);
-        if(template.isAbsolute()){
+        if (template.isAbsolute()) {
             return template;
-        }else{
-            if(ConfigUtils.isJARexecuted() ){
+        } else {
+            if (ConfigUtils.isJARexecuted()) {
                 // The environemnt is a jar.
                 File jarFile = ConfigUtils.getCodeSourceLocation();
                 // May add check if jarFile really is a file?
                 File dir = jarFile.getParentFile();
-                return new File(dir.getPath()+ConfigUtils.getFileSeparator()+file);
-            }else{
+                return new File(dir.getPath() + ConfigUtils.getFileSeparator() + file);
+            } else {
                 // Mostly IDE or console with command java -cp ...
                 return new File(getClass().getClassLoader().getResource(file).getPath());
             }
         }
+    }
+
+    private Templates createTemplateConfig() throws FileNotFoundException {
+        TemplatingConfiguration config = getConfig();
+
+        Templates tc = new Templates();
+        tc.setRequirementTemplate(readTemplateFile(config.getRequirementEntry()));
+        tc.setMilestoneTemplate(readTemplateFile(config.getMilestoneEntry()));
+        tc.setCatalogueTemplate(readTemplateFile(config.getCatalogueEntry()));
+
+        tc.setProgressTemplate(readTemplateFile(config.getProgressEntry()));
+        tc.setGroupMilestoneTemplate(readTemplateFile(config.getGroupMilestoneEntry()));
+        tc.setGroupTemplate(readTemplateFile(config.getGroupEntry()));
+        return tc;
     }
 
 
