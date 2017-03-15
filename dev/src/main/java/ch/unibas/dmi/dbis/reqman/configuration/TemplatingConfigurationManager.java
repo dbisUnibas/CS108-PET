@@ -34,7 +34,7 @@ public class TemplatingConfigurationManager {
         loadTemplateConfig();
     }
 
-    TemplatingConfiguration getConfig() {
+    public TemplatingConfiguration getConfig() {
         if (config == null) {
             throw LOGGER.throwing(new IllegalStateException("Cannot provide a config which was not yet loaded"));
         }
