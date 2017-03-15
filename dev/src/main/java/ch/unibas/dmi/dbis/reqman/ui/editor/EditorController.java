@@ -1,6 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
+import ch.unibas.dmi.dbis.reqman.configuration.Templates;
+import ch.unibas.dmi.dbis.reqman.configuration.TemplatingConfigurationManager;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
@@ -178,12 +180,12 @@ public class EditorController  {
         }
         FileChooser fc = new FileChooser();
         fc.setTitle("Export Catalogue");
-        fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
+        //fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
         File f = fc.showSaveDialog(controlledStage);
         if(f != null){
             // user did not abort file choose
             try {
-                hardcodeExport(f);
+                exportCatalogue(f.getAbsolutePath());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -269,6 +271,30 @@ public class EditorController  {
             }
         }
         return result;
+    }
+
+    private void exportCatalogue(String exportFile) throws FileNotFoundException{
+        RenderManager renderManager = new RenderManager(getCatalogue() ); // assembles the catalogue
+        TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
+        configManager.loadConfig();
+        Templates templates = configManager.getTemplates();
+        String extension = configManager.getTemplatesExtension();
+        renderManager.parseRequirementTemplate(templates.getRequirementTemplate());
+        renderManager.parseMilestoneTemplate(templates.getMilestoneTemplate());
+        renderManager.parseCatalogueTemplate(templates.getCatalogueTemplate());
+
+        String export = renderManager.renderCatalogue();
+        // Appends the configured extension if none is present
+        if(!exportFile.substring(exportFile.lastIndexOf(System.getProperty("file.separator"))).contains(".")){
+            exportFile += extension;
+        }
+        PrintWriter pw = new PrintWriter(new File(exportFile));
+        pw.write(export);
+        pw.close();
+        pw.flush();
+        System.out.println("==============================");
+        System.out.println(" D O N E   Catalogue Export");
+        System.out.println("==============================");
     }
 
     private void hardcodeExport(File f) throws FileNotFoundException {
