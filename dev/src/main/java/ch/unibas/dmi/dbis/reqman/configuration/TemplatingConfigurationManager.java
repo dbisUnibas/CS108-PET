@@ -36,7 +36,7 @@ public class TemplatingConfigurationManager {
         loadTemplateConfig();
     }
 
-    public TemplatingConfiguration getConfig() {
+    TemplatingConfiguration getConfig() {
         if (config == null) {
             throw LOGGER.throwing(new IllegalStateException("Cannot provide a config which was not yet loaded"));
         }
@@ -48,6 +48,12 @@ public class TemplatingConfigurationManager {
             throw new IllegalStateException("Cannot provide the templates when configuration was not yet loaded");
         }
         return templates;
+    }
+    public String getTemplatesExtension() throws IllegalStateException{
+        if (config == null) {
+            throw LOGGER.throwing(new IllegalStateException("Cannot provide a config which was not yet loaded"));
+        }
+        return config.getExtension();
     }
 
     public void loadConfig(File config) {
@@ -107,7 +113,7 @@ public class TemplatingConfigurationManager {
      * @return
      * @throws FileNotFoundException
      */
-    private String readTemplateFile(String file) throws FileNotFoundException {
+    String readTemplateFile(String file) throws FileNotFoundException {
         if(IGNORE_TEMPLATE.equals(file)){
             return "";
         }

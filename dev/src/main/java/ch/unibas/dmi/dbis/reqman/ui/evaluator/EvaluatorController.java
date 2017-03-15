@@ -1,6 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
+import ch.unibas.dmi.dbis.reqman.configuration.Templates;
+import ch.unibas.dmi.dbis.reqman.configuration.TemplatingConfigurationManager;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
@@ -267,16 +269,24 @@ public class EvaluatorController {
         if (!isCatalogueSet()) {
             return;
         }
-        for (Group g : groups) {
-            if (!StringUtils.isNotEmpty(g.getExportFileName())) {
-                g.setExportFileName(g.getName() + ".html");// TODO Handle correctly, with warning or so
-            }
-        }
         DirectoryChooser dc = new DirectoryChooser();
         dc.setTitle("Choose an export folder");
         File dir = dc.showDialog(evaluator.getWindow());
 
-        RenderManager manager = createAndPrepareRenderManager();
+        exportGroups(dir);
+    }
+
+
+    private void exportGroups(File exportDir){
+        RenderManager manager = new RenderManager(catalogue);
+        TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
+        configManager.loadConfig();
+        String extension = configManager.getTemplatesExtension();
+        Templates templates = configManager.getTemplates();
+
+        manager.parseProgressTemplate(templates.getProgressTemplate());
+        manager.parseGroupMilestoneTemplate(templates.getGroupMilestoneTemplate());
+        manager.parseGroupTemplate(templates.getGroupTemplate());
 
         for (Group g : groups) {
             AssessmentView av = groupAVMap.get(g.getName());
@@ -284,7 +294,12 @@ public class EvaluatorController {
             manager.setGroup(g);
             String html = manager.renderGroup(g);
             try {
-                PrintWriter pw = new PrintWriter(dir.getPath() + System.getProperty("file.separator") + g.getExportFileName());
+                String exportFile = exportDir.getPath() + System.getProperty("file.separator") + g.getExportFileName();
+                // If the file has no extension // TODO: REMOVE extension in exportfilename of group
+                if(!exportFile.substring(exportFile.lastIndexOf(System.getProperty("file.separator"))).contains(".")){
+                    exportFile += extension;
+                }
+                PrintWriter pw = new PrintWriter(exportDir.getPath() + System.getProperty("file.separator") + g.getExportFileName());
                 pw.write(html);
                 pw.flush();
                 pw.close();
@@ -297,7 +312,12 @@ public class EvaluatorController {
         }
     }
 
-    private RenderManager createAndPrepareRenderManager() {
+    /**
+     *
+     * @return
+     */
+    @Deprecated // HARDCODED templates.
+    private RenderManager createAndPrepareHCRenderManager() {
         RenderManager manager = new RenderManager(catalogue);
 
         String groupTempate = "<!DOCTYPE html>\n" +
