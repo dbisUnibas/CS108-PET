@@ -30,6 +30,18 @@ public class RenderManager {
     private TemplateParser parser = null;
     private TemplateRenderer renderer = null;
 
+    /**
+     * Existing:
+     *  .name
+     *  .description
+     *  .lecture
+     *  .semester
+     *  .requirements
+     *  .milestones
+     *  .sumTotal
+     *  .sumMS[<ordinal>]
+     *  .milestoneName[<ordinal>]
+     */
     private final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
             new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
             new Field<Catalogue, String>("description", Field.Type.NORMAL, Catalogue::getDescription),
@@ -59,11 +71,20 @@ public class RenderManager {
                 @Override
                 public String renderCarefully(Catalogue instance, String parameter) {
                     Milestone ms = instance.getMilestoneByOrdinal(Integer.valueOf(parameter));
-                    return ms != null ? ms.getName() : "null (" + parameter + ")";
+                    return ms != null ? ms.getName() : "";
                 }
             }
     );
     private Catalogue catalogue = null;
+    /**
+     * Existing:
+     * milestone
+     *  .name
+     *  .date
+     *  .ordinal
+     *  .sumMax
+     *  .dateFormatted[<SimpleDateFormat>]
+     */
     public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
             new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
             new Field<Milestone, Date>("date", Field.Type.OBJECT, Milestone::getDate, date -> {
@@ -98,6 +119,19 @@ public class RenderManager {
             Field.createNormalField("points", p -> p.getPointsSensitive(catalogue)),
             new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS")
     );
+    /**
+     * Existing:
+     * requirement
+     *  .name
+     *  .description
+     *  .maxPoints
+     *  .minMS
+     *  .predecessorNames
+     *  .binary[][]
+     *  .mandatory[][]
+     *  .malus[][]
+     *  .meta[<key>]
+     */
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
             new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
             new Field<Requirement, String>("description", Field.Type.NORMAL, Requirement::getDescription),
@@ -148,6 +182,8 @@ public class RenderManager {
      * .name
      * .progressList
      * .sum
+     * .percentage
+     * .comment
      */
     public final Entity<Milestone> GROUP_MS_ENTITY = new Entity<Milestone>("groupMilestone",
             Field.createNormalField("name", Milestone::getName),
