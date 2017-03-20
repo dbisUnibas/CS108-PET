@@ -1,22 +1,12 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
 import javafx.application.Application;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.input.KeyCombination;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.apache.commons.lang.StringUtils;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 /**
  * TODO: write JavaDoc
@@ -33,22 +23,8 @@ public class EditorApplication extends Application {
     private Label lblName, lblLecture, lblSemester;
 
     public static void main(String[] args) {
-        /*
-        Workaround for:
-        https://issues.apache.org/jira/browse/LOG4J2-1799
-         */
-        System.getProperties().remove("sun.stdout.encoding");
-        System.getProperties().remove("sun.stderr.encoding");
+        Log4J2Fix.applyHotFix();
 
-        try {
-            /*
-            Test to see if executing jar name can be obtained
-             */
-            System.out.print("Code source: ");
-            System.out.println(URLDecoder.decode(EditorApplication.class.getProtectionDomain().getCodeSource().getLocation().getPath(), "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
         launch(args);
     }
 

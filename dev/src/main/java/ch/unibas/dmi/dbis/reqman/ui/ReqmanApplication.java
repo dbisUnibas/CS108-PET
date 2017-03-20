@@ -4,6 +4,7 @@ package ch.unibas.dmi.dbis.reqman.ui;/**
  * @author loris.sauter
  */
 
+import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitledScene;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorScene;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorScene;
@@ -14,17 +15,6 @@ import javafx.stage.Stage;
 
 public class ReqmanApplication extends Application {
 
-    private Stage primaryStage;
-
-
-    private EditorScene editor = new EditorScene(800, 600);
-    private EvaluatorScene evaluator = new EvaluatorScene(800, 600);
-
-    {
-        editor.setOnChangeEvent(this::handleChangeView);
-        evaluator.setOnChangeEvent(this::handleChangeView);
-    }
-
     /**
      * Temporary
      */
@@ -33,8 +23,17 @@ public class ReqmanApplication extends Application {
      * Temporary
      */
     public static final int EVALUATOR_VIEW = 2000;
+    private Stage primaryStage;
+    private EditorScene editor = new EditorScene(800, 600);
+    private EvaluatorScene evaluator = new EvaluatorScene(800, 600);
+
+    {
+        editor.setOnChangeEvent(this::handleChangeView);
+        evaluator.setOnChangeEvent(this::handleChangeView);
+    }
 
     public static void main(String[] args) {
+        Log4J2Fix.applyHotFix();
         launch(args);
     }
 
@@ -45,8 +44,8 @@ public class ReqmanApplication extends Application {
 
     }
 
-    private void changeView(int view){
-        switch(view){
+    private void changeView(int view) {
+        switch (view) {
             case EDITOR_VIEW:
                 showScene(editor);
                 break;
@@ -59,24 +58,24 @@ public class ReqmanApplication extends Application {
         }
     }
 
-    public void handleChangeView(ActionEvent event){
-        if(event instanceof ChangeEvent){
-            ChangeEvent evt = (ChangeEvent)event;
+    public void handleChangeView(ActionEvent event) {
+        if (event instanceof ChangeEvent) {
+            ChangeEvent evt = (ChangeEvent) event;
             changeView(evt.getView());
         }
     }
 
-    private void showScene(TitledScene scene){
+    private void showScene(TitledScene scene) {
         primaryStage.setScene(scene);
         primaryStage.setTitle(scene.getTitle());
         primaryStage.show();
     }
 
 
-    public static class ChangeEvent extends ActionEvent{
+    public static class ChangeEvent extends ActionEvent {
         private int view = -1;
 
-        public ChangeEvent(ActionEvent source, int view){
+        public ChangeEvent(ActionEvent source, int view) {
             super(source, source.getTarget());
             this.view = view;
         }
@@ -86,7 +85,7 @@ public class ReqmanApplication extends Application {
         }
 
         @Override
-        public EventType<ChangeEvent> getEventType(){
+        public EventType<ChangeEvent> getEventType() {
             return new EventType<>(ACTION, "CHANGE");
         }
     }
