@@ -29,16 +29,14 @@ public class EditorController  {
 
     private Catalogue catalogue;
 
-    private Stage controlledStage;
 
-    private EditorApplication editor;
+    private EditorScene editor;
 
     private ObservableList<Requirement> observableReqs = FXCollections.observableArrayList();
     private ObservableList<Milestone> observableMs = FXCollections.observableArrayList();
 
-    public EditorController(EditorApplication editor, Stage controlledStage){
+    public EditorController(EditorScene editor){
         this.editor = editor;
-        this.controlledStage = controlledStage;
     }
 
     public void openCatalogue(Catalogue catalogue){
@@ -144,7 +142,7 @@ public class EditorController  {
 
     public void handleSaveAsCatalogue(ActionEvent event){
         FileChooser saveChooser = createCatalogueFileChooser("Save As");
-        catalogueFile = saveChooser.showSaveDialog(controlledStage);
+        catalogueFile = saveChooser.showSaveDialog(editor.getWindow());
         try {
             JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile); // Important to use getCatalogue as the reqs and ms are set there
         } catch (IOException e) {
@@ -181,7 +179,7 @@ public class EditorController  {
         FileChooser fc = new FileChooser();
         fc.setTitle("Export Catalogue");
         //fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
-        File f = fc.showSaveDialog(controlledStage);
+        File f = fc.showSaveDialog(editor.getWindow());
         if(f != null){
             // user did not abort file choose
             try {
@@ -207,7 +205,7 @@ public class EditorController  {
 
     public void handleOpenCatalogue(ActionEvent event){
         FileChooser openChooser = createCatalogueFileChooser("Open");
-        File file = openChooser.showOpenDialog(controlledStage);
+        File file = openChooser.showOpenDialog(editor.getWindow());
         if(file != null){
             try {
                 openCatalogue(JSONUtils.readCatalogueJSONFile(file));
@@ -221,6 +219,7 @@ public class EditorController  {
     }
 
 
+    @Deprecated // Change way current catalogue is displayed in title.
     private void updateCatalogueProperties(){
         StringBuffer sb = new StringBuffer("ReqMan: Editor");
         sb.append(" - ");
@@ -230,7 +229,6 @@ public class EditorController  {
         sb.append(" @ ");
         sb.append(catalogue.getSemester() != null ? catalogue.getSemester() : "N/A" );
         sb.append(")");
-        controlledStage.setTitle(sb.toString());
         editor.updateCatalogueInfo(catalogue.getName(), catalogue.getLecture(), catalogue.getSemester());
     }
 
