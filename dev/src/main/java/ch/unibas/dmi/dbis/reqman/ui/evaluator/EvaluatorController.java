@@ -110,6 +110,7 @@ public class EvaluatorController {
         } else {
             evaluator.addGroupTab(groupAVMap.get(active.getName()));
         }
+        evaluator.setActiveTab(groupAVMap.get(active.getName() ) );
 
 
     }

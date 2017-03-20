@@ -154,6 +154,14 @@ public class EvaluatorScene extends TitledScene {
         changeHandler = handler;
     }
 
+    public void setActiveTab(AssessmentView assessmentView) {
+        for(int i=0; i<tabPane.getTabs().size(); i++){
+            if(tabPane.getTabs().get(i).getText().equals(assessmentView.getActiveGroup().getName())){
+                tabPane.getSelectionModel().select(i);
+            }
+        }
+    }
+
     private void initComponents() {
         horizontalSplitter.prefWidthProperty().bind(widthProperty());
         horizontalSplitter.prefHeightProperty().bind(heightProperty());
