@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
@@ -235,7 +236,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         this.activeMS = activeMS;
         visitedMilestones.add(activeMS);
         activeProgressViews.clear();
-        controller.getRequirementsByMilestone(activeMS.getOrdinal()).forEach(r ->{
+        List<Requirement> reqs = controller.getRequirementsByMilestone(activeMS.getOrdinal());
+        reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
+        reqs.forEach(r ->{
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
             ProgressView pv = new ProgressView(p,r);
             pv.addPointsChangeListener(this);
