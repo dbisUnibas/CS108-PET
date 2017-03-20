@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 
+import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -12,6 +13,7 @@ import javafx.stage.Stage;
 public class EvaluatorApplication extends Application {
 
     public static void main(String[] args) {
+        Log4J2Fix.applyHotFix();
         launch(args);
     }
 
