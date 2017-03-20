@@ -21,7 +21,19 @@ to the respective groups.
 
 ## Usage
 
-*coming soon*
+`ReqMan` (and its modes `editor` and `evaluator`) is a JavaFX application
+packed in an executable jar. Thus to run `ReqMan` one must execute the jar.
+
+The command to run `ReqMan` from command line, starting the GUI application
+use the following command (where X stands for the complete version string
+(refer to versioning for further information about the version)):
+
+	java -jar reqman-X.jar
+	
+## Issues
+
+Please use Maniphest to report issues. Create a task and set the tag to 
+the ReqMan project as well as setting the visibility to *Members of Project...* ReqMan.
 
 ## Contributors
 
