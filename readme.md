@@ -1,4 +1,4 @@
-# ReqMan - Branch: experimental
+# ReqMan - branch: assessment-exp
 
 ReqMan (Requirements Manager) is an application to manage requirements.
 
@@ -16,8 +16,11 @@ assess their voyage on achieving the *requirement*s with so called *progress*.
 
  - Build
  - Usage
+ - Issues
  - Contributors
  - License
+ - Versioning
+ - Branching
 
 ## Build
 
@@ -70,3 +73,18 @@ See LICENSE.txt for the complete license text.
 ## Versioning
 
 `ReqMan` uses semantic versioning as defined by http://semver.org/
+
+## Branching
+
+There are several branches active:
+
+ - `master` which is up-to-date with the documentation and core classes
+ - `reqman` which is up-to-date with the lates recommended version of
+  `ReqMan`
+ - `editor-exp` which is the branch for developing features related
+   to `editor`
+ - `assessment-exp` which is the branch for developing features related
+   to `evaluator`
+ - `experimental` a branch dedicated to highly experimental development.
+   The application as in the state of this branch may not be fully compatible
+   with the ones of other states.
