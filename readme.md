@@ -30,20 +30,25 @@ assess their voyage on achieving the *requirement*s with so called *progress*.
 
 To build and pack `ReqMan` in an executable jar run:
 
-	gradle jar
+```
+gradle jar
+```
 
 ### Editor
 
 To exclusively have the `editor` application executable in a jar, run:
 
-	gradle deployEditor
+```
+gradle deployEditor
+```
 
 ### Evaluator
 
 To exclusively have the `evaluator` application executable in a jar, run:
 
-	gralde deployEvaluator
-	
+```
+gralde deployEvaluator
+```
 
 ## Usage
 
@@ -54,7 +59,9 @@ The command to run `ReqMan` from command line, starting the GUI application
 use the following command (where X stands for the complete version string
 (refer to versioning for further information about the version)):
 
-	java -jar reqman-X.jar
+```
+java -jar reqman-X.jar
+```
 	
 ## Issues
 
