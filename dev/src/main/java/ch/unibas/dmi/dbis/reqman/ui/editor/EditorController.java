@@ -284,7 +284,7 @@ public class EditorController  {
         String export = renderManager.renderCatalogue();
         // Appends the configured extension if none is present
         if(!exportFile.substring(exportFile.lastIndexOf(System.getProperty("file.separator"))).contains(".")){
-            exportFile += extension;
+            exportFile += "."+extension;
         }
         PrintWriter pw = new PrintWriter(new File(exportFile));
         pw.write(export);
