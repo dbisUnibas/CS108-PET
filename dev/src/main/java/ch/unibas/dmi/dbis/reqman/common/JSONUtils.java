@@ -3,7 +3,6 @@ package ch.unibas.dmi.dbis.reqman.common;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Group;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,7 +38,6 @@ public class JSONUtils {
     public static Catalogue readCatalogueJSONFile(File file) throws IOException {
         return readFromJSONFile(file, Catalogue.class);
     }
-
 
 
     public static Group readGroupJSONFile(File file) throws IOException {
