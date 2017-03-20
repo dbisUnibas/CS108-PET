@@ -66,14 +66,14 @@ public class Requirement {
     /**
      * Creates a new {@link Requirement} with given properties.
      *
-     * @param name             The name of the requirement which shall be short, descriptive and unique
-     * @param description      A description of this requirement.
+     * @param name                The name of the requirement which shall be short, descriptive and unique
+     * @param description         A description of this requirement.
      * @param minMilestoneOrdinal The ordinal of the {@link Milestone} upon this requirement is active
      * @param maxMilestoneOrdinal The ordinal of the {@link Milestone} this requirement is active up to
-     * @param maxPoints        The absolute, maximal amount of points this requirement can generate.
-     * @param binary           Whether this requirement is binary (achieved: yes/no or partial).
-     * @param mandatory        Whether this requirement is mandatory
-     * @param malus            Whether this requirement has to be considered as a malus.
+     * @param maxPoints           The absolute, maximal amount of points this requirement can generate.
+     * @param binary              Whether this requirement is binary (achieved: yes/no or partial).
+     * @param mandatory           Whether this requirement is mandatory
+     * @param malus               Whether this requirement has to be considered as a malus.
      */
     public Requirement(String name, String description, int minMilestoneOrdinal, int maxMilestoneOrdinal, double maxPoints, boolean binary, boolean mandatory, boolean malus) {
         this();
@@ -92,7 +92,7 @@ public class Requirement {
         this.predecessorNames = predecessorNames;
     }
 
-    public void clearPredecessorNames(){
+    public void clearPredecessorNames() {
         predecessorNames = new ArrayList<>();
     }
 
@@ -100,7 +100,7 @@ public class Requirement {
         this.propertiesMap = propertiesMap;
     }
 
-    public void clearPropertiesMap(){
+    public void clearPropertiesMap() {
         propertiesMap = new HashMap<>();
     }
 
@@ -129,7 +129,7 @@ public class Requirement {
 
     /**
      * Returns a copy of the predecessor list.
-     *
+     * <p>
      * The {@link List} returned is a copy and not referenced within this instance.
      * Thus modifying the returning list <b>will not be synced</b> with the list of this instance.
      * To modify the list of predecessors use the appropriate methods provided by {@link Requirement}
@@ -279,7 +279,7 @@ public class Requirement {
     }
 
     @JsonIgnore
-    public double getMaxPointsSensitive(){
+    public double getMaxPointsSensitive() {
         double factor = isMalus() ? -1.0 : 1.0;
         return getMaxPoints() * factor;
     }
