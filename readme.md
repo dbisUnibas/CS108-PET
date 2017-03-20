@@ -2,22 +2,48 @@
 
 ReqMan (Requirements Manager) is an application to manage requirements.
 
-The software's goal is to be a complete requirements manager giving users 
-the ability to define requirements, assign them to a milestone and track
-registered group's progress. Users of ReqMan may also export the feedback
-to the respective groups.
+*Requirements* are grouped in *milestones* and the collection of *requirements*
+with their respective *milestones* is called *catalogue*. *Catalogues* are 
+created using `ReqMan`'s built in `editor`.
+
+Using `ReqMan`'s built in `evaluator` one can register several *groups* and
+assess their voyage on achieving the *requirement*s with so called *progress*.
+
+*Catalogue*s and *group*s may be exported with templates provided.
 
 
 ## Table of Contents
 
- - Install
+ - Build
  - Usage
+ - Issues
  - Contributors
  - License
+ - Versioning
+ - Branching
 
-## Install
+## Build
 
-*coming soon*
+`ReqMan` uses the gradle.
+
+### ReqMan
+
+To build and pack `ReqMan` in an executable jar run:
+
+	gradle jar
+
+### Editor
+
+To exclusively have the `editor` application executable in a jar, run:
+
+	gradle deployEditor
+
+### Evaluator
+
+To exclusively have the `evaluator` application executable in a jar, run:
+
+	gralde deployEvaluator
+	
 
 ## Usage
 
@@ -41,4 +67,24 @@ Loris Sauter - loris.sauter@unibas.ch
 
 ## License
 
-*not yet chosen*
+`ReqMan` is open source and licensed under the MIT license.
+See LICENSE.txt for the complete license text.
+
+## Versioning
+
+`ReqMan` uses semantic versioning as defined by http://semver.org/
+
+## Branching
+
+There are several branches active:
+
+ - `master` which is up-to-date with the documentation and core classes
+ - `reqman` which is up-to-date with the lates recommended version of
+  `ReqMan`
+ - `editor-exp` which is the branch for developing features related
+   to `editor`
+ - `assessment-exp` which is the branch for developing features related
+   to `evaluator`
+ - `experimental` a branch dedicated to highly experimental development.
+   The application as in the state of this branch may not be fully compatible
+   with the ones of other states.
