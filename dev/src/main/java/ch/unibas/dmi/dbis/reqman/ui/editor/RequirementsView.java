@@ -13,24 +13,17 @@ import javafx.scene.input.MouseEvent;
  *
  * @author loris.sauter
  */
-public class RequirementsView extends ModifiableListView<Requirement> implements ModifiableListHandler<Requirement>{
+public class RequirementsView extends ModifiableListView<Requirement> implements ModifiableListHandler<Requirement> {
 
     private EditorController controller;
 
-    public RequirementsView(EditorController controller){
+    public RequirementsView(EditorController controller) {
         super("Requirements");
         this.controller = controller;
-        listView.setItems(controller.getObservableRequirements() );
+        listView.setItems(controller.getObservableRequirements());
         addHandler(this);
         listView.setCellFactory((ListView<Requirement> l) -> new RequirementCell());
         listView.setOnMouseClicked(this::handleModifyRequest);
-    }
-
-    private void handleModifyRequest(MouseEvent mouseEvent) {
-        if(MouseButton.SECONDARY.equals(mouseEvent.getButton() ) ){
-            Requirement sel = listView.getSelectionModel().getSelectedItem();
-            controller.handleModifyRequirement(sel);
-        }
     }
 
     @Override
@@ -44,14 +37,21 @@ public class RequirementsView extends ModifiableListView<Requirement> implements
 
     }
 
+    private void handleModifyRequest(MouseEvent mouseEvent) {
+        if (MouseButton.SECONDARY.equals(mouseEvent.getButton())) {
+            Requirement sel = listView.getSelectionModel().getSelectedItem();
+            controller.handleModifyRequirement(sel);
+        }
+    }
+
     static class RequirementCell extends ListCell<Requirement> {
 
         @Override
-        public void updateItem(Requirement item, boolean empty){
+        public void updateItem(Requirement item, boolean empty) {
             super.updateItem(item, empty);
-            if(!empty){
-                setText(item.getName() );
-            }else{
+            if (!empty) {
+                setText(item.getName());
+            } else {
                 setText("");
             }
         }

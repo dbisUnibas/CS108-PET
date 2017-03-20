@@ -2,10 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.common;
 
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -29,22 +26,38 @@ public class CollapsibleView extends VBox {
         initCollapsible();
     }
 
-    private void initCollapsible(){
+    public void setContent(Node node) {
+        content.getChildren().addAll(node);
+    }
+
+    public void removeContent(Node node) {
+        content.getChildren().remove(node);
+    }
+
+    public void setCollapsible(Node node) {
+        collapsible.getChildren().add(node);
+    }
+
+    public void removeCollapsible(Node node) {
+        collapsible.getChildren().remove(node);
+    }
+
+    private void initCollapsible() {
         collapseButton.setOnAction(this::handleCollapse);
         //collapsible.setVisible(false);
         collapsible.setStyle("-fx-background-color: white;-fx-padding: 10px; -fx-spacing: 10px;-fx-border-width: 1px;-fx-border-color: silver");
 
     }
 
-    private void handleCollapse(ActionEvent event){
-        if(collapsible == null){
+    private void handleCollapse(ActionEvent event) {
+        if (collapsible == null) {
             return;
         }
-        if(collapseButton.isSelected() ){
+        if (collapseButton.isSelected()) {
             collapseButton.setText(Utils.ARROW_UP);
             getChildren().add(collapsible);
             //collapsible.setVisible(true);
-        }else{
+        } else {
             collapseButton.setText(Utils.ARROW_DOWN);
 
             getChildren().remove(collapsible);
@@ -53,30 +66,14 @@ public class CollapsibleView extends VBox {
         event.consume();
     }
 
-    private void initComponents(){
+    private void initComponents() {
         content = new HBox();
         collapsible = new HBox();
 
-        content.prefHeightProperty().bind(prefWidthProperty() );
-        collapsible.prefWidthProperty().bind(prefWidthProperty() );
+        content.prefHeightProperty().bind(prefWidthProperty());
+        collapsible.prefWidthProperty().bind(prefWidthProperty());
 
         getChildren().add(content);
         content.setStyle("-fx-spacing: 10px;-fx-padding: 10px;-fx-border-color: silver;-fx-border-width: 1px;");
-    }
-
-    public void setContent(Node node){
-        content.getChildren().addAll(node);
-    }
-
-    public void removeContent(Node node){
-        content.getChildren().remove(node);
-    }
-
-    public void setCollapsible(Node node){
-        collapsible.getChildren().add(node);
-    }
-
-    public void removeCollapsible(Node node){
-        collapsible.getChildren().remove(node);
     }
 }

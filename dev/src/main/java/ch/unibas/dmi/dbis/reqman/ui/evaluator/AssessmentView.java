@@ -35,8 +35,15 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     private Group group;
     private Milestone activeMS = null;
+    /**
+     * Maps MS ordinal to a map of Req.name <-> Progress (obj)
+     */
+    private Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
+    private List<ProgressSummary> summaries = new ArrayList<>();
+    private List<ProgressView> activeProgressViews = new ArrayList<>();
+    private Set<Milestone> visitedMilestones = new HashSet<>();
 
-    public AssessmentView(EvaluatorController controller, Group active){
+    public AssessmentView(EvaluatorController controller, Group active) {
         super();
 
         this.controller = controller;
@@ -49,15 +56,47 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         updateProgressViews();
     }
 
+    public List<ProgressSummary> getSummaries() {
+        return summaries;
+    }
+
+    public void bindToParentSize(Region parent) {
+        prefWidthProperty().bind(parent.widthProperty());
+        prefHeightProperty().bind(parent.heightProperty());
+    }
+
+    @Override
+    public void pointsChanged(double newValue) {
+        calcActiveSum();
+        controller.markDirty(getActiveGroup());
+    }
+
+    public Group getActiveGroup() {
+        return group;
+    }
+
+    /**
+     * ONLY if group has to be saved. Grabs ALL progress objects
+     *
+     * @return
+     */
+    public List<Progress> getProgressListForSaving() {
+        List<Progress> list = new ArrayList<>();
+
+        progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
+
+        return list;
+    }
+
     private void loadGroup() {
-        if(summaries != null){
+        if (summaries != null) {
             summaries.addAll(group.getProgressSummaries());
         }
 
         List<Progress> progressList = group.getProgressList();
-        if(progressList == null || progressList.isEmpty() ){
+        if (progressList == null || progressList.isEmpty()) {
             progressMap = setupProgressMap();
-        }else{
+        } else {
             progressMap = loadProgress(progressList);
             mergeCatalogueProgress(setupProgressMap(), progressMap);
         }
@@ -68,9 +107,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         catalogueMap.keySet().forEach(ordinal -> {
             Map<String, Progress> groupProgress = groupMap.get(ordinal);
             Map<String, Progress> catalogueProgress = catalogueMap.get(ordinal);
-            Set<String> tempSet = new HashSet<String>(catalogueProgress.keySet() );
+            Set<String> tempSet = new HashSet<String>(catalogueProgress.keySet());
             tempSet.removeAll(groupProgress.keySet());
-            for(String reqName : tempSet){
+            for (String reqName : tempSet) {
                 progressMap.get(ordinal).put(reqName, catalogueProgress.get(reqName));
             }
         });
@@ -78,19 +117,19 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     private Map<Integer, Map<String, Progress>> loadProgress(List<Progress> list) {
         Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
-        for(Progress p : list){
+        for (Progress p : list) {
             int ordinal = p.getMilestoneOrdinal();
             String reqName = p.getRequirementName();
 
-            if(progressMap.containsKey(ordinal) ){
+            if (progressMap.containsKey(ordinal)) {
                 // MS entry exists already
                 Map<String, Progress> rpMap = progressMap.get(ordinal);
-                if(rpMap == null || rpMap.containsKey(reqName) ){
+                if (rpMap == null || rpMap.containsKey(reqName)) {
                     // no map, but ordinal OR requirement is already existing. THIS IS A SEVERE ERROR
-                }else{
+                } else {
                     rpMap.put(reqName, p);
                 }
-            }else{
+            } else {
                 // FIRST time this MS occurs:
                 TreeMap<String, Progress> rpMap = new TreeMap<>();
                 rpMap.put(reqName, p);
@@ -99,11 +138,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         }
         return progressMap;
     }
-
-    /**
-     * Maps MS ordinal to a map of Req.name <-> Progress (obj)
-     */
-    private Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
 
     /**
      * Sets up the map as if the group was newly created
@@ -120,7 +154,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         return progressMap;
     }
 
-    private void initComponents(){
+    private void initComponents() {
         titleBar = new HBox();
         titleAnchor = new AnchorPane();
         lblChoice = new Label("Current Milestone: ");
@@ -136,18 +170,18 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         scrollPane = new ScrollPane();
     }
 
-    private void layoutComponents(){
+    private void layoutComponents() {
         // Forge top aka title bar:
-        titleBar.getChildren().addAll(lblChoice, cbMilestones, btnRefresh, btnSummary );
-        titleBar.setStyle(titleBar.getStyle()+" -fx-spacing: 10px");
+        titleBar.getChildren().addAll(lblChoice, cbMilestones, btnRefresh, btnSummary);
+        titleBar.setStyle(titleBar.getStyle() + " -fx-spacing: 10px");
 
-        if(controller != null){
+        if (controller != null) {
             cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
             cbMilestones.setCellFactory(param -> new Utils.MilestoneCell());
             cbMilestones.setButtonCell(new Utils.MilestoneCell());
         }
 
-        if(controller!=null){
+        if (controller != null) {
             btnRefresh.setOnAction(this::updateProgressViews);
             btnSummary.setOnAction(this::handleComments);
         }
@@ -174,21 +208,19 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     }
 
-    private List<ProgressSummary> summaries = new ArrayList<>();
-
     private void handleComments(ActionEvent event) {
         Milestone ms = cbMilestones.getSelectionModel().getSelectedItem();
-        if(ms != null){
+        if (ms != null) {
             ProgressSummary ps = null;
             boolean replace = false;
-            if(hasSummaryForMilestone(ms)){
+            if (hasSummaryForMilestone(ms)) {
                 ps = EvaluatorPromptFactory.promptSummary(ms, group.getName(), getSummaryForMilestone(ms));
                 replace = true;
-            } else{
-                ps = EvaluatorPromptFactory.promptSummary(ms, group.getName() );
+            } else {
+                ps = EvaluatorPromptFactory.promptSummary(ms, group.getName());
             }
-            if(ps != null){
-                if(replace){
+            if (ps != null) {
+                if (replace) {
                     summaries.remove(getSummaryForMilestone(ms));
                 }
                 summaries.add(ps);
@@ -196,12 +228,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         }
     }
 
-    private boolean hasSummaryForMilestone(Milestone ms){
-        if(summaries.isEmpty() ){
+    private boolean hasSummaryForMilestone(Milestone ms) {
+        if (summaries.isEmpty()) {
             return false;
-        }else{
-            for(ProgressSummary ps:summaries){
-                if(ps.getMilestoneOrdinal() == ms.getOrdinal()){
+        } else {
+            for (ProgressSummary ps : summaries) {
+                if (ps.getMilestoneOrdinal() == ms.getOrdinal()) {
                     return true;
                 }
             }
@@ -209,12 +241,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         return false;
     }
 
-    private ProgressSummary getSummaryForMilestone(Milestone ms){
-        if(summaries.isEmpty() ){
+    private ProgressSummary getSummaryForMilestone(Milestone ms) {
+        if (summaries.isEmpty()) {
             return null;
-        }else{
-            for(ProgressSummary ps:summaries){
-                if(ps.getMilestoneOrdinal() == ms.getOrdinal() ){
+        } else {
+            for (ProgressSummary ps : summaries) {
+                if (ps.getMilestoneOrdinal() == ms.getOrdinal()) {
                     return ps;
                 }
             }
@@ -222,15 +254,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         return null;
     }
 
-    public List<ProgressSummary> getSummaries(){
-        return summaries;
-    }
-
-    private List<ProgressView> activeProgressViews = new ArrayList<>();
-
-    private void loadActiveProgressViews(){
+    private void loadActiveProgressViews() {
         Milestone activeMS = cbMilestones.getSelectionModel().getSelectedItem();
-        if(activeMS == null){
+        if (activeMS == null) {
             return;
         }
         this.activeMS = activeMS;
@@ -238,18 +264,16 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         activeProgressViews.clear();
         List<Requirement> reqs = controller.getRequirementsByMilestone(activeMS.getOrdinal());
         reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
-        reqs.forEach(r ->{
+        reqs.forEach(r -> {
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
-            ProgressView pv = new ProgressView(p,r);
+            ProgressView pv = new ProgressView(p, r);
             pv.addPointsChangeListener(this);
             activeProgressViews.add(pv);
         });
 
     }
 
-    private Set<Milestone> visitedMilestones = new HashSet<>();
-
-    private void updateProgressViews(){
+    private void updateProgressViews() {
         detachProgressViews();
         tfSum.setText(String.valueOf(0));
         loadActiveProgressViews();
@@ -268,60 +292,32 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         tfSum.setText(String.valueOf(sum));
     }
 
-    private void updateProgressViews(ActionEvent event){
+    private void updateProgressViews(ActionEvent event) {
         updateProgressViews();
     }
 
-    private void attachProgressViews(){
+    private void attachProgressViews() {
         activeProgressViews.forEach(pv -> {
             addProgressView(pv);
         });
     }
 
-    private void detachProgressViews(){
+    private void detachProgressViews() {
         activeProgressViews.forEach(pv -> removeProgressView(pv));
     }
 
-    private void addProgressView(ProgressView pv){
+    private void addProgressView(ProgressView pv) {
         content.getChildren().add(pv);
-        pv.prefWidthProperty().bind(scrollPane.widthProperty() );
+        pv.prefWidthProperty().bind(scrollPane.widthProperty());
     }
 
-    private void removeProgressView(ProgressView pv){
+    private void removeProgressView(ProgressView pv) {
         content.getChildren().remove(pv);
     }
 
-    public void bindToParentSize(Region parent){
-        prefWidthProperty().bind(parent.widthProperty());
-        prefHeightProperty().bind(parent.heightProperty());
-    }
-
-    private void bindContent(){
+    private void bindContent() {
         content.prefWidthProperty().bind(widthProperty());
         content.prefHeightProperty().bind(heightProperty());
-    }
-
-    @Override
-    public void pointsChanged(double newValue) {
-        calcActiveSum();
-        controller.markDirty(getActiveGroup() );
-    }
-
-    public Group getActiveGroup(){
-        return group;
-    }
-
-    /**
-     * ONLY if group has to be saved. Grabs ALL progress objects
-     *
-     * @return
-     */
-    public List<Progress> getProgressListForSaving(){
-        List<Progress> list = new ArrayList<>();
-
-        progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
-
-        return list;
     }
 
 

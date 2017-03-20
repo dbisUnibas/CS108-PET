@@ -15,10 +15,11 @@ public interface DeletionHandler extends EventHandler<EditorEvent> {
     /**
      * Handles only {@link EditorEvent} if the {@link javafx.event.EventType} is {@link EditorEvent#DELETION}
      * This default implementation calls {@link DeletionHandler#handleDeletion(EditorEvent)} if conditions are met
+     *
      * @param event
      */
-    default void handle(EditorEvent event){
-        if(EditorEvent.DELETION.equals(event.getEventType() )){
+    default void handle(EditorEvent event) {
+        if (EditorEvent.DELETION.equals(event.getEventType())) {
             handleDeletion(event);
         }
     }

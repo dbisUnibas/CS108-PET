@@ -25,7 +25,7 @@ import java.util.ArrayList;
  *
  * @author loris.sauter
  */
-public class EditorController  {
+public class EditorController {
 
     private Catalogue catalogue;
 
@@ -34,113 +34,90 @@ public class EditorController  {
 
     private ObservableList<Requirement> observableReqs = FXCollections.observableArrayList();
     private ObservableList<Milestone> observableMs = FXCollections.observableArrayList();
+    private File catalogueFile = null;
 
-    public EditorController(EditorScene editor){
+    public EditorController(EditorScene editor) {
         this.editor = editor;
     }
 
-    public void openCatalogue(Catalogue catalogue){
+    public void openCatalogue(Catalogue catalogue) {
         this.catalogue = catalogue;
-        observableReqs = FXCollections.observableArrayList(catalogue.getRequirements() );
-        observableMs = FXCollections.observableArrayList(catalogue.getMilestones() );
+        observableReqs = FXCollections.observableArrayList(catalogue.getRequirements());
+        observableMs = FXCollections.observableArrayList(catalogue.getMilestones());
         editor.passRequirementsToView(observableReqs);
         editor.passMilestonesToView(observableMs);
         updateCatalogueProperties();
     }
 
-    public Catalogue getCatalogue(){
+    public Catalogue getCatalogue() {
         catalogue.setRequirements(observableReqs);
         catalogue.setMilestones(observableMs);
         return catalogue;
     }
 
-    public ObservableList<Requirement> getObservableRequirements(){
+    public ObservableList<Requirement> getObservableRequirements() {
         return observableReqs;
     }
 
-    public ObservableList<Milestone> getObservableMilestones(){
+    public ObservableList<Milestone> getObservableMilestones() {
         return observableMs;
     }
 
-    public void handleAddRequirement(ActionEvent event){
-        if(!isCatalogueSet() ){
+    public void handleAddRequirement(ActionEvent event) {
+        if (!isCatalogueSet()) {
             return; // Prevent open prompt from accelerator even if no catalogue is set
         }
         Requirement r = EditorPromptFactory.promptNewRequirement(this);
-        if(r != null){ // user may cancelled the prompt
-            observableReqs.add(r );
+        if (r != null) { // user may cancelled the prompt
+            observableReqs.add(r);
         }
 
     }
 
-    public void handleRemoveRequirement(ModifiableListView.RemoveEvent<Requirement> event){
-        if(event.getSelected() != null){ // If nothing selected - don't remove it!
-            observableReqs.remove(event.getSelectedIndex() );
+    public void handleRemoveRequirement(ModifiableListView.RemoveEvent<Requirement> event) {
+        if (event.getSelected() != null) { // If nothing selected - don't remove it!
+            observableReqs.remove(event.getSelectedIndex());
         }
 
     }
 
-    public void handleAddMilestone(ActionEvent event){
-        if(!isCatalogueSet() ){
+    public void handleAddMilestone(ActionEvent event) {
+        if (!isCatalogueSet()) {
             return; // Prevent open prompt from accelerator even if no catalogue is set
         }
         Milestone m = EditorPromptFactory.promptNewMilestone();
-        if(m != null){
-            m.setOrdinal(getNextMsOrdinal() );
+        if (m != null) {
+            m.setOrdinal(getNextMsOrdinal());
             observableMs.add(m);
         }
     }
 
-    private boolean isCatalogueSet(){
-        return catalogue != null;
-    }
-
-    private int getNextMsOrdinal(){
-        ArrayList<Milestone> temp = new ArrayList<>(observableMs);
-        temp.sort((ms1, ms2) -> {
-            // TODO nullcheck
-            if(ms1.getOrdinal() < ms2.getOrdinal() ){
-                return -1;
-            }else if(ms1.getOrdinal() == ms2.getOrdinal() ){
-                return 0;
-            }else{
-                return 1;
-            }
-        });
-        if(temp.isEmpty() ){
-            return 1;
-        }
-        return temp.get(temp.size()-1).getOrdinal()+1;
-    }
-
-    public void handleRemoveMilestone(ModifiableListView.RemoveEvent<Milestone> event){
-        if(event.getSelected() != null){ // If nothing selected - don't remove it!
+    public void handleRemoveMilestone(ModifiableListView.RemoveEvent<Milestone> event) {
+        if (event.getSelected() != null) { // If nothing selected - don't remove it!
             observableMs.remove(event.getSelectedIndex());
         }
 
     }
 
-    public void handleNewCatalogue(ActionEvent event){
+    public void handleNewCatalogue(ActionEvent event) {
         Catalogue cat = EditorPromptFactory.promptNewCatalogue();
-        if(cat != null){
+        if (cat != null) {
             this.catalogue = cat;
             updateCatalogueProperties();
             editor.enableAll();
         }
     }
 
-    public void handleModifyCatalogue(ActionEvent event){
+    public void handleModifyCatalogue(ActionEvent event) {
         Catalogue updated = EditorPromptFactory.promptCatalogue(catalogue);
-        if(updated != null){
+        if (updated != null) {
             this.catalogue = updated;
             updateCatalogueProperties();
 
         }
     }
 
-    private File catalogueFile = null;
-
-    public void handleSaveAsCatalogue(ActionEvent event){
+    public void handleSaveAsCatalogue(ActionEvent event) {
         FileChooser saveChooser = createCatalogueFileChooser("Save As");
         catalogueFile = saveChooser.showSaveDialog(editor.getWindow());
         try {
@@ -150,8 +127,8 @@ public class EditorController  {
         }
     }
 
-    public void handleSaveCatalogue(ActionEvent event){
-        if(catalogueFile == null){
+    public void handleSaveCatalogue(ActionEvent event) {
+        if (catalogueFile == null) {
             handleSaveAsCatalogue(event);
         }
 
@@ -162,25 +139,15 @@ public class EditorController  {
         }
     }
 
-    private FileChooser createCatalogueFileChooser(String action){
-        FileChooser fc = new FileChooser();
-        fc.setTitle(action+" Catalogue");
-        fc.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("JSON", "*.json"),
-                new FileChooser.ExtensionFilter("Any", "*.*")
-        );
-        return fc;
-    }
-
-    public void handleExportCatalogue(ActionEvent event){
-        if(!isCatalogueSet()){
+    public void handleExportCatalogue(ActionEvent event) {
+        if (!isCatalogueSet()) {
             return;
         }
         FileChooser fc = new FileChooser();
         fc.setTitle("Export Catalogue");
         //fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
         File f = fc.showSaveDialog(editor.getWindow());
-        if(f != null){
+        if (f != null) {
             // user did not abort file choose
             try {
                 exportCatalogue(f.getAbsolutePath());
@@ -203,10 +170,10 @@ public class EditorController  {
 
     }
 
-    public void handleOpenCatalogue(ActionEvent event){
+    public void handleOpenCatalogue(ActionEvent event) {
         FileChooser openChooser = createCatalogueFileChooser("Open");
         File file = openChooser.showOpenDialog(editor.getWindow());
-        if(file != null){
+        if (file != null) {
             try {
                 openCatalogue(JSONUtils.readCatalogueJSONFile(file));
                 catalogueFile = file;
@@ -218,34 +185,19 @@ public class EditorController  {
 
     }
 
-
-    @Deprecated // Change way current catalogue is displayed in title.
-    private void updateCatalogueProperties(){
-        StringBuffer sb = new StringBuffer("ReqMan: Editor");
-        sb.append(" - ");
-        sb.append(catalogue.getName() != null ? catalogue.getName() : "N/A");
-        sb.append(" (");
-        sb.append(catalogue.getLecture() != null ? catalogue.getLecture() : "N/A" );
-        sb.append(" @ ");
-        sb.append(catalogue.getSemester() != null ? catalogue.getSemester() : "N/A" );
-        sb.append(")");
-        editor.updateCatalogueInfo(catalogue.getName(), catalogue.getLecture(), catalogue.getSemester());
-    }
-
-
     public void handleModifyRequirement(Requirement sel) {
         Requirement update = EditorPromptFactory.promptRequirement(this, sel);
         int index = observableReqs.indexOf(sel);
-        if(update != null){
+        if (update != null) {
             observableReqs.remove(index);
             observableReqs.add(index, update);
         }
     }
 
-    public void handleModifyMilestone(Milestone sel){
+    public void handleModifyMilestone(Milestone sel) {
         Milestone update = EditorPromptFactory.promptMilestone(sel);
         int index = observableMs.indexOf(sel);
-        if(update != null){
+        if (update != null) {
             observableMs.remove(index);
             observableMs.add(index, update);
         }
@@ -253,26 +205,71 @@ public class EditorController  {
 
     public Milestone getMilestoneByOrdinal(int ordinal) {
         Milestone result = null;
-        for(Milestone ms : observableMs){
-            if(ms.getOrdinal() == ordinal){
+        for (Milestone ms : observableMs) {
+            if (ms.getOrdinal() == ordinal) {
                 result = ms;
             }
         }
         return result;
     }
 
-    public Requirement findRequirementByName(String name){
+    public Requirement findRequirementByName(String name) {
         Requirement result = null;
-        for(Requirement req : observableReqs){
-            if(req.getName().equals(name)){
+        for (Requirement req : observableReqs) {
+            if (req.getName().equals(name)) {
                 result = req;
             }
         }
         return result;
     }
 
-    private void exportCatalogue(String exportFile) throws FileNotFoundException{
-        RenderManager renderManager = new RenderManager(getCatalogue() ); // assembles the catalogue
+    private boolean isCatalogueSet() {
+        return catalogue != null;
+    }
+
+    private int getNextMsOrdinal() {
+        ArrayList<Milestone> temp = new ArrayList<>(observableMs);
+        temp.sort((ms1, ms2) -> {
+            // TODO nullcheck
+            if (ms1.getOrdinal() < ms2.getOrdinal()) {
+                return -1;
+            } else if (ms1.getOrdinal() == ms2.getOrdinal()) {
+                return 0;
+            } else {
+                return 1;
+            }
+        });
+        if (temp.isEmpty()) {
+            return 1;
+        }
+        return temp.get(temp.size() - 1).getOrdinal() + 1;
+    }
+
+    private FileChooser createCatalogueFileChooser(String action) {
+        FileChooser fc = new FileChooser();
+        fc.setTitle(action + " Catalogue");
+        fc.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("JSON", "*.json"),
+                new FileChooser.ExtensionFilter("Any", "*.*")
+        );
+        return fc;
+    }
+
+    @Deprecated // Change way current catalogue is displayed in title.
+    private void updateCatalogueProperties() {
+        StringBuffer sb = new StringBuffer("ReqMan: Editor");
+        sb.append(" - ");
+        sb.append(catalogue.getName() != null ? catalogue.getName() : "N/A");
+        sb.append(" (");
+        sb.append(catalogue.getLecture() != null ? catalogue.getLecture() : "N/A");
+        sb.append(" @ ");
+        sb.append(catalogue.getSemester() != null ? catalogue.getSemester() : "N/A");
+        sb.append(")");
+        editor.updateCatalogueInfo(catalogue.getName(), catalogue.getLecture(), catalogue.getSemester());
+    }
+
+    private void exportCatalogue(String exportFile) throws FileNotFoundException {
+        RenderManager renderManager = new RenderManager(getCatalogue()); // assembles the catalogue
         TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
         configManager.loadConfig();
         Templates templates = configManager.getTemplates();
@@ -283,8 +280,8 @@ public class EditorController  {
 
         String export = renderManager.renderCatalogue();
         // Appends the configured extension if none is present
-        if(!exportFile.substring(exportFile.lastIndexOf(System.getProperty("file.separator"))).contains(".")){
-            exportFile += "."+extension;
+        if (!exportFile.substring(exportFile.lastIndexOf(System.getProperty("file.separator"))).contains(".")) {
+            exportFile += "." + extension;
         }
         File eFile = new File(exportFile);
         PrintWriter pw = new PrintWriter(eFile);
@@ -292,8 +289,8 @@ public class EditorController  {
         pw.close();
         pw.flush();
         System.out.println("==============================");
-        System.out.println(" D O N E   Catalogue Export @ "+ StringUtils.prettyPrintTimestamp(System.currentTimeMillis()));
-        System.out.println(" "+eFile.getPath() );
+        System.out.println(" D O N E   Catalogue Export @ " + StringUtils.prettyPrintTimestamp(System.currentTimeMillis()));
+        System.out.println(" " + eFile.getPath());
         System.out.println("==============================");
     }
 
