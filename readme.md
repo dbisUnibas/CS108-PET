@@ -1,11 +1,15 @@
-# ReqMan
+# ReqMan - Branch: experimental
 
 ReqMan (Requirements Manager) is an application to manage requirements.
 
-The software's goal is to be a complete requirements manager giving users 
-the ability to define requirements, assign them to a milestone and track
-registered group's progress. Users of ReqMan may also export the feedback
-to the respective groups.
+*Requirements* are grouped in *milestones* and the collection of *requirements*
+with their respective *milestones* is called *catalogue*. *Catalogues* are 
+created using `ReqMan`'s built in `editor`.
+
+Using `ReqMan`'s built in `evaluator` one can register several *groups* and
+assess their voyage on achieving the *requirement*s with so called *progress*.
+
+*Catalogue*s and *group*s may be exported with templates provided.
 
 
 ## Table of Contents
@@ -17,21 +21,37 @@ to the respective groups.
 
 ## Build
 
-Currently the two modes (editor, evaluator) are separate applications.
+`ReqMan` uses the gradle.
 
-To build the *editor* run:
+### ReqMan
 
+To build and pack `ReqMan` in an executable jar run:
 
-```gradle deployEditor```
+	gradle jar
 
-To build the *evaluator* run:
+### Editor
 
-```gralde deployEvaluator```
+To exclusively have the `editor` application executable in a jar, run:
 
+	gradle deployEditor
+
+### Evaluator
+
+To exclusively have the `evaluator` application executable in a jar, run:
+
+	gralde deployEvaluator
+	
 
 ## Usage
 
-*coming soon*
+`ReqMan` (and its modes `editor` and `evaluator`) is a JavaFX application
+packed in an executable jar. Thus to run `ReqMan` one must execute the jar.
+
+The command to run `ReqMan` from command line, starting the GUI application
+use the following command (where X stands for the complete version string
+(refer to versioning for further information about the version)):
+
+	java -jar reqman-X.jar
 
 ## Contributors
 
@@ -39,4 +59,9 @@ Loris Sauter - loris.sauter@unibas.ch
 
 ## License
 
-*not yet chosen*
+`ReqMan` is open source and licensed under the MIT license.
+See LICENSE.txt for the complete license text.
+
+## Versioning
+
+`ReqMan` uses semantic versioning as defined by http://semver.org/
