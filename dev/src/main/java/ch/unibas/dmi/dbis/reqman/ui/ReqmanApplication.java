@@ -44,6 +44,13 @@ public class ReqmanApplication extends Application {
 
     }
 
+    public void handleChangeView(ActionEvent event) {
+        if (event instanceof ChangeEvent) {
+            ChangeEvent evt = (ChangeEvent) event;
+            changeView(evt.getView());
+        }
+    }
+
     private void changeView(int view) {
         switch (view) {
             case EDITOR_VIEW:
@@ -55,13 +62,6 @@ public class ReqmanApplication extends Application {
             default:
                 // Do nothing, unknown view
 
-        }
-    }
-
-    public void handleChangeView(ActionEvent event) {
-        if (event instanceof ChangeEvent) {
-            ChangeEvent evt = (ChangeEvent) event;
-            changeView(evt.getView());
         }
     }
 
@@ -80,13 +80,13 @@ public class ReqmanApplication extends Application {
             this.view = view;
         }
 
-        int getView() {
-            return view;
-        }
-
         @Override
         public EventType<ChangeEvent> getEventType() {
             return new EventType<>(ACTION, "CHANGE");
+        }
+
+        int getView() {
+            return view;
         }
     }
 }
