@@ -236,7 +236,8 @@ static String readVersion(){
 }
 
 void printVersion(){
-    println(project.version);
+    setVersion(readVersion() )
+    println(project.version)
 }
 
 /**
