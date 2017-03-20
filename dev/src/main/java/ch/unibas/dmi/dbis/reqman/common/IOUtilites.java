@@ -29,7 +29,6 @@ public class IOUtilites {
     }
 
 
-
     public static Group readFromJSONFile(File file) throws IOException {
         return (Group) readFromJSONFile(file, Group.class);
     }
