@@ -52,6 +52,11 @@ use the following command (where X stands for the complete version string
 (refer to versioning for further information about the version)):
 
 	java -jar reqman-X.jar
+	
+## Issues
+
+Please use Maniphest to report issues. Create a task and set the tag to 
+the ReqMan project as well as setting the visibility to *Members of Project...* ReqMan.
 
 ## Contributors
 
