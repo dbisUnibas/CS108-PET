@@ -9,7 +9,7 @@ import java.util.Vector;
  *
  * @author loris.sauter
  */
-public class Group implements Comparable<Group>{
+public class Group implements Comparable<Group> {
 
     private String name;
     private String projectName;
@@ -178,8 +178,8 @@ public class Group implements Comparable<Group>{
     }
 
     public ProgressSummary getProgressSummaryForMilestone(Milestone ms) {
-        for(ProgressSummary ps : progressSummaries){
-            if(ps.getMilestoneOrdinal() == ms.getOrdinal()){
+        for (ProgressSummary ps : progressSummaries) {
+            if (ps.getMilestoneOrdinal() == ms.getOrdinal()) {
                 return ps;
             }
         }
@@ -200,10 +200,10 @@ public class Group implements Comparable<Group>{
         return list;
     }
 
-    public double getTotalSum(Catalogue catalogue){
+    public double getTotalSum(Catalogue catalogue) {
         ArrayList<Double> points = new ArrayList<>();
         getMilestonesForGroup(catalogue).forEach(ms -> {
-            points.add(getSumForMilestone(ms,catalogue ));
+            points.add(getSumForMilestone(ms, catalogue));
         });
         return points.stream().mapToDouble(Double::doubleValue).sum();
     }
