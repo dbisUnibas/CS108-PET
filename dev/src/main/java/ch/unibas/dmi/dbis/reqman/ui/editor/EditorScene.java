@@ -2,7 +2,12 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication;
+import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
+import ch.unibas.dmi.dbis.reqman.ui.common.TitledScene;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
@@ -16,7 +21,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author loris.sauter
  */
-public class EditorScene extends Scene {
+public class EditorScene extends TitledScene{
 
     private EditorController controller;
 
@@ -80,6 +85,9 @@ public class EditorScene extends Scene {
         menuEdit.getItems().addAll(itemModifyCat);
 
         Menu menuView = new Menu("View");
+        MenuItem itemChangeViewToEvaluator = new MenuItem("Evaluator");
+        itemChangeViewToEvaluator.setOnAction(this::handleChangeView);
+        menuView.getItems().addAll(itemChangeViewToEvaluator);
 
         Menu menuHelp = new Menu("Help");
 
@@ -167,5 +175,18 @@ public class EditorScene extends Scene {
 
     public void passMilestonesToView(ObservableList<Milestone> milestones) {
         msView.setItems(milestones);
+    }
+
+    private EventHandler<ReqmanApplication.ChangeEvent> changeHandler = null;
+
+    private void handleChangeView(ActionEvent event){
+        if(changeHandler != null){
+            ReqmanApplication.ChangeEvent evt = new ReqmanApplication.ChangeEvent(event, ReqmanApplication.EVALUATOR_VIEW);
+            changeHandler.handle(evt);
+        }
+    }
+
+    public void setOnChangeEvent(EventHandler<ReqmanApplication.ChangeEvent> handler){
+        changeHandler = handler;
     }
 }

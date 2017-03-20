@@ -125,14 +125,17 @@ gradle.taskGraph.whenReady{
         if(taskGraph.hasTask(deployEditor)){
             jar.appendix = 'editor'
             jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication')
+        }else if(taskGraph.hasTask(deployEvaluator)){
+            jar.appendix = 'evaluator'
+            jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorApplication')
+        }else{
+            jar.appendix = ''
+            jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication')
         }
         if(taskGraph.hasTask(applySnapshotEvaluator) || taskGraph.hasTask(applySnapshotEditor)){
             jar.classifier = 'SNAPSHOT'
         }
-        if(taskGraph.hasTask(deployEvaluator)){
-            jar.appendix = 'evaluator'
-            jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorApplication')
-        }
+
 }
 
 /**
@@ -247,4 +250,8 @@ task setupVersion{
         String v = readVersion()
         setVersion(v)
     }
+}
+
+jar.doLast{
+    println 'Produced jar: '+jar.archiveName
 }

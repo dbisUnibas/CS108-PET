@@ -1,7 +1,12 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.core.Group;
+import ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication;
+import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
+import ch.unibas.dmi.dbis.reqman.ui.common.TitledScene;
+import com.sun.javafx.event.EventDispatchTree;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -21,7 +26,7 @@ import java.util.TreeMap;
  *
  * @author loris.sauter
  */
-public class EvaluatorScene extends Scene{
+public class EvaluatorScene extends TitledScene{
 
     private BorderPane root;
 
@@ -135,6 +140,9 @@ public class EvaluatorScene extends Scene{
         menuEdit.getItems().addAll(itemModify);
 
         Menu menuView = new Menu("View");
+        MenuItem itemChangeToEditor = new MenuItem("Eiditor");
+        itemChangeToEditor.setOnAction(this::handleChangeView);
+        menuView.getItems().addAll(itemChangeToEditor);
 
         Menu menuHelp = new Menu("Help");
 
@@ -232,5 +240,18 @@ public class EvaluatorScene extends Scene{
             tab.setText(text);
         }
 
+    }
+
+    private EventHandler<ReqmanApplication.ChangeEvent> changeHandler = null;
+
+    private void handleChangeView(ActionEvent event){
+        if(changeHandler != null){
+            ReqmanApplication.ChangeEvent evt = new ReqmanApplication.ChangeEvent(event, ReqmanApplication.EDITOR_VIEW);
+            changeHandler.handle(evt);
+        }
+    }
+
+    public void setOnChangeEvent(EventHandler<ReqmanApplication.ChangeEvent> handler){
+        changeHandler = handler;
     }
 }
