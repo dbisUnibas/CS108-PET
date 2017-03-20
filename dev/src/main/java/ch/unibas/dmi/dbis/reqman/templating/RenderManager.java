@@ -32,15 +32,15 @@ public class RenderManager {
 
     /**
      * Existing:
-     *  .name
-     *  .description
-     *  .lecture
-     *  .semester
-     *  .requirements
-     *  .milestones
-     *  .sumTotal
-     *  .sumMS[<ordinal>]
-     *  .milestoneName[<ordinal>]
+     * .name
+     * .description
+     * .lecture
+     * .semester
+     * .requirements
+     * .milestones
+     * .sumTotal
+     * .sumMS[<ordinal>]
+     * .milestoneName[<ordinal>]
      */
     private final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
             new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
@@ -79,11 +79,11 @@ public class RenderManager {
     /**
      * Existing:
      * milestone
-     *  .name
-     *  .date
-     *  .ordinal
-     *  .sumMax
-     *  .dateFormatted[<SimpleDateFormat>]
+     * .name
+     * .date
+     * .ordinal
+     * .sumMax
+     * .dateFormatted[<SimpleDateFormat>]
      */
     public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
             new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
@@ -122,15 +122,15 @@ public class RenderManager {
     /**
      * Existing:
      * requirement
-     *  .name
-     *  .description
-     *  .maxPoints
-     *  .minMS
-     *  .predecessorNames
-     *  .binary[][]
-     *  .mandatory[][]
-     *  .malus[][]
-     *  .meta[<key>]
+     * .name
+     * .description
+     * .maxPoints
+     * .minMS
+     * .predecessorNames
+     * .binary[][]
+     * .mandatory[][]
+     * .malus[][]
+     * .meta[<key>]
      */
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
             new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
@@ -265,10 +265,6 @@ public class RenderManager {
         }
     }
 
-    private void sortProgressList(List<Progress> list) {
-        list.sort(Comparator.comparing(catalogue::getRequirementForProgress, SortingUtils.REQUIREMENT_COMPARATOR));
-    }
-
     public boolean isGroupExportReady() {
         return group != null;
     }
@@ -344,6 +340,14 @@ public class RenderManager {
         parseTemplateCarefully(CATALOGUE_ENTITY, catTemplate);
     }
 
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    private void sortProgressList(List<Progress> list) {
+        list.sort(Comparator.comparing(catalogue::getRequirementForProgress, SortingUtils.REQUIREMENT_COMPARATOR));
+    }
+
     private <E> boolean parseTemplateCarefully(Entity<E> entity, String template) {
         parser.setupFor(entity);
         if (MILESTONE_ENTITY.getEntityName().equals(entity.getEntityName())) {
@@ -365,9 +369,5 @@ public class RenderManager {
             throw LOGGER.throwing(new UnsupportedOperationException("Cannot parse a template for entity: " + entity.toString()));
         }
         return true;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
     }
 }
