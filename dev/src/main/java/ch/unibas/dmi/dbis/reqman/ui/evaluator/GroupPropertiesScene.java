@@ -24,47 +24,26 @@ import java.util.List;
  */
 public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.core.Group> {
 
+    private final String catalogueName;
+    private final EvaluatorController controller;
     private TextField tfName;
     private TextField tfProjectName;
     private TextField tfExportFileName;
-
     private TableView<Member> table;
-
-
     private ch.unibas.dmi.dbis.reqman.core.Group group = null;
+    private ObservableList<Member> tableData;
 
-    private final String catalogueName;
-
-    private final EvaluatorController controller;
-
-    public GroupPropertiesScene(EvaluatorController controller){
+    public GroupPropertiesScene(EvaluatorController controller) {
         this.controller = controller;
         this.catalogueName = controller.getActiveCatalogue().getName();
 
         populateScene();
     }
 
-    public GroupPropertiesScene(EvaluatorController controller, Group group){
+    public GroupPropertiesScene(EvaluatorController controller, Group group) {
         this(controller);
         this.group = group;
         loadGroup();
-    }
-
-    @Override
-    protected void populateScene() {
-        initComponents();
-
-        loadGroup();
-    }
-
-    private void loadGroup(){
-        if(group != null){
-            tfName.setText(group.getName() );
-            tfProjectName.setText(group.getProjectName());
-            tfExportFileName.setText(group.getExportFileName());
-        }
-
-        loadMembers();
     }
 
     @Override
@@ -77,20 +56,20 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         String name = tfName.getText();
         String projectName = tfProjectName.getText();
 
-        if(StringUtils.isNotEmpty(name)){
-            if(!controller.isGroupNameUnique(name)){
-                Utils.showWarningDialog("Invalid group name", "Group names must be unique. There is already another group with name: \n\n"+name);
+        if (StringUtils.isNotEmpty(name)) {
+            if (!controller.isGroupNameUnique(name)) {
+                Utils.showWarningDialog("Invalid group name", "Group names must be unique. There is already another group with name: \n\n" + name);
                 return;
             }
 
             group = new Group(name, projectName, memberToStringList(tableData), catalogueName);
-            if(StringUtils.isNotEmpty(tfExportFileName.getText())){
+            if (StringUtils.isNotEmpty(tfExportFileName.getText())) {
                 group.setExportFileName(tfExportFileName.getText());
             }
             dismiss();
-        }else{
+        } else {
             String msg = "";
-            if(!StringUtils.isNotEmpty(name)){
+            if (!StringUtils.isNotEmpty(name)) {
                 msg += "Group name is missing.\n";
             }
             Utils.showWarningDialog("Mandatory field(s) missing", msg);
@@ -98,26 +77,48 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         }
     }
 
-    private List<String> memberToStringList(List<Member> members){
+    @Override
+    public ch.unibas.dmi.dbis.reqman.core.Group create() throws IllegalStateException {
+        if (!isCreatorReady()) {
+            throw new IllegalStateException("Cannot create Group, creator not ready");
+        }
+        return group;
+    }
+
+    @Override
+    public boolean isCreatorReady() {
+        return group != null;
+    }
+
+    private void loadGroup() {
+        if (group != null) {
+            tfName.setText(group.getName());
+            tfProjectName.setText(group.getProjectName());
+            tfExportFileName.setText(group.getExportFileName());
+        }
+
+        loadMembers();
+    }
+
+    private List<String> memberToStringList(List<Member> members) {
         ArrayList<String> out = new ArrayList<>();
         members.forEach(
                 m -> {
-                    out.add(m.convertToString() );
+                    out.add(m.convertToString());
                 }
         );
         return out;
     }
 
-    private List<Member> stringToMemberList(List<String> members){
+    private List<Member> stringToMemberList(List<String> members) {
         ArrayList<Member> out = new ArrayList<>();
         members.forEach(m -> {
             out.add(Member.convertFromString(m));
         });
-        return  out;
+        return out;
     }
 
-
-    private void initComponents(){
+    private void initComponents() {
         Label lblName = new Label("Group Name*");
         Label lblProjectName = new Label("Project Name");
         Label lblExportFileName = new Label("Export file name");
@@ -131,7 +132,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
         int rowIndex = 0;
 
-        grid.add(lblName, 0,rowIndex);
+        grid.add(lblName, 0, rowIndex);
         grid.add(tfName, 1, rowIndex++);
 
         grid.add(lblProjectName, 0, rowIndex);
@@ -142,14 +143,13 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
         grid.add(lblMembers, 0, rowIndex);
         grid.add(table, 1, rowIndex, 1, 2);
-        rowIndex+=2;
+        rowIndex += 2;
 
 
         grid.add(buttons, 0, ++rowIndex, 2, 1);
 
         setRoot(grid);
     }
-
 
     private TableView<Member> createTableView() {
         TableView<Member> table = new TableView<>();
@@ -176,7 +176,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         TableColumn<Member, String> thirdCol = new TableColumn<>("Email");
         thirdCol.setCellValueFactory(new PropertyValueFactory<>("email"));
         thirdCol.setCellFactory(cellFactory);
-        thirdCol.setOnEditCommit((TableColumn.CellEditEvent<Member, String> t)-> {
+        thirdCol.setOnEditCommit((TableColumn.CellEditEvent<Member, String> t) -> {
             t.getTableView().getItems().get(t.getTablePosition().getRow()).setEmail(t.getNewValue());
         });
 
@@ -202,12 +202,11 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         return table;
     }
 
-
     private void handleAddMember(ActionEvent event) {
         Member member = EvaluatorPromptFactory.promptMember();
-        if(member != null){
+        if (member != null) {
             // Check if the list contains only the empty one. If so replace empty one with new one.
-            if(isMemberListOnlyEmpty() ){
+            if (isMemberListOnlyEmpty()) {
                 tableData.remove(0);
             }
             tableData.add(member);
@@ -218,9 +217,9 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         if (group != null) {
             group.getMembers().forEach(str -> {
                 Member member = Member.convertFromString(str);
-                if(member != null){
+                if (member != null) {
                     tableData.add(member);
-                }else{
+                } else {
                     // TODO Handle illegal member-string!
                 }
             });
@@ -231,8 +230,8 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         table.setItems(tableData);
     }
 
-    private boolean isMemberListOnlyEmpty(){
-        if(tableData.size() > 1){
+    private boolean isMemberListOnlyEmpty() {
+        if (tableData.size() > 1) {
             return false;
         }
         Member first = tableData.get(0);
@@ -245,76 +244,95 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         if (item != null) {
             tableData.remove(index);
         }
-        if(tableData.isEmpty()){
+        if (tableData.isEmpty()) {
             setMemberListOnlyEmpty();
         }
     }
 
     private void setMemberListOnlyEmpty() {
-        tableData = FXCollections.observableArrayList(new Member("","",""));
+        tableData = FXCollections.observableArrayList(new Member("", "", ""));
     }
 
-    private ObservableList<Member> tableData;
-
-    @Override
-    public ch.unibas.dmi.dbis.reqman.core.Group create() throws IllegalStateException {
-        if(!isCreatorReady() ){
-            throw new IllegalStateException("Cannot create Group, creator not ready");
-        }
-        return group;
-    }
-
-    @Override
-    public boolean isCreatorReady() {
-        return group != null;
-    }
-
-    public static class Member{
+    public static class Member {
+        private static final String DELIMETER = ",";
         private final SimpleStringProperty name, surname, email;
 
-        public Member(String name, String surname, String email){
+        public Member(String name, String surname, String email) {
             this.name = new SimpleStringProperty(name);
             this.surname = new SimpleStringProperty(surname);
             this.email = new SimpleStringProperty(email);
         }
 
-        public String getName(){
+        public static String convertToString(Member m) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(m.getName());
+            sb.append(DELIMETER);
+            sb.append(m.getSurname());
+            if (StringUtils.isNotEmpty(m.getEmail())) {
+                sb.append(DELIMETER);
+                sb.append(m.getEmail());
+            }
+            return sb.toString();
+        }
+
+        public static Member convertFromString(String m) {
+            int firstDelim = m.indexOf(DELIMETER);
+
+            if (firstDelim < 0) {
+                throw new IllegalArgumentException("Member invalid: " + m);
+            }
+            String name = m.substring(0, firstDelim);
+
+            int secondDelim = m.lastIndexOf(DELIMETER);
+            String surname = "";
+            String email = "";
+            if (secondDelim < 0) {
+                surname = m.substring(firstDelim + 1);
+            } else {
+                surname = m.substring(firstDelim + 1, secondDelim);
+                email = m.substring(secondDelim + 1);
+            }
+
+            return new Member(name, surname, email);
+        }
+
+        public String getName() {
             return name.getValue();
         }
 
-        public String getSurname(){
+        public String getSurname() {
             return surname.getValue();
         }
 
-        public String getEmail(){
+        public String getEmail() {
             return email.getValue();
         }
 
-        public void setName(String name){
+        public void setName(String name) {
             this.name.setValue(name);
         }
 
-        public void setSurname(String surname){
+        public void setSurname(String surname) {
             this.surname.setValue(surname);
         }
 
-        public void setEmail(String email){
+        public void setEmail(String email) {
             this.email.setValue(email);
         }
 
-        public SimpleStringProperty nameProperty(){
+        public SimpleStringProperty nameProperty() {
             return name;
         }
 
-        public SimpleStringProperty surnameProperty(){
+        public SimpleStringProperty surnameProperty() {
             return surname;
         }
 
-        public SimpleStringProperty emailProperty(){
+        public SimpleStringProperty emailProperty() {
             return email;
         }
 
-        public boolean isEmpty(){
+        public boolean isEmpty() {
             boolean emptyName = name.getValue().isEmpty();
             boolean emptySurname = surname.getValue().isEmpty();
             boolean emptyEmail = email.getValue().isEmpty();
@@ -322,56 +340,21 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
             return emptyEmail && emptySurname && emptyName;
         }
 
-        public String convertToString(){
+        public String convertToString() {
             return convertToString(this);
-        }
-
-        private static final String DELIMETER = ",";
-
-        public static String convertToString(Member m){
-            StringBuilder sb = new StringBuilder();
-            sb.append(m.getName());
-            sb.append(DELIMETER);
-            sb.append(m.getSurname() );
-            if(StringUtils.isNotEmpty(m.getEmail() ) ){
-                sb.append(DELIMETER);
-                sb.append(m.getEmail());
-            }
-            return sb.toString();
-        }
-
-        public static Member convertFromString(String m){
-            int firstDelim = m.indexOf(DELIMETER);
-
-            if(firstDelim < 0){
-                throw new IllegalArgumentException("Member invalid: "+m);
-            }
-            String name = m.substring(0, firstDelim);
-
-            int secondDelim = m.lastIndexOf(DELIMETER);
-            String surname = "";
-            String email = "";
-            if(secondDelim < 0){
-                surname = m.substring(firstDelim+1);
-            }else{
-                surname = m.substring(firstDelim+1, secondDelim);
-                email = m.substring(secondDelim+1);
-            }
-
-            return new Member(name, surname, email);
         }
     }
 
-    private static class UpdatingCell extends TableCell<Member, String>{
+    private static class UpdatingCell extends TableCell<Member, String> {
         private TextField textField;
 
-        public UpdatingCell(){
+        public UpdatingCell() {
 
         }
 
         @Override
-        public void startEdit(){
-            if(!isEmpty() ){
+        public void startEdit() {
+            if (!isEmpty()) {
                 super.startEdit();
                 createTextField();
                 setText(null);
@@ -381,46 +364,52 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         }
 
         @Override
-        public void cancelEdit(){
+        public void cancelEdit() {
             super.cancelEdit();
-            setText(getItem() );
+            setText(getItem());
             setGraphic(null);
         }
 
         @Override
-        public void updateItem(String item, boolean empty){
+        public void updateItem(String item, boolean empty) {
             super.updateItem(item, empty);
-            if(isEmpty()){
+            if (isEmpty()) {
                 setText(null);
                 setGraphic(null);
-            }else{
-                if(isEditing() ){
-                    if(textField != null){
-                        textField.setText(getString() );
+            } else {
+                if (isEditing()) {
+                    if (textField != null) {
+                        textField.setText(getString());
                     }
                     setText(null);
                     setGraphic(textField);
-                }else {
-                    setText(getString() );
+                } else {
+                    setText(getString());
                     setGraphic(null);
                 }
             }
         }
 
+        public String getString() {
+            return getItem() == null ? "" : getItem();
+        }
 
-        private void createTextField(){
-            textField = new TextField(getString() );
-            textField.setMinWidth(this.getWidth()-this.getGraphicTextGap()*2);
-            textField.focusedProperty().addListener((ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue)->{
-                if(!newValue){
+        private void createTextField() {
+            textField = new TextField(getString());
+            textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
+            textField.focusedProperty().addListener((ObservableValue<? extends Boolean> observableValue, Boolean oldValue, Boolean newValue) -> {
+                if (!newValue) {
                     commitEdit(textField.getText());
                 }
             });
         }
+    }
 
-        public String getString(){
-            return getItem() == null ? "" : getItem();
-        }
+    @Override
+    protected void populateScene() {
+        initComponents();
+
+        loadGroup();
     }
 
 

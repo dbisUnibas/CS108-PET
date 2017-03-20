@@ -5,14 +5,17 @@ import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.*;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 
 /**
  * TODO: write JavaDoc
  *
  * @author loris.sauter
  */
-public class CatalogueInfoView extends HBox{
+public class CatalogueInfoView extends HBox {
 
     private GridPane root = new GridPane();
 
@@ -24,11 +27,11 @@ public class CatalogueInfoView extends HBox{
 
     private Catalogue catalogue;
 
-    public CatalogueInfoView(){
+    public CatalogueInfoView() {
         this(null);
     }
 
-    public CatalogueInfoView(Catalogue catalogue){
+    public CatalogueInfoView(Catalogue catalogue) {
         super();
         this.catalogue = catalogue;
 
@@ -39,17 +42,30 @@ public class CatalogueInfoView extends HBox{
         displayData();
     }
 
-    public void setCatalogue(Catalogue cat){
+    public void setCatalogue(Catalogue cat) {
         this.catalogue = cat;
     }
 
+    public void displayData() {
+        displayData(catalogue);
+    }
 
-    private void initComponents(){
+    public void displayData(Catalogue catalogue) {
+        if (catalogue != null) {
+            tfName.setText(catalogue.getName());
+            tfLecture.setText(catalogue.getLecture());
+            tfSemester.setText(catalogue.getSemester());
+            taDesc.setText(catalogue.getDescription());
+            tfSum.setText(StringUtils.prettyPrint(catalogue.getSum()));
+        }
+    }
+
+    private void initComponents() {
         setStyle("-fx-padding: 10px; -fx-spacing: 10px");
         lblName = new Label("Name");
         lblLecture = new Label("Lecture");
         lblSemester = new Label("Semester");
-        lblDescription= new Label("Description");
+        lblDescription = new Label("Description");
         lblSum = new Label("Maximal Points");
 
         tfName = new TextField();
@@ -74,7 +90,7 @@ public class CatalogueInfoView extends HBox{
         root.add(tfLecture, 1, rowIndex++);
         root.add(lblSemester, 0, rowIndex);
         GridPane.setHgrow(lblSemester, Priority.ALWAYS);
-        root.add(tfSemester, 1,rowIndex++);
+        root.add(tfSemester, 1, rowIndex++);
         root.add(lblSum, 0, rowIndex);
         GridPane.setHgrow(lblSum, Priority.ALWAYS);
         root.add(tfSum, 1, rowIndex++);
@@ -89,21 +105,6 @@ public class CatalogueInfoView extends HBox{
 
         root.getColumnConstraints().addAll(col1, col2);
     }
-
-    public void displayData(){
-        displayData(catalogue);
-    }
-
-    public void displayData(Catalogue catalogue){
-        if(catalogue != null){
-            tfName.setText(catalogue.getName());
-            tfLecture.setText(catalogue.getLecture() );
-            tfSemester.setText(catalogue.getSemester() );
-            taDesc.setText(catalogue.getDescription() );
-            tfSum.setText(StringUtils.prettyPrint(catalogue.getSum()));
-        }
-    }
-
 
 
 }

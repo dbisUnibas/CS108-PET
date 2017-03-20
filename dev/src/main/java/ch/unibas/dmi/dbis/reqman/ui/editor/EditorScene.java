@@ -3,12 +3,10 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication;
-import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitledScene;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
@@ -21,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author loris.sauter
  */
-public class EditorScene extends TitledScene{
+public class EditorScene extends TitledScene {
 
     private EditorController controller;
 
@@ -29,17 +27,53 @@ public class EditorScene extends TitledScene{
     private MilestonesView msView;
     private BorderPane root = new BorderPane();
     private Label lblName, lblLecture, lblSemester;
+    private String title = "Editor";
+    private EventHandler<ReqmanApplication.ChangeEvent> changeHandler = null;
+
+    public EditorScene(int width, int height) {
+        super(new BorderPane(), width, height);
+        this.controller = new EditorController(this);
+        initUI();
+    }
 
     public String getTitle() {
         return title;
     }
 
-    private String title = "Editor";
+    public void updateCatalogueInfo(String name, String lecture, String semester) {
+        lblName.setText(StringUtils.isNotEmpty(name) ? name : "");
+        lblLecture.setText(StringUtils.isNotEmpty(lecture) ? lecture : "");
+        lblSemester.setText(StringUtils.isNotEmpty(semester) ? semester : "");
+    }
 
-    public EditorScene(int width, int height){
-        super(new BorderPane(), width, height);
-        this.controller = new EditorController(this);
-        initUI();
+    public void disableAll() {
+        reqView.setDisable(true);
+        msView.setDisable(true);
+    }
+
+    public void enableAll() {
+        reqView.setDisable(false);
+        msView.setDisable(false);
+    }
+
+    public void setDisableReqView(boolean disable) {
+        reqView.setDisable(disable);
+    }
+
+    public void setDisableMsView(boolean disable) {
+        msView.setDisable(disable);
+    }
+
+    public void passRequirementsToView(ObservableList<Requirement> requirements) {
+        reqView.setItems(requirements);
+    }
+
+    public void passMilestonesToView(ObservableList<Milestone> milestones) {
+        msView.setItems(milestones);
+    }
+
+    public void setOnChangeEvent(EventHandler<ReqmanApplication.ChangeEvent> handler) {
+        changeHandler = handler;
     }
 
     private MenuBar createMenuBar() {
@@ -145,48 +179,10 @@ public class EditorScene extends TitledScene{
         return box;
     }
 
-    public void updateCatalogueInfo(String name, String lecture, String semester) {
-        lblName.setText(StringUtils.isNotEmpty(name) ? name : "");
-        lblLecture.setText(StringUtils.isNotEmpty(lecture) ? lecture : "");
-        lblSemester.setText(StringUtils.isNotEmpty(semester) ? semester : "");
-    }
-
-    public void disableAll() {
-        reqView.setDisable(true);
-        msView.setDisable(true);
-    }
-
-    public void enableAll() {
-        reqView.setDisable(false);
-        msView.setDisable(false);
-    }
-
-    public void setDisableReqView(boolean disable) {
-        reqView.setDisable(disable);
-    }
-
-    public void setDisableMsView(boolean disable) {
-        msView.setDisable(disable);
-    }
-
-    public void passRequirementsToView(ObservableList<Requirement> requirements) {
-        reqView.setItems(requirements);
-    }
-
-    public void passMilestonesToView(ObservableList<Milestone> milestones) {
-        msView.setItems(milestones);
-    }
-
-    private EventHandler<ReqmanApplication.ChangeEvent> changeHandler = null;
-
-    private void handleChangeView(ActionEvent event){
-        if(changeHandler != null){
+    private void handleChangeView(ActionEvent event) {
+        if (changeHandler != null) {
             ReqmanApplication.ChangeEvent evt = new ReqmanApplication.ChangeEvent(event, ReqmanApplication.EVALUATOR_VIEW);
             changeHandler.handle(evt);
         }
-    }
-
-    public void setOnChangeEvent(EventHandler<ReqmanApplication.ChangeEvent> handler){
-        changeHandler = handler;
     }
 }

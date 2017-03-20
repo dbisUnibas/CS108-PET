@@ -15,10 +15,11 @@ public interface CreationHandler extends EventHandler<EditorEvent> {
     /**
      * Handles only {@link EditorEvent} with their {@link javafx.event.EventType} set to {@link EditorEvent#CREATION}
      * This default implementation calls {@link CreationHandler#handleCreation(EditorEvent)} if conditions are met
+     *
      * @param event The event to handle
      */
-    default void handle(EditorEvent event){
-        if(EditorEvent.CREATION.equals(event.getEventType() ) ){
+    default void handle(EditorEvent event) {
+        if (EditorEvent.CREATION.equals(event.getEventType())) {
             handleCreation(event);
         }
     }

@@ -1,13 +1,12 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.ui.common.*;
+import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
+import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
-import javafx.stage.Stage;
 
 /**
  * A scene which contains all of the properties a catalogue needs to have.
@@ -18,23 +17,57 @@ import javafx.stage.Stage;
  */
 public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
 
+    private Catalogue catalogue = null;
+    private TextField tfLecture = new TextField();
+    private TextField tfName = new TextField();
+    private TextArea taDesc = new TextArea();
+    private TextField tfSemester = new TextField();
     public CataloguePropertiesScene() {
         super();
         populateScene();
     }
-
     public CataloguePropertiesScene(Catalogue catalogue) {
         this();
         this.catalogue = catalogue;
         loadCatalogue();
     }
 
-    private Catalogue catalogue = null;
+    @Override
+    public Catalogue create() {
+        if (!isCreatorReady()) {
+            throw new IllegalStateException("Creation failed: Was not ready");
+        }
 
-    private TextField tfLecture = new TextField();
-    private TextField tfName = new TextField();
-    private TextArea taDesc = new TextArea();
-    private TextField tfSemester = new TextField();
+        return catalogue;
+    }
+
+    @Override
+    public boolean isCreatorReady() {
+        return catalogue != null;
+    }
+
+    @Override
+    public String getPromptTitle() {
+        return "Catalogue Properties";
+    }
+
+    public void handleSaving(ActionEvent event) {
+        String name = tfName.getText();
+        String lecture = tfLecture.getText();
+
+        if (name == null) {
+            throw new IllegalArgumentException("[Catalogue] Name MUST not be null");
+        }
+
+        catalogue = new Catalogue(
+                name,
+                lecture,
+                taDesc.getText(),
+                tfSemester.getText()
+        );
+        getWindow().hide();
+
+    }
 
     private void loadCatalogue() {
         if (catalogue != null) {
@@ -75,43 +108,6 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         grid.add(taDesc, 1, rowIndex, 1, 3);
         rowIndex += 3;
         grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
-    }
-
-    @Override
-    public Catalogue create() {
-        if (!isCreatorReady()) {
-            throw new IllegalStateException("Creation failed: Was not ready");
-        }
-
-        return catalogue;
-    }
-
-    @Override
-    public boolean isCreatorReady() {
-        return catalogue != null;
-    }
-
-    @Override
-    public String getPromptTitle() {
-        return "Catalogue Properties";
-    }
-
-    public void handleSaving(ActionEvent event) {
-        String name = tfName.getText();
-        String lecture = tfLecture.getText();
-
-        if(name == null){
-            throw new IllegalArgumentException("[Catalogue] Name MUST not be null");
-        }
-
-        catalogue = new Catalogue(
-                name,
-                lecture,
-                taDesc.getText(),
-                tfSemester.getText()
-        );
-        getWindow().hide();
-
     }
 
 }

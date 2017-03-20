@@ -28,25 +28,23 @@ public class EditorApplication extends Application {
         launch(args);
     }
 
-    private void handleQuit(ActionEvent event) {
-        stop();
-    }
-
     @Override
     public void stop() {
         // Ask if sure, unsaved changes blabla
         System.exit(0);
     }
 
-
-
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("ReqMan: Editor");
         EditorScene editor = new EditorScene(800, 600);
         primaryStage.setScene(editor);
-        primaryStage.setTitle(editor.getTitle() );
+        primaryStage.setTitle(editor.getTitle());
         primaryStage.show();
+    }
+
+    private void handleQuit(ActionEvent event) {
+        stop();
     }
 
 }

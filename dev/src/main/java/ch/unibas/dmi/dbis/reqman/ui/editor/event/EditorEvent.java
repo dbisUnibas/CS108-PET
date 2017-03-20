@@ -19,35 +19,34 @@ public class EditorEvent extends ActionEvent {
 
     private EventType<EditorEvent> eventType;
 
-    @Override
-    public EventType<? extends ActionEvent> getEventType(){
-        return  eventType == null ? ANY : eventType;
-    }
-
-    public EditorEvent(){
+    public EditorEvent() {
         super();
     }
 
-
-    public EditorEvent(Object source, EventTarget target, EventType<EditorEvent> type, TargetEntity targetEntity){
+    public EditorEvent(Object source, EventTarget target, EventType<EditorEvent> type, TargetEntity targetEntity) {
         super(source, target);
         this.eventType = type;
         this.targetEntity = targetEntity;
     }
 
-    public TargetEntity getTargetEntity() {
-        return targetEntity;
-    }
-
-    public static EditorEvent generateCreationEvent(Object source, EventTarget target, TargetEntity targetEntity){
+    public static EditorEvent generateCreationEvent(Object source, EventTarget target, TargetEntity targetEntity) {
         return new EditorEvent(source, target, CREATION, targetEntity);
     }
 
-    public static EditorEvent generateDeletionEvent(Object source, EventTarget target, TargetEntity targetEntity){
+    public static EditorEvent generateDeletionEvent(Object source, EventTarget target, TargetEntity targetEntity) {
         return new EditorEvent(source, target, DELETION, targetEntity);
     }
 
-    public static EditorEvent generateModificationEvent(Object source, EventTarget target, TargetEntity targetEntity){
+    public static EditorEvent generateModificationEvent(Object source, EventTarget target, TargetEntity targetEntity) {
         return new EditorEvent(source, target, MODIFICATION, targetEntity);
+    }
+
+    @Override
+    public EventType<? extends ActionEvent> getEventType() {
+        return eventType == null ? ANY : eventType;
+    }
+
+    public TargetEntity getTargetEntity() {
+        return targetEntity;
     }
 }

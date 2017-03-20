@@ -23,9 +23,8 @@ public class ProgressView extends VBox {
 
     // TODO Extract code for collapsible pane. Adjust collapsible's size.
 
-    private Progress progress;
     private final Requirement requirement;
-
+    private Progress progress;
     private Label lblTitle = new Label();
     private ToggleButton collapseButton = new ToggleButton(Utils.ARROW_DOWN);
     private TextArea taDesc = new TextArea();
@@ -34,12 +33,15 @@ public class ProgressView extends VBox {
     private CheckBox check;
 
     private VBox collapsible = new VBox();
+    private AnchorPane content;
+    private List<PointsChangeListener> listeners = new ArrayList<>();
 
-    public ProgressView(Requirement requirement){
+    public ProgressView(Requirement requirement) {
         this(null, requirement);
     }
 
-    public ProgressView(Progress progress, Requirement requirement){
+
+    public ProgressView(Progress progress, Requirement requirement) {
         super();
         this.progress = progress == null ? new Progress() : progress;
         this.requirement = requirement;
@@ -49,32 +51,51 @@ public class ProgressView extends VBox {
         loadProgress();
     }
 
+    public Requirement getRequirement() {
+        return requirement;
+    }
+
+    public Progress getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Progress progress) {
+        this.progress = progress;
+    }
+
+    public void addPointsChangeListener(PointsChangeListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removePointsChangeListener(PointsChangeListener listener) {
+        listeners.remove(listener);
+    }
+
     private void loadProgress() {
-        if(progress != null){
-            if(progress.hasProgress()){
-                if(requirement.isBinary() ){
+        if (progress != null) {
+            if (progress.hasProgress()) {
+                if (requirement.isBinary()) {
                     check.setSelected(true);
-                }else{
+                } else {
                     spinnerPoints.getValueFactory().setValue(progress.getPoints());
                 }
             }
         }
     }
 
-
-    private void initCollapsible(){
+    private void initCollapsible() {
         collapseButton.setOnAction(this::handleCollapse);
         //collapsible.setVisible(false);
         collapsible.setStyle("-fx-background-color: white;-fx-padding: 10px; -fx-spacing: 10px;-fx-border-width: 1px;-fx-border-color: silver");
 
     }
 
-    private void handleCollapse(ActionEvent event){
-        if(collapseButton.isSelected() ){
+    private void handleCollapse(ActionEvent event) {
+        if (collapseButton.isSelected()) {
             collapseButton.setText(Utils.ARROW_UP);
             getChildren().add(collapsible);
             //collapsible.setVisible(true);
-        }else{
+        } else {
             collapseButton.setText(Utils.ARROW_DOWN);
 
             getChildren().remove(collapsible);
@@ -83,11 +104,9 @@ public class ProgressView extends VBox {
         event.consume();
     }
 
-    private AnchorPane content;
+    private void initComponents() {
 
-    private void initComponents(){
-
-        lblTitle.setText(requirement.getName() + "\t("+ ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(requirement.getMaxPointsSensitive())+")"+(!requirement.isMandatory() ? "\t[BONUS]":""));
+        lblTitle.setText(requirement.getName() + "\t(" + ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(requirement.getMaxPointsSensitive()) + ")" + (!requirement.isMandatory() ? "\t[BONUS]" : ""));
 
         taDesc.setEditable(false);
 
@@ -102,11 +121,11 @@ public class ProgressView extends VBox {
         content.getChildren().add(title);
 
         Control control;
-        if(requirement.isBinary() ){
+        if (requirement.isBinary()) {
             check = new CheckBox();
             control = check;
             check.setOnAction(this::handleAssessmentAction);
-        }else{
+        } else {
             spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), 0.0);
             control = spinnerPoints;
             // Solution by: http://stackoverflow.com/a/39380146
@@ -116,7 +135,7 @@ public class ProgressView extends VBox {
                 }
             });
             spinnerPoints.valueProperty().addListener((observable, oldValue, newValue) -> {
-                if(Double.compare(oldValue, newValue) != 0){ // Only if really new value
+                if (Double.compare(oldValue, newValue) != 0) { // Only if really new value
                     progress.setPoints(newValue, requirement.getMaxPoints());
                     notifyPointsListener();
                 }
@@ -125,7 +144,7 @@ public class ProgressView extends VBox {
 
         content.getChildren().add(control);
 
-        content.prefWidthProperty().bind(prefWidthProperty() );
+        content.prefWidthProperty().bind(prefWidthProperty());
 
 
         AnchorPane.setRightAnchor(control, 10d); // not affected by padding?
@@ -154,11 +173,11 @@ public class ProgressView extends VBox {
         cbMalus.setSelected(requirement.isMalus());
         cbMalus.setDisable(true);
 
-        grid.add(lblBinary, 0,0);
+        grid.add(lblBinary, 0, 0);
         grid.add(cbBinary, 1, 0);
-        grid.add(lblMandatory, 3,0);
-        grid.add(cbMandatory, 4,0);
-        grid.add(lblMalus, 6,0);
+        grid.add(lblMandatory, 3, 0);
+        grid.add(cbMandatory, 4, 0);
+        grid.add(lblMalus, 6, 0);
         grid.add(cbMalus, 7, 0);
 
         grid.add(lblDesc, 0, 1);
@@ -171,39 +190,16 @@ public class ProgressView extends VBox {
         //setStyle("-fx-background-color: crimson;");
     }
 
-    public Requirement getRequirement() {
-        return requirement;
-    }
-
-
-    public Progress getProgress() {
-        return progress;
-    }
-
-    public void setProgress(Progress progress) {
-        this.progress = progress;
-    }
-
-    private void handleAssessmentAction(ActionEvent event){
-        if(check.isSelected() ){
+    private void handleAssessmentAction(ActionEvent event) {
+        if (check.isSelected()) {
             progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
-        }else{
+        } else {
             progress.setPoints(0, requirement.getMaxPoints());
         }
         notifyPointsListener();
     }
 
-    private List<PointsChangeListener> listeners = new ArrayList<>();
-
-    public void addPointsChangeListener(PointsChangeListener listener){
-        listeners.add(listener);
-    }
-
-    public void removePointsChangeListener(PointsChangeListener listener){
-        listeners.remove(listener);
-    }
-
-    private void notifyPointsListener(){
+    private void notifyPointsListener() {
         listeners.forEach(l -> l.pointsChanged(progress.getPoints()));
     }
 }

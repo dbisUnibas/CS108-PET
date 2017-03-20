@@ -65,6 +65,57 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         loadRequirement();
     }
 
+    public void handleSaving(ActionEvent event) {
+        String name = tfName.getText();
+        Milestone min = cbMinMS.getValue();
+        double maxPoints = (double) spinnerPoints.getValue();
+
+        if ((name == null || name.isEmpty()) || min == null) {
+            throw new IllegalArgumentException("[Requirement] Name and Minimal Milestone are mandatory fields");
+        }
+
+        Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
+
+        requirement = new Requirement(
+                name,
+                taDesc.getText(),
+                min.getOrdinal(),
+                max.getOrdinal(),
+                maxPoints,
+                binaryYes.isSelected(),
+                mandatoryYes.isSelected(),
+                malusYes.isSelected()
+        );
+
+        if (!predecessors.isEmpty()) {
+            ArrayList<String> names = new ArrayList<>();
+            predecessors.forEach(pred -> names.add(pred.getName()));
+            requirement.setPredecessorNames(names);
+        }
+
+        saveProperties();
+
+        getWindow().hide();
+    }
+
+    @Override
+    public Requirement create() throws IllegalStateException {
+        if (!isCreatorReady()) {
+            throw new IllegalStateException("Creation failed: Creator not ready");
+        }
+        return requirement;
+    }
+
+    @Override
+    public boolean isCreatorReady() {
+        return requirement != null;
+    }
+
+    @Override
+    public String getPromptTitle() {
+        return "Requirement Properties";
+    }
+
     private void loadRequirement() {
         if (requirement != null) {
             tfName.setText(requirement.getName());
@@ -87,15 +138,15 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         }
     }
 
-    private void setMetaListOnlyEmpty(){
-        tableData = FXCollections.observableArrayList(new MetaKeyValuePair("",""));
+    private void setMetaListOnlyEmpty() {
+        tableData = FXCollections.observableArrayList(new MetaKeyValuePair("", ""));
     }
 
     private void loadProperties() {
         if (requirement != null) {
-            if(requirement.getPropertiesMap().isEmpty()){
+            if (requirement.getPropertiesMap().isEmpty()) {
                 setMetaListOnlyEmpty();
-            }else{
+            } else {
                 tableData = convertFromMap(requirement.getPropertiesMap());
             }
 
@@ -106,7 +157,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     }
 
     private void saveProperties() {
-        if(!isMetaListOnlyEmpty() ){
+        if (!isMetaListOnlyEmpty()) {
             requirement.setPropertiesMap(convertFromMetaKeyValuePairList(tableData));
         }
     }
@@ -144,6 +195,178 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
                 predecessors.add(r);
             }
         });
+    }
+
+    private BorderPane createPredecessorChoice() {
+        BorderPane pane = new BorderPane();
+        HBox upper = new HBox();
+        Button addPred = Utils.createPlusButton();
+        Button rmPred = Utils.createMinusButton();
+
+        ListView<Requirement> predList = new ListView<>();
+        predList.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
+        predList.setItems(predecessors);
+        ComboBox<Requirement> reqBox = new ComboBox<>();
+        reqBox.setButtonCell(new RequirementsView.RequirementCell());
+        reqBox.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
+        reqBox.setItems(controller.getObservableRequirements());
+
+        upper.getChildren().addAll(reqBox, addPred, rmPred);
+
+        upper.setStyle("-fx-spacing: 10px; -fx-padding: 10px;");
+        pane.setStyle("-fx-spacing: 10px; -fx-padding: 10px;");
+        pane.setTop(upper);
+        pane.setCenter(predList);
+
+        rmPred.setOnAction(event -> {
+            int index = predList.getSelectionModel().getSelectedIndex();
+            Requirement selected = predList.getSelectionModel().getSelectedItem();
+            if (selected == null) {
+                return; // Do not remove when nothing is selected
+            } else {
+                predecessors.remove(index);
+            }
+        });
+
+        addPred.setOnAction(event -> {
+            Requirement selected = reqBox.getSelectionModel().getSelectedItem();
+            if (selected == null) {
+                return;
+            }
+            predecessors.add(selected);
+        });
+
+        pane.setStyle("-fx-border-width: 1; -fx-border-color: silver;");
+
+        return pane;
+    }
+
+    private void handleNewMaxMS(ActionEvent event) {
+        controller.handleAddMilestone(event);
+        cbMaxMS.getSelectionModel().select(milestoneList.size() - 1);
+    }
+
+    private void handleNewMinMS(ActionEvent event) {
+        controller.handleAddMilestone(event);
+        cbMinMS.getSelectionModel().select(milestoneList.size() - 1);
+    }
+
+    private void loadMilestoneNames() {
+        milestoneList = controller.getObservableMilestones();
+    }
+
+    private TableView<MetaKeyValuePair> createPropertiesTable() {
+        TableView<MetaKeyValuePair> table = new TableView<>();
+        table.setEditable(true);
+
+        TableColumn<MetaKeyValuePair, String> firstCol = new TableColumn<>("Key");
+        firstCol.setCellValueFactory(
+                new PropertyValueFactory<>("key")
+        );
+        firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        firstCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
+            t.getTableView().getItems().get(t.getTablePosition().getRow()).setKey(t.getNewValue());
+        });
+        TableColumn<MetaKeyValuePair, String> secondCol = new TableColumn<>("Value");
+        secondCol.setCellValueFactory(
+                new PropertyValueFactory<>("value")
+        );
+        secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        secondCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
+            t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
+        });
+
+        table.getColumns().addAll(firstCol, secondCol);
+
+        // ContextMenu
+        ContextMenu cm = new ContextMenu();
+        MenuItem addMeta = new MenuItem("Add Row");
+        addMeta.setOnAction(this::handleAddMetaRow);
+        MenuItem rmMeta = new MenuItem("Remove current row");
+        rmMeta.setOnAction(this::handleRemoveMetaRow);
+        cm.getItems().addAll(addMeta, rmMeta);
+
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setOnMouseClicked(event -> {
+            if (MouseButton.SECONDARY.equals(event.getButton())) {
+                cm.show(table, event.getScreenX(), event.getScreenY());
+            }
+        });
+        table.setItems(tableData);
+        return table;
+    }
+
+    private void handleAddMetaRow(ActionEvent event) {
+        MetaKeyValuePair pair = EditorPromptFactory.promptMetaKeyValuePair();
+        if (pair != null) {
+            // Check if the list contains only the empty one. If so replace empty one with new one.
+            if (isMetaListOnlyEmpty()) {
+                tableData.remove(0);
+            }
+            tableData.add(pair);
+        }
+    }
+
+    private boolean isMetaListOnlyEmpty() {
+        if (tableData.size() > 1) {
+            return false;
+        }
+        MetaKeyValuePair first = tableData.get(0);
+        return first.isEmpty();
+    }
+
+    private void handleRemoveMetaRow(ActionEvent event) {
+        int index = table.getSelectionModel().getSelectedIndex();
+        MetaKeyValuePair item = table.getSelectionModel().getSelectedItem();
+        if (item != null) {
+            tableData.remove(index);
+        }
+        if (tableData.isEmpty()) {
+            setMetaListOnlyEmpty();
+        }
+    }
+
+    public static class MetaKeyValuePair {
+        private final SimpleStringProperty key;
+        private final SimpleStringProperty value;
+
+        public MetaKeyValuePair(String key, String value) {
+            this.key = new SimpleStringProperty(key);
+            this.value = new SimpleStringProperty(value);
+        }
+
+        /**
+         * Returns if this {@link MetaKeyValuePair} consits of an empty key AND empty value.
+         *
+         * @return TRUE if key and value are empty strings, FALSE otherwise
+         */
+        public boolean isEmpty() {
+            return key.getValue().isEmpty() && value.getValue().isEmpty();
+        }
+
+        public String getKey() {
+            return key.get();
+        }
+
+        public void setKey(String key) {
+            this.key.set(key);
+        }
+
+        public SimpleStringProperty keyProperty() {
+            return key;
+        }
+
+        public String getValue() {
+            return value.get();
+        }
+
+        public void setValue(String value) {
+            this.value.set(value);
+        }
+
+        public SimpleStringProperty valueProperty() {
+            return value;
+        }
     }
 
     @Override
@@ -301,231 +524,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         grid.setPrefHeight(700); // Hacky solution, due to strangely incresed height.
         grid.setAlignment(Pos.CENTER);
-    }
-
-    public void handleSaving(ActionEvent event) {
-        String name = tfName.getText();
-        Milestone min = cbMinMS.getValue();
-        double maxPoints = (double) spinnerPoints.getValue();
-
-        if ((name == null || name.isEmpty()) || min == null) {
-            throw new IllegalArgumentException("[Requirement] Name and Minimal Milestone are mandatory fields");
-        }
-
-        Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
-
-        requirement = new Requirement(
-                name,
-                taDesc.getText(),
-                min.getOrdinal(),
-                max.getOrdinal(),
-                maxPoints,
-                binaryYes.isSelected(),
-                mandatoryYes.isSelected(),
-                malusYes.isSelected()
-        );
-
-        if (!predecessors.isEmpty()) {
-            ArrayList<String> names = new ArrayList<>();
-            predecessors.forEach(pred -> names.add(pred.getName()));
-            requirement.setPredecessorNames(names);
-        }
-
-        saveProperties();
-
-        getWindow().hide();
-    }
-
-
-    private BorderPane createPredecessorChoice() {
-        BorderPane pane = new BorderPane();
-        HBox upper = new HBox();
-        Button addPred = Utils.createPlusButton();
-        Button rmPred = Utils.createMinusButton();
-
-        ListView<Requirement> predList = new ListView<>();
-        predList.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
-        predList.setItems(predecessors);
-        ComboBox<Requirement> reqBox = new ComboBox<>();
-        reqBox.setButtonCell(new RequirementsView.RequirementCell());
-        reqBox.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
-        reqBox.setItems(controller.getObservableRequirements());
-
-        upper.getChildren().addAll(reqBox, addPred, rmPred);
-
-        upper.setStyle("-fx-spacing: 10px; -fx-padding: 10px;");
-        pane.setStyle("-fx-spacing: 10px; -fx-padding: 10px;");
-        pane.setTop(upper);
-        pane.setCenter(predList);
-
-        rmPred.setOnAction(event -> {
-            int index = predList.getSelectionModel().getSelectedIndex();
-            Requirement selected = predList.getSelectionModel().getSelectedItem();
-            if (selected == null) {
-                return; // Do not remove when nothing is selected
-            } else {
-                predecessors.remove(index);
-            }
-        });
-
-        addPred.setOnAction(event -> {
-            Requirement selected = reqBox.getSelectionModel().getSelectedItem();
-            if (selected == null) {
-                return;
-            }
-            predecessors.add(selected);
-        });
-
-        pane.setStyle("-fx-border-width: 1; -fx-border-color: silver;");
-
-        return pane;
-    }
-
-    private void handleNewMaxMS(ActionEvent event) {
-        controller.handleAddMilestone(event);
-        cbMaxMS.getSelectionModel().select(milestoneList.size() - 1);
-    }
-
-    private void handleNewMinMS(ActionEvent event) {
-        controller.handleAddMilestone(event);
-        cbMinMS.getSelectionModel().select(milestoneList.size() - 1);
-    }
-
-    @Override
-    public Requirement create() throws IllegalStateException {
-        if (!isCreatorReady()) {
-            throw new IllegalStateException("Creation failed: Creator not ready");
-        }
-        return requirement;
-    }
-
-    @Override
-    public boolean isCreatorReady() {
-        return requirement != null;
-    }
-
-    @Override
-    public String getPromptTitle() {
-        return "Requirement Properties";
-    }
-
-    private void loadMilestoneNames() {
-        milestoneList = controller.getObservableMilestones();
-    }
-
-    private TableView<MetaKeyValuePair> createPropertiesTable() {
-        TableView<MetaKeyValuePair> table = new TableView<>();
-        table.setEditable(true);
-
-        TableColumn<MetaKeyValuePair, String> firstCol = new TableColumn<>("Key");
-        firstCol.setCellValueFactory(
-                new PropertyValueFactory<>("key")
-        );
-        firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        firstCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
-            t.getTableView().getItems().get(t.getTablePosition().getRow()).setKey(t.getNewValue());
-        });
-        TableColumn<MetaKeyValuePair, String> secondCol = new TableColumn<>("Value");
-        secondCol.setCellValueFactory(
-                new PropertyValueFactory<>("value")
-        );
-        secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
-        secondCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
-            t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
-        });
-
-        table.getColumns().addAll(firstCol, secondCol);
-
-        // ContextMenu
-        ContextMenu cm = new ContextMenu();
-        MenuItem addMeta = new MenuItem("Add Row");
-        addMeta.setOnAction(this::handleAddMetaRow);
-        MenuItem rmMeta = new MenuItem("Remove current row");
-        rmMeta.setOnAction(this::handleRemoveMetaRow);
-        cm.getItems().addAll(addMeta, rmMeta);
-
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        table.setOnMouseClicked(event -> {
-            if (MouseButton.SECONDARY.equals(event.getButton())) {
-                cm.show(table, event.getScreenX(), event.getScreenY());
-            }
-        });
-        table.setItems(tableData);
-        return table;
-    }
-
-    private void handleAddMetaRow(ActionEvent event) {
-        MetaKeyValuePair pair = EditorPromptFactory.promptMetaKeyValuePair();
-        if(pair != null){
-            // Check if the list contains only the empty one. If so replace empty one with new one.
-            if(isMetaListOnlyEmpty() ){
-                tableData.remove(0);
-            }
-            tableData.add(pair);
-        }
-    }
-
-    private boolean isMetaListOnlyEmpty(){
-        if(tableData.size() > 1){
-            return false;
-        }
-        MetaKeyValuePair first = tableData.get(0);
-        return first.isEmpty();
-    }
-
-    private void handleRemoveMetaRow(ActionEvent event) {
-        int index = table.getSelectionModel().getSelectedIndex();
-        MetaKeyValuePair item = table.getSelectionModel().getSelectedItem();
-        if (item != null) {
-            tableData.remove(index);
-        }
-        if(tableData.isEmpty()){
-            setMetaListOnlyEmpty();
-        }
-    }
-
-
-
-    public static class MetaKeyValuePair {
-        private final SimpleStringProperty key;
-        private final SimpleStringProperty value;
-
-        /**
-         * Returns if this {@link MetaKeyValuePair} consits of an empty key AND empty value.
-         * @return TRUE if key and value are empty strings, FALSE otherwise
-         */
-        public boolean isEmpty(){
-            return key.getValue().isEmpty() && value.getValue().isEmpty();
-        }
-
-        public MetaKeyValuePair(String key, String value) {
-            this.key = new SimpleStringProperty(key);
-            this.value = new SimpleStringProperty(value);
-        }
-
-        public String getKey() {
-            return key.get();
-        }
-
-        public void setKey(String key) {
-            this.key.set(key);
-        }
-
-        public SimpleStringProperty keyProperty() {
-            return key;
-        }
-
-        public String getValue() {
-            return value.get();
-        }
-
-        public void setValue(String value) {
-            this.value.set(value);
-        }
-
-        public SimpleStringProperty valueProperty() {
-            return value;
-        }
     }
 
 }
