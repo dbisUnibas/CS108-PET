@@ -1,10 +1,12 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
-import ch.unibas.dmi.dbis.reqman.common.SimpleCatalogueExporter;
+import ch.unibas.dmi.dbis.reqman.configuration.Templates;
+import ch.unibas.dmi.dbis.reqman.configuration.TemplatingConfigurationManager;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.templating.RenderManager;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -12,10 +14,10 @@ import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 /**
@@ -27,16 +29,14 @@ public class EditorController  {
 
     private Catalogue catalogue;
 
-    private Stage controlledStage;
 
-    private EditorApplication editor;
+    private EditorScene editor;
 
     private ObservableList<Requirement> observableReqs = FXCollections.observableArrayList();
     private ObservableList<Milestone> observableMs = FXCollections.observableArrayList();
 
-    public EditorController(EditorApplication editor, Stage controlledStage){
+    public EditorController(EditorScene editor){
         this.editor = editor;
-        this.controlledStage = controlledStage;
     }
 
     public void openCatalogue(Catalogue catalogue){
@@ -142,7 +142,7 @@ public class EditorController  {
 
     public void handleSaveAsCatalogue(ActionEvent event){
         FileChooser saveChooser = createCatalogueFileChooser("Save As");
-        catalogueFile = saveChooser.showSaveDialog(controlledStage);
+        catalogueFile = saveChooser.showSaveDialog(editor.getWindow());
         try {
             JSONUtils.writeToJSONFile(getCatalogue(), catalogueFile); // Important to use getCatalogue as the reqs and ms are set there
         } catch (IOException e) {
@@ -178,16 +178,13 @@ public class EditorController  {
         }
         FileChooser fc = new FileChooser();
         fc.setTitle("Export Catalogue");
-        fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
-        File f = fc.showSaveDialog(controlledStage);
+        //fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("HTML", "*.html"));
+        File f = fc.showSaveDialog(editor.getWindow());
         if(f != null){
             // user did not abort file choose
-            SimpleCatalogueExporter exporter = new SimpleCatalogueExporter(getCatalogue() );
-            String html = exporter.exportHTML();
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(f))) {
-                bw.write(html);
-                bw.flush();
-            } catch (IOException e) {
+            try {
+                exportCatalogue(f.getAbsolutePath());
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -208,7 +205,7 @@ public class EditorController  {
 
     public void handleOpenCatalogue(ActionEvent event){
         FileChooser openChooser = createCatalogueFileChooser("Open");
-        File file = openChooser.showOpenDialog(controlledStage);
+        File file = openChooser.showOpenDialog(editor.getWindow());
         if(file != null){
             try {
                 openCatalogue(JSONUtils.readCatalogueJSONFile(file));
@@ -222,6 +219,7 @@ public class EditorController  {
     }
 
 
+    @Deprecated // Change way current catalogue is displayed in title.
     private void updateCatalogueProperties(){
         StringBuffer sb = new StringBuffer("ReqMan: Editor");
         sb.append(" - ");
@@ -231,7 +229,6 @@ public class EditorController  {
         sb.append(" @ ");
         sb.append(catalogue.getSemester() != null ? catalogue.getSemester() : "N/A" );
         sb.append(")");
-        controlledStage.setTitle(sb.toString());
         editor.updateCatalogueInfo(catalogue.getName(), catalogue.getLecture(), catalogue.getSemester());
     }
 
@@ -274,4 +271,101 @@ public class EditorController  {
         return result;
     }
 
+    private void exportCatalogue(String exportFile) throws FileNotFoundException{
+        RenderManager renderManager = new RenderManager(getCatalogue() ); // assembles the catalogue
+        TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
+        configManager.loadConfig();
+        Templates templates = configManager.getTemplates();
+        String extension = configManager.getTemplatesExtension();
+        renderManager.parseRequirementTemplate(templates.getRequirementTemplate());
+        renderManager.parseMilestoneTemplate(templates.getMilestoneTemplate());
+        renderManager.parseCatalogueTemplate(templates.getCatalogueTemplate());
+
+        String export = renderManager.renderCatalogue();
+        // Appends the configured extension if none is present
+        if(!exportFile.substring(exportFile.lastIndexOf(System.getProperty("file.separator"))).contains(".")){
+            exportFile += "."+extension;
+        }
+        PrintWriter pw = new PrintWriter(new File(exportFile));
+        pw.write(export);
+        pw.close();
+        pw.flush();
+        System.out.println("==============================");
+        System.out.println(" D O N E   Catalogue Export");
+        System.out.println("==============================");
+    }
+
+    private void hardcodeExport(File f) throws FileNotFoundException {
+        RenderManager manager = new RenderManager(getCatalogue());//get catalogue assembles the catalogue
+        //RenderManager manager = new RenderManager(catalogue);
+        String catHTML = "  <!DOCTYPE html>\n" +
+                "  <html>\n" +
+                "\t<head>\n" +
+                "\t\t<link href=\"http://fonts.googleapis.com/icon?family=Material+Icons\" rel=\"stylesheet\">\n" +
+                "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"css/materialize.min.css\"  media=\"screen,projection\"/>\n" +
+                "\t\t<link type=\"text/css\" rel=\"stylesheet\" href=\"css/achievements.css\"/>\n" +
+                "\t\t<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"/>\n" +
+                "\t</head>\n" +
+                "    <body>\n" +
+                "\t\n" +
+                "\t<br><br><br>\n" +
+                "\t\n" +
+                "\t<div class=\"container\">\n" +
+                "        \n" +
+                "\t\t${catalogue.requirements}\n" +
+                "<br><br>\n" +
+                "<table class=\"bordered responsive-table\">\n" +
+                "<thead>\n" +
+                "<tr>\n" +
+                "<th>${catalogue.milestoneName[1]}</th>\n" +
+                "<th>${catalogue.milestoneName[2]}</th>\n" +
+                "<th>${catalogue.milestoneName[3]}</th>\n" +
+                "<th>${catalogue.milestoneName[4]}</th>\n" +
+                "<th>${catalogue.milestoneName[5]}</th>\n" +
+                "<th>Total</th>\n" +
+                "</tr>\n" +
+                "</thead>\n" +
+                "<tbody>\n" +
+                "<tr>\n" +
+                "<td>${catalogue.sumMS[1]}</td>\n" +
+                "<td>${catalogue.sumMS[2]}</td>\n" +
+                "<td>${catalogue.sumMS[3]}</td>\n" +
+                "<td>${catalogue.sumMS[4]}</td>\n" +
+                "<td>${catalogue.sumMS[5]}</td>\n" +
+                "<td>${catalogue.sumTotal}</td>\n" +
+                "</tr>\n" +
+                "</tbody>\n" +
+                "</table>\n" +
+                "\t\n" +
+                "\t\n" +
+                "      <!--Import jQuery before materialize.js-->\n" +
+                "      <script type=\"text/javascript\" src=\"https://code.jquery.com/jquery-2.1.1.min.js\"></script>\n" +
+                "      <script type=\"text/javascript\" src=\"js/materialize.min.js\"></script>\n" +
+                "    </body>\n" +
+                "  </html>";
+
+        String reqHTML = "<div class=\"achievement ${requirement.meta[category]} ${requirement.mandatory[][bonus]} z-depth-2 hoverable\">\n" +
+                "\t<div class=\"achievement-img-container\">\n" +
+                "\t\t<img src=\"img/${requirement.meta[image]}\">\n" +
+                "\t</div>\n" +
+                "\t<div class=\"achievement-content-container\">\n" +
+                "\t\t<div class=\"achievement-header\">\n" +
+                "\t\t\t<span class=\"achievement-title\">${requirement.name}</span>\n" +
+                "\t\t\t<span class=\"achievement-points\">${requirement.malus[-][]}${requirement.maxPoints}</span>\n" +
+                "\t\t\t<span class=\"achievement-date\">${requirement.minMS.name}</span>\n" +
+                "\t\t</div>\n" +
+                "\t\t<span class=\"achievement-description\">${requirement.description}</span>\n" +
+                "\t</div>\n" +
+                "</div>";
+
+        manager.parseRequirementTemplate(reqHTML);
+        manager.parseCatalogueTemplate(catHTML);
+
+        String export = manager.renderCatalogue();
+
+        PrintWriter pw = new PrintWriter(f);
+        pw.write(export);
+        pw.close();
+        pw.flush();
+    }
 }

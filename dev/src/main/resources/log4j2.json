@@ -12,8 +12,8 @@
     },
     "loggers":{
       "root":{
-        "level":"error",
-        "appender-ref":{"ref":"console", "level":"error"}
+        "level":"warn",
+        "appender-ref":{"ref":"console"}
       },
       "logger":[
         {
@@ -37,6 +37,12 @@
           "appender-ref":{
             "ref":"console"
           }
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.configuration",
+          "level":"debug",
+          "additivity":false,
+          "appender-ref":{"ref":"console"}
         }
       ]
     }

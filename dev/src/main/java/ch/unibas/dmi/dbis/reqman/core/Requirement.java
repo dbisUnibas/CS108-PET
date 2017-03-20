@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.*;
 
 /**
@@ -274,5 +276,11 @@ public class Requirement {
 
     public Map<String, String> getPropertiesMap() {
         return new HashMap<String, String>(propertiesMap);
+    }
+
+    @JsonIgnore
+    public double getMaxPointsSensitive(){
+        double factor = isMalus() ? -1.0 : 1.0;
+        return getMaxPoints() * factor;
     }
 }

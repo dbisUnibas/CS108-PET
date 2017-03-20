@@ -3,6 +3,15 @@
 ##
 #####################################
 
+
+## Custom ignorings:
+###################
+
+# Ignores manual tests (Mostly simple tests which consist of visual and manual checking of something.
+**Tester.java
+
+## --- END custom ignorings ---
+
 ## Gradle entries by:
 ## https://raw.githubusercontent.com/github/gitignore/b89498a4674a21f2f4feb3994e82acc58d747236/Gradle.gitignore
 ## 

@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
-import java.lang.reflect.Member;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -9,14 +9,59 @@ import java.util.Vector;
  *
  * @author loris.sauter
  */
-public class Group {
+public class Group implements Comparable<Group>{
 
     private String name;
     private String projectName;
     private List<String> members;
     private String catalogueName;
-    private List<Progress> progressList;
-    private List<ProgressSummary> progressSummaries;
+    private List<Progress> progressList = new ArrayList<>();
+    private List<ProgressSummary> progressSummaries = new ArrayList<>();
+
+    private String exportFileName;
+
+    public Group(String name, String projectName, List<String> members, String catalogueName) {
+
+        this.name = name;
+        this.projectName = projectName;
+        this.members = members;
+        this.catalogueName = catalogueName;
+    }
+
+    public Group() {
+
+    }
+
+    public double getSumForMilestone(Milestone ms, Catalogue catalogue) {
+        ArrayList<Double> points = new ArrayList<>();
+
+        getProgressByMilestoneOrdinal(ms.getOrdinal()).forEach(p -> points.add(p.getPointsSensitive(catalogue)));
+
+        return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    public List<Milestone> getMilestonesForGroup(Catalogue catalogue) {
+        ArrayList<Milestone> list = new ArrayList<>();
+
+        for (Progress p : getProgressList()) {
+            Milestone ms = catalogue.getMilestoneForProgress(p);
+            if (!list.contains(ms)) {
+                list.add(ms);
+            } else {
+                // Milestone already in list.
+            }
+        }
+
+        return list;
+    }
+
+    public String getExportFileName() {
+        return exportFileName;
+    }
+
+    public void setExportFileName(String exportFileName) {
+        this.exportFileName = exportFileName;
+    }
 
     public String getName() {
         return name;
@@ -82,18 +127,6 @@ public class Group {
         this.catalogueName = catalogueName;
     }
 
-    public Group(String name, String projectName, List<String> members, String catalogueName) {
-
-        this.name = name;
-        this.projectName = projectName;
-        this.members = members;
-        this.catalogueName = catalogueName;
-    }
-
-    public Group() {
-
-    }
-
     public boolean addMember(String name) {
         return members.add(name);
     }
@@ -114,6 +147,10 @@ public class Group {
         return new Vector<Progress>(progressList);
     }
 
+    public void setProgressList(List<Progress> progressList) {
+        this.progressList = progressList;
+    }
+
     public boolean removeProgress(Progress progress) {
         return progressList.remove(progress);
     }
@@ -123,10 +160,52 @@ public class Group {
     }
 
     public List<ProgressSummary> getProgressSummaries() {
-        return new Vector<ProgressSummary>(progressSummaries);
+        return new ArrayList<ProgressSummary>(progressSummaries);
     }
 
     public boolean removeProgressSummary(ProgressSummary progressSummary) {
         return progressSummaries.remove(progressSummary);
     }
+
+    public void setProgressSummaryList(List<ProgressSummary> progressSummaryList) {
+        this.progressSummaries.clear();
+        this.progressSummaries.addAll(progressSummaryList);
+    }
+
+    @Override
+    public int compareTo(Group o) {
+        return name.compareTo(o.getName());
+    }
+
+    public ProgressSummary getProgressSummaryForMilestone(Milestone ms) {
+        for(ProgressSummary ps : progressSummaries){
+            if(ps.getMilestoneOrdinal() == ms.getOrdinal()){
+                return ps;
+            }
+        }
+        return null;
+    }
+
+    public List<Progress> getProgressByMilestoneOrdinal(int ordinal) {
+        ArrayList<Progress> list = new ArrayList<>();
+        for (Progress p : getProgressList()) {
+            if (p.getMilestoneOrdinal() == ordinal) {
+                if (!list.contains(p)) {
+                    list.add(p);
+                } else {
+                    // Progress already in list.
+                }
+            }
+        }
+        return list;
+    }
+
+    public double getTotalSum(Catalogue catalogue){
+        ArrayList<Double> points = new ArrayList<>();
+        getMilestonesForGroup(catalogue).forEach(ms -> {
+            points.add(getSumForMilestone(ms,catalogue ));
+        });
+        return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
 }

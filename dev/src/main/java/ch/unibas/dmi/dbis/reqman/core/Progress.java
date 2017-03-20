@@ -1,5 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.DoubleSummaryStatistics;
+
 /**
  * TODO: write JavaDoc
  *
@@ -8,8 +12,24 @@ package ch.unibas.dmi.dbis.reqman.core;
 public class Progress {
 
     private String requirementName;
-    private String milestoneName;
+    private int milestoneOrdinal;
     private double points;
+
+    public double getPercentage() {
+        return percentage;
+    }
+
+    /**
+     *
+     * @param percentage
+     * @deprecated Since the percentage / fraction is calculated while setting the points.
+     */
+    @Deprecated
+    public void setPercentage(double percentage) {
+        this.percentage = percentage;
+    }
+
+    private double percentage = -1d;
 
 
     public Progress() {
@@ -26,13 +46,13 @@ public class Progress {
 
         Progress progress = (Progress) o;
 
+        if (getMilestoneOrdinal() != progress.getMilestoneOrdinal()) {
+            return false;
+        }
         if (Double.compare(progress.getPoints(), getPoints()) != 0) {
             return false;
         }
-        if (getRequirementName() != null ? !getRequirementName().equals(progress.getRequirementName()) : progress.getRequirementName() != null) {
-            return false;
-        }
-        return getMilestoneName() != null ? getMilestoneName().equals(progress.getMilestoneName()) : progress.getMilestoneName() == null;
+        return getRequirementName() != null ? getRequirementName().equals(progress.getRequirementName()) : progress.getRequirementName() == null;
     }
 
     @Override
@@ -40,16 +60,16 @@ public class Progress {
         int result;
         long temp;
         result = getRequirementName() != null ? getRequirementName().hashCode() : 0;
-        result = 31 * result + (getMilestoneName() != null ? getMilestoneName().hashCode() : 0);
+        result = 31 * result + getMilestoneOrdinal();
         temp = Double.doubleToLongBits(getPoints());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
-    public Progress(String requirementName, String milestoneName, double points) {
+    public Progress(String requirementName, int milestoneOrdinal, double points) {
 
         this.requirementName = requirementName;
-        this.milestoneName = milestoneName;
+        this.milestoneOrdinal = milestoneOrdinal;
         this.points = points;
     }
 
@@ -61,19 +81,47 @@ public class Progress {
         this.requirementName = requirementName;
     }
 
-    public String getMilestoneName() {
-        return milestoneName;
+    public int getMilestoneOrdinal() {
+        return milestoneOrdinal;
     }
 
-    public void setMilestoneName(String milestoneName) {
-        this.milestoneName = milestoneName;
+    public void setMilestoneOrdinal(int milestoneOrdinal) {
+        this.milestoneOrdinal = milestoneOrdinal;
     }
 
     public double getPoints() {
         return points;
     }
 
+    @Deprecated
     public void setPoints(double points) {
         this.points = points;
+    }
+
+    public void setPoints(double points, double max){
+        this.points = points;
+        if(Double.compare(0d, max) == 0 && Double.compare(0d, points)==0){
+            // if max points == points == 0 -> progress 100%
+            percentage = 1d;
+        }else{
+            percentage = points / max;
+        }
+    }
+
+    @JsonIgnore
+    public double getPointsSensitive(Catalogue catalogue){
+        Requirement r = catalogue.getRequirementByName(requirementName);
+        double factor = r.isMalus() ? -1d : 1d;
+        return factor * points;
+    }
+
+    @JsonIgnore
+    public boolean hasProgress(){
+        return percentage > 0;
+    }
+
+    @JsonIgnore
+    public boolean hasDefaultPercentage() {
+        return Double.compare(-1d, percentage)==0;
     }
 }
