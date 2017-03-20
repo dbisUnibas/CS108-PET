@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.configuration.Templates;
 import ch.unibas.dmi.dbis.reqman.configuration.TemplatingConfigurationManager;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
@@ -12,7 +13,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -286,12 +286,14 @@ public class EditorController  {
         if(!exportFile.substring(exportFile.lastIndexOf(System.getProperty("file.separator"))).contains(".")){
             exportFile += "."+extension;
         }
-        PrintWriter pw = new PrintWriter(new File(exportFile));
+        File eFile = new File(exportFile);
+        PrintWriter pw = new PrintWriter(eFile);
         pw.write(export);
         pw.close();
         pw.flush();
         System.out.println("==============================");
-        System.out.println(" D O N E   Catalogue Export");
+        System.out.println(" D O N E   Catalogue Export @ "+ StringUtils.prettyPrintTimestamp(System.currentTimeMillis()));
+        System.out.println(" "+eFile.getPath() );
         System.out.println("==============================");
     }
 

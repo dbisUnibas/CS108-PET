@@ -16,7 +16,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import org.apache.commons.lang.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -299,12 +298,14 @@ public class EvaluatorController {
                 if(!exportFile.substring(exportFile.lastIndexOf(System.getProperty("file.separator"))).contains(".")){
                     exportFile += extension;
                 }
-                PrintWriter pw = new PrintWriter(exportDir.getPath() + System.getProperty("file.separator") + g.getExportFileName());
+                File eFile = new File(exportDir.getPath() + System.getProperty("file.separator") + g.getExportFileName());
+                PrintWriter pw = new PrintWriter(eFile);
                 pw.write(html);
                 pw.flush();
                 pw.close();
                 System.out.println("============================");
-                System.out.println(" FINISHED : " + g.getName());
+                System.out.println(" FINISHED : " + g.getName() + " @ "+ ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrintTimestamp(System.currentTimeMillis()));
+                System.out.println(" "+eFile.getPath());
                 System.out.println("============================");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();

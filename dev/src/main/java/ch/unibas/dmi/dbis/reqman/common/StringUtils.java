@@ -2,6 +2,8 @@ package ch.unibas.dmi.dbis.reqman.common;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 /**
@@ -66,5 +68,11 @@ public class StringUtils {
      */
     public static String concatWithPeriodDelimeter(String... strings){
         return concatWithDelimiter(".", strings);
+    }
+
+    public static String prettyPrintTimestamp(long timestamp){
+        Date d = new Date(timestamp);
+        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY HH:mm:ss:SSS");
+        return sdf.format(d);
     }
 }
