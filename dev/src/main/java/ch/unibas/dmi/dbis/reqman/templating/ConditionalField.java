@@ -7,7 +7,7 @@ import java.util.function.Function;
  *
  * @author loris.sauter
  */
-public class ConditionalField<E> extends  ParametrizedField<E,Boolean> {
+public class ConditionalField<E> extends ParametrizedField<E, Boolean> {
 
     /**
      * On runtime, this will contain the parsed false-string
@@ -17,26 +17,30 @@ public class ConditionalField<E> extends  ParametrizedField<E,Boolean> {
     private Function<Boolean, String> falseRenderer = null;
 
     /**
-     *
      * @param name
      * @param getter
-     * @param defaultTrueRenderer It is ensured, that the passed object to oldRender is TRUE. WILL BE ASSIGNED ON RUNTIME with real value.
+     * @param defaultTrueRenderer  It is ensured, that the passed object to oldRender is TRUE. WILL BE ASSIGNED ON RUNTIME with real value.
      * @param defaultFalseRenderer It is ensured, that the passed object to oldRender is FALSE. WILL BE ASSIGNED ON RUNTIME with real value.
      */
-    public ConditionalField(String name, Function<E,Boolean> getter, Function<Boolean,String> defaultTrueRenderer, Function<Boolean, String> defaultFalseRenderer){
+    public ConditionalField(String name, Function<E, Boolean> getter, Function<Boolean, String> defaultTrueRenderer, Function<Boolean, String> defaultFalseRenderer) {
         super(name, Type.CONDITIONAL, getter, defaultTrueRenderer);
         this.falseRenderer = defaultFalseRenderer;
     }
 
-    public Function<Boolean, String> getTrueRenderer(){
+    public static <E> ConditionalField<E> copy(ConditionalField<E> source) {
+        ConditionalField<E> copy = new ConditionalField<E>(source.getName(), source.getGetter(), source.getTrueRenderer(), source.getFalseRenderer());
+        return copy;
+    }
+
+    public Function<Boolean, String> getTrueRenderer() {
         return getRenderer();
     }
 
-    public Function<Boolean, String> getFalseRenderer(){
+    public Function<Boolean, String> getFalseRenderer() {
         return falseRenderer;
     }
 
-    public void setTrueRenderer(Function<Boolean, String> trueRenderer){
+    public void setTrueRenderer(Function<Boolean, String> trueRenderer) {
         setRenderer(trueRenderer);
     }
 
@@ -45,23 +49,24 @@ public class ConditionalField<E> extends  ParametrizedField<E,Boolean> {
     }
 
     @Override
-    public String render(E instance){
+    public String render(E instance) {
         boolean fieldValue = getter.apply(instance);
-        if(fieldValue){
+        if (fieldValue) {
             return getTrueRenderer().apply(fieldValue);
-        }else{
+        } else {
             return getFalseRenderer().apply(fieldValue);
         }
     }
 
     /**
      * Passed directly to {@link ConditionalField#render(Object)}
+     *
      * @param instance
      * @param param
      * @return
      */
     @Override
-    public String renderCarefully(E instance, String param){
+    public String renderCarefully(E instance, String param) {
         return render(instance);
     }
 
@@ -72,14 +77,9 @@ public class ConditionalField<E> extends  ParametrizedField<E,Boolean> {
         sb.append(", falseRenderer=").append(falseRenderer);
         sb.append(", trueRenderer=").append(getTrueRenderer());
         sb.append(", type='").append(getType()).append('\'');
-        sb.append(", getter='").append(getGetter() ).append('\'');
-        sb.append(", renderer='").append(getRenderer() ).append('\'');
+        sb.append(", getter='").append(getGetter()).append('\'');
+        sb.append(", renderer='").append(getRenderer()).append('\'');
         sb.append('}');
         return sb.toString();
-    }
-
-    public static <E> ConditionalField<E> copy(ConditionalField<E> source){
-        ConditionalField<E> copy = new ConditionalField<E>(source.getName(), source.getGetter(), source.getTrueRenderer(), source.getFalseRenderer());
-        return copy;
     }
 }

@@ -20,32 +20,32 @@ public class TemplateRenderer {
     private TemplateParser parser = null;
 
     @Deprecated
-    public TemplateRenderer(TemplateParser parser){
+    public TemplateRenderer(TemplateParser parser) {
         this.parser = parser;
     }
 
     public TemplateRenderer() {
     }
 
-    public <E> String render(Template<E> template, E instance){
-        LOGGER.debug("Rendering template for instance: "+instance.toString() );
-        LOGGER.trace("Render template: "+template.getTemplate() );
-        StringBuilder out = new StringBuilder(template.getTemplate() );
+    public <E> String render(Template<E> template, E instance) {
+        LOGGER.debug("Rendering template for instance: " + instance.toString());
+        LOGGER.trace("Render template: " + template.getTemplate());
+        StringBuilder out = new StringBuilder(template.getTemplate());
 
         template.getReplacements().forEach(replacement -> {
             Field<E, ?> field = replacement.getField();
-            LOGGER.debug("Replacement: "+replacement.toString());
-            int calcStart = out.indexOf(replacement.getTargetExpression() );
-            int calcEnd = calcStart+replacement.getTargetExpression().length();
-            LOGGER.debug("Calculated region: <"+calcStart+","+calcEnd+">");
-            LOGGER.trace("PreReplacement: "+out.toString());
+            LOGGER.debug("Replacement: " + replacement.toString());
+            int calcStart = out.indexOf(replacement.getTargetExpression());
+            int calcEnd = calcStart + replacement.getTargetExpression().length();
+            LOGGER.debug("Calculated region: <" + calcStart + "," + calcEnd + ">");
+            LOGGER.trace("PreReplacement: " + out.toString());
             String repl = field.render(instance);
-            if(field instanceof ParametrizedField){
+            if (field instanceof ParametrizedField) {
                 repl = ((ParametrizedField) field).renderCarefully(instance, ((ParametrizedField) field).getParameter());
             }
             out.replace(calcStart, calcEnd, repl);
 
-            LOGGER.trace("PostReplacement: "+out.toString());
+            LOGGER.trace("PostReplacement: " + out.toString());
 
             /*
             // Below code not needed, child classes of Field do override render
@@ -65,6 +65,7 @@ public class TemplateRenderer {
 
     /**
      * MAP must have the REGEX escaped value in it!
+     *
      * @param template
      * @param instance
      * @param fields
@@ -72,14 +73,14 @@ public class TemplateRenderer {
      * @return
      */
     @Deprecated
-    public <E> String oldRender(String template, E instance, Map<String, Field<E, ?>> fields){
+    public <E> String oldRender(String template, E instance, Map<String, Field<E, ?>> fields) {
 
         StringBuilder out = new StringBuilder(template);
-        fields.forEach((variable, field)->{
+        fields.forEach((variable, field) -> {
             Pattern p = Pattern.compile(variable);
             Matcher m = p.matcher(out.toString());
-            while(m.find() ){
-                if(field.getType() == Field.Type.SUB_ENTITY){
+            while (m.find()) {
+                if (field.getType() == Field.Type.SUB_ENTITY) {
                     /*
                     Entity sub = field.getSubEntity();
                     Field f = sub.getFieldForName(field.getSubFieldName() );
@@ -87,7 +88,7 @@ public class TemplateRenderer {
                     System.out.println(o);
                     out.replace(m.start(), m.end(), f.oldRender(field.getGetter().apply(instance)));
                     */
-                }else{
+                } else {
                     out.replace(m.start(), m.end(), field.render(instance));
                 }
             }

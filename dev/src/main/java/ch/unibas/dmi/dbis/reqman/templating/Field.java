@@ -157,11 +157,11 @@ public class Field<E, T> {
      *
      * @param name   The name of the field
      * @param getter The getter used to get the field's value.
-     * @param <E> The type of the entity this {@link Field} is for
-     * @param <T> The type of the field this {@link Field} represents
+     * @param <E>    The type of the entity this {@link Field} is for
+     * @param <T>    The type of the field this {@link Field} represents
      * @return A new {@link Field}.
      */
-    public static <E,T> Field<E, T> createNormalField(String name, Function<E,T> getter){
+    public static <E, T> Field<E, T> createNormalField(String name, Function<E, T> getter) {
         return new Field<>(name, Type.NORMAL, getter);
     }
 
@@ -176,19 +176,24 @@ public class Field<E, T> {
      * @param name     The name of the field
      * @param getter   The getter used to get the field's value
      * @param renderer The renderer which renders this field.
-     * @param <E> The type of the enitity this {@link Field} is for
-     * @param <T> The type of the field this {@link Field} represents
+     * @param <E>      The type of the enitity this {@link Field} is for
+     * @param <T>      The type of the field this {@link Field} represents
      * @return
      */
-    public static <E,T> Field<E,T> createObjectField(String name, Function<E,T> getter, Function<T, String> renderer){
+    public static <E, T> Field<E, T> createObjectField(String name, Function<E, T> getter, Function<T, String> renderer) {
         return new Field<>(name, Type.OBJECT, getter, renderer);
     }
 
-    public static <E,T> Field<E,T> createListField(String name, Function<E,T> getter, Function<T, String> renderer){
+    public static <E, T> Field<E, T> createListField(String name, Function<E, T> getter, Function<T, String> renderer) {
         return new Field<>(name, Type.LIST, getter, renderer);
     }
 
     // TODO Write factory methods for all types!
+
+    public static <E, T> Field<E, T> copy(Field<E, T> source) {
+        Field<E, T> copy = new Field<E, T>(source.getName(), source.getType(), source.getGetter(), source.getRenderer());
+        return copy;
+    }
 
     /**
      * Renders the instance's field.
@@ -201,12 +206,12 @@ public class Field<E, T> {
         T value = getter.apply(instance);
         switch (type) {
             case NORMAL:
-                if(getRenderer() == null){
-                    if(value instanceof Double){
-                        return StringUtils.prettyPrint((Double)value);
+                if (getRenderer() == null) {
+                    if (value instanceof Double) {
+                        return StringUtils.prettyPrint((Double) value);
                     }
                     return String.valueOf(value);
-                }else{
+                } else {
                     return renderer.apply(value);
                 }
             case OBJECT:
@@ -216,16 +221,8 @@ public class Field<E, T> {
             case SUB_ENTITY:
                 return null;
             default:
-                throw new IllegalArgumentException("Cannot render a field of type: "+type.toString());
+                throw new IllegalArgumentException("Cannot render a field of type: " + type.toString());
         }
-    }
-
-    protected Function<T, String> getRenderer(){
-        return renderer;
-    }
-
-    protected void setRenderer(Function<T, String> renderer){
-        this.renderer = renderer;
     }
 
     /**
@@ -271,7 +268,6 @@ public class Field<E, T> {
         result = 31 * result + (getter != null ? getter.hashCode() : 0);
         return result;
     }
-
 
     /**
      * Returns the name of the field.
@@ -345,11 +341,6 @@ public class Field<E, T> {
         return sb.toString();
     }
 
-    public static <E,T> Field<E,T> copy(Field<E,T> source){
-        Field<E,T> copy = new Field<E, T>(source.getName(), source.getType(), source.getGetter(), source.getRenderer() );
-        return copy;
-    }
-
     /**
      * The enumeration {@link Type} is used to differentiate between different types of {@link Field}s.
      */
@@ -388,5 +379,13 @@ public class Field<E, T> {
          * To indicate that the field represented by the {@link Field} with this type is a list and therefore cannot be rendered.
          */
         LIST
+    }
+
+    protected Function<T, String> getRenderer() {
+        return renderer;
+    }
+
+    protected void setRenderer(Function<T, String> renderer) {
+        this.renderer = renderer;
     }
 }
