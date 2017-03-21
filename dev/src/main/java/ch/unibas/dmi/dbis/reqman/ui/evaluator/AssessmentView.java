@@ -291,7 +291,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         double sum = currentPoints.stream().mapToDouble(Double::doubleValue).sum();
         tfSum.setText(String.valueOf(sum));
     }
-
     private void updateProgressViews(ActionEvent event) {
         updateProgressViews();
     }
