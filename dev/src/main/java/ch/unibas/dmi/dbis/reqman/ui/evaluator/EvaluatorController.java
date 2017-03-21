@@ -16,7 +16,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,6 +43,8 @@ public class EvaluatorController {
     private Map<String, File> groupFileMap = new TreeMap<>();
     private File lastLocation = null;
     private File lastOpenLocation = null;
+
+    private final Logger LOGGER = LogManager.getLogger(getClass() );
 
     public EvaluatorController(EvaluatorScene evaluator) {
         this.evaluator = evaluator;
@@ -70,13 +73,16 @@ public class EvaluatorController {
         FileChooser fc = Utils.createCatalogueFileChooser("Load");
         File f = fc.showOpenDialog(evaluator.getWindow());
         if (f != null) {
+            LOGGER.info("Loading catalogue: "+f.getPath());
             try {
                 catalogue = JSONUtils.readCatalogueJSONFile(f);
                 evaluator.getCatalogueInfoView().displayData(catalogue);
                 evaluator.enableAll();
+                LOGGER.info("Finished loading catalogue with name: "+catalogue.getName() );
             } catch (UnrecognizedPropertyException ex) {
                 Utils.showErrorDialog("Failed loading catalogue", "The provided file could not be read as a catalogue.\nTry again with a catalogue file.");
             } catch (IOException e) {
+                LOGGER.error("An IOException occurred while loading catalogue file: "+f.getPath(), e);
                 // TODO Handle exception
                 e.printStackTrace();
             }

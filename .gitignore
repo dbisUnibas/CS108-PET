@@ -7,6 +7,9 @@
 ## Custom ignorings:
 ###################
 
+# Ignores logs
+dev/logs/
+
 # Ignores manual tests (Mostly simple tests which consist of visual and manual checking of something.
 **Tester.java
 
