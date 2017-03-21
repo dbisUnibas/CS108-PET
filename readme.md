@@ -2,14 +2,14 @@
 
 ReqMan (Requirements Manager) is an application to manage requirements.
 
-*Requirements* are grouped in *milestones* and the collection of *requirements*
-with their respective *milestones* is called *catalogue*. *Catalogues* are 
+**Requirement**s are grouped in **milestone**s and the collection of **requirement**s
+with their respective **milestone**s is called **catalogue**. **Catalogue**s are 
 created using `ReqMan`'s built in `editor`.
 
-Using `ReqMan`'s built in `evaluator` one can register several *groups* and
-assess their voyage on achieving the *requirement*s with so called *progress*.
+Using `ReqMan`'s built in `evaluator` one can register several **group**s and
+assess their voyage on achieving the **requirement**s with so called **progress**.
 
-*Catalogue*s and *group*s may be exported with templates provided.
+*Catalogue**s and **group**s may be exported with templates provided.
 
 
 ## Table of Contents
@@ -86,12 +86,14 @@ See LICENSE.txt for the complete license text.
 There are several branches active:
 
  - `master` which is up-to-date with the documentation and core classes
- - `reqman` which is up-to-date with the lates recommended version of
+ - `reqman` which is up-to-date with the latest recommended version of
   `ReqMan`
  - `editor-exp` which is the branch for developing features related
    to `editor`
  - `assessment-exp` which is the branch for developing features related
    to `evaluator`
+ - `reqman-exp` which is the branch for developing features related to both: 
+   `editor` and `evaluator`
  - `experimental` a branch dedicated to highly experimental development.
    The application as in the state of this branch may not be fully compatible
    with the ones of other states.
