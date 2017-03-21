@@ -51,6 +51,10 @@ public class TemplatingConfigurationManager {
     }
 
     public void loadConfig(File config) {
+        if(config == null){
+            throw LOGGER.throwing(new NullPointerException("Cannot load config if the specified file is null"));
+        }
+        LOGGER.info("Loading templating config for file: "+config.getPath() );
         TemplatingConfiguration cnfg = null;
         try {
             cnfg = JSONUtils.readFromJSONFile(config, TemplatingConfiguration.class);
@@ -59,6 +63,7 @@ public class TemplatingConfigurationManager {
             handleExceptionDuringLoading(ioe);
         }
         loadTemplateConfig();
+        LOGGER.info("Finished loading templating config.");
     }
 
     public void loadConfig() {
