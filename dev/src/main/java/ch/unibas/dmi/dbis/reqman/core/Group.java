@@ -208,4 +208,16 @@ public class Group implements Comparable<Group> {
         return points.stream().mapToDouble(Double::doubleValue).sum();
     }
 
+    public Progress getProgressForRequirement(Requirement requirement){
+        if(requirement == null){
+            throw new IllegalArgumentException("Requirement cannot be null, if progress for it should be provided");
+        }
+        for(Progress p : progressList){
+            if(p.getRequirementName().equals(requirement.getName() ) ){
+                return p;
+            }
+        }
+        return null;
+    }
+
 }
