@@ -97,7 +97,7 @@ public class EvaluatorController {
 
         if (group != null) {
             addGroupToInternalStorage(group);
-            addGroupTab(group);
+            addGroupTab(group, true);
         }
     }
 
@@ -111,14 +111,16 @@ public class EvaluatorController {
     }
 
     public void addGroupTab(Group active) {
+        addGroupTab(active, false);
+    }
+
+    void addGroupTab(Group active, boolean fresh){
         if (evaluator.isGroupTabbed(active)) {
             // Dont add another tab of the same group
         } else {
-            evaluator.addGroupTab(groupAVMap.get(active.getName()));
+            evaluator.addGroupTab(groupAVMap.get(active.getName()), fresh );
         }
         evaluator.setActiveTab(groupAVMap.get(active.getName() ) );
-
-
     }
 
     public List<Requirement> getRequirementsByMilestone(int ordinal) {

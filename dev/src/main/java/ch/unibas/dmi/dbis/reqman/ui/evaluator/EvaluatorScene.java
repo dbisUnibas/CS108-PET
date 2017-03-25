@@ -65,12 +65,19 @@ public class EvaluatorScene extends TitledScene {
     }
 
     public void addGroupTab(AssessmentView av) {
+        addGroupTab(av, false);
+    }
+
+    void addGroupTab(AssessmentView av, boolean unsafed){
         Tab tab = new Tab();
         tab.setText(av.getActiveGroup().getName());
         av.bindToParentSize(rightContent);
         tab.setContent(av);
         tabPane.getTabs().add(tab);
         groupTabMap.put(av.getActiveGroup(), tab);
+        if(unsafed){
+            markDirty(av.getActiveGroup() );
+        }
     }
 
     public boolean isGroupTabbed(Group group) {
