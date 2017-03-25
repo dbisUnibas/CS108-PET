@@ -1,8 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.core.Group;
+import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitledScene;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
@@ -12,6 +14,8 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ConcurrentModificationException;
 import java.util.TreeMap;
@@ -43,6 +47,11 @@ public class EvaluatorScene extends TitledScene {
     private TreeMap<Group, Tab> groupTabMap = new TreeMap<>();
     private EventHandler<ReqmanApplication.ChangeEvent> changeHandler = null;
 
+    private final ToggleGroup toggleMilestone = new ToggleGroup();
+    private Menu menuGlobalMilestone;
+
+    private final Logger LOGGER = LogManager.getLogger(getClass());
+
     public EvaluatorScene(String title, int width, int height) {
         this(width, height);
         this.title = title;
@@ -64,13 +73,16 @@ public class EvaluatorScene extends TitledScene {
         return catInfoView;
     }
 
-    public void addGroupTab(AssessmentView av) {
+    void addGroupTab(AssessmentView av, boolean unsafed){
         Tab tab = new Tab();
         tab.setText(av.getActiveGroup().getName());
         av.bindToParentSize(rightContent);
         tab.setContent(av);
         tabPane.getTabs().add(tab);
         groupTabMap.put(av.getActiveGroup(), tab);
+        if(unsafed){
+            markDirty(av.getActiveGroup() );
+        }
     }
 
     public boolean isGroupTabbed(Group group) {
@@ -232,8 +244,54 @@ public class EvaluatorScene extends TitledScene {
         Menu menuEdit = new Menu("Edit");
         MenuItem itemModify = new MenuItem("Modify Group");
         itemModify.setOnAction(controller::handleModifyGroup);
+        menuGlobalMilestone = new Menu("Set milestone forall groups");
 
-        menuEdit.getItems().addAll(itemModify);
+
+        // The set-milestone-forall-groups menu related handling
+        toggleMilestone.selectedToggleProperty().addListener( (ObservableValue<? extends Toggle> ov, Toggle oldToggle, Toggle newToggle ) -> {
+            if(ov != null){
+                LOGGER.trace("OV: "+ov.toString() );
+                if(ov.getValue() instanceof RadioMenuItem){
+                    RadioMenuItem item = (RadioMenuItem) ov.getValue();
+                    if(item != null && item.getUserData() != null){
+                        if(item.getUserData() instanceof String && ((String)item.getUserData()).equals("clear")){
+                            controller.resetGlobalMilestoneChoice();
+                            return;
+                        }
+                    }
+                }
+            }
+            if(newToggle != null){
+                if(newToggle.getUserData() instanceof Milestone){
+                    Milestone newMS = (Milestone) newToggle.getUserData();
+                    LOGGER.trace("newMS: "+newMS.getName());
+                }else{
+                    LOGGER.trace("newToggle: "+newToggle.toString() );
+                }
+
+            }
+            if(oldToggle != null){
+                if(oldToggle.getUserData() instanceof  Milestone){
+                    Milestone oldMS = (Milestone) oldToggle.getUserData();
+                    LOGGER.trace("oldMS: "+oldMS.getName() );
+                }else{
+                    LOGGER.trace("oldToggle: "+oldToggle.toString());
+                }
+
+            }
+
+            /*
+            Conclusion: Only if *newly* selected the event is fired and thus handled in here.
+             */
+            if(toggleMilestone.getSelectedToggle() != null && toggleMilestone.getSelectedToggle().getUserData() instanceof Milestone){
+                Milestone ms = (Milestone) toggleMilestone.getSelectedToggle().getUserData();
+                LOGGER.debug("Selected: "+ms.getName());
+                controller.setGlobalMilestoneChoice(ms);
+            }
+        } );
+
+
+        menuEdit.getItems().addAll(itemModify, menuGlobalMilestone);
 
         Menu menuView = new Menu("View");
         MenuItem itemChangeToEditor = new MenuItem("Eiditor");
@@ -252,5 +310,18 @@ public class EvaluatorScene extends TitledScene {
             ReqmanApplication.ChangeEvent evt = new ReqmanApplication.ChangeEvent(event, ReqmanApplication.EDITOR_VIEW);
             changeHandler.handle(evt);
         }
+    }
+
+    void setupGlobalMilestoneMenu(){
+        for(Milestone ms : controller.getMilestones()){
+            RadioMenuItem itemMilestone = new RadioMenuItem(ms.getName() );
+            itemMilestone.setUserData(ms);
+            itemMilestone.setToggleGroup(toggleMilestone);
+            menuGlobalMilestone.getItems().add(itemMilestone);
+        }
+        RadioMenuItem itemClearMilestone = new RadioMenuItem("Clear Global Milestone");
+        itemClearMilestone.setUserData("clear");
+        itemClearMilestone.setToggleGroup(toggleMilestone);
+        menuGlobalMilestone.getItems().add(0, itemClearMilestone);
     }
 }

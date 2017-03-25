@@ -40,6 +40,7 @@ public class EvaluatorController {
 
     private ObservableList<Group> groups;
     private Map<String, AssessmentView> groupAVMap = new TreeMap<>();
+    private Milestone activeMS = null;
     private Map<String, File> groupFileMap = new TreeMap<>();
     private File lastLocation = null;
     private File lastOpenLocation = null;
@@ -78,6 +79,7 @@ public class EvaluatorController {
                 catalogue = JSONUtils.readCatalogueJSONFile(f);
                 evaluator.getCatalogueInfoView().displayData(catalogue);
                 evaluator.enableAll();
+                evaluator.setupGlobalMilestoneMenu();
                 LOGGER.info("Finished loading catalogue with name: "+catalogue.getName() );
             } catch (UnrecognizedPropertyException ex) {
                 Utils.showErrorDialog("Failed loading catalogue", "The provided file could not be read as a catalogue.\nTry again with a catalogue file.");
@@ -97,7 +99,7 @@ public class EvaluatorController {
 
         if (group != null) {
             addGroupToInternalStorage(group);
-            addGroupTab(group);
+            addGroupTab(group, true);
         }
     }
 
@@ -111,14 +113,30 @@ public class EvaluatorController {
     }
 
     public void addGroupTab(Group active) {
+        addGroupTab(active, false);
+    }
+
+    public void setGlobalMilestoneChoice(Milestone ms) {
+        LOGGER.debug("Set global milestone choice to: "+ms.getName() );
+        this.activeMS = ms;
+        for(AssessmentView av : groupAVMap.values()){
+            LOGGER.trace("Setting milestone "+ms.getName() +" for AV: "+av.getActiveGroup().getName() );
+            av.selectMilestone(ms);
+        }
+    }
+
+    public void resetGlobalMilestoneChoice() {
+        LOGGER.debug("Resetting global milestone choice");
+        this.activeMS = null;
+    }
+
+    void addGroupTab(Group active, boolean fresh){
         if (evaluator.isGroupTabbed(active)) {
             // Dont add another tab of the same group
         } else {
-            evaluator.addGroupTab(groupAVMap.get(active.getName()));
+            evaluator.addGroupTab(groupAVMap.get(active.getName()), fresh );
         }
         evaluator.setActiveTab(groupAVMap.get(active.getName() ) );
-
-
     }
 
     public List<Requirement> getRequirementsByMilestone(int ordinal) {
@@ -251,7 +269,14 @@ public class EvaluatorController {
 
     private void addGroupToInternalStorage(Group group) {
         groups.add(group);
-        groupAVMap.put(group.getName(), new AssessmentView(this, group));
+        if(activeMS != null){
+            LOGGER.trace("Creating AV with pre-set MS: "+activeMS.getName());
+            groupAVMap.put(group.getName(), new AssessmentView(this, group, activeMS) );
+        }else{
+            LOGGER.trace("Creating AV without pre-set MS");
+            groupAVMap.put(group.getName(), new AssessmentView(this, group));
+        }
+
     }
 
     private void removeGroup(Group group) {

@@ -72,6 +72,11 @@ public class StringUtils {
         return concatWithDelimiter(".", strings);
     }
 
+    /**
+     * Prints a given timestamp with the SimpleDateFormat {@code dd.MM.YYYY HH:mm:ss:SSS}
+     * @param timestamp The timestamp to pretty print
+     * @return The formatted timestamp, as a string.
+     */
     public static String prettyPrintTimestamp(long timestamp) {
         Date d = new Date(timestamp);
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY HH:mm:ss:SSS");
