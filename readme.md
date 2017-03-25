@@ -1,4 +1,4 @@
-# ReqMan - branch: reqman
+# ReqMan - branch: reqman-exp
 
 ReqMan (Requirements Manager) is an application to manage requirements.
 
