@@ -173,7 +173,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private void layoutComponents() {
         // Forge top aka title bar:
         titleBar.getChildren().addAll(lblChoice, cbMilestones, btnRefresh, btnSummary);
-        titleBar.setStyle(titleBar.getStyle() + " -fx-spacing: 10px");
+        titleBar.setStyle(titleBar.getStyle() + "-fx-spacing: 10px; -fx-padding: 10px;");
 
         if (controller != null) {
             cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
