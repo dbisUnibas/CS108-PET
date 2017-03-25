@@ -8,6 +8,8 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -32,6 +34,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private VBox content;
     private ScrollPane scrollPane;
 
+    private final Logger LOGGER = LogManager.getLogger(getClass() );
 
     private EvaluatorController controller;
 
@@ -45,17 +48,25 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private List<ProgressView> activeProgressViews = new ArrayList<>();
     private Set<Milestone> visitedMilestones = new HashSet<>();
 
-    public AssessmentView(EvaluatorController controller, Group active) {
+    AssessmentView(EvaluatorController controller, Group active) {
+        this(controller, active, null);
+    }
+
+    AssessmentView(EvaluatorController controller, Group activeGroup, Milestone activeMS){
         super();
+        LOGGER.debug("Initializing for group "+activeGroup.getName() );
 
         this.controller = controller;
-        this.group = active;
+        this.group = activeGroup;
+        this.activeMS = activeMS;
+
+        LOGGER.debug("Active MS: "+(this.activeMS != null ? this.activeMS.getName() : "null"));
 
         initComponents();
         layoutComponents();
         loadGroup();
 
-        updateProgressViews();
+        updateProgressViews(this.activeMS);
     }
 
     public List<ProgressSummary> getSummaries() {
@@ -88,6 +99,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
 
         return list;
+    }
+
+    public void setActiveMilestone(Milestone activeMilestone) {
+        this.activeMS = activeMilestone;
     }
 
     private void loadGroup() {
@@ -180,17 +195,16 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
         if (controller != null) {
             cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
-            this.activeMS = cbMilestones.getItems().get(0);
             cbMilestones.setCellFactory(param -> new Utils.MilestoneCell());
             cbMilestones.setButtonCell(new Utils.MilestoneCell());
 
             cbMilestones.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+                LOGGER.trace("Handling milestone choice");
                 updateProgressViews(cbMilestones.getSelectionModel().getSelectedItem());
             });
         }
 
         if (controller != null) {
-            //btnRefresh.setOnAction(this::updateProgressViews);
             btnSummary.setOnAction(this::handleComments);
         }
 
@@ -262,20 +276,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         return null;
     }
 
-    private void loadActiveProgressViews() {
-        loadActiveProgressViews(this.activeMS);
-    }
-
     private void loadActiveProgressViews(Milestone activeMS){
-        if (activeMS == null) {
-            return;
-        }
-        if(this.activeMS == null){
-            this.activeMS = activeMS;
-        }
-        visitedMilestones.add(activeMS);
+        LOGGER.trace(":loadActiveProgressViews - MS: "+activeMS.getName());
+        LOGGER.trace(":loadActiveProgressViews - this.activeMS: "+this.activeMS.getName());
+        visitedMilestones.add(this.activeMS);
         activeProgressViews.clear();
-        List<Requirement> reqs = controller.getRequirementsByMilestone(activeMS.getOrdinal());
+        List<Requirement> reqs = controller.getRequirementsByMilestone(this.activeMS.getOrdinal());
         reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
         reqs.forEach(r -> {
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
@@ -283,25 +289,27 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
             pv.addPointsChangeListener(this);
             activeProgressViews.add(pv);
         });
+
     }
 
-    private void updateProgressViews() {
+    /**
+     *
+     * @param activeMS If {@code == null}, the first entry in the choice is set.
+     */
+    private void updateProgressViews(Milestone activeMS){
+        LOGGER.trace(":updateProgressViews - MS: "+ (activeMS != null ? activeMS.getName() : "null") );
         detachProgressViews();
         tfSum.setText("0");
-        loadActiveProgressViews();
+        if(activeMS == null){
+            LOGGER.trace(":updateProgressViews - Setting default active ms");
+            this.activeMS = cbMilestones.getItems().get(0);
+        }
+        loadActiveProgressViews(this.activeMS);
         attachProgressViews();
         calcActiveSum();
         if(cbMilestones.getSelectionModel().getSelectedItem() == null){
             cbMilestones.getSelectionModel().select(this.activeMS);
         }
-    }
-
-    private void updateProgressViews(Milestone activeMS){
-        detachProgressViews();
-        tfSum.setText("0");
-        loadActiveProgressViews(activeMS);
-        attachProgressViews();
-        calcActiveSum();
     }
 
     /**
@@ -310,7 +318,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
      */
     public void selectMilestone(Milestone ms){
         this.activeMS = ms;
-        updateProgressViews();
+        cbMilestones.getSelectionModel().select(ms);
     }
 
     private void calcActiveSum() {
@@ -322,10 +330,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         });
         double sum = currentPoints.stream().mapToDouble(Double::doubleValue).sum();
         tfSum.setText(String.valueOf(sum));
-    }
-
-    private void updateProgressViews(ActionEvent event) {
-        updateProgressViews();
     }
 
     private void attachProgressViews() {
