@@ -22,6 +22,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private AnchorPane titleAnchor;
     private Label lblChoice;
     private ComboBox<Milestone> cbMilestones;
+    @Deprecated // Added changelistener to cbMilestones
     private Button btnRefresh;
     private Button btnSummary;
     private HBox statusWrapper;
@@ -160,7 +161,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         titleAnchor = new AnchorPane();
         lblChoice = new Label("Current Milestone: ");
         cbMilestones = new ComboBox<>();
-        btnRefresh = new Button("Update");
+        //btnRefresh = new Button("Update");
         btnSummary = new Button("Comments");
         statusWrapper = new HBox();
         statusBar = new AnchorPane();
@@ -174,17 +175,22 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private void layoutComponents() {
         // Forge top aka title bar:
         titleBar.setAlignment(Pos.CENTER_LEFT);
-        titleBar.getChildren().addAll(lblChoice, cbMilestones, btnRefresh, btnSummary);
+        titleBar.getChildren().addAll(lblChoice, cbMilestones, btnSummary);
         titleBar.setStyle(titleBar.getStyle() + "-fx-spacing: 10px; -fx-padding: 10px;");
 
         if (controller != null) {
             cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
+            this.activeMS = cbMilestones.getItems().get(0);
             cbMilestones.setCellFactory(param -> new Utils.MilestoneCell());
             cbMilestones.setButtonCell(new Utils.MilestoneCell());
+
+            cbMilestones.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+                updateProgressViews(cbMilestones.getSelectionModel().getSelectedItem());
+            });
         }
 
         if (controller != null) {
-            btnRefresh.setOnAction(this::updateProgressViews);
+            //btnRefresh.setOnAction(this::updateProgressViews);
             btnSummary.setOnAction(this::handleComments);
         }
 
@@ -205,8 +211,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         AnchorPane.setTopAnchor(sep2, 0d);
         AnchorPane.setRightAnchor(statusWrapper, 10d);
         setBottom(statusBar);
-
-        cbMilestones.getSelectionModel().select(0);
 
     }
 
@@ -257,11 +261,16 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     }
 
     private void loadActiveProgressViews() {
-        Milestone activeMS = cbMilestones.getSelectionModel().getSelectedItem();
+        loadActiveProgressViews(this.activeMS);
+    }
+
+    private void loadActiveProgressViews(Milestone activeMS){
         if (activeMS == null) {
             return;
         }
-        this.activeMS = activeMS;
+        if(this.activeMS == null){
+            this.activeMS = activeMS;
+        }
         visitedMilestones.add(activeMS);
         activeProgressViews.clear();
         List<Requirement> reqs = controller.getRequirementsByMilestone(activeMS.getOrdinal());
@@ -272,15 +281,34 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
             pv.addPointsChangeListener(this);
             activeProgressViews.add(pv);
         });
-
     }
 
     private void updateProgressViews() {
         detachProgressViews();
-        tfSum.setText(String.valueOf(0));
+        tfSum.setText("0");
         loadActiveProgressViews();
         attachProgressViews();
         calcActiveSum();
+        if(cbMilestones.getSelectionModel().getSelectedItem() == null){
+            cbMilestones.getSelectionModel().select(this.activeMS);
+        }
+    }
+
+    private void updateProgressViews(Milestone activeMS){
+        detachProgressViews();
+        tfSum.setText("0");
+        loadActiveProgressViews(activeMS);
+        attachProgressViews();
+        calcActiveSum();
+    }
+
+    /**
+     * Also updates the view
+     * @param ms
+     */
+    public void selectMilestone(Milestone ms){
+        this.activeMS = ms;
+        updateProgressViews();
     }
 
     private void calcActiveSum() {
