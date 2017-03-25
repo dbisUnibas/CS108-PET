@@ -204,7 +204,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         setCenter(scrollPane);
 
         // Forge bottom aka status bar:
+        statusWrapper.setAlignment(Pos.CENTER_LEFT);
         statusWrapper.getChildren().addAll(lblSum, tfSum);
+        statusWrapper.setStyle("-fx-padding: 10px; -fx-spacing: 10px;");
         Separator sep2 = new Separator();
         statusBar.getChildren().add(statusWrapper);
         statusBar.getChildren().add(sep2);
