@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
@@ -172,6 +173,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     private void layoutComponents() {
         // Forge top aka title bar:
+        titleBar.setAlignment(Pos.CENTER_LEFT);
         titleBar.getChildren().addAll(lblChoice, cbMilestones, btnRefresh, btnSummary);
         titleBar.setStyle(titleBar.getStyle() + "-fx-spacing: 10px; -fx-padding: 10px;");
 
