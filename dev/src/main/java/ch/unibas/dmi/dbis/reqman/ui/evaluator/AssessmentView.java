@@ -200,6 +200,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
             cbMilestones.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
                 LOGGER.trace("Handling milestone choice");
+                this.activeMS = cbMilestones.getSelectionModel().getSelectedItem();
                 updateProgressViews(cbMilestones.getSelectionModel().getSelectedItem());
             });
         }
@@ -286,11 +287,27 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         reqs.forEach(r -> {
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
             ProgressView pv = new ProgressView(p, r);
+            verifyPredecessorsAchieved(pv);
             pv.addPointsChangeListener(this);
             activeProgressViews.add(pv);
         });
 
     }
+
+    private void verifyPredecessorsAchieved(ProgressView pv){
+        int achievedPredecessors = 0;
+        for(String name : pv.getRequirement().getPredecessorNames() ) {
+            Requirement pred = controller.getRequirementByName(name);
+            Progress p = group.getProgressForRequirement(pred);
+            if(p.hasProgress() ){
+                achievedPredecessors++;
+            }
+        }
+        if(achievedPredecessors != pv.getRequirement().getPredecessorNames().size() ){
+            pv.setDisable(true);
+        }
+    }
+
 
     /**
      *
