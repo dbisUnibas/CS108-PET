@@ -256,3 +256,10 @@ task setupVersion{
 jar.doLast{
     println 'Produced jar: '+jar.archiveName
 }
+
+task reqmanVersion{
+    doLast{
+        println('Current version of ReqMan: ')
+        printVersion()
+    }
+}

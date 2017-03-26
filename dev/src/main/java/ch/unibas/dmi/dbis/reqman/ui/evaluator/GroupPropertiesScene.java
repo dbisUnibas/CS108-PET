@@ -13,6 +13,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.util.Callback;
 import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,8 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     private TableView<Member> table;
     private ch.unibas.dmi.dbis.reqman.core.Group group = null;
     private ObservableList<Member> tableData;
+
+    private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GroupPropertiesScene.class );
 
     public GroupPropertiesScene(EvaluatorController controller) {
         this.controller = controller;
@@ -276,21 +279,26 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         }
 
         public static Member convertFromString(String m) {
+            LOGGER.debug("Member:convertFormString - "+m);
             int firstDelim = m.indexOf(DELIMETER);
-
+            LOGGER.debug("Member:convertFormString - First delim: "+firstDelim);
             if (firstDelim < 0) {
                 throw new IllegalArgumentException("Member invalid: " + m);
             }
             String name = m.substring(0, firstDelim);
-
+            LOGGER.debug("Member:convertFormString - Extracted name: "+name);
             int secondDelim = m.lastIndexOf(DELIMETER);
+            LOGGER.debug("Member:convertFormString - Second delim: "+secondDelim);
             String surname = "";
             String email = "";
-            if (secondDelim < 0) {
+            if (secondDelim < 0 || secondDelim == firstDelim) {
                 surname = m.substring(firstDelim + 1);
+                LOGGER.debug("Member:convertFormString - Surname: "+surname);
             } else {
                 surname = m.substring(firstDelim + 1, secondDelim);
+                LOGGER.debug("Member:convertFormString - Surname: "+surname);
                 email = m.substring(secondDelim + 1);
+                LOGGER.debug("Member:convertFormString - Email: "+email);
             }
 
             return new Member(name, surname, email);
