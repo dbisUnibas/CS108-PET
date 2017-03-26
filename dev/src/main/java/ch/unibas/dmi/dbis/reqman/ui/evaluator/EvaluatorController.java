@@ -230,13 +230,19 @@ public class EvaluatorController {
         if (!isCatalogueSet()) {
             return;
         }
-        /*
+        LOGGER.trace(":handleModifyGroup");
         Group active = evaluator.getActiveGroup();
+        if(active == null){
+            return;
+        }
+        LOGGER.debug("Modify requrest for: "+active.getName() );
         Group newGroup = EvaluatorPromptFactory.promptGroup(active, this);
         if(newGroup != null){
             replaceGroup(active, newGroup);
+        }else{
+            LOGGER.trace("Modification aborted");
         }
-        */
+
     }
 
     public ObservableList<Group> getObservableGroups() {
@@ -268,15 +274,27 @@ public class EvaluatorController {
     }
 
     private void addGroupToInternalStorage(Group group) {
-        groups.add(group);
-        if(activeMS != null){
-            LOGGER.trace("Creating AV with pre-set MS: "+activeMS.getName());
-            groupAVMap.put(group.getName(), new AssessmentView(this, group, activeMS) );
-        }else{
-            LOGGER.trace("Creating AV without pre-set MS");
-            groupAVMap.put(group.getName(), new AssessmentView(this, group));
-        }
+        addGroupToInternalStorage(group, null);
+    }
 
+    private void addGroupToInternalStorage(Group group, AssessmentView av){
+        if(av != null){
+            LOGGER.trace(":addGroupToInternalStorage - Adding pre-existing AV");
+            groupAVMap.put(group.getName(), av);
+            if(activeMS != null){
+                LOGGER.trace(":addGroupToInternalStorage - Selecting activeMS: "+activeMS.getName());
+                av.selectMilestone(activeMS);
+            }
+        }else{
+            if(activeMS != null){
+                LOGGER.trace("Creating AV with pre-set MS: "+activeMS.getName());
+                groupAVMap.put(group.getName(), new AssessmentView(this, group, activeMS) );
+            }else{
+                LOGGER.trace("Creating AV without pre-set MS");
+                groupAVMap.put(group.getName(), new AssessmentView(this, group));
+            }
+        }
+        groups.add(group);
     }
 
     private void removeGroup(Group group) {
@@ -307,9 +325,17 @@ public class EvaluatorController {
     }
 
     private void replaceGroup(Group oldGroup, Group newGroup) {
-        removeGroup(oldGroup);
-        addGroupTab(newGroup);
-        addGroupToInternalStorage(newGroup);
+        // TODO: Remove old group tab, remove old group in list
+        AssessmentView av = groupAVMap.get(oldGroup.getName() );
+        av.replaceGroup(newGroup);
+        groupAVMap.remove(oldGroup.getName() );
+        addGroupToInternalStorage(newGroup, av);
+        removeGroupTab(oldGroup);
+        addGroupTab(newGroup, true);
+    }
+
+    private void removeGroupTab(Group grou) {
+        evaluator.removeTab(grou);
     }
 
     private void exportGroups(File exportDir) {

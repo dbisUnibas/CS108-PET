@@ -105,6 +105,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         this.activeMS = activeMilestone;
     }
 
+    void replaceGroup(Group newGroup) {
+        this.group = newGroup;
+    }
+
     private void loadGroup() {
         if (summaries != null) {
             summaries.addAll(group.getProgressSummaries());
