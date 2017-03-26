@@ -118,9 +118,14 @@ public class EvaluatorScene extends TitledScene {
                 }
             }
         } catch (ConcurrentModificationException ex) {
-            // Silently catching this exception, since it occurs by design.
+            // Silently catching this exception, since 1 thread environment
         }
 
+    }
+
+    void removeGroupTab(Group oldGroup){
+        Tab oldTab = groupTabMap.get(oldGroup);
+        tabPane.getTabs().remove(oldTab);
     }
 
     public String getTitle() {

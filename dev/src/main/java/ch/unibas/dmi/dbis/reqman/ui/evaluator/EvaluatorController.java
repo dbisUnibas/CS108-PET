@@ -329,13 +329,14 @@ public class EvaluatorController {
         AssessmentView av = groupAVMap.get(oldGroup.getName() );
         av.replaceGroup(newGroup);
         groupAVMap.remove(oldGroup.getName() );
+        groups.remove(oldGroup);
         addGroupToInternalStorage(newGroup, av);
         removeGroupTab(oldGroup);
         addGroupTab(newGroup, true);
     }
 
-    private void removeGroupTab(Group grou) {
-        evaluator.removeTab(grou);
+    private void removeGroupTab(Group group) {
+        evaluator.removeGroupTab(group);
     }
 
     private void exportGroups(File exportDir) {
