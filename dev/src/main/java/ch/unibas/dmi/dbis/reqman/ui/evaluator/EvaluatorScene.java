@@ -67,6 +67,7 @@ public class EvaluatorScene extends TitledScene {
         catInfoView = new CatalogueInfoView();
         initComponents();
         disableAll();
+        controller.openBackupsIfExistent();
     }
 
     public CatalogueInfoView getCatalogueInfoView() {
@@ -165,6 +166,11 @@ public class EvaluatorScene extends TitledScene {
             tab.setText(text);
         }
 
+    }
+
+    boolean isDirty(Group group){
+        Tab tab = groupTabMap.get(group);
+        return tab.getStyleClass().contains("modified");
     }
 
     public void setOnChangeEvent(EventHandler<ReqmanApplication.ChangeEvent> handler) {
@@ -328,5 +334,9 @@ public class EvaluatorScene extends TitledScene {
         itemClearMilestone.setUserData("clear");
         itemClearMilestone.setToggleGroup(toggleMilestone);
         menuGlobalMilestone.getItems().add(0, itemClearMilestone);
+    }
+
+    public void stop() {
+        controller.stop();
     }
 }

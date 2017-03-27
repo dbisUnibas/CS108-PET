@@ -1,6 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.common.IOUtilites;
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
+import ch.unibas.dmi.dbis.reqman.configuration.ConfigUtils;
 import ch.unibas.dmi.dbis.reqman.configuration.Templates;
 import ch.unibas.dmi.dbis.reqman.configuration.TemplatingConfigurationManager;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
@@ -19,10 +22,10 @@ import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -70,25 +73,31 @@ public class EvaluatorController {
         return r;
     }
 
+    private File catalogueFile = null;
+
     public void handleLoadCatalogue(ActionEvent event) {
         FileChooser fc = Utils.createCatalogueFileChooser("Load");
-        File f = fc.showOpenDialog(evaluator.getWindow());
-        if (f != null) {
-            LOGGER.info("Loading catalogue: "+f.getPath());
+        catalogueFile = fc.showOpenDialog(evaluator.getWindow());
+        if (catalogueFile != null) {
+            LOGGER.info("Loading catalogue: "+catalogueFile.getPath());
             try {
-                catalogue = JSONUtils.readCatalogueJSONFile(f);
-                evaluator.getCatalogueInfoView().displayData(catalogue);
-                evaluator.enableAll();
-                evaluator.setupGlobalMilestoneMenu();
-                LOGGER.info("Finished loading catalogue with name: "+catalogue.getName() );
+                loadCatalogue(catalogueFile);
             } catch (UnrecognizedPropertyException ex) {
                 Utils.showErrorDialog("Failed loading catalogue", "The provided file could not be read as a catalogue.\nTry again with a catalogue file.");
             } catch (IOException e) {
-                LOGGER.error("An IOException occurred while loading catalogue file: "+f.getPath(), e);
+                LOGGER.error("An IOException occurred while loading catalogue file: "+catalogueFile.getPath(), e);
                 // TODO Handle exception
                 e.printStackTrace();
             }
         }
+    }
+
+    private void loadCatalogue(File catalogueFile) throws IOException {
+        catalogue = JSONUtils.readCatalogueJSONFile(catalogueFile);
+        evaluator.getCatalogueInfoView().displayData(catalogue);
+        evaluator.enableAll();
+        evaluator.setupGlobalMilestoneMenu();
+        LOGGER.info("Finished loading catalogue with name: "+catalogue.getName() );
     }
 
     public void handleAddGroup(ActionEvent event) {
@@ -166,18 +175,7 @@ public class EvaluatorController {
             if (f != null) {
                 try {
                     Group group = JSONUtils.readGroupJSONFile(f);
-                    if (!group.getCatalogueName().equals(catalogue.getName())) {
-                        Utils.showErrorDialog("Catalogue signature failure", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: " + group.getCatalogueName() + ", Currentl catalogue: " + catalogue.getName());
-                        return;
-                    }
-                    if (!isGroupNameUnique(group.getName())) {
-                        Utils.showErrorDialog("Opening group failed", "There already exists a group with name:\n\n" + group.getName() + "\n\nYou have to rename the group manually if both groups are needed.");
-                        return;
-                    }
-                    addGroupToInternalStorage(group);
-                    groupFileMap.put(group.getName(), f);
-                    lastOpenLocation = f.getParentFile();
-                    addGroupTab(group);
+                    loadGroup(f, group);
                 } catch (UnrecognizedPropertyException ex) {
                     Utils.showErrorDialog("Failed opening group", "The provided file could not be read as a group.\nTry again with a group file.");
                 } catch (IOException e) {
@@ -186,6 +184,23 @@ public class EvaluatorController {
             }
         });
 
+    }
+
+    private void loadGroup(File f, Group group) {
+        if (!group.getCatalogueName().equals(catalogue.getName())) {
+            Utils.showErrorDialog("Catalogue signature failure", "The group loaded has a different catalogue name stored than currently active:\nGroups's catalgue name: " + group.getCatalogueName() + ", Currentl catalogue: " + catalogue.getName());
+            return;
+        }
+        if (!isGroupNameUnique(group.getName())) {
+            Utils.showErrorDialog("Opening group failed", "There already exists a group with name:\n\n" + group.getName() + "\n\nYou have to rename the group manually if both groups are needed.");
+            return;
+        }
+        addGroupToInternalStorage(group);
+        if(f != null){
+            groupFileMap.put(group.getName(), f);
+            lastOpenLocation = f.getParentFile();
+        }
+        addGroupTab(group);
     }
 
     public void handleSaveGroup(ActionEvent event) {
@@ -200,6 +215,7 @@ public class EvaluatorController {
         } else {
             try {
                 saveGroup(active, av, f);
+                evaluator.unmarkDirty(active);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -218,6 +234,7 @@ public class EvaluatorController {
         if (f != null) {
             try {
                 saveGroup(active, av, f);
+                evaluator.unmarkDirty(active);
                 groupFileMap.put(active.getName(), f);
                 lastLocation = f.getParentFile();
             } catch (IOException e) {
@@ -305,7 +322,6 @@ public class EvaluatorController {
     private void saveGroup(Group group, AssessmentView av, File f) throws IOException {
         gatherGroupProperties(group, av);
         JSONUtils.writeToJSONFile(group, f);
-        evaluator.unmarkDirty(group);
     }
 
     private void gatherGroupProperties(Group group, AssessmentView av) {
@@ -325,7 +341,6 @@ public class EvaluatorController {
     }
 
     private void replaceGroup(Group oldGroup, Group newGroup) {
-        // TODO: Remove old group tab, remove old group in list
         AssessmentView av = groupAVMap.get(oldGroup.getName() );
         av.replaceGroup(newGroup);
         groupAVMap.remove(oldGroup.getName() );
@@ -469,5 +484,91 @@ public class EvaluatorController {
         manager.parseProgressTemplate(progressTemplate);
 
         return manager;
+    }
+
+    void stop() {
+        LOGGER.info("Stopping...");
+        for(Group g : groups){
+            if(evaluator.isDirty(g) ){
+                saveAsBackup(g);
+            }
+        }
+    }
+
+    private static final String BACKUP_EXTENSION = "backup";
+
+    private static final String GROUP_KEY = "group";
+    private static final String CATALOGUE_KEY = "catalogue";
+
+    private void saveAsBackup(Group g){
+        File location = ConfigUtils.getCodeSourceLocation();
+        File dir = location.getParentFile();
+        File backup = new File(dir.getPath() +ConfigUtils.getFileSeparator()+ StringUtils.prettyPrintTimestamp(System.currentTimeMillis(), "YYYY-MM-dd-HH-mm-ss-SSS" ) + "."+BACKUP_EXTENSION );
+        try {
+            gatherGroupProperties(g, groupAVMap.get(g.getName() ));
+
+            HashMap<String, Object> backupObj = new HashMap<>();
+            backupObj.put(CATALOGUE_KEY, catalogueFile != null ? catalogueFile.getAbsolutePath() : null);
+            backupObj.put(GROUP_KEY, JSONUtils.toJSON(g));
+
+            JSONUtils.writeToJSONFile(backupObj, backup);
+
+            LOGGER.info("Saved backup of group "+g.getName()+" to "+backup.getPath() );
+        } catch (IOException e) {
+            LOGGER.error("Exception during backupsave: ", e);
+        }
+    }
+
+    private static final Logger LOG = LogManager.getLogger(EvaluatorController.class);
+
+    private static final FileFilter BACKUP_FILTER = (file) -> {
+        if(file.isDirectory() ){
+            return false;
+        }else{
+            String name = file.getName();
+            LOG.debug("Filtering... "+name);
+            String extension = name.substring(name.lastIndexOf("."));
+            LOG.debug(" ... with extension: "+extension);
+            if(BACKUP_EXTENSION.equals(extension.substring(1)) ){ // substring(1) so "." is gone
+                return true;
+            }
+            return false;
+        }
+    };
+
+    void openBackupsIfExistent(){
+        File dir = ConfigUtils.getCodeSourceLocation().getParentFile();
+        if(dir.isDirectory() ){
+            for(File file : dir.listFiles(BACKUP_FILTER) ) {
+                LOGGER.info("Found .backup file: "+file.getPath() );
+                try {
+                    Map<String, Object> backupObj = JSONUtils.readFromJSONFile(file);
+                    boolean hasCatalogueKey = backupObj.containsKey(CATALOGUE_KEY);
+                    boolean hasGroupKey = backupObj.containsKey(GROUP_KEY);
+
+                    if(hasCatalogueKey && hasGroupKey ){
+                        if(backupObj.get(CATALOGUE_KEY) instanceof String){
+                            File catFile = new File((String)backupObj.get(CATALOGUE_KEY));
+                            loadCatalogue(catFile);
+                            catalogueFile = catFile;
+                            // Catalogue set
+                            if(backupObj.get(GROUP_KEY) instanceof String) {
+                                Group g = JSONUtils.readFromString((String)backupObj.get(GROUP_KEY),Group.class);
+                                loadGroup(null, g);
+                                LOGGER.info("Successfully opened group"+g.getName()+" from backupfile "+file.getName() );
+                            }
+                        }else{
+                            LOGGER.error("Expected catalogue property to be of type String.");
+                            return;
+                        }
+                    }else{
+                        LOGGER.error("Found .backup file without expected structure: "+backupObj.toString() );
+                        return;
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Exception reading .backup file.",e);
+                }
+            }
+        }
     }
 }

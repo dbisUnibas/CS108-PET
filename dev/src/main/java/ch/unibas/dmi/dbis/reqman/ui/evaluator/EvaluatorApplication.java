@@ -12,6 +12,8 @@ import javafx.stage.Stage;
  */
 public class EvaluatorApplication extends Application {
 
+    private EvaluatorScene scene;
+
     public static void main(String[] args) {
         Log4J2Fix.applyHotFix();
         launch(args);
@@ -19,10 +21,15 @@ public class EvaluatorApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        EvaluatorScene scene = new EvaluatorScene(800, 600);
+        scene = new EvaluatorScene(800, 600);
         primaryStage.setTitle(scene.getTitle());
         primaryStage.setScene(scene);
         primaryStage.show();
 
+    }
+
+    @Override
+    public void stop(){
+        scene.stop();
     }
 }

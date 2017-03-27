@@ -4,11 +4,14 @@ import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Group;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * TODO: write JavaDoc
@@ -42,5 +45,10 @@ public class JSONUtils {
 
     public static Group readGroupJSONFile(File file) throws IOException {
         return readFromJSONFile(file, Group.class);
+    }
+
+    public static Map<String, Object> readFromJSONFile(File file) throws IOException{
+        return MAPPER.readValue(file, new TypeReference<Map<String, Object>>() {
+        });
     }
 }

@@ -78,6 +78,10 @@ public class StringUtils {
      * @return The formatted timestamp, as a string.
      */
     public static String prettyPrintTimestamp(long timestamp) {
+        return prettyPrintTimestamp(timestamp, "dd.MM.YYYY HH:mm:ss:SSS");
+    }
+
+    public static String prettyPrintTimestamp(long timestamp, String format){
         Date d = new Date(timestamp);
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY HH:mm:ss:SSS");
         return sdf.format(d);

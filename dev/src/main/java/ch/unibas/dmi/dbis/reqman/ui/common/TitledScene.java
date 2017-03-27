@@ -13,4 +13,5 @@ public abstract class TitledScene extends Scene implements TitleProvider {
     public TitledScene(Parent root, int width, int height) {
         super(root, width, height);
     }
+
 }
