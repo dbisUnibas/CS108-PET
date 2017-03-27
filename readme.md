@@ -33,7 +33,7 @@ To start building `ReqMan`, navigate to the `dev/` folder.
 To build `ReqMan` run:
 
 ```
-gradlew jar build
+gradlew build
 ```
 
 ### Editor
