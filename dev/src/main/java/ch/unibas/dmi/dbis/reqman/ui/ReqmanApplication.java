@@ -27,6 +27,8 @@ public class ReqmanApplication extends Application {
     private EditorScene editor = new EditorScene(800, 600);
     private EvaluatorScene evaluator = new EvaluatorScene(800, 600);
 
+    private int currentView = -1;
+
     {
         editor.setOnChangeEvent(this::handleChangeView);
         evaluator.setOnChangeEvent(this::handleChangeView);
@@ -41,7 +43,7 @@ public class ReqmanApplication extends Application {
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
         showScene(evaluator);
-
+        currentView = EVALUATOR_VIEW;
     }
 
     public void handleChangeView(ActionEvent event) {
@@ -61,8 +63,8 @@ public class ReqmanApplication extends Application {
                 break;
             default:
                 // Do nothing, unknown view
-
         }
+        currentView = view;
     }
 
     private void showScene(TitledScene scene) {
@@ -70,6 +72,14 @@ public class ReqmanApplication extends Application {
         primaryStage.setTitle(scene.getTitle());
         primaryStage.show();
     }
+
+    @Override
+    public void stop(){
+        if(currentView == EVALUATOR_VIEW ){
+            evaluator.stop();
+        }
+    }
+
 
 
     public static class ChangeEvent extends ActionEvent {
@@ -89,4 +99,5 @@ public class ReqmanApplication extends Application {
             return view;
         }
     }
+
 }

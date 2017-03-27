@@ -83,7 +83,7 @@ public class StringUtils {
 
     public static String prettyPrintTimestamp(long timestamp, String format){
         Date d = new Date(timestamp);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY HH:mm:ss:SSS");
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(d);
     }
 }
