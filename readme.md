@@ -21,6 +21,7 @@ assess their voyage on achieving the **requirement**s with so called **progress*
  - License
  - Versioning
  - Branching
+ - Repository structure
 
 ## Build
 
@@ -101,3 +102,14 @@ There are several branches active:
  - `experimental` a branch dedicated to highly experimental development.
    The application as in the state of this branch may not be fully compatible
    with the ones of other states.
+   
+## Repository structure
+
+The repository contains the following files & folders:
+
+ - .gitignore   The gitignore for this repository.
+ - CS108.json   A catalogue used by FS17, cs108
+ - dev/         The development folder
+ - LICENSE.txt  The full license file
+ - process/     A folder containing additional documentation and process related files
+ - readme.md    This readme
