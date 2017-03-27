@@ -555,7 +555,10 @@ public class EvaluatorController {
                             if(backupObj.get(GROUP_KEY) instanceof String) {
                                 Group g = JSONUtils.readFromString((String)backupObj.get(GROUP_KEY),Group.class);
                                 loadGroup(null, g);
+                                markDirty(g);
                                 LOGGER.info("Successfully opened group"+g.getName()+" from backupfile "+file.getName() );
+                                boolean deletSucc = file.delete();
+                                LOGGER.info("Removed backup file: "+file.getName() );
                             }
                         }else{
                             LOGGER.error("Expected catalogue property to be of type String.");
