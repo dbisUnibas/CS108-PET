@@ -168,6 +168,12 @@ public class EvaluatorController {
             fc.setInitialDirectory(lastOpenLocation);
         }
         List<File> files = fc.showOpenMultipleDialog(evaluator.getWindow());
+
+        if(files == null) {
+            // User abort
+            return;
+        }
+
         if (files.isEmpty()) {
             return;
         }

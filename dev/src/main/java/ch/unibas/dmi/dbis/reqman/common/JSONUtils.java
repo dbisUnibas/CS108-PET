@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +22,10 @@ import java.util.Map;
 public class JSONUtils {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    {
+        MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
+    }
 
     public static String toJSON(Object obj) throws JsonProcessingException {
         return MAPPER.writeValueAsString(obj);
