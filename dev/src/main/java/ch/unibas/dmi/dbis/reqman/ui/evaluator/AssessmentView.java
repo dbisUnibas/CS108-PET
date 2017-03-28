@@ -299,17 +299,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     }
 
     private void verifyPredecessorsAchieved(ProgressView pv){
-        int achievedPredecessors = 0;
-        for(String name : pv.getRequirement().getPredecessorNames() ) {
-            Requirement pred = controller.getRequirementByName(name);
-            Progress p = group.getProgressForRequirement(pred);
-            if(p.hasProgress() ){
-                achievedPredecessors++;
-            }
-        }
-        if(achievedPredecessors != pv.getRequirement().getPredecessorNames().size() ){
-            pv.setDisable(true);
-        }
+        pv.setDisable(!group.isProgressUnlocked(controller.getActiveCatalogue(), pv.getProgress()));
     }
 
 

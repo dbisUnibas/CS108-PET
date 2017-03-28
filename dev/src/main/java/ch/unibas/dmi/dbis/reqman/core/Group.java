@@ -220,4 +220,15 @@ public class Group implements Comparable<Group> {
         return null;
     }
 
+    public boolean isProgressUnlocked(Catalogue catalogue, Progress progress){
+        int predecessorsAchieved = 0;
+        for(String name : catalogue.getRequirementForProgress(progress).getPredecessorNames() ){
+            Progress pred = getProgressForRequirement(catalogue.getRequirementByName(name));
+            if(pred.hasProgress() ){
+                predecessorsAchieved++;
+            }
+        }
+        return predecessorsAchieved == catalogue.getRequirementForProgress(progress).getPredecessorNames().size();
+    }
+
 }
