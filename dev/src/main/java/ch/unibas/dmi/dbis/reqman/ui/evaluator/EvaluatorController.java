@@ -328,6 +328,7 @@ public class EvaluatorController {
     private void saveGroup(Group group, AssessmentView av, File f) throws IOException {
         gatherGroupProperties(group, av);
         JSONUtils.writeToJSONFile(group, f);
+        LOGGER.info(String.format("Wrote group (%s) to json file: %s", group.getName(), f.getPath()) );
     }
 
     private void gatherGroupProperties(Group group, AssessmentView av) {

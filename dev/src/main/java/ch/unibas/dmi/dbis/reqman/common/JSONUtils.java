@@ -23,7 +23,7 @@ public class JSONUtils {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    {
+    static{
         MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
