@@ -29,7 +29,6 @@ public class RenderManager {
     private Template<Progress> templateProgress = null;
     private TemplateParser parser = null;
     private TemplateRenderer renderer = null;
-
     /**
      * Existing:
      * .name
@@ -75,6 +74,7 @@ public class RenderManager {
                 }
             }
     );
+    private Group group = null;
     private Catalogue catalogue = null;
     /**
      * Existing:
@@ -114,10 +114,12 @@ public class RenderManager {
      * progress
      * .points
      * .hasPoints
+     * .isUnlocked[][]
      */
     public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
             Field.createNormalField("points", p -> p.getPointsSensitive(catalogue)),
-            new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS")
+            new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS"),
+            new ConditionalField<Progress>("isUnlocked", p -> group.isProgressUnlocked(catalogue, p), b -> "UNLOCEKD", b -> "LOCKED")
     );
     /**
      * Existing:
@@ -174,7 +176,7 @@ public class RenderManager {
                 }
             }
     );
-    private Group group = null;
+
 
     /**
      * Existing:
