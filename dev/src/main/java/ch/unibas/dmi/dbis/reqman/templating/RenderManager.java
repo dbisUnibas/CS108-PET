@@ -245,6 +245,7 @@ public class RenderManager {
         this.catalogue = catalogue;
         parser = new TemplateParser();
         renderer = new TemplateRenderer();
+        LOGGER.debug("Catalogue: "+catalogue.getName() );
     }
 
     public RenderManager(Catalogue catalogue, Group group) {

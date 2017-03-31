@@ -71,7 +71,17 @@ jar{
 
 }
 
-
+processResources {
+    // Pass version to reqman by adding it to reqman.properties
+    from(sourceSets.main.resources.srcDirs){
+        include 'reqman.properties'
+        expand projectVersion: project.version
+    }
+    // Do not copy the original file, since it would not have the version in it
+    from(sourceSets.main.resources.srcDirs){
+        exclude 'reqman.properties'
+    }
+}
 
 task incrementTest {
     doLast{

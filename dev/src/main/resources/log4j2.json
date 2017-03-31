@@ -66,7 +66,7 @@
           "level":"trace",
           "additivity":false,
           "AppenderRef":[
-            {"ref":"console", "level":"info"}
+            {"ref":"console", "level":"debug"}
           ]
         },
         {
