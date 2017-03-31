@@ -247,6 +247,7 @@ public class EvaluatorScene extends TitledScene {
         itemSaveAs.setOnAction(controller::handleSaveAsGroup);
         MenuItem itemExportGroup = new MenuItem("Export Group(s)");
         itemExportGroup.setOnAction(controller::handleExportGroup);
+
         MenuItem itemExit = new MenuItem("Quit");
 
 
@@ -307,7 +308,9 @@ public class EvaluatorScene extends TitledScene {
         Menu menuView = new Menu("View");
         MenuItem itemChangeToEditor = new MenuItem("Eiditor");
         itemChangeToEditor.setOnAction(this::handleChangeView);
-        menuView.getItems().addAll(itemChangeToEditor);
+        MenuItem itemOverview = new MenuItem("Show Overview");
+        itemOverview.setOnAction(controller::handleOverview);
+        menuView.getItems().addAll(itemChangeToEditor, new SeparatorMenuItem(), itemOverview);
 
         Menu menuHelp = new Menu("Help");
 

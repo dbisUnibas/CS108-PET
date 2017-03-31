@@ -12,11 +12,16 @@ import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.templating.RenderManager;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
+import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.Scene;
+import javafx.scene.layout.HBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
@@ -318,6 +323,22 @@ public class EvaluatorController {
             }
         }
         groups.add(group);
+    }
+
+    void handleOverview(ActionEvent event){
+        if(catalogue == null || (groups == null || groups.isEmpty())){
+            return;
+        }
+        SimpleOverviewBuilder overview = new SimpleOverviewBuilder(catalogue, groups);
+        String export = overview.exportOverviewHTML();
+        WebView view = new WebView();
+        WebEngine engine = view.getEngine();
+        engine.loadContent(export);
+        HBox box = new HBox();
+        Scene webScene = new Scene(box, evaluator.getWidth(), evaluator.getHeight());
+        box.getChildren().add(view);
+        PopupStage popupStage = new PopupStage("Overview", webScene);
+        popupStage.showAndWait();
     }
 
     private void removeGroup(Group group) {
