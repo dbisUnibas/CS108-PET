@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.common.IOUtilites;
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.configuration.ConfigUtils;
@@ -28,8 +27,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
