@@ -5,6 +5,7 @@ package ch.unibas.dmi.dbis.reqman.ui;/**
  */
 
 import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
+import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitledScene;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorScene;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorScene;
@@ -12,6 +13,8 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ReqmanApplication extends Application {
 
@@ -27,6 +30,9 @@ public class ReqmanApplication extends Application {
     private EditorScene editor = new EditorScene(800, 600);
     private EvaluatorScene evaluator = new EvaluatorScene(800, 600);
 
+    private static Logger LOGGER;
+    private static Version version;
+
     private int currentView = -1;
 
     {
@@ -36,6 +42,9 @@ public class ReqmanApplication extends Application {
 
     public static void main(String[] args) {
         Log4J2Fix.applyHotFix();
+        version = Version.getInstance();
+        LOGGER = LogManager.getLogger(ReqmanApplication.class);
+        LOGGER.info("Starting reqman @ v"+ version.getVersion() );
         launch(args);
     }
 

@@ -95,6 +95,15 @@
             {"ref":"console"},
             {"ref":"rollingFile","level":"info"}
           ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication",
+          "level":"info",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"},
+            {"ref":"rollingFile","level":"info"}
+          ]
         }
       ]
     }

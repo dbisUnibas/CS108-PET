@@ -31,7 +31,7 @@ public class Version {
     private Version() {
         props = new Properties();
         try {
-            props.load(getClass().getResourceAsStream(PROPERTIES_FILE));
+            props.load(Version.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE));
             version = (String)props.get(VERSION_KEY);
         } catch (IOException e) {
             LOGGER.error("Could not load reqman.properties.", e);
