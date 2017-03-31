@@ -1,5 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.function.Function;
 
 /**
@@ -8,6 +11,8 @@ import java.util.function.Function;
  * @author loris.sauter
  */
 public class ConditionalField<E> extends ParametrizedField<E, Boolean> {
+
+    private static final Logger LOGGER = LogManager.getLogger(TemplateRenderer.class);
 
     /**
      * On runtime, this will contain the parsed false-string
@@ -50,7 +55,11 @@ public class ConditionalField<E> extends ParametrizedField<E, Boolean> {
 
     @Override
     public String render(E instance) {
+        LOGGER.trace(":render$Conditional");
         boolean fieldValue = getter.apply(instance);
+        LOGGER.trace(":render$Conditional - Condition: "+fieldValue);
+        LOGGER.trace(":render$Conditional - trueRenderer: "+getTrueRenderer().apply(fieldValue ) );
+        LOGGER.trace(":render$Conditional - falseRenderer: "+getFalseRenderer().apply(fieldValue ) );
         if (fieldValue) {
             return getTrueRenderer().apply(fieldValue);
         } else {

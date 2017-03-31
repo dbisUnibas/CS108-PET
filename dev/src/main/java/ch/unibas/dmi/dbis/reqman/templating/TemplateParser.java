@@ -187,7 +187,7 @@ public class TemplateParser {
                     ConditionalField<E> condField = (ConditionalField) field;
                     condField.setTrueRenderer(trueRenderer);
                     condField.setFalseRenderer(falseRenderer);
-                    return condField;
+                    return ConditionalField.copy(condField);
                 } else if (field instanceof ParametrizedField) {
                     // CASE Missing option_closing:
                     int firstClosing = expression.indexOf(OPTION_CLOSING);

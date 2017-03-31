@@ -50,6 +50,8 @@ public class TemplatingConfigurationManager {
         return config.getExtension();
     }
 
+    private File configFile = null;
+
     public void loadConfig(File config) {
         if(config == null){
             throw LOGGER.throwing(new NullPointerException("Cannot load config if the specified file is null"));
@@ -59,6 +61,7 @@ public class TemplatingConfigurationManager {
         try {
             cnfg = JSONUtils.readFromJSONFile(config, TemplatingConfiguration.class);
             setConfig(cnfg);
+            configFile = config;
         } catch (IOException ioe) {
             handleExceptionDuringLoading(ioe);
         }
@@ -98,11 +101,18 @@ public class TemplatingConfigurationManager {
     }
 
     private File buildTemplateFile(String file) {
+        LOGGER.debug("Building template file for: "+file);
         File template = new File(file);
         if (template.isAbsolute()) {
+            LOGGER.debug("Absolute path: "+template.getPath() );
             return template;
         } else {
-            if (ConfigUtils.isJARexecuted()) {
+            if(configFile != null){
+                LOGGER.debug("Config file directly specified. Resolving relative path of "+configFile.getPath());
+                File f = configFile.toPath().resolveSibling(file).toFile(); // assuming relative to config file
+                LOGGER.debug("Resolved template file: "+f.getPath());
+                return f;
+            }else if (ConfigUtils.isJARexecuted()) {
                 // The environemnt is a jar.
                 File jarFile = ConfigUtils.getCodeSourceLocation();
                 // May add check if jarFile really is a file?

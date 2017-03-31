@@ -40,23 +40,12 @@ public class TemplateRenderer {
             LOGGER.debug("Calculated region: <" + calcStart + "," + calcEnd + ">");
             LOGGER.trace("PreReplacement: " + out.toString());
             String repl = field.render(instance);
-            if (field instanceof ParametrizedField) {
+            if (field instanceof ParametrizedField && !(field instanceof ConditionalField) ){
                 repl = ((ParametrizedField) field).renderCarefully(instance, ((ParametrizedField) field).getParameter());
             }
             out.replace(calcStart, calcEnd, repl);
 
             LOGGER.trace("PostReplacement: " + out.toString());
-
-            /*
-            // Below code not needed, child classes of Field do override render
-            if(field instanceof  SubEntityField){
-                SubEntityField sub = (SubEntityField)field;
-
-            }else if(field instanceof ConditionalField){
-                ConditionalField cond = (ConditionalField)field;
-            }else{
-                out.replace(replacement.getStart(), replacement.getEnd(), field.render(instance));
-            }*/
         });
 
         return out.toString();
