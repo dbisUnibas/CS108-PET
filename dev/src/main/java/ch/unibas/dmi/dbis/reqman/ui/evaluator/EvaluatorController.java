@@ -335,7 +335,11 @@ public class EvaluatorController {
         WebEngine engine = view.getEngine();
         engine.loadContent(export);
         HBox box = new HBox();
+        view.prefWidthProperty().bind(box.widthProperty() );
+        view.prefHeightProperty().bind(box.heightProperty());
         Scene webScene = new Scene(box, evaluator.getWidth(), evaluator.getHeight());
+        box.prefWidthProperty().bind(webScene.widthProperty());
+        box.prefHeightProperty().bind(webScene.heightProperty());
         box.getChildren().add(view);
         PopupStage popupStage = new PopupStage("Overview", webScene);
         popupStage.showAndWait();
