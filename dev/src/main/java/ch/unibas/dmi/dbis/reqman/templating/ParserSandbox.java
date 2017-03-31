@@ -30,7 +30,7 @@ public class ParserSandbox {
         String msTem1 = "${milestone.ordinal}";
         String msTem2 = "${milestone.ordinal} @ OTHER";
 
-        TemplateParser parser = new TemplateParser(cat);
+        TemplateParser parser = new TemplateParser();
         RenderManager manager = new RenderManager(cat);
         parser.setupFor(manager.MILESTONE_ENTITY);
         Map<String, Field<Milestone, ?>> map = parser.oldParse(msTemplate); // Would be in template

@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,11 +43,7 @@ public class TemplateParser {
     private Pattern pattern;
     private String regexEntity;
 
-    private Catalogue catalogue;
-    // TODO: TemplateParser for Groups will need Group AND Catalogue.
-
-    public TemplateParser(Catalogue cat) {
-        catalogue = cat;
+    public TemplateParser() {
     }
 
     public void setupFor(Entity entity) {
@@ -201,7 +196,6 @@ public class TemplateParser {
                     ParametrizedField parField = (ParametrizedField) field;
                     ParametrizedField copy = ParametrizedField.copy(parField);
                     copy.setParameter(param);
-                    // TODO somehow not passing the parameter correctly
                     return copy;
                 } else {
                     LOGGER.warn(String.format("Field [%s] of entity [%s] is not parametrized. Ignoring those parameters.", fieldName, entity.getEntityName()));
@@ -234,27 +228,6 @@ public class TemplateParser {
 
     private void throwNoSuchField(String name) throws ParseException {
         throw new ParseException("Entity (" + entity.getEntityName() + ") has no field with name " + name + " registered");
-    }
-
-    public static class ParseException extends RuntimeException {
-        public ParseException() {
-        }
-
-        public ParseException(String message) {
-            super(message);
-        }
-
-        public ParseException(String message, Throwable cause) {
-            super(message, cause);
-        }
-
-        public ParseException(Throwable cause) {
-            super(cause);
-        }
-
-        public ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-            super(message, cause, enableSuppression, writableStackTrace);
-        }
     }
 
     <E> List<Replacement<E>> parseReplacements(String template) {
@@ -301,8 +274,24 @@ public class TemplateParser {
         return list;
     }
 
+    public static class ParseException extends RuntimeException {
+        public ParseException() {
+        }
 
-    // TODO Implement TemplateManager which holds all templates (and entities), so that ${catalogue.requirements} is renderable
+        public ParseException(String message) {
+            super(message);
+        }
 
+        public ParseException(String message, Throwable cause) {
+            super(message, cause);
+        }
 
+        public ParseException(Throwable cause) {
+            super(cause);
+        }
+
+        public ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+            super(message, cause, enableSuppression, writableStackTrace);
+        }
+    }
 }

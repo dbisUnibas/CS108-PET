@@ -243,7 +243,7 @@ public class RenderManager {
 
     public RenderManager(Catalogue catalogue) {
         this.catalogue = catalogue;
-        parser = new TemplateParser(catalogue);
+        parser = new TemplateParser();
         renderer = new TemplateRenderer();
     }
 

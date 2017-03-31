@@ -185,8 +185,6 @@ public class Field<E, T> {
         return new Field<>(name, Type.LIST, getter, renderer);
     }
 
-    // TODO Write factory methods for all types!
-
     public static <E, T> Field<E, T> copy(Field<E, T> source) {
         Field<E, T> copy = new Field<E, T>(source.getName(), source.getType(), source.getGetter(), source.getRenderer());
         return copy;
