@@ -306,7 +306,7 @@ public class EvaluatorScene extends TitledScene {
         menuEdit.getItems().addAll(itemModify, menuGlobalMilestone);
 
         Menu menuView = new Menu("View");
-        MenuItem itemChangeToEditor = new MenuItem("Eiditor");
+        MenuItem itemChangeToEditor = new MenuItem("Editor");
         itemChangeToEditor.setOnAction(this::handleChangeView);
         MenuItem itemOverview = new MenuItem("Show Overview");
         itemOverview.setOnAction(controller::handleOverview);
