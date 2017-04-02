@@ -115,11 +115,31 @@ public class RenderManager {
      * .points
      * .hasPoints
      * .isUnlocked[][]
+     * .date
+     * .dateFormatted[]
      */
     public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
             Field.createNormalField("points", p -> p.getPointsSensitive(catalogue)),
             new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS"),
-            new ConditionalField<Progress>("isUnlocked", p -> group.isProgressUnlocked(catalogue, p), b -> "UNLOCEKD", b -> "LOCKED")
+            new ConditionalField<Progress>("isUnlocked", p -> group.isProgressUnlocked(catalogue, p), b -> "UNLOCEKD", b -> "LOCKED"),
+            new Field<Progress, Date>("date", Field.Type.OBJECT, Progress::getDate, date -> {
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
+                return format.format(date);
+            }),
+            new ParametrizedField<Progress, Date>("dateFormatted", Progress::getDate) {
+                private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
+
+                @Override
+                public String renderCarefully(Progress instance, String parameter) {
+                    try {
+                        SimpleDateFormat format = new SimpleDateFormat(parameter);
+                        return format.format(getGetter().apply(instance));
+                    } catch (IllegalArgumentException iae) {
+                        LOGGER.error("The specified pattern is not compliant with java.text.SimpleDateFormat.", iae);
+                    }
+                    return "";
+                }
+            }
     );
     /**
      * Existing:
@@ -133,6 +153,7 @@ public class RenderManager {
      * .mandatory[][]
      * .malus[][]
      * .meta[<key>]
+     * .singularMS[][]
      */
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
             new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
@@ -140,6 +161,9 @@ public class RenderManager {
             new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPointsSensitive),
             new SubEntityField<Requirement, Milestone>("minMS", (requirement -> {
                 return catalogue.getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal());
+            }), MILESTONE_ENTITY),
+            new SubEntityField<Requirement, Milestone>("maxMS", (requirement -> {
+                return catalogue.getMilestoneByOrdinal(requirement.getMaxMilestoneOrdinal());
             }), MILESTONE_ENTITY),
             new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, Requirement::getPredecessorNames, list -> {
                 StringBuilder sb = new StringBuilder();
@@ -174,7 +198,8 @@ public class RenderManager {
                         return "";
                     }
                 }
-            }
+            },
+            new ConditionalField<Requirement>("singularMS", r -> r.getMinMilestoneOrdinal() == r.getMaxMilestoneOrdinal(), b-> "YES", b-> "NO")
     );
 
 
