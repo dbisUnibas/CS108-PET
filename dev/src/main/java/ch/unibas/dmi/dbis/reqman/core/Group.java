@@ -208,23 +208,23 @@ public class Group implements Comparable<Group> {
         return points.stream().mapToDouble(Double::doubleValue).sum();
     }
 
-    public Progress getProgressForRequirement(Requirement requirement){
-        if(requirement == null){
+    public Progress getProgressForRequirement(Requirement requirement) {
+        if (requirement == null) {
             throw new IllegalArgumentException("Requirement cannot be null, if progress for it should be provided");
         }
-        for(Progress p : progressList){
-            if(p.getRequirementName().equals(requirement.getName() ) ){
+        for (Progress p : progressList) {
+            if (p.getRequirementName().equals(requirement.getName())) {
                 return p;
             }
         }
         return null;
     }
 
-    public boolean isProgressUnlocked(Catalogue catalogue, Progress progress){
+    public boolean isProgressUnlocked(Catalogue catalogue, Progress progress) {
         int predecessorsAchieved = 0;
-        for(String name : catalogue.getRequirementForProgress(progress).getPredecessorNames() ){
+        for (String name : catalogue.getRequirementForProgress(progress).getPredecessorNames()) {
             Progress pred = getProgressForRequirement(catalogue.getRequirementByName(name));
-            if(pred.hasProgress() ){
+            if (pred.hasProgress()) {
                 predecessorsAchieved++;
             }
         }

@@ -61,14 +61,8 @@ public class Catalogue {
         return semester;
     }
 
-    public void setMilestones(List<Milestone> milestones) {
-        this.milestones = milestones;
-    }
-
-    public void setRequirements(List<Requirement> requirements) {
-        this.requirements = requirements;
-        this.reqsPerMinMS = new TreeMap<>();
-        requirements.forEach(this::addRequirementToMSMap);
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 
     public void clearMilestones() {
@@ -119,10 +113,6 @@ public class Catalogue {
         return result;
     }
 
-    public void setSemester(String semester) {
-        this.semester = semester;
-    }
-
     public boolean addMilestone(Milestone milestone) {
         return milestones.add(milestone);
     }
@@ -133,6 +123,10 @@ public class Catalogue {
 
     public List<Milestone> getMilestones() {
         return new ArrayList<>(milestones);
+    }
+
+    public void setMilestones(List<Milestone> milestones) {
+        this.milestones = milestones;
     }
 
     public boolean addRequirement(Requirement requirement) {
@@ -156,6 +150,12 @@ public class Catalogue {
 
     public List<Requirement> getRequirements() {
         return new ArrayList<>(requirements);
+    }
+
+    public void setRequirements(List<Requirement> requirements) {
+        this.requirements = requirements;
+        this.reqsPerMinMS = new TreeMap<>();
+        requirements.forEach(this::addRequirementToMSMap);
     }
 
     public void addAllRequirements(Requirement... requirements) {

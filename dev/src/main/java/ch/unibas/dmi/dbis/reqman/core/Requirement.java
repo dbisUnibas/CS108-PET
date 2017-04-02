@@ -88,16 +88,8 @@ public class Requirement {
         this.malus = malus;
     }
 
-    public void setPredecessorNames(List<String> predecessorNames) {
-        this.predecessorNames = predecessorNames;
-    }
-
     public void clearPredecessorNames() {
         predecessorNames = new ArrayList<>();
-    }
-
-    public void setPropertiesMap(Map<String, String> propertiesMap) {
-        this.propertiesMap = propertiesMap;
     }
 
     public void clearPropertiesMap() {
@@ -140,6 +132,9 @@ public class Requirement {
         return new ArrayList<String>(predecessorNames);
     }
 
+    public void setPredecessorNames(List<String> predecessorNames) {
+        this.predecessorNames = predecessorNames;
+    }
 
     public String addProperty(String key, String value) {
         return propertiesMap.put(key, value);
@@ -276,6 +271,10 @@ public class Requirement {
 
     public Map<String, String> getPropertiesMap() {
         return new HashMap<String, String>(propertiesMap);
+    }
+
+    public void setPropertiesMap(Map<String, String> propertiesMap) {
+        this.propertiesMap = propertiesMap;
     }
 
     @JsonIgnore
