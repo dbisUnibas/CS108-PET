@@ -148,7 +148,8 @@ public class Group implements Comparable<Group> {
     }
 
     public void setProgressList(List<Progress> progressList) {
-        this.progressList = progressList;
+        this.progressList.clear();
+        this.progressList.addAll(progressList);
     }
 
     public boolean removeProgress(Progress progress) {

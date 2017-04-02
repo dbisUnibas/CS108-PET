@@ -44,8 +44,18 @@ public class Version {
      * Returns the full version String. This matches the version suffix of the executed jar, when reqman was correctly built.
      * @return The full version String.
      */
-    public String getVersion() {
+    public String getFullVersion() {
         return version;
+    }
+
+    /**
+     * Returns the version string.
+     * Since ReqMan uses semantic versioning, this returns a string in format:
+     * MAJOR.MINOR.FIX
+     * @return the version string in format semantic versioning format
+     */
+    public String getVersion(){
+        return version.substring(0, version.indexOf("-"));
     }
 
     /**

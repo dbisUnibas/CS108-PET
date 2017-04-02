@@ -64,11 +64,9 @@ sourceSets{
 }
 
 jar{
-
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
-
 }
 
 processResources {
@@ -119,6 +117,20 @@ task deployEvaluator(dependsOn: [build, jar]){
     doLast{
         println('Deploayed Evaluator version ' +project.version)
         println('Resulting jar: '+jar.getArchiveName() )
+    }
+}
+
+task deployUpdater(type: Jar, dependsOn: classes){
+    appendix = 'updater'
+    from sourceSets.main.output
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    manifest {
+        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.updating.FileUpdater'
+    }
+    doLast{
+        println('Deployed updater: '+jar.getArchiveName() )
     }
 }
 

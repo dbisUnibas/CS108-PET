@@ -44,7 +44,7 @@ public class ReqmanApplication extends Application {
         Log4J2Fix.applyHotFix();
         version = Version.getInstance();
         LOGGER = LogManager.getLogger(ReqmanApplication.class);
-        LOGGER.info("Starting reqman @ v"+ version.getVersion() );
+        LOGGER.info("Starting reqman @ v"+ version.getFullVersion() );
         launch(args);
     }
 
