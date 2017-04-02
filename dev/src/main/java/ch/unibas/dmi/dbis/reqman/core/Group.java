@@ -20,6 +20,16 @@ public class Group implements Comparable<Group> {
 
     private String exportFileName;
 
+    private String version;
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
     public Group(String name, String projectName, List<String> members, String catalogueName) {
 
         this.name = name;

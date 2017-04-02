@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
+import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.configuration.ConfigUtils;
 import ch.unibas.dmi.dbis.reqman.configuration.Templates;
 import ch.unibas.dmi.dbis.reqman.configuration.TemplatingConfigurationManager;
@@ -356,6 +357,7 @@ public class EvaluatorController {
     private void gatherGroupProperties(Group group, AssessmentView av) {
         group.setProgressList(av.getProgressListForSaving(true));
         group.setProgressSummaryList(av.getSummaries());
+        group.setVersion(Version.getInstance().getVersion());
     }
 
     private void setupLastLocation(FileChooser fc) {
