@@ -313,7 +313,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
         reqs.forEach(r -> {
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
-            ProgressView pv = new ProgressView(p, r, true);
+            ProgressView pv = new ProgressView(p, r);
             verifyPredecessorsAchieved(pv);
             pv.addPointsChangeListener(this);
             activeProgressViews.add(pv);

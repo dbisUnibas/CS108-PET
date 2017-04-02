@@ -57,21 +57,14 @@ public class ProgressView extends VBox {
         loadProgress();
     }
 
-    public ProgressView(Progress progress, Requirement requirement, boolean exp){
-        this(progress, requirement);
-        if(exp){
-            initExperimental();
-            loadProgress(true);
-        }
-    }
-
-    private void initExperimental() {
+    private void initYesNoButtons() {
         if(!requirement.isBinary()){
             return;
         }
         controlWrapper.getChildren().clear();
 
         controlWrapper.getChildren().addAll(yesBtn, noBtn);
+        controlWrapper.setStyle("-fx-spacing: 10px;");
 
         yesBtn.setOnAction(action -> {
             progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
@@ -107,29 +100,18 @@ public class ProgressView extends VBox {
     }
 
     private void loadProgress() {
-        if (progress != null) {
-            if (progress.hasProgress()) {
-                if (requirement.isBinary()) {
-                    check.setSelected(true);
-                } else {
-                    spinnerPoints.getValueFactory().setValue(progress.getPoints());
-                }
+        if(progress != null){
+            if(progress.hasDefaultPercentage() ){
+                return; // Do nothing, if default percentage.
             }
-        }
-    }
-
-    private  void loadProgress(boolean exp){
-        if(exp){
-            if(progress != null){
+            if(requirement.isBinary() ){
                 if(progress.hasProgress() ){
-                    if(requirement.isBinary() ){
-                        yesBtn.setSelected(true);
-                    }else{
-                        spinnerPoints.getValueFactory().setValue(progress.getPoints());
-                    }
+                    yesBtn.setSelected(true);
                 }else{
-
+                    noBtn.setSelected(true);
                 }
+            }else{
+                spinnerPoints.getValueFactory().setValue(progress.getPoints());
             }
         }
     }
@@ -178,11 +160,9 @@ public class ProgressView extends VBox {
 
         controlWrapper = new HBox();
         if (requirement.isBinary()) {
-            check = new CheckBox();
-            controlWrapper.getChildren().add(check);
-            check.setOnAction(this::handleAssessmentAction);
+            initYesNoButtons();
         } else {
-            spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), 0.0);
+            spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1);
             controlWrapper.getChildren().add(spinnerPoints);
             // Solution by: http://stackoverflow.com/a/39380146
             spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {

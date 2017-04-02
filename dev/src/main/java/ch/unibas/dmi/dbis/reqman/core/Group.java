@@ -144,7 +144,7 @@ public class Group implements Comparable<Group> {
     }
 
     public List<Progress> getProgressList() {
-        return new Vector<Progress>(progressList);
+        return new ArrayList<>(progressList);
     }
 
     public void setProgressList(List<Progress> progressList) {
