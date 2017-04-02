@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
@@ -42,6 +43,8 @@ public class ProgressView extends VBox {
     private AnchorPane content;
     private List<PointsChangeListener> listeners = new ArrayList<>();
 
+    private Milestone active = null;
+
     public ProgressView(Requirement requirement) {
         this(null, requirement);
     }
@@ -68,15 +71,23 @@ public class ProgressView extends VBox {
 
         yesBtn.setOnAction(action -> {
             progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
-            progress.setDate(new Date());
+            progress.setDate(active != null ? active.getDate() : new Date());
             notifyPointsListener();
         });
 
         noBtn.setOnAction(action -> {
             progress.setPoints(0, requirement.getMaxPoints());
-            progress.setDate(new Date());
+            progress.setDate(active != null ? active.getDate() : new Date());
             notifyPointsListener();
         });
+    }
+
+    public Milestone getActiveMilestone() {
+        return active;
+    }
+
+    public void setActiveMilestone(Milestone active) {
+        this.active = active;
     }
 
     public Requirement getRequirement() {

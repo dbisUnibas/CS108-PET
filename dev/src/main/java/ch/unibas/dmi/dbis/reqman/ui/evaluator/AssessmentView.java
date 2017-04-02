@@ -313,10 +313,27 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
         reqs.forEach(r -> {
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
+
             ProgressView pv = new ProgressView(p, r);
+            pv.setActiveMilestone(activeMS);
             verifyPredecessorsAchieved(pv);
             pv.addPointsChangeListener(this);
-            activeProgressViews.add(pv);
+
+            // Filter the ones that are not really on this milestone and are already assessed
+            if(p.getDate() == null){
+                // progress was not yet tracked.
+                activeProgressViews.add(pv);
+            }else if(p.getDate().before(activeMS.getDate() ) ){
+                // progress was made STRICTLY before active milestone
+                // this ProgressView must not be shown now
+            }else if(p.getDate().equals(activeMS.getDate() )){
+                // comparison possible - always a ms date is used.
+                // the progress date matches the current milestone -> show pv
+                activeProgressViews.add(pv);
+            }else{
+                activeProgressViews.add(pv);
+            }
+            //activeProgressViews.add(pv);
         });
 
     }
