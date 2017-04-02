@@ -224,7 +224,7 @@ public class Group implements Comparable<Group> {
         int predecessorsAchieved = 0;
         for (String name : catalogue.getRequirementForProgress(progress).getPredecessorNames()) {
             Progress pred = getProgressForRequirement(catalogue.getRequirementByName(name));
-            if (pred.hasProgress()) {
+            if (pred != null && pred.hasProgress()) {
                 predecessorsAchieved++;
             }
         }

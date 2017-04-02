@@ -354,7 +354,7 @@ public class EvaluatorController {
     }
 
     private void gatherGroupProperties(Group group, AssessmentView av) {
-        group.setProgressList(av.getProgressListForSaving());
+        group.setProgressList(av.getProgressListForSaving(true));
         group.setProgressSummaryList(av.getSummaries());
     }
 

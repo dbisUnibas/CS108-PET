@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,8 +29,14 @@ public class ProgressView extends VBox {
     private ToggleButton collapseButton = new ToggleButton(Utils.ARROW_DOWN);
     private TextArea taDesc = new TextArea();
 
+    private HBox controlWrapper;
+
     private Spinner<Double> spinnerPoints;
     private CheckBox check;
+
+    private ToggleGroup toggleGroup = new ToggleGroup();
+    private RadioButton yesBtn;
+    private RadioButton noBtn;
 
     private VBox collapsible = new VBox();
     private AnchorPane content;
@@ -48,6 +55,35 @@ public class ProgressView extends VBox {
         initComponents();
         initCollapsible();
         loadProgress();
+    }
+
+    public ProgressView(Progress progress, Requirement requirement, boolean exp){
+        this(progress, requirement);
+        if(exp){
+            initExperimental();
+            loadProgress(true);
+        }
+    }
+
+    private void initExperimental() {
+        if(!requirement.isBinary()){
+            return;
+        }
+        controlWrapper.getChildren().clear();
+
+        controlWrapper.getChildren().addAll(yesBtn, noBtn);
+
+        yesBtn.setOnAction(action -> {
+            progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
+            progress.setDate(new Date());
+            notifyPointsListener();
+        });
+
+        noBtn.setOnAction(action -> {
+            progress.setPoints(0, requirement.getMaxPoints());
+            progress.setDate(new Date());
+            notifyPointsListener();
+        });
     }
 
     public Requirement getRequirement() {
@@ -77,6 +113,22 @@ public class ProgressView extends VBox {
                     check.setSelected(true);
                 } else {
                     spinnerPoints.getValueFactory().setValue(progress.getPoints());
+                }
+            }
+        }
+    }
+
+    private  void loadProgress(boolean exp){
+        if(exp){
+            if(progress != null){
+                if(progress.hasProgress() ){
+                    if(requirement.isBinary() ){
+                        yesBtn.setSelected(true);
+                    }else{
+                        spinnerPoints.getValueFactory().setValue(progress.getPoints());
+                    }
+                }else{
+
                 }
             }
         }
@@ -119,14 +171,19 @@ public class ProgressView extends VBox {
 
         content.getChildren().add(title);
 
-        Control control;
+        yesBtn = new RadioButton("Yes");
+        yesBtn.setToggleGroup(toggleGroup);
+        noBtn = new RadioButton("No");
+        noBtn.setToggleGroup(toggleGroup);
+
+        controlWrapper = new HBox();
         if (requirement.isBinary()) {
             check = new CheckBox();
-            control = check;
+            controlWrapper.getChildren().add(check);
             check.setOnAction(this::handleAssessmentAction);
         } else {
             spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), 0.0);
-            control = spinnerPoints;
+            controlWrapper.getChildren().add(spinnerPoints);
             // Solution by: http://stackoverflow.com/a/39380146
             spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
                 if (!newValue) {
@@ -141,13 +198,13 @@ public class ProgressView extends VBox {
             });
         }
 
-        content.getChildren().add(control);
+        content.getChildren().add(controlWrapper);
 
         content.prefWidthProperty().bind(prefWidthProperty());
 
 
-        AnchorPane.setRightAnchor(control, 10d); // not affected by padding?
-        AnchorPane.setTopAnchor(control, 10d); // not affected by padding?
+        AnchorPane.setRightAnchor(controlWrapper, 10d); // not affected by padding?
+        AnchorPane.setTopAnchor(controlWrapper, 10d); // not affected by padding?
 
         AnchorPane.setLeftAnchor(title, 0d); // affected by padding?
         AnchorPane.setTopAnchor(title, 10d);// not affected by padding=
@@ -195,6 +252,7 @@ public class ProgressView extends VBox {
         } else {
             progress.setPoints(0, requirement.getMaxPoints());
         }
+        progress.setDate(new Date() );
         notifyPointsListener();
     }
 

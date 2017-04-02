@@ -94,10 +94,25 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
      * @return
      */
     public List<Progress> getProgressListForSaving() {
+        return getProgressListForSaving(false);
+    }
+
+    /**
+     * Grabs all progress' objects and returns the list of them.
+     * @param trim It true, only those progresses with !hasDefaultPercentage are grabbed
+     * @return
+     */
+    public List<Progress> getProgressListForSaving(boolean trim){
         List<Progress> list = new ArrayList<>();
-
-        progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
-
+        if(trim){
+            progressMap.values().forEach(consumer-> consumer.values().forEach( p -> {
+                if(!p.hasDefaultPercentage() ){
+                    list.add(p);
+                }
+            }));
+        }else{
+            progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
+        }
         return list;
     }
 
@@ -126,13 +141,21 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     private void mergeCatalogueProgress(Map<Integer, Map<String, Progress>> catalogueMap, Map<Integer, Map<String, Progress>> groupMap) {
         catalogueMap.keySet().forEach(ordinal -> {
+            LOGGER.debug(":mergeCatalogueProgress - Merging for MS: "+ordinal);
             Map<String, Progress> groupProgress = groupMap.get(ordinal);
             Map<String, Progress> catalogueProgress = catalogueMap.get(ordinal);
             Set<String> tempSet = new HashSet<String>(catalogueProgress.keySet());
-            tempSet.removeAll(groupProgress.keySet());
-            for (String reqName : tempSet) {
-                progressMap.get(ordinal).put(reqName, catalogueProgress.get(reqName));
+            if(groupProgress != null){ // may be null if the group was stored to disk and a milestone was not yet tracked.
+                tempSet.removeAll(groupProgress.keySet());
+                for (String reqName : tempSet) {
+                    progressMap.get(ordinal).put(reqName, catalogueProgress.get(reqName));
+                }
+            }else{
+                LOGGER.debug(":mergeCatalogueProgress - "+String.format("%s", catalogueProgress));
+                LOGGER.debug(":mergeCatalogueProgress - "+String.format("%s", progressMap.get(ordinal)));
+                progressMap.put(ordinal, new TreeMap<>(catalogueProgress));
             }
+
         });
     }
 
@@ -290,7 +313,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
         reqs.forEach(r -> {
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
-            ProgressView pv = new ProgressView(p, r);
+            ProgressView pv = new ProgressView(p, r, true);
             verifyPredecessorsAchieved(pv);
             pv.addPointsChangeListener(this);
             activeProgressViews.add(pv);

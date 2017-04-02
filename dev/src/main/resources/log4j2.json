@@ -97,6 +97,15 @@
           ]
         },
         {
+          "name":"ch.unibas.dmi.dbis.reqman.ui.evaluator.AssessmentView",
+          "level":"info",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"},
+            {"ref":"rollingFile"}
+          ]
+        },
+        {
           "name":"ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication",
           "level":"info",
           "additivity":false,
