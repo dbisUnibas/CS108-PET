@@ -142,7 +142,7 @@ public class RenderManager {
                     return "";
                 }
             },
-            new SubEntityField<Progress, Milestone>("minMS", (p -> catalogue.getMilestoneByOrdinal(p.getMilestoneOrdinal())), MILESTONE_ENTITY)
+            new SubEntityField<Progress, Milestone>("milestone", (p -> catalogue.getMilestoneByOrdinal(p.getMilestoneOrdinal())), MILESTONE_ENTITY)
     );
     /**
      * Existing:
