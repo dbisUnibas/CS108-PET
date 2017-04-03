@@ -97,8 +97,16 @@
           ]
         },
         {
+          "name":"ch.unibas.dmi.dbis.reqman.core",
+          "level":"trace",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"}
+          ]
+        },
+        {
           "name":"ch.unibas.dmi.dbis.reqman.ui.evaluator.AssessmentView",
-          "level":"info",
+          "level":"debug",
           "additivity":false,
           "AppenderRef":[
             {"ref":"console"},

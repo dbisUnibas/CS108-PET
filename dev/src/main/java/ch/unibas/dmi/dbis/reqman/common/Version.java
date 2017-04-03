@@ -24,6 +24,8 @@ public class Version {
 
     private final Properties props;
 
+    public static final String NO_VERSION = "N/A";
+
     private String version;
 
     private static final Logger LOGGER = LogManager.getLogger(Version.class);
@@ -36,7 +38,7 @@ public class Version {
         } catch (Exception e) {
             LOGGER.error("Could not load reqman.properties.", e);
             LOGGER.error("Setting verstion to N/A, which is in general pretty bad. Check your build!");
-            version = "N/A";
+            version = NO_VERSION;
         }
     }
 
@@ -55,6 +57,9 @@ public class Version {
      * @return the version string in format semantic versioning format
      */
     public String getVersion(){
+        if(version.equals(NO_VERSION)){
+            return NO_VERSION;
+        }
         return version.substring(0, version.indexOf("-"));
     }
 

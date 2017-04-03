@@ -1,6 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -42,10 +46,16 @@ public class Group implements Comparable<Group> {
 
     }
 
+    private static final Logger LOG = LogManager.getLogger(Group.class);
+
     public double getSumForMilestone(Milestone ms, Catalogue catalogue) {
         ArrayList<Double> points = new ArrayList<>();
 
-        getProgressByMilestoneOrdinal(ms.getOrdinal()).forEach(p -> points.add(p.getPointsSensitive(catalogue)));
+        for(Progress p : getProgressByMilestoneOrdinal(ms.getOrdinal() ) ){
+            double summand = p.hasProgress() ? p.getPointsSensitive(catalogue) : 0;
+            LOG.debug(String.format("[%s] Has progress: %b, points: %f, sensitive=%f, summand=%g",catalogue.getRequirementForProgress(p).getName(), p.hasProgress(), p.getPoints(), p.getPointsSensitive(catalogue), summand));
+            points.add(summand);// only add points if progress
+        }
 
         return points.stream().mapToDouble(Double::doubleValue).sum();
     }
@@ -198,17 +208,15 @@ public class Group implements Comparable<Group> {
     }
 
     public List<Progress> getProgressByMilestoneOrdinal(int ordinal) {
-        ArrayList<Progress> list = new ArrayList<>();
+        HashSet<Progress> set = new HashSet<>();
         for (Progress p : getProgressList()) {
             if (p.getMilestoneOrdinal() == ordinal) {
-                if (!list.contains(p)) {
-                    list.add(p);
-                } else {
-                    // Progress already in list.
+                if(!set.add(p)){
+                    LOG.debug("WARN: "+p.getRequirementName()+" already in set");
                 }
             }
         }
-        return list;
+        return new ArrayList<>(set);
     }
 
     public double getTotalSum(Catalogue catalogue) {

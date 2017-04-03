@@ -72,14 +72,12 @@ public class ProgressView extends VBox {
         yesBtn.setOnAction(action -> {
             progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
             progress.setDate(active != null ? active.getDate() : new Date());
-            progress.setMilestoneOrdinal(active.getOrdinal());
             notifyPointsListener();
         });
 
         noBtn.setOnAction(action -> {
             progress.setPoints(Progress.NO_POINTS, requirement.getMaxPoints());
             progress.setDate(active != null ? active.getDate() : new Date());
-            progress.setMilestoneOrdinal(active.getOrdinal());
             notifyPointsListener();
         });
     }
@@ -175,7 +173,7 @@ public class ProgressView extends VBox {
         if (requirement.isBinary()) {
             initYesNoButtons();
         } else {
-            spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1);
+            spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1d);
             controlWrapper.getChildren().add(spinnerPoints);
             // Solution by: http://stackoverflow.com/a/39380146
             spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {

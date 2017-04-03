@@ -373,7 +373,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     }
 
     private void calcActiveSum() {
-        double sum = group.getSumForMilestone(activeMS, controller.getActiveCatalogue() );
+        double sum = group.getSumForMilestone(activeMS, controller.getActiveCatalogue());
         tfSum.setText(String.valueOf(sum));
     }
 
