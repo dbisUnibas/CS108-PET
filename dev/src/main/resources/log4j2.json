@@ -47,10 +47,10 @@
         },
         {
           "name": "ch.unibas.dmi.dbis.reqman.templating.TemplateParser",
-          "level": "trace",
+          "level": "debug",
           "additivity": false,
           "AppenderRef":[
-            {"ref":"console", "level":"info"}
+            {"ref":"console"}
           ]
         },
         {
