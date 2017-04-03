@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sun.net.ProgressEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -117,6 +118,7 @@ public class RenderManager {
      * .isUnlocked[][]
      * .date
      * .dateFormatted[]
+     * .milestone
      */
     public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
             Field.createNormalField("points", p -> p.getPointsSensitive(catalogue)),
@@ -139,7 +141,8 @@ public class RenderManager {
                     }
                     return "";
                 }
-            }
+            },
+            new SubEntityField<Progress, Milestone>("minMS", (p -> catalogue.getMilestoneByOrdinal(p.getMilestoneOrdinal())), MILESTONE_ENTITY)
     );
     /**
      * Existing:

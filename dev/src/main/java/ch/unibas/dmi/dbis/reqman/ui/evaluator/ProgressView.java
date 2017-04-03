@@ -72,12 +72,14 @@ public class ProgressView extends VBox {
         yesBtn.setOnAction(action -> {
             progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
             progress.setDate(active != null ? active.getDate() : new Date());
+            progress.setMilestoneOrdinal(active.getOrdinal());
             notifyPointsListener();
         });
 
         noBtn.setOnAction(action -> {
-            progress.setPoints(0, requirement.getMaxPoints());
+            progress.setPoints(Progress.NO_POINTS, requirement.getMaxPoints());
             progress.setDate(active != null ? active.getDate() : new Date());
+            progress.setMilestoneOrdinal(active.getOrdinal());
             notifyPointsListener();
         });
     }

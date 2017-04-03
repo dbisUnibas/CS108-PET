@@ -33,7 +33,7 @@ public class Version {
         try {
             props.load(Version.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE));
             version = (String)props.get(VERSION_KEY);
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.error("Could not load reqman.properties.", e);
             LOGGER.error("Setting verstion to N/A, which is in general pretty bad. Check your build!");
             version = "N/A";

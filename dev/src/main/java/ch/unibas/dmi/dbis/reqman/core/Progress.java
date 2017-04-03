@@ -101,7 +101,15 @@ public class Progress {
         this.points = points;
     }
 
+    public static final double NO_POINTS = -999;
+
     public void setPoints(double points, double max) {
+        if(points == NO_POINTS){
+            percentage = 0d;
+            this.points = -1;
+            return;
+        }
+
         this.points = points;
         if (Double.compare(0d, max) == 0 && Double.compare(0d, points) == 0) {
             // if max points == points == 0 -> progress 100%
