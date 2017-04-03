@@ -373,13 +373,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     }
 
     private void calcActiveSum() {
-        ArrayList<Double> currentPoints = new ArrayList<>();
-        activeProgressViews.forEach(pv -> {
-            Requirement req = pv.getRequirement();
-            double factor = req.isMalus() ? -1.0 : 1.0;
-            currentPoints.add(pv.getProgress().getPoints() * factor);
-        });
-        double sum = currentPoints.stream().mapToDouble(Double::doubleValue).sum();
+        double sum = group.getSumForMilestone(activeMS, controller.getActiveCatalogue() );
         tfSum.setText(String.valueOf(sum));
     }
 
