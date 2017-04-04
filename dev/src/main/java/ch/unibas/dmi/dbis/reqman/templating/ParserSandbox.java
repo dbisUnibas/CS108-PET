@@ -14,10 +14,10 @@ import java.util.Map;
  */
 public class ParserSandbox {
 
-    public static void main(String[] args){
-        Milestone ms = new Milestone("Milestone", 0, new Date() );
-        Requirement r = new Requirement("first","desc",ms.getOrdinal(),ms.getOrdinal(),3,true,true,false);
-        Catalogue cat = new Catalogue("Lecture","name","desc","fs");
+    public static void main(String[] args) {
+        Milestone ms = new Milestone("Milestone", 0, new Date());
+        Requirement r = new Requirement("first", "desc", ms.getOrdinal(), ms.getOrdinal(), 3, true, true, false);
+        Catalogue cat = new Catalogue("Lecture", "name", "desc", "fs");
         cat.addAllMilestones(ms);
         cat.addRequirement(r);
 
@@ -30,7 +30,7 @@ public class ParserSandbox {
         String msTem1 = "${milestone.ordinal}";
         String msTem2 = "${milestone.ordinal} @ OTHER";
 
-        TemplateParser parser = new TemplateParser(cat);
+        TemplateParser parser = new TemplateParser();
         RenderManager manager = new RenderManager(cat);
         parser.setupFor(manager.MILESTONE_ENTITY);
         Map<String, Field<Milestone, ?>> map = parser.oldParse(msTemplate); // Would be in template

@@ -24,27 +24,18 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
     private String groupName;
 
 
-
-    public ProgressSummaryScene(Milestone milestone, String groupName){
+    public ProgressSummaryScene(Milestone milestone, String groupName) {
         super();
         this.milestone = milestone;
         this.groupName = groupName;
         populateScene();
     }
 
-    public ProgressSummaryScene(Milestone milestone, String groupName, ProgressSummary progressSummary){
+    public ProgressSummaryScene(Milestone milestone, String groupName, ProgressSummary progressSummary) {
         this(milestone, groupName);
         this.summary = progressSummary;
         loadSummary();
     }
-
-    private void loadSummary(){
-        if(summary != null){
-            taInternal.setText( summary.getInternalComment());
-            taExternal.setText( summary.getExternalComment());
-        }
-    }
-
 
     @Override
     public String getPromptTitle() {
@@ -53,10 +44,10 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
 
     @Override
     public void handleSaving(ActionEvent event) {
-        boolean externalExists = StringUtils.isNotEmpty(taExternal.getText() );
-        boolean internalExists = StringUtils.isNotEmpty(taInternal.getText() );
+        boolean externalExists = StringUtils.isNotEmpty(taExternal.getText());
+        boolean internalExists = StringUtils.isNotEmpty(taInternal.getText());
 
-        if(externalExists || internalExists){
+        if (externalExists || internalExists) {
             summary = new ProgressSummary(milestone.getOrdinal(), taInternal.getText(), taExternal.getText());
         }
 
@@ -65,7 +56,7 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
 
     @Override
     public ProgressSummary create() throws IllegalStateException {
-        if(!isCreatorReady() ){
+        if (!isCreatorReady()) {
             throw new IllegalStateException("Cannot create ProgressSummary since the Creator is not ready");
         }
         return summary;
@@ -74,6 +65,13 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
     @Override
     public boolean isCreatorReady() {
         return summary != null;
+    }
+
+    private void loadSummary() {
+        if (summary != null) {
+            taInternal.setText(summary.getInternalComment());
+            taExternal.setText(summary.getExternalComment());
+        }
     }
 
     @Override
@@ -97,11 +95,11 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
         grid.add(lblMilestoneName, 1, rowIndex++);
 
         grid.add(lblExternal, 0, rowIndex);
-        grid.add(taExternal, 1, rowIndex,1,2);
-        rowIndex +=2;
+        grid.add(taExternal, 1, rowIndex, 1, 2);
+        rowIndex += 2;
 
         grid.add(lblInternal, 0, rowIndex);
-        grid.add(taInternal, 1,rowIndex,1,2);
+        grid.add(taInternal, 1, rowIndex, 1, 2);
         rowIndex += 2;
 
         grid.add(buttons, 0, ++rowIndex, 2, 1);

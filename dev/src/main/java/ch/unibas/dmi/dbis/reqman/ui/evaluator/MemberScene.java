@@ -18,7 +18,7 @@ public class MemberScene extends AbstractVisualCreator<GroupPropertiesScene.Memb
 
     private TextField tfName, tfSurname, tfEmail;
 
-    public MemberScene(){
+    public MemberScene() {
         super();
         populateScene();
     }
@@ -33,28 +33,28 @@ public class MemberScene extends AbstractVisualCreator<GroupPropertiesScene.Memb
 
         boolean missing = false;
         String msg = "";
-        if(!StringUtils.isNotEmpty(tfName.getText() )){
+        if (!StringUtils.isNotEmpty(tfName.getText())) {
             msg += "Name is a mandatory field and cannot be omitted.\n";
             missing = true;
         }
-        if(!StringUtils.isNotEmpty(tfSurname.getText() ) ){
+        if (!StringUtils.isNotEmpty(tfSurname.getText())) {
             msg += "Surname is a mandatory field and cannot be omitted.";
             missing = true;
         }
 
-        if(missing){
+        if (missing) {
             Utils.showWarningDialog("Mandatory field(s) missing", msg);
             return;
         }
 
-        member = new GroupPropertiesScene.Member(tfName.getText(), tfSurname.getText(), StringUtils.isNotEmpty(tfEmail.getText())?tfEmail.getText():"");
+        member = new GroupPropertiesScene.Member(tfName.getText(), tfSurname.getText(), StringUtils.isNotEmpty(tfEmail.getText()) ? tfEmail.getText() : "");
         dismiss();
 
     }
 
     @Override
     public GroupPropertiesScene.Member create() throws IllegalStateException {
-        if(!isCreatorReady()){
+        if (!isCreatorReady()) {
             throw new IllegalStateException("Cannot create Member if not ready");
         }
         return member;
@@ -75,7 +75,7 @@ public class MemberScene extends AbstractVisualCreator<GroupPropertiesScene.Memb
         tfSurname = new TextField();
         tfEmail = new TextField();
 
-        grid.add(lblName, 0,0);
+        grid.add(lblName, 0, 0);
         grid.add(tfName, 1, 0);
 
         grid.add(lblSurname, 0, 1);
@@ -84,7 +84,7 @@ public class MemberScene extends AbstractVisualCreator<GroupPropertiesScene.Memb
         grid.add(lblEmail, 0, 2);
         grid.add(tfEmail, 1, 2);
 
-        grid.add(buttons, 0, 4,2,1);
+        grid.add(buttons, 0, 4, 2, 1);
 
         setRoot(grid);
     }

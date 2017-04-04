@@ -7,7 +7,6 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 
 import java.time.ZoneId;
 import java.util.Date;
@@ -28,10 +27,40 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
         super();
         populateScene();
     }
+
     public MilestonePropertiesScene(Milestone milestone) {
         this();
         this.milestone = milestone;
         loadMilestone();
+    }
+
+    public void handleSaving(ActionEvent event) {
+        String name = (tfName.getText() == null || tfName.getText().isEmpty()) ? "Milestone" : tfName.getText(); // Default name
+        Date d = null;
+        if (inputDate.getValue() != null) {
+            d = Date.from(inputDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        }
+
+        milestone = new Milestone(name, 0, d);// ordinal is handled later
+        getWindow().hide();
+    }
+
+    @Override
+    public Milestone create() throws IllegalStateException {
+        if (!isCreatorReady()) {
+            throw new IllegalStateException("Creation of Milestone failed: Creator not ready");
+        }
+        return milestone;
+    }
+
+    @Override
+    public boolean isCreatorReady() {
+        return milestone != null;
+    }
+
+    @Override
+    public String getPromptTitle() {
+        return "Milestone Properties";
     }
 
     private void loadMilestone() {
@@ -44,17 +73,6 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
             }
             lblOrdinal.setText(String.valueOf(milestone.getOrdinal()));
         }
-    }
-
-    public void handleSaving(ActionEvent event) {
-        String name = (tfName.getText() == null || tfName.getText().isEmpty()) ? "Milestone" : tfName.getText(); // Default name
-        Date d = null;
-        if (inputDate.getValue() != null) {
-            d = Date.from(inputDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-        }
-
-        milestone = new Milestone(name, 0, d);// ordinal is handled later
-        getWindow().hide();
     }
 
     @Override
@@ -83,23 +101,5 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
         grid.add(inputDate, 1, rowIndex++);
 
         grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
-    }
-
-    @Override
-    public Milestone create() throws IllegalStateException {
-        if (!isCreatorReady()) {
-            throw new IllegalStateException("Creation of Milestone failed: Creator not ready");
-        }
-        return milestone;
-    }
-
-    @Override
-    public boolean isCreatorReady() {
-        return milestone != null;
-    }
-
-    @Override
-    public String getPromptTitle() {
-        return "Milestone Properties";
     }
 }

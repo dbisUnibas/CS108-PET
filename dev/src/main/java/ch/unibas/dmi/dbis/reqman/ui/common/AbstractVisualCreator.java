@@ -7,9 +7,11 @@ import javafx.event.ActionEvent;
  *
  * @author loris.sauter
  */
-public abstract class AbstractVisualCreator<T> extends AbstractPopulatedGridScene implements Creator<T>{
+public abstract class AbstractVisualCreator<T> extends AbstractPopulatedGridScene implements Creator<T> {
 
-    public AbstractVisualCreator(){
+    protected SaveCancelPane buttons = new SaveCancelPane();
+
+    public AbstractVisualCreator() {
         super();
         setupButtonHandling();
     }
@@ -21,13 +23,11 @@ public abstract class AbstractVisualCreator<T> extends AbstractPopulatedGridScen
     /**
      * Dismisses the visual creator: It hides the parental window und thus cancels the creation.
      */
-    public void dismiss(){
+    public void dismiss() {
         getWindow().hide();
     }
 
-    protected SaveCancelPane buttons = new SaveCancelPane();
-
-    protected void setupButtonHandling(){
+    protected void setupButtonHandling() {
         buttons.setOnSave(this::handleSaving);
         buttons.setOnCancel(event -> dismiss());
     }

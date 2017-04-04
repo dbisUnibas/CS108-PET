@@ -64,14 +64,32 @@ sourceSets{
 }
 
 jar{
-
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
-
 }
 
+processResources {
+    // Pass version to reqman by adding it to reqman.properties
+    from(sourceSets.main.resources.srcDirs){
+        include 'reqman.properties'
+        expand projectVersion: project.version
+    }
+    // Do not copy the original file, since it would not have the version in it
+    from(sourceSets.main.resources.srcDirs){
+        exclude 'reqman.properties'
+    }
+}
 
+/**
+ * From:
+ * https://github.com/nostra13/Android-Universal-Image-Loader/issues/1086
+ */
+tasks.withType(Javadoc) {
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
 
 task incrementTest {
     doLast{
@@ -99,6 +117,20 @@ task deployEvaluator(dependsOn: [build, jar]){
     doLast{
         println('Deploayed Evaluator version ' +project.version)
         println('Resulting jar: '+jar.getArchiveName() )
+    }
+}
+
+task deployUpdater(type: Jar, dependsOn: classes){
+    appendix = 'updater'
+    from sourceSets.main.output
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    manifest {
+        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.updating.FileUpdater'
+    }
+    doLast{
+        println('Deployed updater: '+jar.getArchiveName() )
     }
 }
 
@@ -255,4 +287,11 @@ task setupVersion{
 
 jar.doLast{
     println 'Produced jar: '+jar.archiveName
+}
+
+task reqmanVersion{
+    doLast{
+        println('Current version of ReqMan: ')
+        printVersion()
+    }
 }

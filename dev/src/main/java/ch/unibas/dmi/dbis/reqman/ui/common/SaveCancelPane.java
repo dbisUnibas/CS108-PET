@@ -84,6 +84,14 @@ public class SaveCancelPane extends AnchorPane {
         this.cancelHandler = handler;
     }
 
+    public Button getSaveButton() {
+        return saveButton;
+    }
+
+    public Button getCancelButton() {
+        return cancelButton;
+    }
+
     private void handleSave(ActionEvent event) {
         if (saveHandler != null) {
             saveHandler.handle(event);
@@ -94,7 +102,6 @@ public class SaveCancelPane extends AnchorPane {
         }
     }
 
-
     private void handleCancel(ActionEvent event) {
         if (cancelHandler != null) {
             cancelHandler.handle(event);
@@ -103,14 +110,6 @@ public class SaveCancelPane extends AnchorPane {
                 handler.cancel(event);
             });
         }
-    }
-
-    public Button getSaveButton() {
-        return saveButton;
-    }
-
-    public Button getCancelButton() {
-        return cancelButton;
     }
 
     /**

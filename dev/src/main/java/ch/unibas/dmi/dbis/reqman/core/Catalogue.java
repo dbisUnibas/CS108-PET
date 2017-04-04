@@ -61,21 +61,15 @@ public class Catalogue {
         return semester;
     }
 
-    public void setMilestones(List<Milestone> milestones) {
-        this.milestones = milestones;
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 
-    public void setRequirements(List<Requirement> requirements) {
-        this.requirements = requirements;
-        this. reqsPerMinMS = new TreeMap<>();
-        requirements.forEach(this::addRequirementToMSMap);
-    }
-
-    public void clearMilestones(){
+    public void clearMilestones() {
         milestones = new ArrayList<>();
     }
 
-    public void clearRequirements(){
+    public void clearRequirements() {
         requirements = new ArrayList<>();
     }
 
@@ -119,10 +113,6 @@ public class Catalogue {
         return result;
     }
 
-    public void setSemester(String semester) {
-        this.semester = semester;
-    }
-
     public boolean addMilestone(Milestone milestone) {
         return milestones.add(milestone);
     }
@@ -131,15 +121,19 @@ public class Catalogue {
         return milestones.remove(milestone);
     }
 
-    public List<Milestone> getMilestones(){
+    public List<Milestone> getMilestones() {
         return new ArrayList<>(milestones);
+    }
+
+    public void setMilestones(List<Milestone> milestones) {
+        this.milestones = milestones;
     }
 
     public boolean addRequirement(Requirement requirement) {
 
-        if(reqsPerMinMS.get(requirement.getMinMilestoneOrdinal() ) != null){
+        if (reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()) != null) {
             reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).add(requirement);
-        }else{
+        } else {
             List<Requirement> list = new ArrayList<>(Arrays.asList(requirement));
             reqsPerMinMS.put(requirement.getMinMilestoneOrdinal(), list);
         }
@@ -147,18 +141,24 @@ public class Catalogue {
     }
 
     public boolean removeRequirement(Requirement requirement) {
-        if(reqsPerMinMS.get(requirement.getMinMilestoneOrdinal() ) != null){
+        if (reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()) != null) {
             reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).remove(requirement);
         }
         return requirements.remove(requirement);
 
     }
 
-    public List<Requirement> getRequirements(){
+    public List<Requirement> getRequirements() {
         return new ArrayList<>(requirements);
     }
 
-    public void addAllRequirements(Requirement... requirements){
+    public void setRequirements(List<Requirement> requirements) {
+        this.requirements = requirements;
+        this.reqsPerMinMS = new TreeMap<>();
+        requirements.forEach(this::addRequirementToMSMap);
+    }
+
+    public void addAllRequirements(Requirement... requirements) {
         List<Requirement> list = new ArrayList<>(Arrays.asList(requirements));
 
         this.requirements.addAll(list);
@@ -167,63 +167,63 @@ public class Catalogue {
 
     }
 
-    private void addRequirementToMSMap(Requirement requirement){
-        int ordinal = requirement.getMinMilestoneOrdinal();
-        if(reqsPerMinMS.get(ordinal) != null ){
-            reqsPerMinMS.get(ordinal).add(requirement);
-
-        }else{
-            reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement )));
-        }
-    }
-
-    public void addAllMilestones(Milestone...milestones){
+    public void addAllMilestones(Milestone... milestones) {
         this.milestones.addAll(Arrays.asList(milestones));
     }
 
     public Milestone getMilestoneByOrdinal(int ordinal) {
         Milestone result = null;
-        for(Milestone ms : milestones){
-            if(ms.getOrdinal() == ordinal){
+        for (Milestone ms : milestones) {
+            if (ms.getOrdinal() == ordinal) {
                 result = ms;
             }
         }
         return result;
     }
 
-    public List<Requirement> getRequirementsByMilestone(int ordinal){
-        if(reqsPerMinMS.containsKey(ordinal)){
+    public List<Requirement> getRequirementsByMilestone(int ordinal) {
+        ArrayList<Requirement> reqs = new ArrayList<>();
+        for(Requirement r : requirements){
+            if(r.getMinMilestoneOrdinal() <= ordinal && ordinal <= r.getMaxMilestoneOrdinal() ){
+                reqs.add(r);
+            }
+        }
+        return reqs;
+    }
+
+    public List<Requirement> getRequirementsWithMinMS(int ordinal){
+        if (reqsPerMinMS.containsKey(ordinal)) {
             return new ArrayList<Requirement>(reqsPerMinMS.get(ordinal));
-        }else{
+        } else {
             return null;
         }
     }
 
     @JsonIgnore
-    public double getSum(int msOrdinal){
+    public double getSum(int msOrdinal) {
         List<Requirement> reqs = reqsPerMinMS.get(msOrdinal);
-        if(reqs == null){
+        if (reqs == null) {
             return 0;
-        }else{
+        } else {
             List<Double> points = new ArrayList<>();
-            reqs.forEach(req -> points.add(!req.isMandatory() || req.isMalus() ? 0 :req.getMaxPoints()));
+            reqs.forEach(req -> points.add(!req.isMandatory() || req.isMalus() ? 0 : req.getMaxPoints()));
             return points.stream().mapToDouble(Double::doubleValue).sum();
         }
     }
 
     @JsonIgnore
-    public double getSum(){
+    public double getSum() {
         List<Double> points = new ArrayList<>();
-        reqsPerMinMS.keySet().forEach(ordinal ->{
+        reqsPerMinMS.keySet().forEach(ordinal -> {
             points.add(getSum(ordinal));
         });
         return points.stream().mapToDouble(Double::doubleValue).sum();
     }
 
     @JsonIgnore
-    public Requirement getRequirementByName(String name){
-        for(Requirement r : requirements){
-            if(r.getName().equals(name)){
+    public Requirement getRequirementByName(String name) {
+        for (Requirement r : requirements) {
+            if (r.getName().equals(name)) {
                 return r;
             }
         }
@@ -231,9 +231,9 @@ public class Catalogue {
     }
 
     @JsonIgnore
-    public boolean containsRequirement(String name){
-        for(Requirement r : requirements){
-            if(r.getName().equals(name)){
+    public boolean containsRequirement(String name) {
+        for (Requirement r : requirements) {
+            if (r.getName().equals(name)) {
                 return true;
             }
         }
@@ -248,5 +248,15 @@ public class Catalogue {
     @JsonIgnore
     public Milestone getMilestoneForProgress(Progress progress) {
         return getMilestoneByOrdinal(progress.getMilestoneOrdinal());
+    }
+
+    private void addRequirementToMSMap(Requirement requirement) {
+        int ordinal = requirement.getMinMilestoneOrdinal();
+        if (reqsPerMinMS.get(ordinal) != null) {
+            reqsPerMinMS.get(ordinal).add(requirement);
+
+        } else {
+            reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement)));
+        }
     }
 }
