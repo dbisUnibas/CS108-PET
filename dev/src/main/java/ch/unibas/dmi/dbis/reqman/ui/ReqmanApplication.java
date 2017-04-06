@@ -94,7 +94,7 @@ public class ReqmanApplication extends Application {
 
     private void showScene(TitledScene scene) {
         primaryStage.setScene(scene);
-        primaryStage.setTitle(scene.getTitle());
+        primaryStage.setTitle(setupTitle(scene.getTitle()));
         primaryStage.show();
     }
 
@@ -108,6 +108,10 @@ public class ReqmanApplication extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle(scene.getTitle());
         primaryStage.show();
+    }
+
+    private String setupTitle(String title){
+        return "ReqMan: "+title + " ("+version.getVersion()+")";
     }
 
     @Override
@@ -124,6 +128,7 @@ public class ReqmanApplication extends Application {
         private double height = -1;
         private boolean maximized = false;
 
+        @Deprecated // Window size is passed by in newer versions of reqman.
         public ChangeEvent(ActionEvent source, int view) {
             super(source, source.getTarget());
             this.view = view;

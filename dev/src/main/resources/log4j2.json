@@ -109,8 +109,7 @@
           "level":"debug",
           "additivity":false,
           "AppenderRef":[
-            {"ref":"console"},
-            {"ref":"rollingFile"}
+            {"ref":"console"}
           ]
         },
         {
