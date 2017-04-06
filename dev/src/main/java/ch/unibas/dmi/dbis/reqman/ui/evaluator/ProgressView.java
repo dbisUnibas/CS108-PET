@@ -10,6 +10,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,6 +23,8 @@ import java.util.List;
  * @author loris.sauter
  */
 public class ProgressView extends VBox {
+
+    private final static Logger LOG = LogManager.getLogger(ProgressView.class);
 
     // TODO Extract code for collapsible pane. Adjust collapsible's size.
 
@@ -43,6 +47,9 @@ public class ProgressView extends VBox {
     private AnchorPane content;
     private List<PointsChangeListener> listeners = new ArrayList<>();
 
+    private List<DirtyListener> dirtyListeners = new ArrayList<>();
+    private double previousPoints = -1d;
+
     private Milestone active = null;
 
     public ProgressView(Requirement requirement) {
@@ -60,6 +67,10 @@ public class ProgressView extends VBox {
         loadProgress();
     }
 
+    private boolean hasPointsChanged(double newPoints){
+        return Double.compare(previousPoints, newPoints) == 0;
+    }
+
     private void initYesNoButtons() {
         if(!requirement.isBinary()){
             return;
@@ -73,13 +84,35 @@ public class ProgressView extends VBox {
             progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
             progress.setDate(active != null ? active.getDate() : new Date());
             notifyPointsListener();
+            handleToggling(action);
         });
 
         noBtn.setOnAction(action -> {
             progress.setPoints(Progress.NO_POINTS, requirement.getMaxPoints());
             progress.setDate(active != null ? active.getDate() : new Date());
             notifyPointsListener();
+            handleToggling(action);
         });
+    }
+
+    private void handleToggling(ActionEvent event){
+        double points = -1d;
+        if(yesBtn.equals(event.getSource() ) ){
+            LOG.trace(":handleYes");
+            points = requirement.getMaxPoints();
+        }else if(noBtn.equals(event.getSource() )){
+            LOG.trace(":handleNo");
+            points = Progress.NO_POINTS;
+        }
+
+        if(hasPointsChanged(points)){
+            progress.setPoints(points, requirement.getMaxPoints());
+            progress.setDate(active.getDate());
+            progress.setMilestoneOrdinal(active.getOrdinal());
+            notifyDirtyListeners(true);
+            notifyPointsListener();
+        }
+
     }
 
     public Milestone getActiveMilestone() {
@@ -249,5 +282,17 @@ public class ProgressView extends VBox {
 
     private void notifyPointsListener() {
         listeners.forEach(l -> l.pointsChanged(progress.getPoints()));
+    }
+
+    void addDirtyListener(DirtyListener listener){
+        dirtyListeners.add(listener);
+    }
+
+    void removeDirtyList(DirtyListener listener){
+        dirtyListeners.remove(listener);
+    }
+
+    private void notifyDirtyListeners(boolean dirty){
+        dirtyListeners.forEach( listener -> listener.mark(dirty));
     }
 }

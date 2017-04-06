@@ -109,6 +109,14 @@
           "level":"debug",
           "additivity":false,
           "AppenderRef":[
+            {"ref":"console", "level":"info"}
+          ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.ui.evaluator.ProgressView",
+          "level":"debug",
+          "additivity":false,
+          "AppenderRef":[
             {"ref":"console"}
           ]
         },
