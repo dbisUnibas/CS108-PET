@@ -18,7 +18,7 @@ import java.util.*;
  *
  * @author loris.sauter
  */
-public class AssessmentView extends BorderPane implements PointsChangeListener {
+public class AssessmentView extends BorderPane implements PointsChangeListener, DirtyListener {
 
     private HBox titleBar;
     private AnchorPane titleAnchor;
@@ -113,6 +113,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         }else{
             progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
         }
+        activeProgressViews.forEach(pv->pv.markSaved());
         return list;
     }
 
@@ -264,10 +265,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
             ProgressSummary ps = null;
             boolean replace = false;
             if (hasSummaryForMilestone(ms)) {
-                ps = EvaluatorPromptFactory.promptSummary(ms, group.getName(), getSummaryForMilestone(ms));
+                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getName(), getSummaryForMilestone(ms));
+                EvaluatorPromptFactory.showSummary(ms, group.getName(), summary -> {handleSummaryReceiving(summary, true);}, getSummaryForMilestone(ms));
                 replace = true;
             } else {
-                ps = EvaluatorPromptFactory.promptSummary(ms, group.getName());
+                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getName());
+                EvaluatorPromptFactory.showSummary(ms, group.getName(), progressSummary -> handleSummaryReceiving(progressSummary, false));
             }
             if (ps != null) {
                 if (replace) {
@@ -275,6 +278,39 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
                 }
                 summaries.add(ps);
             }
+        }
+    }
+
+    private void handleSummaryReceiving(ProgressSummary ps, boolean replace){
+        LOGGER.debug(String.format(":handleSummaryReceiving - Received summary: %s", ps));
+        if(ps != null){
+            // Case receiving non-null summary
+            ProgressSummary sent = getSummaryForMilestone(controller.getActiveCatalogue().getMilestoneByOrdinal(ps.getMilestoneOrdinal()));
+            if(replace){
+                // Case have to replace summary
+                summaries.remove(getSummaryForMilestone(controller.getActiveCatalogue().getMilestoneByOrdinal(ps.getMilestoneOrdinal())));
+            }
+            summaries.add(ps);
+            if(sent == ps){ // if it is *the same object*
+                // No changes, since exactly the same as before
+                LOGGER.debug(":handleSummaryReceiving - Received is same as sent");
+                boolean equalExternal = ps.getExternalComment().equals(sent.getExternalComment() );
+                boolean equalInternal = ps.getInternalComment().equals(sent.getInternalComment() );
+                LOGGER.debug(":handleSummaryReceiving - "+String.format("Equal external=%s and internal=%s", equalExternal, equalInternal) );
+                if(equalExternal && equalInternal){
+                    // no changes
+                    LOGGER.debug(":handleSummaryReceiving - No changes");
+                }else{
+                    // changes
+                    LOGGER.debug(":handleSummaryReceiving - Changes detected");
+                    markDirty();
+                }
+            }else{
+                // first time recevining summary for this ms
+                LOGGER.debug(":handleSummaryReceiving - Received differs form sent");
+                markDirty();
+            }
+
         }
     }
 
@@ -315,9 +351,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
 
             ProgressView pv = new ProgressView(p, r);
+
             pv.setActiveMilestone(activeMS);
             verifyPredecessorsAchieved(pv);
             pv.addPointsChangeListener(this);
+
+            pv.addDirtyListener(this);
 
             // Filter the ones that are not really on this milestone and are already assessed
             if(p.getDate() == null){
@@ -402,4 +441,15 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     }
 
 
+    @Override
+    public void markDirty() {
+        calcActiveSum();
+        controller.markDirty(getActiveGroup());
+    }
+
+    @Override
+    public void unmarkDirty() {
+        calcActiveSum();
+        controller.unmarkDirty(getActiveGroup());
+    }
 }

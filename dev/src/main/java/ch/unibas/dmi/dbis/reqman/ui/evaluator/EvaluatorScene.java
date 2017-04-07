@@ -14,6 +14,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -52,15 +53,16 @@ public class EvaluatorScene extends TitledScene {
 
     private final Logger LOGGER = LogManager.getLogger(getClass());
 
-    public EvaluatorScene(String title, int width, int height) {
-        this(width, height);
+    public EvaluatorScene(Stage parent, String title, int width, int height) {
+        this(parent, width, height);
         this.title = title;
 
     }
+    private Stage parent;
 
-
-    public EvaluatorScene(int width, int height) {
+    public EvaluatorScene(Stage parent, int width, int height) {
         super(new BorderPane(), width, height);
+        this.parent = parent;
         root = (BorderPane) getRoot();
         controller = new EvaluatorController(this);
         groupView = new GroupView(controller);
@@ -321,7 +323,7 @@ public class EvaluatorScene extends TitledScene {
 
     private void handleChangeView(ActionEvent event) {
         if (changeHandler != null) {
-            ReqmanApplication.ChangeEvent evt = new ReqmanApplication.ChangeEvent(event, ReqmanApplication.EDITOR_VIEW);
+            ReqmanApplication.ChangeEvent evt = new ReqmanApplication.ChangeEvent(event, ReqmanApplication.EDITOR_VIEW, getWidth(), getHeight(), parent.isMaximized());
             changeHandler.handle(evt);
         }
     }
