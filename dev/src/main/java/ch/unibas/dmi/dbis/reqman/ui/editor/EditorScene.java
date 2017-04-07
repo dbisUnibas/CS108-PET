@@ -12,6 +12,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -30,9 +31,12 @@ public class EditorScene extends TitledScene {
     private String title = "Editor";
     private EventHandler<ReqmanApplication.ChangeEvent> changeHandler = null;
 
-    public EditorScene(int width, int height) {
+    private Stage parent;
+
+    public EditorScene(Stage parent, int width, int height) {
         super(new BorderPane(), width, height);
         this.controller = new EditorController(this);
+        this.parent = parent;
         initUI();
     }
 
@@ -181,7 +185,7 @@ public class EditorScene extends TitledScene {
 
     private void handleChangeView(ActionEvent event) {
         if (changeHandler != null) {
-            ReqmanApplication.ChangeEvent evt = new ReqmanApplication.ChangeEvent(event, ReqmanApplication.EVALUATOR_VIEW);
+            ReqmanApplication.ChangeEvent evt = new ReqmanApplication.ChangeEvent(event, ReqmanApplication.EVALUATOR_VIEW, getWidth(), getHeight(), parent.isMaximized());
             changeHandler.handle(evt);
         }
     }

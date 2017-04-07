@@ -5,6 +5,8 @@ import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.ProgressSummary;
 import ch.unibas.dmi.dbis.reqman.ui.common.PromptPopup;
 
+import java.util.function.Consumer;
+
 /**
  * TODO: Write JavaDoc
  *
@@ -40,4 +42,16 @@ public class EvaluatorPromptFactory {
         PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName, summary));
         return popup.prompt();
     }
+
+
+    static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor){
+        PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName), acceptor);
+        popup.showPrompt();
+    }
+
+    static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor, ProgressSummary summary){
+        PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName, summary), acceptor);
+        popup.showPrompt();
+    }
+
 }
