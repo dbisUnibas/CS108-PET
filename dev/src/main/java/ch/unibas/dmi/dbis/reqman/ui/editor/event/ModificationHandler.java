@@ -8,12 +8,12 @@ import javafx.event.EventHandler;
  * @author loris.sauter
  */
 @FunctionalInterface
-public interface ModificationHandler extends EventHandler<EditorEvent>{
+public interface ModificationHandler extends EventHandler<EditorEvent> {
 
     void handleModification(EditorEvent event);
 
-    default void handle(EditorEvent event){
-        if(EditorEvent.MODIFICATION.equals(event.getEventType() ) ){
+    default void handle(EditorEvent event) {
+        if (EditorEvent.MODIFICATION.equals(event.getEventType())) {
             handleModification(event);
         }
     }

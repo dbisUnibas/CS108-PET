@@ -3,6 +3,22 @@
 ##
 #####################################
 
+## Custom ignorings:
+###################
+
+# Ignores logs
+dev/logs/
+
+# Ignores manual tests (Mostly simple tests which consist of visual and manual checking of something.
+**Tester.java
+
+# Various temporary file endings
+**Thumbs.db
+**~
+**.*~
+
+## --- END custom ignorings ---
+
 ## Gradle entries by:
 ## https://raw.githubusercontent.com/github/gitignore/b89498a4674a21f2f4feb3994e82acc58d747236/Gradle.gitignore
 ## 
@@ -30,6 +46,9 @@ gradle-app.setting
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# Complete .idea folder
+**/.idea/*
 
 # User-specific stuff:
 .idea/**/workspace.xml

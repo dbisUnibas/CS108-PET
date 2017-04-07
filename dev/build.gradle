@@ -64,14 +64,32 @@ sourceSets{
 }
 
 jar{
-
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
-
 }
 
+processResources {
+    // Pass version to reqman by adding it to reqman.properties
+    from(sourceSets.main.resources.srcDirs){
+        include 'reqman.properties'
+        expand projectVersion: project.version
+    }
+    // Do not copy the original file, since it would not have the version in it
+    from(sourceSets.main.resources.srcDirs){
+        exclude 'reqman.properties'
+    }
+}
 
+/**
+ * From:
+ * https://github.com/nostra13/Android-Universal-Image-Loader/issues/1086
+ */
+tasks.withType(Javadoc) {
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+    options.addStringOption('Xdoclint:none', '-quiet')
+}
 
 task incrementTest {
     doLast{
@@ -95,12 +113,38 @@ task deployEditor(dependsOn: [build, jar]){
     }
 }
 
-task applySnapshot(dependsOn: deployEditor){
+task deployEvaluator(dependsOn: [build, jar]){
+    doLast{
+        println('Deploayed Evaluator version ' +project.version)
+        println('Resulting jar: '+jar.getArchiveName() )
+    }
+}
+
+task deployUpdater(type: Jar, dependsOn: classes){
+    appendix = 'updater'
+    from sourceSets.main.output
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    manifest {
+        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.updating.FileUpdater'
+    }
+    doLast{
+        println('Deployed updater: '+jar.getArchiveName() )
+    }
+}
+
+task applySnapshotEditor(dependsOn: deployEditor){
     doLast{
         println('Finished: '+jar.archiveName)
     }
 }
 
+task applySnapshotEvaluator(dependsOn: deployEvaluator){
+    doLast{
+        println('Finished: '+jar.archiveName)
+    }
+}
 
 /*
  * Goal: filter in Version.java @v@ and replace with actual version. Then comiple with it.
@@ -113,10 +157,17 @@ gradle.taskGraph.whenReady{
         if(taskGraph.hasTask(deployEditor)){
             jar.appendix = 'editor'
             jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication')
+        }else if(taskGraph.hasTask(deployEvaluator)){
+            jar.appendix = 'evaluator'
+            jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorApplication')
+        }else{
+            jar.appendix = ''
+            jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication')
         }
-        if(taskGraph.hasTask(applySnapshot)){
+        if(taskGraph.hasTask(applySnapshotEvaluator) || taskGraph.hasTask(applySnapshotEditor)){
             jar.classifier = 'SNAPSHOT'
         }
+
 }
 
 /**
@@ -142,11 +193,28 @@ static void incrementVersion(String versionPart){
     p.load(pF.newDataInputStream() )
 }
 
+/**
+ * Sets the version number of given version part.
+ * @param versionPart
+ * @param number
+ */
+static void setVersionPart(String versionPart, int number){
+    String vKey = "artifact${versionPart}"
+    Properties p = new Properties()
+    File pF = new File('version.properties')
+    p.load(pF.newDataInputStream() )
+    p.setProperty(vKey, String.valueOf(number) )
+    p.store(pF.newWriter(), null)
+    p.load(pF.newDataInputStream() )
+}
+
 task incrementMajorVersion{
     group = 'versioning'
     description = 'Increments the majro version (so the M in M.m.F) number by 1. Only invoke when a major version update is appropriate.'
     doFirst{
         incrementVersion('MajorVersion')
+        setVersionPart('MinorVersion',0)
+        printVersion()
     }
 }
 
@@ -155,6 +223,8 @@ task incrementMinorVersion{
     description = 'Increments the minor version (so the m in M.m.F) number by 1. Only invoke when a minor version update is appropriate.'
     doFirst{
         incrementVersion('MinorVersion')
+        setVersionPart('FixVersion',0)
+        printVersion()
     }
 }
 
@@ -163,6 +233,7 @@ task incrementFixVersion{
     description = 'Increments the fix version (so the F in  M.m.F) number by 1. Only invoke when a bugfix is applied.'
     doFirst{
         incrementVersion('FixVersion')
+        printVersion()
     }
 }
 
@@ -196,6 +267,11 @@ static String readVersion(){
     return major.toString()+'.'+minor+'.'+fix+'-b'+build.toString()
 }
 
+void printVersion(){
+    setVersion(readVersion() )
+    println(project.version)
+}
+
 /**
  * Reads the version.properties file with its artifact version numbers and then creats the version string
  * with respect to that file's content.
@@ -206,5 +282,16 @@ task setupVersion{
     doFirst{
         String v = readVersion()
         setVersion(v)
+    }
+}
+
+jar.doLast{
+    println 'Produced jar: '+jar.archiveName
+}
+
+task reqmanVersion{
+    doLast{
+        println('Current version of ReqMan: ')
+        printVersion()
     }
 }

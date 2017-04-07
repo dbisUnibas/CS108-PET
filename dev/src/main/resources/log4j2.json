@@ -6,37 +6,121 @@
         "name":"console",
         "target":"SYSTEM_OUT",
         "PatternLayout":{
-          "pattern":"%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"
+          "pattern":"[%d{MM-dd-yyyy HH:mm:ss.SSS}][%t] %-5level %logger{36}: %msg%n"
+        }
+
+      },
+      "RollingFile":{
+        "name":"rollingFile",
+        "fileName":"logs/reqman.log",
+        "filePattern":"logs/$${date:yyyy-MM}reqman-%d{MM-dd-yyyy}-%i.log.gz",
+        "PatternLayout":{
+          "pattern":"[%d{MM-dd-yyyy HH:mm:ss.SSS}][%t] %-5level %logger{36}: %msg%n"
+        },
+        "Policies":{
+          "SizeBasedTriggeringPolicy":{
+            "size":"10 MB"
+          }
+        },
+        "DefaultRolloverStrategy":{
+          "max":"5"
         }
       }
     },
     "loggers":{
       "root":{
         "level":"error",
-        "appender-ref":{"ref":"console", "level":"error"}
+        "AppenderRef":[
+          {"ref":"console"},
+          {"ref":"rollingFile"}
+        ]
       },
       "logger":[
         {
           "name":"ch.unibas.dmi.dbis.reqman.templating",
           "level":"debug",
           "additivity":false,
-          "appender-ref":{"ref":"console"}
+          "AppenderRef":[
+            {"ref":"console"},
+            {"ref":"rollingFile", "level":"info"}
+          ]
         },
         {
           "name": "ch.unibas.dmi.dbis.reqman.templating.TemplateParser",
-          "level": "info",
+          "level": "debug",
           "additivity": false,
-          "appender-ref": {
-            "ref": "console"
-          }
+          "AppenderRef":[
+            {"ref":"console"}
+          ]
+        },
+        {
+          "name": "ch.unibas.dmi.dbis.reqman.templating.TemplateRenderer",
+          "level": "trace",
+          "additivity": false,
+          "AppenderRef":[
+            {"ref":"console", "level":"info"}
+          ]
         },
         {
           "name":"ch.unibas.dmi.dbis.reqman.templating.RenderManager",
           "level":"trace",
           "additivity":false,
-          "appender-ref":{
-            "ref":"console"
-          }
+          "AppenderRef":[
+            {"ref":"console", "level":"debug"}
+          ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.configuration",
+          "level":"debug",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console", "level":"info"},
+            {"ref":"rollingFile", "level":"info"}
+          ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.ui.editor",
+          "level":"info",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"},
+            {"ref":"rollingFile","level":"info"}
+          ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.ui.evaluator",
+          "level":"info",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"},
+            {"ref":"rollingFile","level":"info"}
+          ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.core",
+          "level":"trace",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"}
+          ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.ui.evaluator.AssessmentView",
+          "level":"debug",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"},
+            {"ref":"rollingFile"}
+          ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication",
+          "level":"info",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"},
+            {"ref":"rollingFile","level":"info"}
+          ]
         }
       ]
     }
