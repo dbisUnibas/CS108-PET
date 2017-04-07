@@ -231,6 +231,10 @@ public class EvaluatorController {
         }
     }
 
+    void unmarkDirty(Group g){
+        evaluator.unmarkDirty(g);
+    }
+
     public void handleSaveAsGroup(ActionEvent event) {
         if (!isCatalogueSet()) {
             return;

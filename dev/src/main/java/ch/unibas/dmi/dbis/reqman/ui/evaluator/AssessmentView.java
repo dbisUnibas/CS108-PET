@@ -113,6 +113,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         }else{
             progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
         }
+        activeProgressViews.forEach(pv->pv.markSaved());
         return list;
     }
 
@@ -425,6 +426,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
 
     @Override
     public void unmarkDirty() {
-        System.out.println("UNDIRTY");
+        calcActiveSum();
+        controller.unmarkDirty(getActiveGroup());
     }
 }

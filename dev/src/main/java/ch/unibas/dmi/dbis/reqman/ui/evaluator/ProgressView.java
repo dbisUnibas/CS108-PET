@@ -48,7 +48,13 @@ public class ProgressView extends VBox {
     private List<PointsChangeListener> listeners = new ArrayList<>();
 
     private List<DirtyListener> dirtyListeners = new ArrayList<>();
+    @Deprecated // replaced by previousSavedYesNoConfig
     private double previousPoints = -1d;
+
+    /**
+     * To track, if the user has reverted its change.
+     */
+    private boolean[] previousSavedYesNoConfig = new boolean[]{false, false};
 
     private Milestone active = null;
 
@@ -67,8 +73,14 @@ public class ProgressView extends VBox {
         loadProgress();
     }
 
+    @Deprecated
     private boolean hasPointsChanged(double newPoints){
+
         return Double.compare(previousPoints, newPoints) == 0;
+    }
+
+    private boolean hasYesNoConfigChaned(boolean yesSelected, boolean noSelected){
+        return previousSavedYesNoConfig[0] != yesSelected && previousSavedYesNoConfig[1] != noSelected;
     }
 
     private void initYesNoButtons() {
@@ -97,20 +109,26 @@ public class ProgressView extends VBox {
 
     private void handleToggling(ActionEvent event){
         double points = -1d;
+        boolean changes = false;
         if(yesBtn.equals(event.getSource() ) ){
             LOG.trace(":handleYes");
             points = requirement.getMaxPoints();
+            changes = true;
         }else if(noBtn.equals(event.getSource() )){
             LOG.trace(":handleNo");
             points = Progress.NO_POINTS;
+            changes = true;
         }
 
-        if(hasPointsChanged(points)){
+        if(hasYesNoConfigChaned(yesBtn.isSelected(), noBtn.isSelected())){
+            LOG.trace(":configChanged");
             progress.setPoints(points, requirement.getMaxPoints());
             progress.setDate(active.getDate());
             progress.setMilestoneOrdinal(active.getOrdinal());
             notifyDirtyListeners(true);
             notifyPointsListener();
+        }else{
+            notifyDirtyListeners(false);
         }
 
     }
@@ -154,6 +172,8 @@ public class ProgressView extends VBox {
                 }else{
                     noBtn.setSelected(true);
                 }
+                previousSavedYesNoConfig[0] = yesBtn.isSelected();
+                previousSavedYesNoConfig[1] = noBtn.isSelected();
             }else{
                 spinnerPoints.getValueFactory().setValue(progress.getPoints());
             }
@@ -294,5 +314,12 @@ public class ProgressView extends VBox {
 
     private void notifyDirtyListeners(boolean dirty){
         dirtyListeners.forEach( listener -> listener.mark(dirty));
+    }
+
+    void markSaved(){
+        if(yesBtn != null && noBtn != null){
+            previousSavedYesNoConfig[0] = yesBtn.isSelected();
+            previousSavedYesNoConfig[1] = noBtn.isSelected();
+        }
     }
 }

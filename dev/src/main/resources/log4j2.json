@@ -114,7 +114,7 @@
         },
         {
           "name":"ch.unibas.dmi.dbis.reqman.ui.evaluator.ProgressView",
-          "level":"debug",
+          "level":"trace",
           "additivity":false,
           "AppenderRef":[
             {"ref":"console"}
