@@ -558,10 +558,15 @@ public class EvaluatorController {
         }else{
             String name = file.getName();
             LOG.debug("Filtering... "+name);
-            String extension = name.substring(name.lastIndexOf("."));
-            LOG.debug(" ... with extension: "+extension);
-            if(BACKUP_EXTENSION.equals(extension.substring(1)) ){ // substring(1) so "." is gone
-                return true;
+            int index = name.lastIndexOf(name.lastIndexOf("."));
+            if(index != -1){
+                String extension = name.substring(name.lastIndexOf("."));
+                LOG.debug(" ... with extension: "+extension);
+                if(BACKUP_EXTENSION.equals(extension.substring(1)) ){ // substring(1) so "." is gone
+                    return true;
+                }
+            }else{
+                LOG.debug("... extension-less files are ignored");
             }
             return false;
         }
