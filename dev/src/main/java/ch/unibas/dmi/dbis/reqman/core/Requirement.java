@@ -282,4 +282,22 @@ public class Requirement {
         double factor = isMalus() ? -1.0 : 1.0;
         return getMaxPoints() * factor;
     }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Requirement{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", minMilestoneOrdinal=").append(minMilestoneOrdinal);
+        sb.append(", maxMilestoneOrdinal=").append(maxMilestoneOrdinal);
+        sb.append(", maxPoints=").append(maxPoints);
+        sb.append(", binary=").append(binary);
+        sb.append(", mandatory=").append(mandatory);
+        sb.append(", predecessorNames=").append(predecessorNames);
+        sb.append(", propertiesMap=").append(propertiesMap);
+        sb.append(", malus=").append(malus);
+        sb.append(", maxPointsSensitive=").append(getMaxPointsSensitive());
+        sb.append('}');
+        return sb.toString();
+    }
 }

@@ -2,12 +2,21 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 
 import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
+import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 /**
  * TODO: write JavaDoc
@@ -24,6 +33,8 @@ public class EditorApplication extends Application {
     private Label lblName, lblLecture, lblSemester;
 
     private static volatile boolean exp = false;
+
+    private static final Logger LOG = LogManager.getLogger(EditorApplication.class);
 
     public static void main(String[] args) {
         Log4J2Fix.applyHotFix();
@@ -46,8 +57,10 @@ public class EditorApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
         if(exp){
+            LOG.info("Experimental env");
             startExp(primaryStage);
         }else{
+            LOG.info("Normal");
             startOld(primaryStage);
         }
     }
@@ -60,12 +73,52 @@ public class EditorApplication extends Application {
         primaryStage.show();
     }
 
+    private ObservableList<Requirement> reqs;
+
     private void startExp(Stage primaryStage){
+        LOG.trace(":startExp");
         primaryStage.setTitle("ReqMan: Editor (EXPERIMENTAL)");
         RequirementTableView view = new RequirementTableView();
+        List<Requirement> requirements = generateReqs();
+        LOG.trace(":startExp - generated reqs");
+        reqs =  FXCollections.observableArrayList(requirements );
+        view.setOnAdd(this::handleAdd );
+        LOG.trace(":startExp - past setOnAdd");
+        view.setOnRemove(this::handleRm);
+        LOG.trace(":startExp - past setOnRemove");
+        view.setRequirements(reqs);
+        LOG.trace(":startExp - past setReqs");
         Scene scene = new Scene(view, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private List<Requirement> generateReqs(){
+        LOG.trace(":generateReqs");
+        ArrayList<Requirement> list = new ArrayList<>();
+        for(int i=0; i<10;i++){
+            Random rand = new Random();
+            String name = "Req"+i;
+            double points = rand.nextInt(5)+(rand.nextInt(10)/10f);
+            boolean binary = rand.nextInt(10) <=5;
+            boolean mandatory = rand.nextInt(10)<=8;
+            boolean malus = rand.nextInt(10)<2;
+            Requirement req = new Requirement(name, "Description", 1,5,points, binary, mandatory, malus);
+            list.add(req);
+            LOG.trace(String.format("Generated: %s", req.toString()));
+        }
+        return list;
+    }
+
+    private void handleAdd(ActionEvent evt){
+        LOG.trace(":handleAdd");
+        reqs.add(new Requirement("R"+reqs.size()+1,"DESC", 1, 5, Math.random()+3, Math.random() <= 0.5, Math.random() >= 0.6, Math.random() <0.1));
+    }
+
+    private void handleRm(ActionEvent evt){
+        LOG.trace(":handleRM");
+        Random r = new Random();
+        reqs.remove(r.nextInt(reqs.size()));
     }
 
     private void handleQuit(ActionEvent event) {
