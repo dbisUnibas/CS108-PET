@@ -282,12 +282,35 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     }
 
     private void handleSummaryReceiving(ProgressSummary ps, boolean replace){
+        LOGGER.debug(String.format(":handleSummaryReceiving - Received summary: %s", ps));
         if(ps != null){
+            // Case receiving non-null summary
+            ProgressSummary sent = getSummaryForMilestone(controller.getActiveCatalogue().getMilestoneByOrdinal(ps.getMilestoneOrdinal()));
             if(replace){
+                // Case have to replace summary
                 summaries.remove(getSummaryForMilestone(controller.getActiveCatalogue().getMilestoneByOrdinal(ps.getMilestoneOrdinal())));
             }
             summaries.add(ps);
-            markDirty();
+            if(sent == ps){ // if it is *the same object*
+                // No changes, since exactly the same as before
+                LOGGER.debug(":handleSummaryReceiving - Received is same as sent");
+                boolean equalExternal = ps.getExternalComment().equals(sent.getExternalComment() );
+                boolean equalInternal = ps.getInternalComment().equals(sent.getInternalComment() );
+                LOGGER.debug(":handleSummaryReceiving - "+String.format("Equal external=%s and internal=%s", equalExternal, equalInternal) );
+                if(equalExternal && equalInternal){
+                    // no changes
+                    LOGGER.debug(":handleSummaryReceiving - No changes");
+                }else{
+                    // changes
+                    LOGGER.debug(":handleSummaryReceiving - Changes detected");
+                    markDirty();
+                }
+            }else{
+                // first time recevining summary for this ms
+                LOGGER.debug(":handleSummaryReceiving - Received differs form sent");
+                markDirty();
+            }
+
         }
     }
 

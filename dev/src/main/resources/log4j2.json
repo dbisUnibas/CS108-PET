@@ -98,7 +98,7 @@
         },
         {
           "name":"ch.unibas.dmi.dbis.reqman.core",
-          "level":"trace",
+          "level":"info",
           "additivity":false,
           "AppenderRef":[
             {"ref":"console"}
@@ -109,7 +109,7 @@
           "level":"debug",
           "additivity":false,
           "AppenderRef":[
-            {"ref":"console", "level":"info"}
+            {"ref":"console", "level":"debug"}
           ]
         },
         {
