@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
 import javafx.collections.ObservableList;
@@ -167,13 +168,24 @@ public class EditorHandler implements EventHandler<EditorEvent> {
     }
 
     public void saveCatalogue() {
-        editor.indicateWaiting(true);
-        manager.saveCatalogue();
-        editor.indicateWaiting(false);
+        if(manager.isCatalogueLoaded() ){
+            editor.indicateWaiting(true);
+            manager.saveCatalogue();
+            editor.indicateWaiting(false);
+        }
+
     }
 
-    public void saveAsCatalogue(File file) {
-        manager.saveAsCatalogue(file);
+    public void saveAsCatalogue() {
+        if(manager.isCatalogueLoaded()){
+            FileChooser sc = Utils.createCatalogueFileChooser("Save As");
+            File f = sc.showSaveDialog(editor.getScene().getWindow());
+            if(f!= null){
+                manager.saveAsCatalogue(f);
+            }
+
+        }
+        ;
     }
 
     public boolean isCatalogueFilePresent() {

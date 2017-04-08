@@ -110,6 +110,6 @@ public class EditorView extends BorderPane implements TitleProvider{
     }
 
     public void indicateWaiting(boolean waiting) {
-        getScene().setCursor(waiting ? Cursor.WAIT : Cursor.DEFAULT);
+        getScene().getRoot().setCursor(waiting ? Cursor.WAIT : Cursor.DEFAULT);
     }
 }

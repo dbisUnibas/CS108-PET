@@ -138,11 +138,7 @@ public class EditorApplication extends Application {
     }
 
     private void saveAs(){
-        FileChooser sc = Utils.createCatalogueFileChooser("Save As");
-        File f = sc.showSaveDialog(scene.getWindow());
-        if(f!= null){
-            handler.saveAsCatalogue(f);
-        }
+            handler.saveAsCatalogue();
     }
 
 
