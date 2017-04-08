@@ -1,6 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
@@ -20,46 +22,39 @@ public class EditorView extends BorderPane implements TitleProvider{
 
 
     private RequirementTableView reqTableView;
-    private MilestonesView msView;
+    //private MilestonesView msView;
+    private Node msView;
     private CatalogueInfoPane catInfo;
 
 
+    @Deprecated
     private EditorController controller;
+
+    private final EditorHandler handler;
 
     private String title = "Editor";
 
     private static int counter = 0;
     private static volatile  boolean info = false;
 
-    public EditorView(EditorController controller){
+    public EditorView(EditorHandler handler){
         super();
-        this.controller = controller;
+        LOGGER_UI.trace("<init>");
+        this.handler = handler;
+        this.handler.setEditorView(this);
         initComponents();
         layoutComponents();
-
-        /* === EXPERIMENTAL === */
-        reqTableView.setOnAdd(event -> {
-            catInfo.setMaxPoints(counter++);
-        });
-
-        reqTableView.setOnRemove(event -> {
-            if(info){
-                catInfo.setCatName("");
-                catInfo.setCatLecture("");
-                catInfo.setCatSemester("");
-            }else{
-                catInfo.setCatName("Programmierprojekt");
-                catInfo.setCatLecture("Programmier-Projekt");
-                catInfo.setCatSemester("FS17");
-            }
-            info = !info;
-            LOGGER_UI.debug("Style class: "+catInfo.debugStyle());
-        });
     }
 
     private void initComponents(){
+        LOGGER_UI.trace(":initComps");
         reqTableView = new RequirementTableView();
-        msView = new MilestonesView(controller);
+        reqTableView.setOnAdd(handler::handleCreation);
+        reqTableView.setOnRemove(handler::handleDeletion);
+
+        //msView = new MilestonesView(controller);
+        msView = new Label("Milestones");
+
         catInfo = new CatalogueInfoPane();
 
 
@@ -70,6 +65,7 @@ public class EditorView extends BorderPane implements TitleProvider{
     }
 
     private void layoutComponents(){
+        LOGGER_UI.trace(":layoutComps");
         splitter.getItems().addAll(msView, reqTableView);
         splitter.setDividerPositions(0.33);
         setTop(catInfo);
@@ -86,7 +82,9 @@ public class EditorView extends BorderPane implements TitleProvider{
         msView.setDisable(true);
     }
 
-
+    public RequirementTableView getReqTableView() {
+        return reqTableView;
+    }
 
     @Override
     public String getTitle() {

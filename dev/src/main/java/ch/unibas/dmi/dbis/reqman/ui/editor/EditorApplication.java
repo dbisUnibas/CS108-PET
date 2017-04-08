@@ -4,17 +4,23 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -67,15 +73,65 @@ public class EditorApplication extends Application {
         }
     }
 
+    private EditorHandler handler = new EditorHandler();
+    private Scene scene;
+
     private void startNew(Stage primaryStage) {
         LOG.trace(":startNew");
-        EditorController controller = new EditorController();
-        EditorView editor = new EditorView(controller);
-        Scene scene = new Scene(editor, 800,600);
+
+        EditorView editor = new EditorView(handler);
+
+        scene = new Scene(createExperimentalWrapper(editor), 800,600);
         primaryStage.setScene(scene);
         primaryStage.setTitle(editor.getTitle() + " " + String.format("(%s-EXPERIMENTAL)", Version.getInstance().getVersion()));
         primaryStage.show();
     }
+
+    private BorderPane createExperimentalWrapper(EditorView editor) {
+        LOG.trace(":createExpWrapper");
+        BorderPane pane = new BorderPane();
+        pane.setTop(createExperimentalMenu());
+        pane.setCenter(editor);
+        return pane;
+    }
+
+    private MenuBar createExperimentalMenu(){
+        LOG.trace(":createExpMenu");
+        MenuBar menu = new MenuBar();
+
+        Menu menuFile = new Menu("File");
+
+        MenuItem itemOpen = new MenuItem("Open");
+        itemOpen.setOnAction(evt -> {
+            FileChooser openChooser = Utils.createCatalogueFileChooser("Open");
+            File file = openChooser.showOpenDialog(scene.getWindow());
+            if(file != null){
+                handler.openCatalogue(file);
+            }
+        });
+
+        MenuItem itemSave = new MenuItem("Save");
+        itemSave.setOnAction(evt -> {
+            if(handler.isCatalogueFilePresent() ){
+                handler.saveCatalogue();
+            }else{
+                saveAs();
+            }
+        });
+
+        menuFile.getItems().addAll(itemOpen, itemSave);
+        menu.getMenus().add(menuFile);
+        return menu;
+    }
+
+    private void saveAs(){
+        FileChooser sc = Utils.createCatalogueFileChooser("Save As");
+        File f = sc.showSaveDialog(scene.getWindow());
+        if(f!= null){
+            handler.saveAsCatalogue(f);
+        }
+    }
+
 
     private void startOld(Stage primaryStage){
         primaryStage.setTitle("ReqMan: Editor");

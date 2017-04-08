@@ -5,6 +5,8 @@ import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -41,7 +43,6 @@ public class RequirementTableView extends BorderPane {
     private TableView<ObservableRequirement> table;
     private ObservableList<ObservableRequirement> tableData = FXCollections.observableArrayList();
 
-
     RequirementTableView(){
         initComponents();
         layoutComponents();
@@ -55,7 +56,7 @@ public class RequirementTableView extends BorderPane {
 
     public void setOnRemove(EventHandler<EditorEvent> handler){
         rmBtn.setOnAction(event -> {
-            handler.handle(EditorEvent.generateDeletionEvent(event, TargetEntity.REQUIREMENT, table.getSelectionModel().getSelectedIndex() ));
+            handler.handle(EditorEvent.generateDeletionEvent(event, TargetEntity.REQUIREMENT, table.getSelectionModel().getSelectedIndex(), table.getSelectionModel().getSelectedItem() ));
         });
     }
 
@@ -63,7 +64,7 @@ public class RequirementTableView extends BorderPane {
         // Ensures that this view is really simply view - and nothing more!
         LOGGER.trace(":setRequirements");
         requirements.forEach(r -> tableData.add(ObservableRequirement.fromRequirement(r)));
-
+        LOGGER.trace(":setRequirements - Created "+tableData.size()+" observable requirements");
         requirements.addListener(new ListChangeListener<Requirement>() {
             @Override
             public void onChanged(Change<? extends Requirement> c) {
@@ -87,6 +88,12 @@ public class RequirementTableView extends BorderPane {
                     }
 
                 }
+            }
+        });
+        requirements.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                LOGGER.trace("Invalid");
             }
         });
     }
@@ -172,6 +179,10 @@ public class RequirementTableView extends BorderPane {
 
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         return table;
+    }
+
+    public int getRequirementsSize() {
+        return tableData.size();
     }
 
 

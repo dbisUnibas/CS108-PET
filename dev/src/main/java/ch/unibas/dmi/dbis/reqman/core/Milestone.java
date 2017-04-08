@@ -57,6 +57,7 @@ public class Milestone {
         return ordinal;
     }
 
+    // TODO reduce visibility
     public void setOrdinal(int ordinal) {
         this.ordinal = ordinal;
     }

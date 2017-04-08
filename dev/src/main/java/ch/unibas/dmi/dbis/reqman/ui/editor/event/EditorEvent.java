@@ -20,6 +20,7 @@ public class EditorEvent extends ActionEvent {
     private ActionEvent parent;
 
     private int index = -1; // So exception thrown, if not correctly set and used
+    private Object deletion = null; // must match TargetEntity
 
     private final EventType<EditorEvent> eventType;
 
@@ -29,9 +30,14 @@ public class EditorEvent extends ActionEvent {
         this.targetEntity = targetEntity;
     }
 
-    EditorEvent(ActionEvent parent, TargetEntity targetEntity, EventType<EditorEvent> type, int index) {
+    EditorEvent(ActionEvent parent, TargetEntity targetEntity, EventType<EditorEvent> type, int index, Object deleted) {
         this(parent,targetEntity, type );
         this.index = index;
+        deletion = deleted;
+    }
+
+    public Object getDeletion() {
+        return deletion;
     }
 
     EditorEvent(ActionEvent parent, TargetEntity targetEntity, EventType<EditorEvent> type){
@@ -47,8 +53,8 @@ public class EditorEvent extends ActionEvent {
         return new EditorEvent(source, target, DELETION, targetEntity);
     }
 
-    public static EditorEvent generateDeletionEvent(ActionEvent parent, TargetEntity targetEntity, int index){
-        EditorEvent evt = new EditorEvent(parent, targetEntity, DELETION, index);
+    public static EditorEvent generateDeletionEvent(ActionEvent parent, TargetEntity targetEntity, int index, Object deletion){
+        EditorEvent evt = new EditorEvent(parent, targetEntity, DELETION, index, deletion);
         return evt;
     }
 
