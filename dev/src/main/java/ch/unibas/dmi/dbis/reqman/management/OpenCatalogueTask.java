@@ -2,9 +2,6 @@ package ch.unibas.dmi.dbis.reqman.management;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import javafx.concurrent.Task;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 
@@ -13,9 +10,7 @@ import java.io.File;
  *
  * @author loris.sauter
  */
-class OpenCatalogueTask extends Task<Catalogue> {
-
-    private static final Logger LOGGER = LogManager.getLogger(OpenCatalogueTask.class);
+class OpenCatalogueTask extends ManagementTask<Catalogue> {
 
     private final File openFile;
 
@@ -33,11 +28,6 @@ class OpenCatalogueTask extends Task<Catalogue> {
         LOGGER.info("Successfully read catalogue file "+openFile.getPath());
         updateAll("Successfully read catalogue.", 1.0);
         return LOGGER.traceExit(cat);
-    }
-
-    private void updateAll(String message, double progress){
-        updateMessage(message);
-        updateProgress(progress, 1.0);
     }
 
 }

@@ -138,7 +138,7 @@
           ]
         },
         {
-          "name":"ch.unibas.dmi.dbis.reqman.management.EntityManager",
+          "name":"ch.unibas.dmi.dbis.reqman.management",
           "level":"trace",
           "additivity":false,
           "AppenderRef":[

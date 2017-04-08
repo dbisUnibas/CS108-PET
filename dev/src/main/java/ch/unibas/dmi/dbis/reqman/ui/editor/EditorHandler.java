@@ -155,7 +155,9 @@ public class EditorHandler implements EventHandler<EditorEvent> {
     }
 
     public void saveCatalogue() {
+        editor.indicateWaiting(true);
         manager.saveCatalogue();
+        editor.indicateWaiting(false);
     }
 
     public void saveAsCatalogue(File file) {

@@ -1,23 +1,19 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
-import ch.unibas.dmi.dbis.reqman.Callback;
-import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
+import ch.unibas.dmi.dbis.reqman.common.Callback;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -104,19 +100,19 @@ public class EntityManager {
             }
         });
     }
-    private static void runTask(Task task){
+
+    private static void runTask(ManagementTask task){
         Thread th = new Thread(task);
-        th.setDaemon(true);
+        th.setDaemon(true); // silently shutsdown upon exiting
         th.start();
     }
-
     /**
      * @param file nontnull
      */
     public void openCatalogue(File file, Callback doneCallback) {
         LOGGER.trace(":openCat");
 
-        Task<Catalogue> openTask = new OpenCatalogueTask(file);
+        OpenCatalogueTask openTask = new OpenCatalogueTask(file);
 
         openTask.setOnFailed(event -> {
             throw new RuntimeException("Opening failed: ", openTask.getException());
@@ -128,20 +124,8 @@ public class EntityManager {
             doneCallback.apply(null);
         });
 
-        Platform.runLater(openTask);
+        runTask(openTask);
 
-
-        //Platform.runLater(() -> {
-            /*LOGGER.trace(":openCatalogue - started");
-            try {
-                Catalogue cat = JSONUtils.readCatalogueJSONFile(file);
-                setCatalogue(cat);
-                catalogueFile = file;
-                LOGGER.info("Successfully opened catalogue from " + file.getPath());
-            } catch (IOException e) {
-                e.printStackTrace(); // TODO handling
-            }
-        //});*/
     }
 
     public boolean isCatalogueFilePresent(){
@@ -155,15 +139,19 @@ public class EntityManager {
         saveCatalogue(catalogueFile);
     }
 
+
     private void saveCatalogue(File file){
-        Platform.runLater(() -> {
-            try {
-                JSONUtils.writeToJSONFile(catalogue, file);
-                LOGGER.info("Saved catalogue to: "+file.getPath());
-            } catch (IOException e) {
-                e.printStackTrace(); // TODO Handling
-            }
+        SaveCatalogueTask saveTask = new SaveCatalogueTask(catalogue, file);
+        saveTask.setOnFailed(event -> {
+            throw new RuntimeException("Failed saving catalogue.",saveTask.getException());
         });
+
+        saveTask.setOnSucceeded(event -> {
+            LOGGER.info("Saved catalogue to: "+file.getPath() );
+            catalogueFile = file;
+        });
+
+        runTask(saveTask);
     }
 
     public void saveAsCatalogue(File file){

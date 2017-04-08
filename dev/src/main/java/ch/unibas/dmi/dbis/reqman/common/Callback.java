@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.reqman;
+package ch.unibas.dmi.dbis.reqman.common;
 
 import java.util.function.Function;
 

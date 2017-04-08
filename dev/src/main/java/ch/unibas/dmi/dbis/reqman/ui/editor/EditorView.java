@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
+import javafx.scene.Cursor;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
@@ -95,5 +96,9 @@ public class EditorView extends BorderPane implements TitleProvider{
     @Override
     public String getTitle() {
         return title;
+    }
+
+    public void indicateWaiting(boolean waiting) {
+        getScene().setCursor(waiting ? Cursor.WAIT : Cursor.DEFAULT);
     }
 }
