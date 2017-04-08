@@ -1,3 +1,16 @@
+/* reqman: style.css */
+/*
+Styling to indicate that a tab is not saved yet.
+ */
 .modified .tab-label {
     -fx-font-weight: bold;
 }
+
+/*
+Styling for all displays (label which display an information)
+Currently not working
+ */
+.label.display {
+    -fx-background-color: white !important;
+}
+

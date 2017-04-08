@@ -18,6 +18,7 @@ public interface DeletionHandler extends EventHandler<EditorEvent> {
      *
      * @param event
      */
+    @Override
     default void handle(EditorEvent event) {
         if (EditorEvent.DELETION.equals(event.getEventType())) {
             handleDeletion(event);

@@ -35,11 +35,19 @@ public class Version {
         try {
             props.load(Version.class.getClassLoader().getResourceAsStream(PROPERTIES_FILE));
             version = (String)props.get(VERSION_KEY);
+            if(!Character.isDigit(version.charAt(0))){
+                LOGGER.error("Version invalid. Are we in a dev environemnt?" +String.format(" (version=%s)", version) );
+                handleInvalidVersion();
+            }
         } catch (Exception e) {
             LOGGER.error("Could not load reqman.properties.", e);
-            LOGGER.error("Setting verstion to N/A, which is in general pretty bad. Check your build!");
-            version = NO_VERSION;
+            handleInvalidVersion();
         }
+    }
+
+    private void handleInvalidVersion(){
+        LOGGER.error("Setting verstion to N/A, which is in general pretty bad. Check your build!");
+        version = NO_VERSION;
     }
 
     /**

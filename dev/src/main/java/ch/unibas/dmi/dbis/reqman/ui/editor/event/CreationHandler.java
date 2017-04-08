@@ -18,9 +18,12 @@ public interface CreationHandler extends EventHandler<EditorEvent> {
      *
      * @param event The event to handle
      */
+    @Override
     default void handle(EditorEvent event) {
         if (EditorEvent.CREATION.equals(event.getEventType())) {
             handleCreation(event);
+            event.consume();
         }
+
     }
 }
