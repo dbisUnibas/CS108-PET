@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 
 import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
+import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -58,11 +59,22 @@ public class EditorApplication extends Application {
     public void start(Stage primaryStage) {
         if(exp){
             LOG.info("Experimental env");
-            startExp(primaryStage);
+            //startTableProofConcept(primaryStage);
+            startNew(primaryStage);
         }else{
             LOG.info("Normal");
             startOld(primaryStage);
         }
+    }
+
+    private void startNew(Stage primaryStage) {
+        LOG.trace(":startNew");
+        EditorController controller = new EditorController();
+        EditorView editor = new EditorView(controller);
+        Scene scene = new Scene(editor, 800,600);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle(editor.getTitle() + " " + String.format("(%s-EXPERIMENTAL)", Version.getInstance().getVersion()));
+        primaryStage.show();
     }
 
     private void startOld(Stage primaryStage){
@@ -75,19 +87,19 @@ public class EditorApplication extends Application {
 
     private ObservableList<Requirement> reqs;
 
-    private void startExp(Stage primaryStage){
-        LOG.trace(":startExp");
+    private void startTableProofConcept(Stage primaryStage){
+        LOG.trace(":startTableProofConcept");
         primaryStage.setTitle("ReqMan: Editor (EXPERIMENTAL)");
         RequirementTableView view = new RequirementTableView();
         List<Requirement> requirements = generateReqs();
-        LOG.trace(":startExp - generated reqs");
+        LOG.trace(":startTableProofConcept - generated reqs");
         reqs =  FXCollections.observableArrayList(requirements );
         view.setOnAdd(this::handleAdd );
-        LOG.trace(":startExp - past setOnAdd");
+        LOG.trace(":startTableProofConcept - past setOnAdd");
         view.setOnRemove(this::handleRm);
-        LOG.trace(":startExp - past setOnRemove");
+        LOG.trace(":startTableProofConcept - past setOnRemove");
         view.setRequirements(reqs);
-        LOG.trace(":startExp - past setReqs");
+        LOG.trace(":startTableProofConcept - past setReqs");
         Scene scene = new Scene(view, 800, 600);
         primaryStage.setScene(scene);
         primaryStage.show();

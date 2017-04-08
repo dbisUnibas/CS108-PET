@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
  *
  * @author loris.sauter
  */
-class RequirementTableView extends BorderPane {
+public class RequirementTableView extends BorderPane {
 
     private static final Logger LOGGER = LogManager.getLogger(RequirementTableView.class);
 

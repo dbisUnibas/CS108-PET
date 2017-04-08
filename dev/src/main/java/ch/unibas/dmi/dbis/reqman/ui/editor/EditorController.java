@@ -36,6 +36,10 @@ public class EditorController {
     private ObservableList<Milestone> observableMs = FXCollections.observableArrayList();
     private File catalogueFile = null;
 
+    EditorController(){
+        editor = null;
+    }
+
     public EditorController(EditorScene editor) {
         this.editor = editor;
     }
