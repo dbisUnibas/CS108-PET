@@ -5,7 +5,6 @@ import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 
 /**
  * TODO: write JavaDoc
@@ -15,6 +14,8 @@ import javafx.scene.input.KeyEvent;
 public class MetaKeyValuePairScene extends AbstractVisualCreator<RequirementPropertiesScene.MetaKeyValuePair> {
 
     private RequirementPropertiesScene.MetaKeyValuePair pair = null;
+    private TextField tfKey = new TextField();
+    private TextField tfValue = new TextField();
 
     public MetaKeyValuePairScene() {
         super();
@@ -30,14 +31,13 @@ public class MetaKeyValuePairScene extends AbstractVisualCreator<RequirementProp
     public void handleSaving(ActionEvent event) {
         String key = tfKey.getText();
         String val = tfValue.getText();
-        if(key != null && !key.isEmpty() ){
-            if(val != null && !val.isEmpty() ){
+        if (key != null && !key.isEmpty()) {
+            if (val != null && !val.isEmpty()) {
                 pair = new RequirementPropertiesScene.MetaKeyValuePair(key, val);
             }
         }
         getWindow().hide();
     }
-
 
     @Override
     public RequirementPropertiesScene.MetaKeyValuePair create() throws IllegalStateException {
@@ -48,9 +48,6 @@ public class MetaKeyValuePairScene extends AbstractVisualCreator<RequirementProp
     public boolean isCreatorReady() {
         return pair != null;
     }
-
-    private TextField tfKey = new TextField();
-    private TextField tfValue = new TextField();
 
     @Override
     protected void populateScene() {
@@ -65,10 +62,10 @@ public class MetaKeyValuePairScene extends AbstractVisualCreator<RequirementProp
         grid.add(tfValue, 1, 1);
 
         SaveCancelPane buttons = new SaveCancelPane();
-        buttons.setOnCancel(event -> getWindow().hide() );
+        buttons.setOnCancel(event -> getWindow().hide());
         buttons.setOnSave(this::handleSaving);
 
-        grid.add(buttons, 0, 3, 2,1);
+        grid.add(buttons, 0, 3, 2, 1);
         setRoot(grid);
     }
 }

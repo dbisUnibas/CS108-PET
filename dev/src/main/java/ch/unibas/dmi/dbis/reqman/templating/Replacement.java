@@ -28,13 +28,13 @@ public class Replacement<E> implements Renderer<E> {
     public String toString() {
         final StringBuffer sb = new StringBuffer("Replacement{");
         sb.append("field=");
-        if(field instanceof Field){
-            sb.append(field!=null?field.toString():"null");
-        }else if(field instanceof  SubEntityField){
-            SubEntityField subField = (SubEntityField)field;
-            sb.append(subField.toString() );
-        }else{
-            sb.append(field != null ? field.toString(): "null");
+        if (field instanceof Field) {
+            sb.append(field != null ? field.toString() : "null");
+        } else if (field instanceof SubEntityField) {
+            SubEntityField subField = (SubEntityField) field;
+            sb.append(subField.toString());
+        } else {
+            sb.append(field != null ? field.toString() : "null");
         }
         sb.append(", start=").append(start);
         sb.append(", end=").append(end);

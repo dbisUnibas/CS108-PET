@@ -9,6 +9,7 @@ public interface Renderer<E> {
 
     /**
      * Renders the given instance.
+     *
      * @param instance
      * @return
      */

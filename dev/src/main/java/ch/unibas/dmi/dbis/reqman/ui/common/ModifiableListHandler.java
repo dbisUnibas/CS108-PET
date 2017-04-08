@@ -1,7 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
-import javafx.event.ActionEvent;
-
 /**
  * TODO: write JavaDoc
  *

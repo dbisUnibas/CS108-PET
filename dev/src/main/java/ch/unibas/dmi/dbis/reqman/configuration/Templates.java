@@ -14,7 +14,7 @@ public class Templates {
     private String groupMilestoneTemplate;
     private String groupTemplate;
 
-    public Templates(){
+    public Templates() {
 
     }
 

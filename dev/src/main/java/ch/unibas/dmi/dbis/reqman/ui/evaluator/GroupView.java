@@ -27,15 +27,6 @@ public class GroupView extends ModifiableListView<Group> implements ModifiableLi
         listView.setOnMouseClicked(this::handleMouseClick);
     }
 
-    private void handleMouseClick(MouseEvent event) {
-        if (MouseButton.PRIMARY.equals(event.getButton())) {// 'left' mousebutton?
-            if (event.getClickCount() == 2) {// double click?
-                Group g = listView.getSelectionModel().getSelectedItem();
-                controller.addGroupTab(g);
-            }
-        }
-    }
-
     @Override
     public void onRemove(RemoveEvent<Group> event) {
         controller.handleRemoveGroup(event);
@@ -44,6 +35,15 @@ public class GroupView extends ModifiableListView<Group> implements ModifiableLi
     @Override
     public void onAdd(AddEvent<Group> event) {
         controller.handleAddGroup(event);
+    }
+
+    private void handleMouseClick(MouseEvent event) {
+        if (MouseButton.PRIMARY.equals(event.getButton())) {// 'left' mousebutton?
+            if (event.getClickCount() == 2) {// double click?
+                Group g = listView.getSelectionModel().getSelectedItem();
+                controller.addGroupTab(g);
+            }
+        }
     }
 
     public static class GroupCell extends ListCell<Group> {

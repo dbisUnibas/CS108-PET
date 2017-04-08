@@ -9,8 +9,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 
 import java.util.ArrayList;
 
@@ -24,7 +22,7 @@ public class ModifiableListView<T> extends BorderPane {
     // TODO Allow custom styling
 
     protected ModifiableListController<T> controller = null;
-
+    protected ListView<T> listView = new ListView();
     private ArrayList<ModifiableListHandler<T>> handlers = new ArrayList<>();
 
     public ModifiableListView(String title) {
@@ -48,8 +46,6 @@ public class ModifiableListView<T> extends BorderPane {
         handlers.remove(handler);
     }
 
-    protected ListView<T> listView = new ListView();
-
     public void setItems(ObservableList<T> items) {
         listView.setItems(items);
     }
@@ -58,6 +54,48 @@ public class ModifiableListView<T> extends BorderPane {
         return listView.getItems();
     }
 
+    public static class RemoveEvent<T> extends ActionEvent {
+        public static final EventType<RemoveEvent> REMOVE = new EventType<>(ActionEvent.ACTION, "remove");
+        private T selected;
+        private int index;
+
+        public RemoveEvent(ActionEvent source, T selected, int index) {
+            super(source.getSource(), source.getTarget());
+            this.selected = selected;
+            this.index = index;
+        }
+
+        @Override
+        public EventType<? extends ActionEvent> getEventType() {
+            return REMOVE;
+        }
+
+        public T getSelected() {
+            return selected;
+        }
+
+        public int getSelectedIndex() {
+            return index;
+        }
+    }
+
+    /**
+     * Rather a flag event
+     *
+     * @param <T>
+     */
+    public static class AddEvent<T> extends ActionEvent {
+        public static final EventType<AddEvent> ADD = new EventType<>(ActionEvent.ACTION, "add");
+
+        public AddEvent(ActionEvent source) {
+            super(source.getSource(), source.getTarget());
+        }
+
+        @Override
+        public EventType<? extends ActionEvent> getEventType() {
+            return ADD;
+        }
+    }
 
     protected void setOnAddAction(ActionEvent event) {
         AddEvent<T> addEvent = new AddEvent<T>(event);
@@ -122,51 +160,6 @@ public class ModifiableListView<T> extends BorderPane {
         this.setTop(titleBar);
         this.setCenter(content);
 
-    }
-
-
-    public static class RemoveEvent<T> extends ActionEvent {
-        private T selected;
-
-        private int index;
-
-        public static final EventType<RemoveEvent> REMOVE = new EventType<>(ActionEvent.ACTION, "remove");
-
-        public RemoveEvent(ActionEvent source, T selected, int index) {
-            super(source.getSource(), source.getTarget());
-            this.selected = selected;
-            this.index = index;
-        }
-
-        @Override
-        public EventType<? extends ActionEvent> getEventType() {
-            return REMOVE;
-        }
-
-        public T getSelected() {
-            return selected;
-        }
-
-        public int getSelectedIndex() {
-            return index;
-        }
-    }
-
-    /**
-     * Rather a flag event
-     * @param <T>
-     */
-    public static class AddEvent<T> extends ActionEvent{
-        public static final EventType<AddEvent> ADD = new EventType<>(ActionEvent.ACTION, "add");
-
-        public AddEvent(ActionEvent source){
-            super(source.getSource(), source.getTarget() );
-        }
-
-        @Override
-        public EventType<? extends ActionEvent> getEventType(){
-            return ADD;
-        }
     }
 
 }

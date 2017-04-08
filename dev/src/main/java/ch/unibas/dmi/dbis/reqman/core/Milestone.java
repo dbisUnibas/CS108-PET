@@ -15,6 +15,16 @@ public class Milestone {
 
     private Date date;
 
+    public Milestone() {
+
+    }
+
+    public Milestone(String name, int ordinal, Date date) {
+        this.name = name;
+        this.ordinal = ordinal;
+        this.date = date;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -41,16 +51,6 @@ public class Milestone {
         result = 31 * result + (getName() != null ? getName().hashCode() : 0);
         result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
         return result;
-    }
-
-    public Milestone() {
-
-    }
-
-    public Milestone(String name, int ordinal, Date date) {
-        this.name = name;
-        this.ordinal = ordinal;
-        this.date = date;
     }
 
     public int getOrdinal() {

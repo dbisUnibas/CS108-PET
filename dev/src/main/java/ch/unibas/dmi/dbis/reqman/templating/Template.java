@@ -23,7 +23,6 @@ public class Template<E> {
     }
 
 
-
     public String getTemplate() {
         return template;
     }

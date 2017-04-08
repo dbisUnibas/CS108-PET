@@ -1,6 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
 
@@ -9,7 +13,7 @@ import java.util.Vector;
  *
  * @author loris.sauter
  */
-public class Group implements Comparable<Group>{
+public class Group implements Comparable<Group> {
 
     private String name;
     private String projectName;
@@ -19,6 +23,16 @@ public class Group implements Comparable<Group>{
     private List<ProgressSummary> progressSummaries = new ArrayList<>();
 
     private String exportFileName;
+
+    private String version;
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public Group(String name, String projectName, List<String> members, String catalogueName) {
 
@@ -32,10 +46,16 @@ public class Group implements Comparable<Group>{
 
     }
 
+    private static final Logger LOG = LogManager.getLogger(Group.class);
+
     public double getSumForMilestone(Milestone ms, Catalogue catalogue) {
         ArrayList<Double> points = new ArrayList<>();
 
-        getProgressByMilestoneOrdinal(ms.getOrdinal()).forEach(p -> points.add(p.getPointsSensitive(catalogue)));
+        for(Progress p : getProgressByMilestoneOrdinal(ms.getOrdinal() ) ){
+            double summand = p.hasProgress() ? p.getPointsSensitive(catalogue) : 0;
+            LOG.debug(String.format("[%s] Has progress: %b, points: %f, sensitive=%f, summand=%g",catalogue.getRequirementForProgress(p).getName(), p.hasProgress(), p.getPoints(), p.getPointsSensitive(catalogue), summand));
+            points.add(summand);// only add points if progress
+        }
 
         return points.stream().mapToDouble(Double::doubleValue).sum();
     }
@@ -144,11 +164,12 @@ public class Group implements Comparable<Group>{
     }
 
     public List<Progress> getProgressList() {
-        return new Vector<Progress>(progressList);
+        return new ArrayList<>(progressList);
     }
 
     public void setProgressList(List<Progress> progressList) {
-        this.progressList = progressList;
+        this.progressList.clear();
+        this.progressList.addAll(progressList);
     }
 
     public boolean removeProgress(Progress progress) {
@@ -178,8 +199,8 @@ public class Group implements Comparable<Group>{
     }
 
     public ProgressSummary getProgressSummaryForMilestone(Milestone ms) {
-        for(ProgressSummary ps : progressSummaries){
-            if(ps.getMilestoneOrdinal() == ms.getOrdinal()){
+        for (ProgressSummary ps : progressSummaries) {
+            if (ps.getMilestoneOrdinal() == ms.getOrdinal()) {
                 return ps;
             }
         }
@@ -187,25 +208,46 @@ public class Group implements Comparable<Group>{
     }
 
     public List<Progress> getProgressByMilestoneOrdinal(int ordinal) {
-        ArrayList<Progress> list = new ArrayList<>();
+        HashSet<Progress> set = new HashSet<>();
         for (Progress p : getProgressList()) {
             if (p.getMilestoneOrdinal() == ordinal) {
-                if (!list.contains(p)) {
-                    list.add(p);
-                } else {
-                    // Progress already in list.
+                if(!set.add(p)){
+                    LOG.debug("WARN: "+p.getRequirementName()+" already in set");
                 }
             }
         }
-        return list;
+        return new ArrayList<>(set);
     }
 
-    public double getTotalSum(Catalogue catalogue){
+    public double getTotalSum(Catalogue catalogue) {
         ArrayList<Double> points = new ArrayList<>();
         getMilestonesForGroup(catalogue).forEach(ms -> {
-            points.add(getSumForMilestone(ms,catalogue ));
+            points.add(getSumForMilestone(ms, catalogue));
         });
         return points.stream().mapToDouble(Double::doubleValue).sum();
+    }
+
+    public Progress getProgressForRequirement(Requirement requirement) {
+        if (requirement == null) {
+            throw new IllegalArgumentException("Requirement cannot be null, if progress for it should be provided");
+        }
+        for (Progress p : progressList) {
+            if (p.getRequirementName().equals(requirement.getName())) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public boolean isProgressUnlocked(Catalogue catalogue, Progress progress) {
+        int predecessorsAchieved = 0;
+        for (String name : catalogue.getRequirementForProgress(progress).getPredecessorNames()) {
+            Progress pred = getProgressForRequirement(catalogue.getRequirementByName(name));
+            if (pred != null && pred.hasProgress()) {
+                predecessorsAchieved++;
+            }
+        }
+        return predecessorsAchieved == catalogue.getRequirementForProgress(progress).getPredecessorNames().size();
     }
 
 }

@@ -7,35 +7,43 @@ import java.util.function.Function;
  *
  * @author loris.sauter
  */
-public class SubEntityField<E, T> extends Field<E, T>{
+public class SubEntityField<E, T> extends Field<E, T> {
+
+    private Entity<T> subEntity;
+    private String subFieldName;
 
     public SubEntityField(String name, Function<E, T> getter, Entity<T> subEntity) {
         super(name, Type.SUB_ENTITY, getter);
         this.subEntity = subEntity;
     }
 
-    private Entity<T> subEntity;
-    public Entity<T> getSubEntity(){
+    public static <E, T> SubEntityField<E, T> copy(SubEntityField<E, T> source) {
+        SubEntityField<E, T> copy = new SubEntityField<E, T>(source.getName(), source.getGetter(), source.getSubEntity());
+        copy.setSubFieldName(source.getSubFieldName());
+        return copy;
+    }
+
+    public Entity<T> getSubEntity() {
         return subEntity;
     }
 
-    private String subFieldName;
-    public String getSubFieldName(){
+    public String getSubFieldName() {
         return subFieldName;
     }
-    public void setSubFieldName(String name){
+
+    public void setSubFieldName(String name) {
         subFieldName = name;
     }
 
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("SubEntityField{");
-        sb.append("subEntity=").append(subEntity!= null?subEntity.getEntityName():"null");
+        sb.append("subEntity=").append(subEntity != null ? subEntity.getEntityName() : "null");
         sb.append(", name='").append(name).append('\'');
         sb.append(", subFieldName='").append(subFieldName).append('\'');
         sb.append(", type='").append(getType()).append('\'');
-        sb.append(", getter='").append(getGetter() ).append('\'');
-        sb.append(", renderer='").append(getRenderer() ).append('\'');
+        sb.append(", getter='").append(getGetter()).append('\'');
+        sb.append(", renderer='").append(getRenderer()).append('\'');
         sb.append('}');
         return sb.toString();
     }
@@ -69,14 +77,8 @@ public class SubEntityField<E, T> extends Field<E, T>{
     }
 
     @Override
-    public String render(E instance){
+    public String render(E instance) {
         Field subField = subEntity.getFieldForName(subFieldName);
         return subField.render(getter.apply(instance));
-    }
-
-    public static <E,T> SubEntityField<E,T> copy(SubEntityField<E,T> source){
-        SubEntityField<E,T> copy = new SubEntityField<E, T>(source.getName(), source.getGetter(), source.getSubEntity());
-        copy.setSubFieldName(source.getSubFieldName());
-        return copy;
     }
 }

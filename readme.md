@@ -2,14 +2,14 @@
 
 ReqMan (Requirements Manager) is an application to manage requirements.
 
-*Requirements* are grouped in *milestones* and the collection of *requirements*
-with their respective *milestones* is called *catalogue*. *Catalogues* are 
+**Requirement**s are grouped in **milestone**s and the collection of **requirement**s
+with their respective **milestone**s is called **catalogue**. **Catalogue**s are 
 created using `ReqMan`'s built in `editor`.
 
-Using `ReqMan`'s built in `evaluator` one can register several *groups* and
-assess their voyage on achieving the *requirement*s with so called *progress*.
+Using `ReqMan`'s built in `evaluator` one can register several **group**s and
+assess their voyage on achieving the **requirement**s with so called **progress**.
 
-*Catalogue*s and *group*s may be exported with templates provided.
+*Catalogue**s and **group**s may be exported with templates provided.
 
 
 ## Table of Contents
@@ -21,40 +21,52 @@ assess their voyage on achieving the *requirement*s with so called *progress*.
  - License
  - Versioning
  - Branching
+ - Repository structure
 
 ## Build
 
-`ReqMan` uses the gradle.
+`ReqMan` uses gradle. The source of `ReqMan` is located under `dev/src/`.
+To start building `ReqMan`, navigate to the `dev/` folder.
 
 ### ReqMan
 
-To build and pack `ReqMan` in an executable jar run:
+To build `ReqMan` run:
 
-	gradle jar
+```
+gradlew build
+```
 
 ### Editor
 
 To exclusively have the `editor` application executable in a jar, run:
 
-	gradle deployEditor
+```
+gradlew deployEditor
+```
 
 ### Evaluator
 
 To exclusively have the `evaluator` application executable in a jar, run:
 
-	gralde deployEvaluator
-	
+```
+graldew deployEvaluator
+```
 
 ## Usage
 
 `ReqMan` (and its modes `editor` and `evaluator`) is a JavaFX application
 packed in an executable jar. Thus to run `ReqMan` one must execute the jar.
 
+After building the jar as described above, it is assumed the user is still
+in the `dev/` folder.
+
 The command to run `ReqMan` from command line, starting the GUI application
 use the following command (where X stands for the complete version string
 (refer to versioning for further information about the version)):
 
-	java -jar reqman-X.jar
+```
+java -jar build/libs/reqman-X.jar
+```
 	
 ## Issues
 
@@ -79,12 +91,25 @@ See LICENSE.txt for the complete license text.
 There are several branches active:
 
  - `master` which is up-to-date with the documentation and core classes
- - `reqman` which is up-to-date with the lates recommended version of
+ - `reqman` which is up-to-date with the latest **recommended** version of
   `ReqMan`
  - `editor-exp` which is the branch for developing features related
    to `editor`
  - `assessment-exp` which is the branch for developing features related
    to `evaluator`
+ - `reqman-exp` which is the branch for developing features related to both: 
+   `editor` and `evaluator` and points to the **latest** version of `ReqMan`
  - `experimental` a branch dedicated to highly experimental development.
    The application as in the state of this branch may not be fully compatible
    with the ones of other states.
+   
+## Repository structure
+
+The repository contains the following files & folders:
+
+ - .gitignore   The gitignore for this repository.
+ - CS108.json   A catalogue used by FS17, cs108
+ - dev/         The development folder
+ - LICENSE.txt  The full license file
+ - process/     A folder containing additional documentation and process related files
+ - readme.md    This readme

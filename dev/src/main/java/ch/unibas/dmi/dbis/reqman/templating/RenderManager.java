@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sun.net.ProgressEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -29,18 +30,17 @@ public class RenderManager {
     private Template<Progress> templateProgress = null;
     private TemplateParser parser = null;
     private TemplateRenderer renderer = null;
-
     /**
      * Existing:
-     *  .name
-     *  .description
-     *  .lecture
-     *  .semester
-     *  .requirements
-     *  .milestones
-     *  .sumTotal
-     *  .sumMS[<ordinal>]
-     *  .milestoneName[<ordinal>]
+     * .name
+     * .description
+     * .lecture
+     * .semester
+     * .requirements
+     * .milestones
+     * .sumTotal
+     * .sumMS[<ordinal>]
+     * .milestoneName[<ordinal>]
      */
     private final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
             new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
@@ -75,15 +75,16 @@ public class RenderManager {
                 }
             }
     );
+    private Group group = null;
     private Catalogue catalogue = null;
     /**
      * Existing:
      * milestone
-     *  .name
-     *  .date
-     *  .ordinal
-     *  .sumMax
-     *  .dateFormatted[<SimpleDateFormat>]
+     * .name
+     * .date
+     * .ordinal
+     * .sumMax
+     * .dateFormatted[<SimpleDateFormat>]
      */
     public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
             new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
@@ -114,23 +115,48 @@ public class RenderManager {
      * progress
      * .points
      * .hasPoints
+     * .isUnlocked[][]
+     * .date
+     * .dateFormatted[]
+     * .milestone
      */
     public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
             Field.createNormalField("points", p -> p.getPointsSensitive(catalogue)),
-            new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS")
+            new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS"),
+            new ConditionalField<Progress>("isUnlocked", p -> group.isProgressUnlocked(catalogue, p), b -> "UNLOCEKD", b -> "LOCKED"),
+            new Field<Progress, Date>("date", Field.Type.OBJECT, Progress::getDate, date -> {
+                SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
+                return format.format(date);
+            }),
+            new ParametrizedField<Progress, Date>("dateFormatted", Progress::getDate) {
+                private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
+
+                @Override
+                public String renderCarefully(Progress instance, String parameter) {
+                    try {
+                        SimpleDateFormat format = new SimpleDateFormat(parameter);
+                        return format.format(getGetter().apply(instance));
+                    } catch (IllegalArgumentException iae) {
+                        LOGGER.error("The specified pattern is not compliant with java.text.SimpleDateFormat.", iae);
+                    }
+                    return "";
+                }
+            },
+            new SubEntityField<Progress, Milestone>("milestone", (p -> catalogue.getMilestoneByOrdinal(p.getMilestoneOrdinal())), MILESTONE_ENTITY)
     );
     /**
      * Existing:
      * requirement
-     *  .name
-     *  .description
-     *  .maxPoints
-     *  .minMS
-     *  .predecessorNames
-     *  .binary[][]
-     *  .mandatory[][]
-     *  .malus[][]
-     *  .meta[<key>]
+     * .name
+     * .description
+     * .maxPoints
+     * .minMS
+     * .predecessorNames
+     * .binary[][]
+     * .mandatory[][]
+     * .malus[][]
+     * .meta[<key>]
+     * .singularMS[][]
      */
     public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
             new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
@@ -138,6 +164,9 @@ public class RenderManager {
             new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPointsSensitive),
             new SubEntityField<Requirement, Milestone>("minMS", (requirement -> {
                 return catalogue.getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal());
+            }), MILESTONE_ENTITY),
+            new SubEntityField<Requirement, Milestone>("maxMS", (requirement -> {
+                return catalogue.getMilestoneByOrdinal(requirement.getMaxMilestoneOrdinal());
             }), MILESTONE_ENTITY),
             new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, Requirement::getPredecessorNames, list -> {
                 StringBuilder sb = new StringBuilder();
@@ -172,9 +201,10 @@ public class RenderManager {
                         return "";
                     }
                 }
-            }
+            },
+            new ConditionalField<Requirement>("singularMS", r -> r.getMinMilestoneOrdinal() == r.getMaxMilestoneOrdinal(), b-> "YES", b-> "NO")
     );
-    private Group group = null;
+
 
     /**
      * Existing:
@@ -241,8 +271,9 @@ public class RenderManager {
 
     public RenderManager(Catalogue catalogue) {
         this.catalogue = catalogue;
-        parser = new TemplateParser(catalogue);
+        parser = new TemplateParser();
         renderer = new TemplateRenderer();
+        LOGGER.debug("Catalogue: "+catalogue.getName() );
     }
 
     public RenderManager(Catalogue catalogue, Group group) {
@@ -263,10 +294,6 @@ public class RenderManager {
         } else {
             throw new IllegalStateException(String.format("Cannot render the instance [%s], if no template exists for.", instance));
         }
-    }
-
-    private void sortProgressList(List<Progress> list) {
-        list.sort(Comparator.comparing(catalogue::getRequirementForProgress, SortingUtils.REQUIREMENT_COMPARATOR));
     }
 
     public boolean isGroupExportReady() {
@@ -344,6 +371,14 @@ public class RenderManager {
         parseTemplateCarefully(CATALOGUE_ENTITY, catTemplate);
     }
 
+    public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    private void sortProgressList(List<Progress> list) {
+        list.sort(Comparator.comparing(catalogue::getRequirementForProgress, SortingUtils.REQUIREMENT_COMPARATOR));
+    }
+
     private <E> boolean parseTemplateCarefully(Entity<E> entity, String template) {
         parser.setupFor(entity);
         if (MILESTONE_ENTITY.getEntityName().equals(entity.getEntityName())) {
@@ -365,9 +400,5 @@ public class RenderManager {
             throw LOGGER.throwing(new UnsupportedOperationException("Cannot parse a template for entity: " + entity.toString()));
         }
         return true;
-    }
-
-    public void setGroup(Group group) {
-        this.group = group;
     }
 }
