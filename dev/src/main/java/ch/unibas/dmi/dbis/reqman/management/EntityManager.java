@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
+import ch.unibas.dmi.dbis.reqman.Callback;
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
@@ -11,6 +12,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -102,17 +104,35 @@ public class EntityManager {
             }
         });
     }
-
+    private static void runTask(Task task){
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
+    }
 
     /**
      * @param file nontnull
      */
-    public void openCatalogue(File file) {
+    public void openCatalogue(File file, Callback doneCallback) {
         LOGGER.trace(":openCat");
+
+        Task<Catalogue> openTask = new OpenCatalogueTask(file);
+
+        openTask.setOnFailed(event -> {
+            throw new RuntimeException("Opening failed: ", openTask.getException());
+        });
+        openTask.setOnSucceeded(event -> {
+            setCatalogue(openTask.getValue() );
+            catalogueFile = file;
+            LOGGER.trace(":openCatalogue finished");
+            doneCallback.apply(null);
+        });
+
+        Platform.runLater(openTask);
 
 
         //Platform.runLater(() -> {
-            LOGGER.trace(":openCatalogue - started");
+            /*LOGGER.trace(":openCatalogue - started");
             try {
                 Catalogue cat = JSONUtils.readCatalogueJSONFile(file);
                 setCatalogue(cat);
@@ -121,7 +141,7 @@ public class EntityManager {
             } catch (IOException e) {
                 e.printStackTrace(); // TODO handling
             }
-        //});
+        //});*/
     }
 
     public boolean isCatalogueFilePresent(){

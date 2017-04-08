@@ -137,9 +137,8 @@ public class EditorHandler implements EventHandler<EditorEvent> {
 
     public void openCatalogue(File file) {
         LOGGER.trace(":openCatalogue "+String.format("File: %s",file.getPath()));
-        manager.openCatalogue(file);
+        manager.openCatalogue(file, () -> setupEditor());
 
-        setupEditor();
     }
 
     private void setupEditor(){
