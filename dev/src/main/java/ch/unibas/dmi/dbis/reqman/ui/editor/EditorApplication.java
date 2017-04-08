@@ -129,7 +129,10 @@ public class EditorApplication extends Application {
             handler.handleCreation(EditorEvent.generateCreationEvent(evt, TargetEntity.CATALOGUE));
         });
 
-        menuFile.getItems().addAll(itemNew,itemOpen, itemSave);
+        MenuItem itemExport = new MenuItem("Export");
+        itemExport.setOnAction(handler::handleExportCatalogue);
+
+        menuFile.getItems().addAll(itemNew,itemOpen, itemSave, itemExport);
         menu.getMenus().add(menuFile);
         return menu;
     }

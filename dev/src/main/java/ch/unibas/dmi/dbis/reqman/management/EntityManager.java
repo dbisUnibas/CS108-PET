@@ -159,7 +159,14 @@ public class EntityManager {
     }
 
     public void exportCatalogue(File file){
-        LOGGER.error("Not implemented yet");
+        ExportCatalogueTask task = new ExportCatalogueTask(catalogue, file);
+        task.setOnFailed(event -> {
+            throw new RuntimeException("Failed exporting catalgoue", task.getException());
+        });
+        task.setOnSucceeded(event -> {
+            LOGGER.info("Export done");
+        });
+        runTask(task);
     }
 
     public String getLecture() {
@@ -276,14 +283,25 @@ public class EntityManager {
 
     public void replaceRequirement(Requirement oldReq, Requirement newReq) {
         // Case name changed: have to update all reqs, which use oldReq as predecessor
-        if(!oldReq.getName().equals(newReq.getName() ) ){
+        if (!oldReq.getName().equals(newReq.getName())) {
             getSuccessors(oldReq).forEach(r -> {
                 r.removePredecessorName(oldReq.getName());
-                r.addPredecessorName(newReq.getName() );
+                r.addPredecessorName(newReq.getName());
             });
         }
-        if(observableRequirements.remove(oldReq)){
+        if (observableRequirements.remove(oldReq)) {
             observableRequirements.add(newReq);
         }
+    }
+
+    public void modifyCatalogue(Catalogue mod) {
+        catalogue.setName(mod.getName() );
+        catalogue.setDescription(mod.getDescription() );
+        catalogue.setLecture(mod.getLecture() );
+        catalogue.setSemester(mod.getSemester() );
+    }
+
+    public Catalogue getCatalogue() {
+        return catalogue;
     }
 }

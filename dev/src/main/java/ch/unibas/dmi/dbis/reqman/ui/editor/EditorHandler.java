@@ -7,7 +7,9 @@ import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,7 +28,11 @@ public class EditorHandler implements EventHandler<EditorEvent> {
 
     private EditorView editor = null;
 
-    void setEditorView(EditorView view){
+    private final static void throwInappropriateTargetEntity(TargetEntity entity) {
+        throw new IllegalArgumentException("EditorHandler can only handle TargetEntity.CATALOGUE, TargetEntity.REQUIREMENT, TargetEntity.MILESTONE, but " + entity.toString() + " was given");
+    }
+
+    void setEditorView(EditorView view) {
         this.editor = view;
     }
 
@@ -56,20 +62,20 @@ public class EditorHandler implements EventHandler<EditorEvent> {
         switch (evt.getTargetEntity()) {
             case CATALOGUE:
                 Catalogue cat = EditorPromptFactory.promptNewCatalogue();
-                if(cat != null){
+                if (cat != null) {
                     manager.setCatalogue(cat);
                     setupEditor();
                 }
                 break;
             case REQUIREMENT:
                 Requirement req = EditorPromptFactory.promptNewRequirement(this);
-                if(req != null){
+                if (req != null) {
                     manager.addRequirement(req);
                 }
                 break;
             case MILESTONE:
                 Milestone ms = EditorPromptFactory.promptNewMilestone();
-                if(ms != null){
+                if (ms != null) {
                     manager.addMilestone(ms);
                 }
 
@@ -80,50 +86,25 @@ public class EditorHandler implements EventHandler<EditorEvent> {
     }
 
     public void handleDeletion(EditorEvent evt) {
-        switch(evt.getTargetEntity()){
+        switch (evt.getTargetEntity()) {
             case CATALOGUE:
                 throw new IllegalArgumentException("Cannot delete the catalogue");
             case REQUIREMENT:
-                if(evt.getDelivery() instanceof RequirementTableView.ObservableRequirement){
-                    RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement)evt.getDelivery();
+                if (evt.getDelivery() instanceof RequirementTableView.ObservableRequirement) {
+                    RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement) evt.getDelivery();
                     Requirement req = manager.getRequirementByName(obsReq.getName());
                     LOGGER.debug(String.format("Deletion Requirement: selected=%s, index=%d, result=%s", obsReq, evt.getIndex(), req));
                     manager.removeRequirement(req);
-                    LOGGER.debug("size: "+editor.getRequirementsView().getRequirementsSize() );
-                }else{
+                    LOGGER.debug("size: " + editor.getRequirementsView().getRequirementsSize());
+                } else {
                     throw new RuntimeException("Something went really bad.");
                 }
 
                 break;
             case MILESTONE:
-                if(evt.getDelivery() instanceof  Milestone){
-                    Milestone milestone = (Milestone)evt.getDelivery();
+                if (evt.getDelivery() instanceof Milestone) {
+                    Milestone milestone = (Milestone) evt.getDelivery();
                     manager.removeMilestone(milestone);
-                }
-                break;
-                default:
-                    throwInappropriateTargetEntity(evt.getTargetEntity());
-        }
-    }
-
-    public void handleModification(EditorEvent evt) {
-        switch(evt.getTargetEntity()){
-            case CATALOGUE:
-                break;
-            case REQUIREMENT:
-                if(evt.getDelivery() instanceof RequirementTableView.ObservableRequirement){
-                    RequirementTableView.ObservableRequirement obsReq =(RequirementTableView.ObservableRequirement)evt.getDelivery();
-                    Requirement r = manager.getRequirementByName(obsReq.getName());
-                    Requirement mod = EditorPromptFactory.promptRequirement(this, r);
-                    if(mod != null){
-                        manager.replaceRequirement(r, mod);
-                    }
-                }
-                break;
-            case MILESTONE:
-                if(evt.getDelivery() instanceof Milestone){
-                    Milestone mod = EditorPromptFactory.promptMilestone((Milestone)evt.getDelivery() );
-                    manager.replaceMilestone((Milestone)evt.getDelivery(), mod);
                 }
                 break;
             default:
@@ -131,27 +112,57 @@ public class EditorHandler implements EventHandler<EditorEvent> {
         }
     }
 
-    private final static void throwInappropriateTargetEntity(TargetEntity entity){
-        throw new IllegalArgumentException("EditorHandler can only handle TargetEntity.CATALOGUE, TargetEntity.REQUIREMENT, TargetEntity.MILESTONE, but "+entity.toString()+" was given");
+    public void handleModification(EditorEvent evt) {
+        switch (evt.getTargetEntity()) {
+            case CATALOGUE:
+                Catalogue cat = manager.getCatalogue();
+                Catalogue modCat = EditorPromptFactory.promptCatalogue(cat);
+                manager.modifyCatalogue(modCat);
+                setupCatalogueInfo();
+
+                break;
+            case REQUIREMENT:
+                if (evt.getDelivery() instanceof RequirementTableView.ObservableRequirement) {
+                    RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement) evt.getDelivery();
+                    Requirement r = manager.getRequirementByName(obsReq.getName());
+                    Requirement mod = EditorPromptFactory.promptRequirement(this, r);
+                    if (mod != null) {
+                        manager.replaceRequirement(r, mod);
+                    }
+                }
+                break;
+            case MILESTONE:
+                if (evt.getDelivery() instanceof Milestone) {
+                    Milestone mod = EditorPromptFactory.promptMilestone((Milestone) evt.getDelivery());
+                    manager.replaceMilestone((Milestone) evt.getDelivery(), mod);
+                }
+                break;
+            default:
+                throwInappropriateTargetEntity(evt.getTargetEntity());
+        }
     }
 
     public void openCatalogue(File file) {
-        LOGGER.trace(":openCatalogue "+String.format("File: %s",file.getPath()));
+        LOGGER.trace(":openCatalogue " + String.format("File: %s", file.getPath()));
         manager.openCatalogue(file, () -> setupEditor());
 
     }
 
-    private void setupEditor(){
+    private void setupEditor() {
         editor.getRequirementsView().setRequirements(manager.getObservableRequirements());
-        editor.getMilestoneView().setItems(manager.getObservableMilestones() );
+        editor.getMilestoneView().setItems(manager.getObservableMilestones());
 
+        setupCatalogueInfo();
 
+        editor.enableAll();
+    }
+
+    private void setupCatalogueInfo() {
         editor.getCatalogueView().setCatName(manager.getName());
         editor.getCatalogueView().setCatLecture(manager.getLecture());
         editor.getCatalogueView().setCatSemester(manager.getSemester());
-        editor.getCatalogueView().maxPointsProperty().bind(manager.sumProperty() );
+        editor.getCatalogueView().maxPointsProperty().bind(manager.sumProperty());
 
-        editor.enableAll();
     }
 
     public void saveCatalogue() {
@@ -162,10 +173,6 @@ public class EditorHandler implements EventHandler<EditorEvent> {
 
     public void saveAsCatalogue(File file) {
         manager.saveAsCatalogue(file);
-    }
-
-    public void exportCatalogue(File file) {
-        manager.exportCatalogue(file);
     }
 
     public boolean isCatalogueFilePresent() {
@@ -190,5 +197,17 @@ public class EditorHandler implements EventHandler<EditorEvent> {
 
     public ObservableList<Requirement> getObservableRequirements() {
         return manager.getObservableRequirements();
+    }
+
+    void handleExportCatalogue(ActionEvent event){
+        if(!manager.isCatalogueLoaded() ){
+            return;
+        }
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Export Catalogue");
+        File f = fc.showSaveDialog(editor.getScene().getWindow());
+        if(f != null){
+            manager.exportCatalogue(f);
+        }
     }
 }

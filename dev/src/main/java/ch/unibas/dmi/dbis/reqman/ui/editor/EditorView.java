@@ -1,6 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
+import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
+import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
+import javafx.event.ActionEvent;
 import javafx.scene.Cursor;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
@@ -69,6 +72,14 @@ public class EditorView extends BorderPane implements TitleProvider{
         setTop(catInfo);
         setCenter(splitter);
         disableAll();
+
+        // TEMP
+        catInfo.setOnMouseClicked(evt -> {
+            if(evt.getClickCount() == 2){
+                EditorEvent event = EditorEvent.generateModificationEvent(new ActionEvent(evt.getSource(), evt.getTarget()), TargetEntity.CATALOGUE, null);
+                handler.handleModification(event);
+            }
+        });
     }
 
     void enableAll(){
