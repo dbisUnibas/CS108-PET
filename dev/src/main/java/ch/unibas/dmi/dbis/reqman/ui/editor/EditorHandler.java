@@ -144,8 +144,9 @@ public class EditorHandler implements EventHandler<EditorEvent> {
 
     public void openCatalogue(File file) {
         LOGGER.trace(":openCatalogue " + String.format("File: %s", file.getPath()));
+        editor.indicateWaiting(true);
         manager.openCatalogue(file, () -> setupEditor());
-
+        editor.indicateWaiting(false);
     }
 
     private void setupEditor() {
@@ -207,7 +208,9 @@ public class EditorHandler implements EventHandler<EditorEvent> {
         fc.setTitle("Export Catalogue");
         File f = fc.showSaveDialog(editor.getScene().getWindow());
         if(f != null){
+            editor.indicateWaiting(true);
             manager.exportCatalogue(f);
+            editor.indicateWaiting(false);
         }
     }
 }
