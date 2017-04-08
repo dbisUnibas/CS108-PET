@@ -9,5 +9,9 @@ public enum TargetEntity {
 
     REQUIREMENT,
     MILESTONE,
-    CATALOGUE;
+    CATALOGUE,
+
+    PROGRESS,
+    PROGRESS_SUMMARY,
+    GROUP;
 }

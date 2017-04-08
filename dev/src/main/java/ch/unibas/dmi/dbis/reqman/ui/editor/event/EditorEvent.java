@@ -17,16 +17,26 @@ public class EditorEvent extends ActionEvent {
 
     private TargetEntity targetEntity;
 
-    private EventType<EditorEvent> eventType;
+    private ActionEvent parent;
 
-    public EditorEvent() {
-        super();
-    }
+    private int index = -1; // So exception thrown, if not correctly set and used
 
-    public EditorEvent(Object source, EventTarget target, EventType<EditorEvent> type, TargetEntity targetEntity) {
+    private final EventType<EditorEvent> eventType;
+
+    EditorEvent(Object source, EventTarget target, EventType<EditorEvent> type, TargetEntity targetEntity) {
         super(source, target);
         this.eventType = type;
         this.targetEntity = targetEntity;
+    }
+
+    EditorEvent(ActionEvent parent, TargetEntity targetEntity, EventType<EditorEvent> type, int index) {
+        this(parent,targetEntity, type );
+        this.index = index;
+    }
+
+    EditorEvent(ActionEvent parent, TargetEntity targetEntity, EventType<EditorEvent> type){
+        this(parent.getSource(), parent.getTarget(), type, targetEntity);
+        this.parent = parent;
     }
 
     public static EditorEvent generateCreationEvent(Object source, EventTarget target, TargetEntity targetEntity) {
@@ -37,8 +47,33 @@ public class EditorEvent extends ActionEvent {
         return new EditorEvent(source, target, DELETION, targetEntity);
     }
 
+    public static EditorEvent generateDeletionEvent(ActionEvent parent, TargetEntity targetEntity, int index){
+        EditorEvent evt = new EditorEvent(parent, targetEntity, DELETION, index);
+        return evt;
+    }
+
     public static EditorEvent generateModificationEvent(Object source, EventTarget target, TargetEntity targetEntity) {
         return new EditorEvent(source, target, MODIFICATION, targetEntity);
+    }
+
+    public boolean hasParent(){
+        return parent != null;
+    }
+
+    public ActionEvent getParent() {
+        return parent;
+    }
+
+    protected void setParent(ActionEvent parent) {
+        this.parent = parent;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    protected void setIndex(int index) {
+        this.index = index;
     }
 
     @Override
@@ -48,5 +83,9 @@ public class EditorEvent extends ActionEvent {
 
     public TargetEntity getTargetEntity() {
         return targetEntity;
+    }
+
+    public static EditorEvent generateCreationEvent(ActionEvent event, TargetEntity targetEntity) {
+        return new EditorEvent(event, targetEntity, CREATION);
     }
 }

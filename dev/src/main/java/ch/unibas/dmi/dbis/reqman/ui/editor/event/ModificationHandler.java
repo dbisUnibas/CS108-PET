@@ -12,6 +12,7 @@ public interface ModificationHandler extends EventHandler<EditorEvent> {
 
     void handleModification(EditorEvent event);
 
+    @Override
     default void handle(EditorEvent event) {
         if (EditorEvent.MODIFICATION.equals(event.getEventType())) {
             handleModification(event);

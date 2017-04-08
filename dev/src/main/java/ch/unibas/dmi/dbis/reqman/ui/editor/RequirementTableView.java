@@ -3,18 +3,16 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
+import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
@@ -40,8 +38,8 @@ class RequirementTableView extends BorderPane {
     private Button addBtn;
     private Button rmBtn;
 
-    private TableView<RequirementTableRepresentation> table;
-    private ObservableList<RequirementTableRepresentation> tableData = FXCollections.observableArrayList();
+    private TableView<ObservableRequirement> table;
+    private ObservableList<ObservableRequirement> tableData = FXCollections.observableArrayList();
 
 
     RequirementTableView(){
@@ -49,17 +47,22 @@ class RequirementTableView extends BorderPane {
         layoutComponents();
     }
 
-    public void setOnAdd(EventHandler<ActionEvent> handler){
-        addBtn.setOnAction(handler);
+    public void setOnAdd(EventHandler<EditorEvent> handler){
+        addBtn.setOnAction(event -> {
+            handler.handle(EditorEvent.generateCreationEvent(event, TargetEntity.REQUIREMENT) );
+        });
     }
 
-    public void setOnRemove(EventHandler<ActionEvent> handler){
-        rmBtn.setOnAction(handler);
+    public void setOnRemove(EventHandler<EditorEvent> handler){
+        rmBtn.setOnAction(event -> {
+            handler.handle(EditorEvent.generateDeletionEvent(event, TargetEntity.REQUIREMENT, table.getSelectionModel().getSelectedIndex() ));
+        });
     }
 
     public void setRequirements(ObservableList<Requirement> requirements){
+        // Ensures that this view is really simply view - and nothing more!
         LOGGER.trace(":setRequirements");
-        requirements.forEach(r -> tableData.add(RequirementTableRepresentation.fromRequirement(r)));
+        requirements.forEach(r -> tableData.add(ObservableRequirement.fromRequirement(r)));
 
         requirements.addListener(new ListChangeListener<Requirement>() {
             @Override
@@ -76,10 +79,10 @@ class RequirementTableView extends BorderPane {
 
                     } else {
                         for (Requirement removeItem : c.getRemoved()) {
-                            tableData.remove(RequirementTableRepresentation.fromRequirement(removeItem));
+                            tableData.remove(ObservableRequirement.fromRequirement(removeItem));
                         }
                         for (Requirement addItem : c.getAddedSubList()) {
-                            tableData.add(RequirementTableRepresentation.fromRequirement(addItem));
+                            tableData.add(ObservableRequirement.fromRequirement(addItem));
                         }
                     }
 
@@ -119,21 +122,24 @@ class RequirementTableView extends BorderPane {
     private void initComponents(){
         title = new Label("Requirements");
         header = new HBox();
+
         addBtn = Utils.createPlusButton();
+        addBtn.setTooltip(new Tooltip("Opens a dialog to add a new requirement"));
         rmBtn = Utils.createMinusButton();
+        rmBtn.setTooltip(new Tooltip("Removes the currently selected requirement"));
 
         table = initTable();
     }
 
-    private TableView<RequirementTableRepresentation> initTable() {
+    private TableView<ObservableRequirement> initTable() {
         table = new TableView<>();
         table.setEditable(false);
 
-        TableColumn<RequirementTableRepresentation, String> nameColumn = new TableColumn<>("Name");
+        TableColumn<ObservableRequirement, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(c -> c.getValue().nameProperty() ); // For unknown reason new PropertyValueFactory is not working.
         nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 
-        TableColumn<RequirementTableRepresentation, Number> pointsColumn = new TableColumn<>("Points");
+        TableColumn<ObservableRequirement, Number> pointsColumn = new TableColumn<>("Points");
         pointsColumn.setCellValueFactory(c -> c.getValue().pointsProperty() );
         pointsColumn.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<Number>() {
 
@@ -148,15 +154,15 @@ class RequirementTableView extends BorderPane {
             }
         }));
 
-        TableColumn<RequirementTableRepresentation, Boolean> binaryColumn = new TableColumn<>("Binary");
+        TableColumn<ObservableRequirement, Boolean> binaryColumn = new TableColumn<>("Binary");
         binaryColumn.setCellValueFactory(c -> c.getValue().binaryProperty() );
         binaryColumn.setCellFactory(CheckBoxTableCell.forTableColumn(binaryColumn));
 
-        TableColumn<RequirementTableRepresentation, Boolean> mandatoryColumn = new TableColumn<>("Mandatory");
+        TableColumn<ObservableRequirement, Boolean> mandatoryColumn = new TableColumn<>("Mandatory");
         mandatoryColumn.setCellValueFactory(c -> c.getValue().mandatoryProperty() );
         mandatoryColumn.setCellFactory(CheckBoxTableCell.forTableColumn(mandatoryColumn));
 
-        TableColumn<RequirementTableRepresentation, Boolean> malusColumn = new TableColumn<>("Malus");
+        TableColumn<ObservableRequirement, Boolean> malusColumn = new TableColumn<>("Malus");
         malusColumn.setCellValueFactory(c -> c.getValue().malusProperty() );
         malusColumn.setCellFactory(CheckBoxTableCell.forTableColumn(malusColumn));
 
@@ -168,14 +174,15 @@ class RequirementTableView extends BorderPane {
         return table;
     }
 
-    static class RequirementTableRepresentation{
+
+    static class ObservableRequirement {
         private final SimpleStringProperty name;
         private final SimpleDoubleProperty points;
         private final SimpleBooleanProperty binary;
         private final SimpleBooleanProperty mandatory;
         private final SimpleBooleanProperty malus;
 
-        RequirementTableRepresentation(String name, double points, boolean binary, boolean mandatory, boolean malus){
+        ObservableRequirement(String name, double points, boolean binary, boolean mandatory, boolean malus){
             this.name = new SimpleStringProperty(name);
             this.points = new SimpleDoubleProperty(points);
             this.binary = new SimpleBooleanProperty(binary);
@@ -237,7 +244,7 @@ class RequirementTableView extends BorderPane {
 
         @Override
         public String toString() {
-            final StringBuffer sb = new StringBuffer("RequirementTableRepresentation{");
+            final StringBuffer sb = new StringBuffer("ObservableRequirement{");
             sb.append("name=").append(name.get());
             sb.append(", points=").append(points.get());
             sb.append(", binary=").append(binary.get());
@@ -247,9 +254,9 @@ class RequirementTableView extends BorderPane {
             return sb.toString();
         }
 
-        static RequirementTableRepresentation fromRequirement(Requirement r){
+        static ObservableRequirement fromRequirement(Requirement r){
             LOGGER.trace(":fromRequirement");
-            RequirementTableRepresentation rep = new RequirementTableRepresentation(r.getName(), r.getMaxPoints(), r.isBinary(), r.isMandatory(), r.isMalus());
+            ObservableRequirement rep = new ObservableRequirement(r.getName(), r.getMaxPoints(), r.isBinary(), r.isMandatory(), r.isMalus());
             LOGGER.trace(":fromRequirement - Created "+String.format("the representation: %s", rep));
             return rep;
         }
@@ -259,7 +266,7 @@ class RequirementTableView extends BorderPane {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
 
-            RequirementTableRepresentation that = (RequirementTableRepresentation) o;
+            ObservableRequirement that = (ObservableRequirement) o;
 
             return getName().equals(that.getName());
         }
