@@ -48,6 +48,7 @@ public class EditorView extends BorderPane implements TitleProvider{
         reqTableView = new RequirementTableView();
         reqTableView.setOnAdd(handler::handleCreation);
         reqTableView.setOnRemove(handler::handleDeletion);
+        reqTableView.setOnModify(handler::handleModification);
 
         msView = new MilestonesListView(handler);
 

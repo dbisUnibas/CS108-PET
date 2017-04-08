@@ -11,12 +11,14 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -52,6 +54,12 @@ public class RequirementTableView extends BorderPane {
         addBtn.setOnAction(event -> {
             handler.handle(EditorEvent.generateCreationEvent(event, TargetEntity.REQUIREMENT) );
         });
+    }
+
+    EventHandler<EditorEvent> modifyHandler = null;
+
+    public void setOnModify(EventHandler<EditorEvent> handler){
+        this.modifyHandler = handler;
     }
 
     public void setOnRemove(EventHandler<EditorEvent> handler){
@@ -137,7 +145,21 @@ public class RequirementTableView extends BorderPane {
         rmBtn.setTooltip(new Tooltip("Removes the currently selected requirement"));
 
         table = initTable();
+        table.setOnMouseClicked(this::handleModification);
     }
+
+    private void handleModification(MouseEvent evt){
+        if(evt.getClickCount() == 2){
+            if(modifyHandler != null){
+                ObservableRequirement obsReq = table.getSelectionModel().getSelectedItem();
+                if(obsReq != null){
+                    modifyHandler.handle(EditorEvent.generateModificationEvent(new ActionEvent(evt.getSource(), evt.getTarget()), TargetEntity.REQUIREMENT, obsReq));
+                }
+            }
+        }
+    }
+
+
 
     private TableView<ObservableRequirement> initTable() {
         table = new TableView<>();
@@ -268,6 +290,9 @@ public class RequirementTableView extends BorderPane {
 
         static ObservableRequirement fromRequirement(Requirement r){
             LOGGER.trace(":fromRequirement");
+            if(r == null){
+                throw new IllegalArgumentException("Cannot create ObservableRequirement from null-Requirement");
+            }
             ObservableRequirement rep = new ObservableRequirement(r.getName(), r.getMaxPoints(), r.isBinary(), r.isMandatory(), r.isMalus());
             LOGGER.trace(":fromRequirement - Created "+String.format("the representation: %s", rep));
             return rep;

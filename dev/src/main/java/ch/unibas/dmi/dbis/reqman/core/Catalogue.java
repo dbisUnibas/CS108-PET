@@ -276,4 +276,8 @@ public class Catalogue {
         list.sort(Comparator.comparingInt(Milestone::getOrdinal));
         return list.get(list.size()-1).getOrdinal();
     }
+
+    public List<Milestone> milestoneList() {
+        return milestones;
+    }
 }

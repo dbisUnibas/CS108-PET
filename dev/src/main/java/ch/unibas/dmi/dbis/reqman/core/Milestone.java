@@ -36,13 +36,7 @@ public class Milestone {
 
         Milestone milestone = (Milestone) o;
 
-        if (getOrdinal() != milestone.getOrdinal()) {
-            return false;
-        }
-        if (getName() != null ? !getName().equals(milestone.getName()) : milestone.getName() != null) {
-            return false;
-        }
-        return getDate() != null ? getDate().equals(milestone.getDate()) : milestone.getDate() == null;
+        return this.getOrdinal() == milestone.getOrdinal();
     }
 
     @Override

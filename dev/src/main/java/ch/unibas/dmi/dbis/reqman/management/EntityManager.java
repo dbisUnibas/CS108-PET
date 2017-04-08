@@ -16,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,7 +60,7 @@ public class EntityManager {
     public void setCatalogue(Catalogue catalogue) {
         this.catalogue = catalogue;
         observableRequirements = FXCollections.observableList(catalogue.requirementList());
-        observableMilestones = FXCollections.observableList(catalogue.getMilestones());
+        observableMilestones = FXCollections.observableList(catalogue.milestoneList());
         lastOrdinal = catalogue.getLastOrdinal();
 
         sumProperty.set(catalogue.getSum() );
@@ -79,6 +80,9 @@ public class EntityManager {
                         LOGGER.error("UPDATED"); // TODO Handle
                     } else {
                         for (Requirement removeItem : c.getRemoved()) {
+                            if(removeItem == null){
+                                continue;
+                            }
                             double sumPre = catalogue.getSum();
                             double change = removeItem.getMaxPoints();
                             double sumPost = sumPre - change;
@@ -86,6 +90,9 @@ public class EntityManager {
                             sumProperty.set(catalogue.getSum()-removeItem.getMaxPoints());
                         }
                         for (Requirement addItem : c.getAddedSubList()) {
+                            if(addItem == null){
+                                continue;
+                            }
                             sumProperty.set(catalogue.getSum()+addItem.getMaxPoints() );
                         }
                     }
@@ -96,11 +103,14 @@ public class EntityManager {
         });
     }
 
+
     /**
      * @param file nontnull
      */
     public void openCatalogue(File file) {
         LOGGER.trace(":openCat");
+
+
         //Platform.runLater(() -> {
             LOGGER.trace(":openCatalogue - started");
             try {
@@ -235,5 +245,37 @@ public class EntityManager {
 
     public boolean isCatalogueLoaded() {
         return catalogue != null;
+    }
+
+    public void replaceMilestone(Milestone oldMS, Milestone newMS) {
+        if(observableMilestones.remove(oldMS) ){
+            newMS.setOrdinal(oldMS.getOrdinal());
+            observableMilestones.add(newMS);
+        }
+    }
+
+    private List<Requirement> getSuccessors(Requirement requirement){
+        ArrayList<Requirement> list = new ArrayList<>();
+
+        observableRequirements.forEach( r -> {
+            if(r.getPredecessorNames().contains(requirement.getName() )){
+                list.add(r);
+            }
+        });
+
+        return list;
+    }
+
+    public void replaceRequirement(Requirement oldReq, Requirement newReq) {
+        // Case name changed: have to update all reqs, which use oldReq as predecessor
+        if(!oldReq.getName().equals(newReq.getName() ) ){
+            getSuccessors(oldReq).forEach(r -> {
+                r.removePredecessorName(oldReq.getName());
+                r.addPredecessorName(newReq.getName() );
+            });
+        }
+        if(observableRequirements.remove(oldReq)){
+            observableRequirements.add(newReq);
+        }
     }
 }

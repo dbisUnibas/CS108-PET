@@ -129,7 +129,7 @@ public class Requirement {
      * @return A copy of the list of predecessor names.
      */
     public List<String> getPredecessorNames() {
-        return new ArrayList<String>(predecessorNames);
+        return new ArrayList<>(predecessorNames);
     }
 
     public void setPredecessorNames(List<String> predecessorNames) {
@@ -151,34 +151,7 @@ public class Requirement {
 
         Requirement that = (Requirement) o;
 
-        if (getMinMilestoneOrdinal() != that.getMinMilestoneOrdinal()) {
-            return false;
-        }
-        if (getMaxMilestoneOrdinal() != that.getMaxMilestoneOrdinal()) {
-            return false;
-        }
-        if (Double.compare(that.getMaxPoints(), getMaxPoints()) != 0) {
-            return false;
-        }
-        if (isBinary() != that.isBinary()) {
-            return false;
-        }
-        if (isMandatory() != that.isMandatory()) {
-            return false;
-        }
-        if (isMalus() != that.isMalus()) {
-            return false;
-        }
-        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null) {
-            return false;
-        }
-        if (getDescription() != null ? !getDescription().equals(that.getDescription()) : that.getDescription() != null) {
-            return false;
-        }
-        if (getPredecessorNames() != null ? !getPredecessorNames().equals(that.getPredecessorNames()) : that.getPredecessorNames() != null) {
-            return false;
-        }
-        return getPropertiesMap() != null ? getPropertiesMap().equals(that.getPropertiesMap()) : that.getPropertiesMap() == null;
+        return getName().equals(that.getName());
     }
 
     @Override
@@ -300,4 +273,5 @@ public class Requirement {
         sb.append('}');
         return sb.toString();
     }
+
 }

@@ -6,8 +6,10 @@ import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -24,6 +26,7 @@ public class MilestonesListView  extends ModifiableListView<Milestone> implement
         addHandler(this);
         listView.setCellFactory((ListView<Milestone> l) -> new MilestonesView.MilestoneCell());
         listView.setOnMouseClicked(this::handleModifyRequest);
+        listView.setTooltip(new Tooltip("Double-click on Milestone to modify"));
 
     }
 
@@ -41,7 +44,11 @@ public class MilestonesListView  extends ModifiableListView<Milestone> implement
 
     private void handleModifyRequest(MouseEvent mouseEvent) {
         if(mouseEvent.getClickCount() == 2){
-            System.out.println("clicked!");
+            Milestone ms = listView.getSelectionModel().getSelectedItem();
+            if(ms != null){
+                EditorEvent mod = EditorEvent.generateModificationEvent(new ActionEvent(mouseEvent.getSource(), mouseEvent.getTarget()), TargetEntity.MILESTONE, ms);
+                handler.handleModification(mod);
+            }
         }
     }
 

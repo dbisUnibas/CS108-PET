@@ -56,16 +56,23 @@ public class EditorHandler implements EventHandler<EditorEvent> {
         switch (evt.getTargetEntity()) {
             case CATALOGUE:
                 Catalogue cat = EditorPromptFactory.promptNewCatalogue();
-                manager.setCatalogue(cat);
-                setupEditor();
+                if(cat != null){
+                    manager.setCatalogue(cat);
+                    setupEditor();
+                }
                 break;
             case REQUIREMENT:
                 Requirement req = EditorPromptFactory.promptNewRequirement(this);
-                manager.addRequirement(req);
+                if(req != null){
+                    manager.addRequirement(req);
+                }
                 break;
             case MILESTONE:
                 Milestone ms = EditorPromptFactory.promptNewMilestone();
-                manager.addMilestone(ms);
+                if(ms != null){
+                    manager.addMilestone(ms);
+                }
+
                 break;
             default:
                 throwInappropriateTargetEntity(evt.getTargetEntity());
@@ -77,8 +84,8 @@ public class EditorHandler implements EventHandler<EditorEvent> {
             case CATALOGUE:
                 throw new IllegalArgumentException("Cannot delete the catalogue");
             case REQUIREMENT:
-                if(evt.getDeletion() instanceof RequirementTableView.ObservableRequirement){
-                    RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement)evt.getDeletion();
+                if(evt.getDelivery() instanceof RequirementTableView.ObservableRequirement){
+                    RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement)evt.getDelivery();
                     Requirement req = manager.getRequirementByName(obsReq.getName());
                     LOGGER.debug(String.format("Deletion Requirement: selected=%s, index=%d, result=%s", obsReq, evt.getIndex(), req));
                     manager.removeRequirement(req);
@@ -89,8 +96,8 @@ public class EditorHandler implements EventHandler<EditorEvent> {
 
                 break;
             case MILESTONE:
-                if(evt.getDeletion() instanceof  Milestone){
-                    Milestone milestone = (Milestone)evt.getDeletion();
+                if(evt.getDelivery() instanceof  Milestone){
+                    Milestone milestone = (Milestone)evt.getDelivery();
                     manager.removeMilestone(milestone);
                 }
                 break;
@@ -104,10 +111,20 @@ public class EditorHandler implements EventHandler<EditorEvent> {
             case CATALOGUE:
                 break;
             case REQUIREMENT:
-
+                if(evt.getDelivery() instanceof RequirementTableView.ObservableRequirement){
+                    RequirementTableView.ObservableRequirement obsReq =(RequirementTableView.ObservableRequirement)evt.getDelivery();
+                    Requirement r = manager.getRequirementByName(obsReq.getName());
+                    Requirement mod = EditorPromptFactory.promptRequirement(this, r);
+                    if(mod != null){
+                        manager.replaceRequirement(r, mod);
+                    }
+                }
                 break;
             case MILESTONE:
-
+                if(evt.getDelivery() instanceof Milestone){
+                    Milestone mod = EditorPromptFactory.promptMilestone((Milestone)evt.getDelivery() );
+                    manager.replaceMilestone((Milestone)evt.getDelivery(), mod);
+                }
                 break;
             default:
                 throwInappropriateTargetEntity(evt.getTargetEntity());
