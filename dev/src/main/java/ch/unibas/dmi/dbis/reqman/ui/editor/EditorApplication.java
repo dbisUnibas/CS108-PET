@@ -5,6 +5,8 @@ import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
+import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -119,7 +121,15 @@ public class EditorApplication extends Application {
             }
         });
 
-        menuFile.getItems().addAll(itemOpen, itemSave);
+        MenuItem itemNew = new MenuItem("New");
+        itemNew.setOnAction(evt -> {
+            if(handler.isCatalogueLoaded() ){
+                System.out.println("WILL DISCARD PREVIOUS CHANGES");
+            }
+            handler.handleCreation(EditorEvent.generateCreationEvent(evt, TargetEntity.CATALOGUE));
+        });
+
+        menuFile.getItems().addAll(itemNew,itemOpen, itemSave);
         menu.getMenus().add(menuFile);
         return menu;
     }

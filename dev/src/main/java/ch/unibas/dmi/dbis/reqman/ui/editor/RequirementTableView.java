@@ -88,6 +88,7 @@ public class RequirementTableView extends BorderPane {
                     }
 
                 }
+                c.reset();
             }
         });
         requirements.addListener(new InvalidationListener() {

@@ -267,7 +267,11 @@ public class Catalogue {
         }
     }
 
+    @JsonIgnore
     public int getLastOrdinal() {
+        if(milestones.isEmpty() ){
+            return 0;
+        }
         ArrayList<Milestone> list = new ArrayList<>(getMilestones());
         list.sort(Comparator.comparingInt(Milestone::getOrdinal));
         return list.get(list.size()-1).getOrdinal();

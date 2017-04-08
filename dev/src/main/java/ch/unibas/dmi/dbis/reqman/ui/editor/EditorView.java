@@ -1,8 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import org.apache.logging.log4j.LogManager;
@@ -22,8 +20,7 @@ public class EditorView extends BorderPane implements TitleProvider{
 
 
     private RequirementTableView reqTableView;
-    //private MilestonesView msView;
-    private Node msView;
+    private MilestonesListView msView;
     private CatalogueInfoPane catInfo;
 
 
@@ -52,8 +49,7 @@ public class EditorView extends BorderPane implements TitleProvider{
         reqTableView.setOnAdd(handler::handleCreation);
         reqTableView.setOnRemove(handler::handleDeletion);
 
-        //msView = new MilestonesView(controller);
-        msView = new Label("Milestones");
+        msView = new MilestonesListView(handler);
 
         catInfo = new CatalogueInfoPane();
 
@@ -70,6 +66,7 @@ public class EditorView extends BorderPane implements TitleProvider{
         splitter.setDividerPositions(0.33);
         setTop(catInfo);
         setCenter(splitter);
+        disableAll();
     }
 
     void enableAll(){
@@ -82,8 +79,16 @@ public class EditorView extends BorderPane implements TitleProvider{
         msView.setDisable(true);
     }
 
-    public RequirementTableView getReqTableView() {
+    RequirementTableView getRequirementsView() {
         return reqTableView;
+    }
+
+    MilestonesListView getMilestoneView(){
+        return msView;
+    }
+
+    CatalogueInfoPane getCatalogueView(){
+        return catInfo;
     }
 
     @Override

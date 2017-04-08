@@ -7,7 +7,9 @@ import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,6 +31,7 @@ public class EntityManager {
     private File catalogueFile = null;
     private ObservableList<Requirement> observableRequirements;
     private ObservableList<Milestone> observableMilestones;
+    private final SimpleDoubleProperty sumProperty = new SimpleDoubleProperty();
 
     public ObservableList<Requirement> getObservableRequirements() {
         return observableRequirements;
@@ -59,6 +62,38 @@ public class EntityManager {
         observableMilestones = FXCollections.observableList(catalogue.getMilestones());
         lastOrdinal = catalogue.getLastOrdinal();
 
+        sumProperty.set(catalogue.getSum() );
+
+        observableRequirements.addListener(new ListChangeListener<Requirement>() {
+            @Override
+            public void onChanged(Change<? extends Requirement> c) {
+                LOGGER.trace(":changed");
+                while (c.next()) {
+                    if (c.wasPermutated()) {
+                        // Permutation
+                        for (int i = c.getFrom(); i < c.getTo(); ++i) {
+
+                        }
+                    } else if (c.wasUpdated()) {
+                        // Update
+                        LOGGER.error("UPDATED"); // TODO Handle
+                    } else {
+                        for (Requirement removeItem : c.getRemoved()) {
+                            double sumPre = catalogue.getSum();
+                            double change = removeItem.getMaxPoints();
+                            double sumPost = sumPre - change;
+                            LOGGER.trace(String.format(":onChanged - Remove: pre:%g, change:%g, post%g", sumPre, change, sumPost));
+                            sumProperty.set(catalogue.getSum()-removeItem.getMaxPoints());
+                        }
+                        for (Requirement addItem : c.getAddedSubList()) {
+                            sumProperty.set(catalogue.getSum()+addItem.getMaxPoints() );
+                        }
+                    }
+
+                }
+                c.reset();
+            }
+        });
     }
 
     /**
@@ -126,20 +161,20 @@ public class EntityManager {
     }
 
     public boolean addMilestone(Milestone milestone) {
-        milestone.setOrdinal(lastOrdinal++);
-        return catalogue.addMilestone(milestone);
+        milestone.setOrdinal(++lastOrdinal);
+        return observableMilestones.add(milestone);
     }
 
     public boolean removeMilestone(Milestone milestone) {
-        return catalogue.removeMilestone(milestone);
+        return observableMilestones.remove(milestone);
     }
 
-    public List<Milestone> getMilestones() {
+    List<Milestone> getMilestones() {
         return catalogue.getMilestones();
     }
 
     public boolean addRequirement(Requirement requirement) {
-        return catalogue.addRequirement(requirement);
+        return observableRequirements.add(requirement);
     }
 
     public boolean removeRequirement(Requirement requirement) {
@@ -192,5 +227,13 @@ public class EntityManager {
     @JsonIgnore
     public Milestone getMilestoneForProgress(Progress progress) {
         return catalogue.getMilestoneForProgress(progress);
+    }
+
+    public SimpleDoubleProperty sumProperty() {
+        return sumProperty;
+    }
+
+    public boolean isCatalogueLoaded() {
+        return catalogue != null;
     }
 }

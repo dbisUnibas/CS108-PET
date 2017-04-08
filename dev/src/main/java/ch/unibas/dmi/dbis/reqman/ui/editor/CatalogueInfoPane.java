@@ -71,10 +71,10 @@ public class CatalogueInfoPane extends VBox {
 
 
         lblTitle = new Label(title);
-        lblName = new Label("Name");
-        lblLecture = new Label("Lecture");
-        lblSemester = new Label("Semester");
-        lblPoints = new Label("Max. Points");
+        lblName = new Label("Name: ");
+        lblLecture = new Label("Lecture: ");
+        lblSemester = new Label("Semester: ");
+        lblPoints = new Label("Max. Points: ");
 
         dispName = new Label();
         dispName.textProperty().bind(catName);

@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
 import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,9 +57,10 @@ public class EditorHandler implements EventHandler<EditorEvent> {
             case CATALOGUE:
                 Catalogue cat = EditorPromptFactory.promptNewCatalogue();
                 manager.setCatalogue(cat);
+                setupEditor();
                 break;
             case REQUIREMENT:
-                Requirement req = EditorPromptFactory.promptNewRequirement(null);
+                Requirement req = EditorPromptFactory.promptNewRequirement(this);
                 manager.addRequirement(req);
                 break;
             case MILESTONE:
@@ -80,14 +82,17 @@ public class EditorHandler implements EventHandler<EditorEvent> {
                     Requirement req = manager.getRequirementByName(obsReq.getName());
                     LOGGER.debug(String.format("Deletion Requirement: selected=%s, index=%d, result=%s", obsReq, evt.getIndex(), req));
                     manager.removeRequirement(req);
-                    LOGGER.debug("size: "+editor.getReqTableView().getRequirementsSize() );
+                    LOGGER.debug("size: "+editor.getRequirementsView().getRequirementsSize() );
                 }else{
                     throw new RuntimeException("Something went really bad.");
                 }
 
                 break;
             case MILESTONE:
-
+                if(evt.getDeletion() instanceof  Milestone){
+                    Milestone milestone = (Milestone)evt.getDeletion();
+                    manager.removeMilestone(milestone);
+                }
                 break;
                 default:
                     throwInappropriateTargetEntity(evt.getTargetEntity());
@@ -116,7 +121,21 @@ public class EditorHandler implements EventHandler<EditorEvent> {
     public void openCatalogue(File file) {
         LOGGER.trace(":openCatalogue "+String.format("File: %s",file.getPath()));
         manager.openCatalogue(file);
-        editor.getReqTableView().setRequirements(manager.getObservableRequirements());
+
+        setupEditor();
+    }
+
+    private void setupEditor(){
+        editor.getRequirementsView().setRequirements(manager.getObservableRequirements());
+        editor.getMilestoneView().setItems(manager.getObservableMilestones() );
+
+
+        editor.getCatalogueView().setCatName(manager.getName());
+        editor.getCatalogueView().setCatLecture(manager.getLecture());
+        editor.getCatalogueView().setCatSemester(manager.getSemester());
+        editor.getCatalogueView().maxPointsProperty().bind(manager.sumProperty() );
+
+        editor.enableAll();
     }
 
     public void saveCatalogue() {
@@ -133,5 +152,25 @@ public class EditorHandler implements EventHandler<EditorEvent> {
 
     public boolean isCatalogueFilePresent() {
         return manager.isCatalogueFilePresent();
+    }
+
+    public boolean isCatalogueLoaded() {
+        return manager.isCatalogueLoaded();
+    }
+
+    public Milestone getMilestoneByOrdinal(int ordinal) {
+        return manager.getMilestoneByOrdinal(ordinal);
+    }
+
+    public Requirement getRequirementByName(String name) {
+        return manager.getRequirementByName(name);
+    }
+
+    public ObservableList<Milestone> getObservableMilestones() {
+        return manager.getObservableMilestones();
+    }
+
+    public ObservableList<Requirement> getObservableRequirements() {
+        return manager.getObservableRequirements();
     }
 }

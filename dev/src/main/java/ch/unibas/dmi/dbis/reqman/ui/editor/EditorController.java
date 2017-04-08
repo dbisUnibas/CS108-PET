@@ -25,7 +25,7 @@ import java.util.ArrayList;
  *
  * @author loris.sauter
  */
-public class EditorController {
+@Deprecated  public class EditorController {
 
     private Catalogue catalogue;
 
@@ -68,13 +68,15 @@ public class EditorController {
     }
 
     public void handleAddRequirement(ActionEvent event) {
-        if (!isCatalogueSet()) {
+        System.err.println("Outdated class");
+        return;
+        /*if (!isCatalogueSet()) {
             return; // Prevent open prompt from accelerator even if no catalogue is set
         }
-        Requirement r = EditorPromptFactory.promptNewRequirement(this);
+        //Requirement r = EditorPromptFactory.promptNewRequirement(this);
         if (r != null) { // user may cancelled the prompt
             observableReqs.add(r);
-        }
+        }*/
 
     }
 
@@ -190,12 +192,14 @@ public class EditorController {
     }
 
     public void handleModifyRequirement(Requirement sel) {
-        Requirement update = EditorPromptFactory.promptRequirement(this, sel);
+        System.err.println("Outdated class");
+        return;
+        /*Requirement update = EditorPromptFactory.promptRequirement(this, sel);
         int index = observableReqs.indexOf(sel);
         if (update != null) {
             observableReqs.remove(index);
             observableReqs.add(index, update);
-        }
+        }*/
     }
 
     public void handleModifyMilestone(Milestone sel) {

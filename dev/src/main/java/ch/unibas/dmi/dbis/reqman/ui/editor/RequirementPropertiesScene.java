@@ -5,6 +5,8 @@ import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
+import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -45,7 +47,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     private RadioButton mandatoryNo = new RadioButton("No");
     private RadioButton malusYes = new RadioButton("Yes");
     private RadioButton malusNo = new RadioButton("No");
-    private EditorController controller;
     private Requirement requirement = null;
     private ObservableList<MetaKeyValuePair> tableData;
     private TableView<MetaKeyValuePair> table = createPropertiesTable();
@@ -53,17 +54,20 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     private ObservableList<Milestone> milestoneList;
     private ObservableList<MetaKeyValuePair> metaData;
 
-    public RequirementPropertiesScene(EditorController controller) {
+    private EditorHandler handler;
+    public RequirementPropertiesScene(EditorHandler handler){
         super();
-        this.controller = controller;
+        this.handler = handler;
         populateScene();
     }
 
-    public RequirementPropertiesScene(EditorController controller, Requirement requirement) {
-        this(controller);
+    public RequirementPropertiesScene(EditorHandler handler, Requirement requirement){
+        this(handler);
         this.requirement = requirement;
         loadRequirement();
     }
+
+
 
     public void handleSaving(ActionEvent event) {
         String name = tfName.getText();
@@ -185,12 +189,12 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     }
 
     private Milestone getMilestoneByOrdinal(int ordinal) {
-        return controller.getMilestoneByOrdinal(ordinal);
+        return handler.getMilestoneByOrdinal(ordinal);
     }
 
     private void loadPredecessors() {
         requirement.getPredecessorNames().forEach(name -> {
-            Requirement r = controller.findRequirementByName(name);
+            Requirement r = handler.getRequirementByName(name);
             if (r != null) {
                 predecessors.add(r);
             }
@@ -209,7 +213,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         ComboBox<Requirement> reqBox = new ComboBox<>();
         reqBox.setButtonCell(new RequirementsView.RequirementCell());
         reqBox.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
-        reqBox.setItems(controller.getObservableRequirements());
+        reqBox.setItems(handler.getObservableRequirements());
 
         upper.getChildren().addAll(reqBox, addPred, rmPred);
 
@@ -242,17 +246,17 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     }
 
     private void handleNewMaxMS(ActionEvent event) {
-        controller.handleAddMilestone(event);
+        handler.handleCreation(EditorEvent.generateCreationEvent(event, TargetEntity.MILESTONE));
         cbMaxMS.getSelectionModel().select(milestoneList.size() - 1);
     }
 
     private void handleNewMinMS(ActionEvent event) {
-        controller.handleAddMilestone(event);
+        handler.handleCreation(EditorEvent.generateCreationEvent(event, TargetEntity.MILESTONE));
         cbMinMS.getSelectionModel().select(milestoneList.size() - 1);
     }
 
     private void loadMilestoneNames() {
-        milestoneList = controller.getObservableMilestones();
+        milestoneList = handler.getObservableMilestones();
     }
 
     private TableView<MetaKeyValuePair> createPropertiesTable() {
@@ -416,7 +420,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
 
         spinnerPoints.setEditable(true);
-        // TODO add spinner-handler
         // Solution by: http://stackoverflow.com/a/39380146
         spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
