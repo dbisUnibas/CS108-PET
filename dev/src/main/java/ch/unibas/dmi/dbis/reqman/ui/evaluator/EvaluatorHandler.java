@@ -43,7 +43,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         this.evaluator = view;
     }
 
-    List<Milestone> getMilestones() {
+    public List<Milestone> getMilestones() {
         return new ArrayList<>(manager.getObservableMilestones());
     }
 
@@ -95,23 +95,21 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     }
 
-    void handleModification(CUDEvent event) {
+    public void handleModification(CUDEvent event) {
         switch (event.getTargetEntity()) {
             case GROUP:
                 LOGGER.trace(":handleModificaiton");
-                if (event.getDelivery() != null && event.getDelivery() instanceof Group) {
-                    Group gr = (Group) event.getDelivery();
-                    // DONT FORGET TO UPDATE ALL NAME REFERNECES, IF NAME CHANGED!
-                    Group mod = EvaluatorPromptFactory.promptGroup(gr, this);
-                    manager.replaceGroup(gr, mod);
-                }
+                Group gr = evaluator.getActiveGroup();
+                // DONT FORGET TO UPDATE ALL NAME REFERNECES, IF NAME CHANGED!
+                Group mod = EvaluatorPromptFactory.promptGroup(gr, this);
+                manager.replaceGroup(gr, mod);
                 break;
             default:
                 // Ignoring
         }
     }
 
-    void handleDeletion(CUDEvent event) {
+    public void handleDeletion(CUDEvent event) {
         switch (event.getTargetEntity()) {
             case GROUP:
                 // DELETE GROUP
@@ -126,7 +124,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
     }
 
-    void handleCreation(CUDEvent event) {
+    public void handleCreation(CUDEvent event) {
         switch (event.getTargetEntity()) {
             case GROUP:
                 LOGGER.trace(":handleCreation");
@@ -140,11 +138,11 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
     }
 
-    boolean isGroupNameUnique(String name) {
+    public boolean isGroupNameUnique(String name) {
         return manager.isGroupNameUnique(name);
     }
 
-    void handleOpenGroups(ActionEvent actionEvent) {
+    public void handleOpenGroups(ActionEvent actionEvent) {
         if (!manager.isCatalogueLoaded()) {
             return;
         }
@@ -190,27 +188,27 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         addGroupToMap(g, null);
     }
 
-    void handleSaveGroup(ActionEvent actionEvent) {
+    public void handleSaveGroup(ActionEvent actionEvent) {
         Group active = evaluator.getActiveGroup();
-        if(manager.hasGroupFile(active) ){
+        if (manager.hasGroupFile(active)) {
             manager.saveGroup(active);
-        }else{
+        } else {
             handleSaveGroupAs(actionEvent);
         }
     }
 
-    void handleSaveGroupAs(ActionEvent event) {
+    public void handleSaveGroupAs(ActionEvent event) {
         FileChooser fc = Utils.createGroupFileChooser("Save As");
-        if(manager.hasLastSaveLocation() ){
-            fc.setInitialDirectory(manager.getLastSaveLocation() );
+        if (manager.hasLastSaveLocation()) {
+            fc.setInitialDirectory(manager.getLastSaveLocation());
         }
         File f = fc.showSaveDialog(evaluator.getScene().getWindow());
-        if(f != null){
+        if (f != null) {
             manager.saveGroupAs(evaluator.getActiveGroup(), f);
         }
     }
 
-    void handleOpenCatalogue(ActionEvent event) {
+    public void handleOpenCatalogue(ActionEvent event) {
         FileChooser fc = Utils.createCatalogueFileChooser("Open");
         if (manager.hasLastOpenLocation()) {
             fc.setInitialDirectory(manager.getLastOpenLocation());

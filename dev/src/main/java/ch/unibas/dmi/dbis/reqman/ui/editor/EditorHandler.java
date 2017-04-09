@@ -184,9 +184,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
             if(f!= null){
                 manager.saveAsCatalogue(f);
             }
-
         }
-        ;
     }
 
     public boolean isCatalogueFilePresent() {
@@ -213,7 +211,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         return manager.getObservableRequirements();
     }
 
-    void handleExportCatalogue(ActionEvent event){
+    public void handleExportCatalogue(ActionEvent event){
         if(!manager.isCatalogueLoaded() ){
             return;
         }

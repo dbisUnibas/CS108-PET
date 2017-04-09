@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorView;
+import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorView;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
@@ -20,7 +21,7 @@ class MainScene extends Scene {
     private VBox topContainer = new VBox();
 
     private EditorView editor;
-
+    private EvaluatorView evaluator;
 
     MainScene(){
         super(new Region(), 800,600);
