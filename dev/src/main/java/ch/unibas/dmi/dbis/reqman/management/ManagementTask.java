@@ -13,7 +13,7 @@ public abstract class ManagementTask<R> extends Task<R> {
     protected static final Logger LOGGER = LogManager.getLogger(ManagementTask.class);
 
     protected void updateAll(String message, double progress){
-        LOGGER.trace(message);
+        LOGGER.trace(message+String.format("(%f)",progress/1.0));
         updateMessage(message);
         updateProgress(progress, 1.0);
     }

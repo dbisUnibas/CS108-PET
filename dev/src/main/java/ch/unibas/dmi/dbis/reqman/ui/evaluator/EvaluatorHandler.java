@@ -159,28 +159,38 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
             return; // USER ABORT
         }
         if(files.size() == 1){
-            try{
                 manager.openGroup(files.get(0), () -> {
                     loadGroupUI(manager.getLastOpenedGroup() );
                 });
-            }catch (CatalogueNameMismatchException ex){
-                String message = String.format("Could not finish opening group from file %s.\n" +
-                        "The specified group (name: %s)'s catalogue signature is: %s\n" +
-                        "Current catalogue name: %s", ex.getGroupFile().getPath(), ex.getGroupName(), ex.getGroupCatName(), ex.getCatName());
-                Utils.showErrorDialog("Catalogue signature mismatch", message);
-            }catch (NonUniqueGroupNameException e){
-                String message = String.format("Cannot finish opening of group %s, there exists alread a group with that name.", e.getName());
-                Utils.showErrorDialog("Duplication error", message);
-            }
 
         }else if(files.size() >= 2){
-            throw new UnsupportedOperationException("not impelemnted yet");
+            manager.openGroups(files, this::loadGroupUI);
         }
         // USER ABORT
     }
 
+    private void loadGroupUI(List<Group> groups){
+        groups.forEach(this::loadGroupUI);
+    }
+
     private void loadGroupUI(Group g) {
         LOGGER.trace("Creating UI for group "+g.getName());
+        if(manager.getLastOpenException() != null){
+            LOGGER.warn("Caught Exception");
+            Exception e = manager.getLastOpenException();
+            if(e instanceof CatalogueNameMismatchException){
+                CatalogueNameMismatchException cnme = (CatalogueNameMismatchException)e;
+                String message = String.format("Could not finish opening group from file %s.\n" +
+                        "The specified group (name: %s)'s catalogue signature is: %s\n" +
+                        "Current catalogue name: %s", cnme.getGroupFile().getPath(), cnme.getGroupName(), cnme.getGroupCatName(), cnme.getCatName());
+                Utils.showErrorDialog("Catalogue signature mismatch", message);
+            }else if(e instanceof NonUniqueGroupNameException){
+                NonUniqueGroupNameException nugne = (NonUniqueGroupNameException)e;
+                String message = String.format("Cannot finish opening of group %s, there exists alread a group with that name.", nugne.getName());
+                Utils.showErrorDialog("Duplication error", message);
+            }
+        }
+
         addGroupToMap(g, null);
     }
 

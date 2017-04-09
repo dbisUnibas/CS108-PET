@@ -12,7 +12,7 @@ import java.io.File;
  *
  * @author loris.sauter
  */
-public class OpenGroupTask extends ManagementTask<Group>{
+public class OpenGroupTask extends ThrowingManagementTask<Group>{
 
     private static final Logger LOGGER = LogManager.getLogger(OpenGroupTask.class);
 

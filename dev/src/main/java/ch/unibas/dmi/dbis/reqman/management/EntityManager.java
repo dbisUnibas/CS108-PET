@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
 import ch.unibas.dmi.dbis.reqman.common.Callback;
+import ch.unibas.dmi.dbis.reqman.common.ThrowingCallback;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * TODO: Write JavaDoc
@@ -54,11 +56,9 @@ public class EntityManager {
         return instance;
     }
 
-    private static void runTask(ManagementTask task, Callback internalCallback, Callback doneCallback) {
-        // TODO Exception handling!
-        Thread th = new Thread(task);
-        th.setDaemon(true); // silently shutsdown upon exiting
-        th.start();
+    private static void runTask(ManagementTask task, Callback internalCallback, Callback doneCallback){
+        Thread th = createDeamon(task);
+
 
         task.setOnFailed(event -> {
             throw new RuntimeException("Opening failed: ", task.getException());
@@ -66,11 +66,7 @@ public class EntityManager {
 
         if (internalCallback != null) {
             task.setOnSucceeded(event -> {
-                try{
-                    internalCallback.apply(null);
-                }catch(Exception ex){
-                    throw new RuntimeException(ex);
-                }
+                internalCallback.apply(null);
 
 
                 if (doneCallback != null) {
@@ -79,13 +75,39 @@ public class EntityManager {
 
             });
         }
+        th.start();
     }
 
-    private static void runTask(ManagementTask task) {
+    private static Thread createDeamon(ManagementTask task){
+        Thread thread = new Thread(task);
+        thread.setDaemon(true); // silently shutsdown upon exiting
+
+        task.setOnFailed(event -> {
+            throw new RuntimeException("Opening failed: ", task.getException());
+        });
+        return thread;
+    }
+
+    private static void runTaskThrowing(ThrowingManagementTask task, ThrowingCallback internalCallback, Callback doneCallback){
+        Thread deamon = createDeamon(task);
+        if (internalCallback != null) {
+            task.setThrowingOnSucceeded(event -> {
+                internalCallback.callThrowing();
+
+                if (doneCallback != null) {
+                    doneCallback.apply(null);
+                }
+
+            });
+        }
+        deamon.start();
+    }
+
+    private static void runTask(ManagementTask task){
         runTask(task, null, null);
     }
 
-    private static void runTask(ManagementTask task, Callback internal) {
+    private static void runTask(ManagementTask task, Callback internal){
         runTask(task, internal, null);
     }
 
@@ -104,17 +126,22 @@ public class EntityManager {
     /**
      * @param file nontnull
      */
-    public void openCatalogue(File file, Callback doneCallback) {
+    public void openCatalogue(File file, Callback doneCallback){
         LOGGER.trace(":openCat");
 
         OpenCatalogueTask openTask = new OpenCatalogueTask(file);
 
-        runTask(openTask, () -> {
-            setCatalogue(openTask.getValue());
-            catalogueFile = file;
-            LOGGER.trace(":openCatalogue - Finished");
+        try {
+            runTask(openTask, () -> {
+                setCatalogue(openTask.getValue());
+                catalogueFile = file;
+                lastOpenLocation = ensureDirectory(file);
+                LOGGER.trace(":openCatalogue - Finished");
 
-        }, doneCallback);
+            }, doneCallback);
+        } catch (Exception e) {
+            e.printStackTrace(); // TODO handle
+        }
 
     }
 
@@ -132,10 +159,14 @@ public class EntityManager {
     private void saveCatalogue(File file) {
         SaveCatalogueTask saveTask = new SaveCatalogueTask(catalogue, file);
 
-        runTask(saveTask, () -> {
-            LOGGER.info("Saved catalogue to: " + file.getPath());
-            catalogueFile = file;
-        });
+        try {
+            runTask(saveTask, () -> {
+                LOGGER.info("Saved catalogue to: " + file.getPath());
+                catalogueFile = file;
+            });
+        } catch (Exception e) {
+            e.printStackTrace(); // TODO Handle
+        }
     }
 
     public void saveAsCatalogue(File file) {
@@ -144,10 +175,14 @@ public class EntityManager {
 
     public void exportCatalogue(File file) {
         ExportCatalogueTask task = new ExportCatalogueTask(catalogue, file);
-        runTask(task, () -> {
-            LOGGER.info("Export done");
-            lastExportLocation = ensureDirectory(file);
-        });
+        try {
+            runTask(task, () -> {
+                LOGGER.info("Export done");
+                lastExportLocation = ensureDirectory(file);
+            });
+        } catch (Exception e) {
+            e.printStackTrace(); // TODO handle
+        }
     }
 
     public String getLecture() {
@@ -392,32 +427,60 @@ public class EntityManager {
         return catalogueFile;
     }
 
-    public void openGroup(File file, Callback done) throws CatalogueNameMismatchException, NonUniqueGroupNameException {
+    private Exception lastOpenException = null;
+
+    public void openGroup(File file, Callback done) {
         LOGGER.entry(file);
         OpenGroupTask task = new OpenGroupTask(file);
-        try {
-            runTask(task, () -> {
-                lastOpenLocation = ensureDirectory(file);
-                lastOpenedGroup = task.getValue();
+            runTaskThrowing(task, () -> {
+                if(task.getLastException() != null){ // NOT WORKING
+                    lastOpenException = task.getLastException();
+                }
                 openedGroup(file, lastOpenedGroup);
             }, done);
-        }catch(RuntimeException ex){
-            throw ex;
-        }
+    }
+
+    public void openGroups(List<File> files, Consumer<List<Group>> callback){
+        LOGGER.entry(files);
+        OpenMultipleGroupsTask task = new OpenMultipleGroupsTask(files);
+        runTask(task, () -> {
+            openedGroups(files, task.getValue());
+        },() -> {
+            callback.accept(task.getValue());
+        });
+    }
+
+    public Exception getLastOpenException(){
+        return lastOpenException;
     }
 
     private void openedGroup(File file, Group group) throws CatalogueNameMismatchException, NonUniqueGroupNameException {
         LOGGER.trace(":openedGroup");
+        LOGGER.entry(file, group);
         if (!group.getCatalogueName().equals(catalogue.getName())) {
-            throw new CatalogueNameMismatchException(catalogue.getName(), group.getCatalogueName(), group.getName(), file);
+            throw LOGGER.throwing(new CatalogueNameMismatchException(catalogue.getName(), group.getCatalogueName(), group.getName(), file) );
         }
         if(!isGroupNameUnique(group.getName()) ){
-            throw new NonUniqueGroupNameException(group.getName() );
+            throw LOGGER.throwing(new NonUniqueGroupNameException(group.getName() ) );
         }
         groupFileMap.put(group.getName(), file);
         groups.add(group);
+        lastOpenLocation = ensureDirectory(file);
+        lastOpenedGroup = group;
+        LOGGER.info("Successfully loaded group "+String.format("(%s)", group.getName())+" to workspace.");
+    }
 
-        LOGGER.info("Successfully added opened group to workspace.");
+    /**
+     * Contract: files.size()==groups.size();
+     * @param files
+     * @param groups
+     */
+    private void openedGroups(List<File> files, List<Group> groups){
+        LOGGER.trace(":openedGroups");
+        for(int i=0; i<files.size(); ++i){
+            openedGroup(files.get(i), groups.get(i));
+        }
+        LOGGER.trace("Finished loading of groups");
     }
 
     public Group getLastOpenedGroup() {

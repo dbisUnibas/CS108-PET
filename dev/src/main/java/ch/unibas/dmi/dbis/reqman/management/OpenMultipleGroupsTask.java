@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
+import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.core.Group;
 
 import java.io.File;
@@ -17,11 +18,29 @@ public class OpenMultipleGroupsTask extends ManagementTask<List<Group>> {
 
     public OpenMultipleGroupsTask(List<File> files) {
         this.files = new ArrayList<>(files);
-        throw new UnsupportedOperationException("Not implemented yet");
     }
 
     @Override
     protected List<Group> call() throws Exception {
-        return null;
+        List<Group> list = new ArrayList<>();
+        for(int i=1; i<=files.size();i++){
+            updateAll("Opening group "+files.get(i-1).getName()+"..."+String.format(" (%d/%d)",i,files.size()), calcFirstProgress(i));
+            Group gr = JSONUtils.readGroupJSONFile(files.get(i-1));
+            list.add(gr);
+            updateAll("Succsessfully opened group "+gr.getName()+"."+String.format(" (%d/%d)",i,files.size()), calcSecondProgress(i));
+        }
+        return list;
+    }
+
+    /**
+     *
+     * @param i Must be that first stage: i==1
+     * @return
+     */
+    private double calcFirstProgress(double i){
+        return i * (0.2/(double)files.size()) + (i-1)*(0.8/(double)files.size());
+    }
+    private double calcSecondProgress(double i){
+        return i * (0.2/(double)files.size()) + (i)*(0.8/(double)files.size());
     }
 }
