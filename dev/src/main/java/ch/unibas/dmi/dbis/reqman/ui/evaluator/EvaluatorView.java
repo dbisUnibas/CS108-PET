@@ -118,6 +118,7 @@ public class EvaluatorView extends HBox implements TitleProvider {
 
     public void addGroupTab(AssessmentView view, boolean fresh) {
         Tab tab = new Tab();
+        tab.setUserData(view.getActiveGroup().getName() );
         tab.setText(view.getActiveGroup().getName());
         view.bindToParentSize(rightContent);
         tab.setContent(view);
@@ -154,11 +155,19 @@ public class EvaluatorView extends HBox implements TitleProvider {
     }
 
     public void setActiveTab(AssessmentView assessmentView) {
-        Tab toActive = groupTabMap.get(assessmentView.getActiveGroup().getName() );
-        tabPane.getSelectionModel().select(toActive);
+        setActiveTab(assessmentView.getActiveGroup().getName() );
     }
 
     public void setActiveTab(String name) {
+        Tab toActive = groupTabMap.get( name);
+        tabPane.getSelectionModel().select(toActive);
+    }
 
+    public Group getActiveGroup() {
+        Tab tab = tabPane.getSelectionModel().getSelectedItem();
+        if(tab.getUserData() instanceof String){
+            return handler.getGroupByName((String)tab.getUserData());
+        }
+        return null;
     }
 }

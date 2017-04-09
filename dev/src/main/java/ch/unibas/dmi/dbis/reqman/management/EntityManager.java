@@ -429,15 +429,17 @@ public class EntityManager {
 
     private Exception lastOpenException = null;
 
-    public void openGroup(File file, Callback done) {
+    public void openGroup(File file, Consumer<Group> done) {
         LOGGER.entry(file);
         OpenGroupTask task = new OpenGroupTask(file);
             runTaskThrowing(task, () -> {
                 if(task.getLastException() != null){ // NOT WORKING
                     lastOpenException = task.getLastException();
                 }
-                openedGroup(file, lastOpenedGroup);
-            }, done);
+                openedGroup(file, task.getValue());
+            }, () -> {
+                done.accept(task.getValue());
+            } );
     }
 
     public void openGroups(List<File> files, Consumer<List<Group>> callback){
@@ -457,16 +459,21 @@ public class EntityManager {
     private void openedGroup(File file, Group group) throws CatalogueNameMismatchException, NonUniqueGroupNameException {
         LOGGER.trace(":openedGroup");
         LOGGER.entry(file, group);
-        if (!group.getCatalogueName().equals(catalogue.getName())) {
+        if(group == null || file == null){
+            throw new NullPointerException("Group or file null");
+        }
+        /*if (!group.getCatalogueName().equals(catalogue.getName())) {
             throw LOGGER.throwing(new CatalogueNameMismatchException(catalogue.getName(), group.getCatalogueName(), group.getName(), file) );
         }
         if(!isGroupNameUnique(group.getName()) ){
             throw LOGGER.throwing(new NonUniqueGroupNameException(group.getName() ) );
-        }
+        }*/
         groupFileMap.put(group.getName(), file);
+        LOGGER.trace(":openedGroup - stored file");
         groups.add(group);
+        LOGGER.trace(":openedGroup - Added group");
         lastOpenLocation = ensureDirectory(file);
-        lastOpenedGroup = group;
+        LOGGER.trace(":openedGroup - stored last location");
         LOGGER.info("Successfully loaded group "+String.format("(%s)", group.getName())+" to workspace.");
     }
 
@@ -484,10 +491,35 @@ public class EntityManager {
     }
 
     public Group getLastOpenedGroup() {
+        if(lastOpenedGroup == null){
+            throw new NullPointerException();
+        }
         return lastOpenedGroup;
     }
 
     public ObservableList<Progress> getObservableProgress(Group provider){
         return FXCollections.observableList(provider.progressList());
+    }
+
+    public boolean hasGroupFile(Group active) {
+        LOGGER.trace(":hasGroupFile");
+        LOGGER.entry(active);
+        return groupFileMap.containsKey(active.getName() );
+    }
+
+    public void saveGroup(Group group) {
+        File f = groupFileMap.get(group.getName());
+        SaveGroupTask task = new SaveGroupTask(f, group);
+        runTask(task, () -> {
+            LOGGER.info("Saved group ("+group.getName()+") to "+f.getPath());
+        });
+    }
+
+    public void saveGroupAs(Group group, File file){
+        SaveGroupTask task = new SaveGroupTask(file, group);
+        runTask(task, () -> {
+            LOGGER.info("SavedAs group ("+group.getName()+") to "+file.getPath());
+            groupFileMap.put(group.getName(), file);
+        });
     }
 }

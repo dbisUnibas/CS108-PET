@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @author loris.sauter
  */
-public class EvaluatorHandler implements EventHandler<CUDEvent>{
+public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     private final static Logger LOGGER = LogManager.getLogger(EvaluatorHandler.class);
 
@@ -33,16 +33,17 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
     private EvaluatorView evaluator;
 
     private HashMap<String, AssessmentView> groupViewMap = new HashMap<>();
+    private Milestone activeMS = null;
 
-    EvaluatorHandler(){
+    EvaluatorHandler() {
         LOGGER.trace("<init>");
     }
 
-    void setEvaluatorView(EvaluatorView view){
+    void setEvaluatorView(EvaluatorView view) {
         this.evaluator = view;
     }
 
-    List<Milestone> getMilestones(){
+    List<Milestone> getMilestones() {
         return new ArrayList<>(manager.getObservableMilestones());
     }
 
@@ -76,17 +77,17 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
 
     @Override
     public void handle(CUDEvent event) {
-        if(event != null){
-            if(CUDEvent.CREATION.equals(event.getEventType() )) {
+        if (event != null) {
+            if (CUDEvent.CREATION.equals(event.getEventType())) {
                 // CREATION
                 handleCreation(event);
-            }else if(CUDEvent.DELETION.equals(event.getEventType() ) ){
+            } else if (CUDEvent.DELETION.equals(event.getEventType())) {
                 // DELETION
                 handleDeletion(event);
-            }else if(CUDEvent.MODIFICATION.equals(event.getEventType() ) ){
+            } else if (CUDEvent.MODIFICATION.equals(event.getEventType())) {
                 handleModification(event);
-            }else{
-                throw new IllegalArgumentException("Cannot handle event type: "+event.getEventType().toString() );
+            } else {
+                throw new IllegalArgumentException("Cannot handle event type: " + event.getEventType().toString());
             }
             event.consume();
         }
@@ -94,14 +95,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
 
     }
 
-
-
     void handleModification(CUDEvent event) {
-        switch(event.getTargetEntity() ){
+        switch (event.getTargetEntity()) {
             case GROUP:
                 LOGGER.trace(":handleModificaiton");
-                if(event.getDelivery() != null && event.getDelivery() instanceof Group){
-                    Group gr = (Group)event.getDelivery();
+                if (event.getDelivery() != null && event.getDelivery() instanceof Group) {
+                    Group gr = (Group) event.getDelivery();
                     // DONT FORGET TO UPDATE ALL NAME REFERNECES, IF NAME CHANGED!
                     Group mod = EvaluatorPromptFactory.promptGroup(gr, this);
                     manager.replaceGroup(gr, mod);
@@ -113,12 +112,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
     }
 
     void handleDeletion(CUDEvent event) {
-        switch(event.getTargetEntity() ){
+        switch (event.getTargetEntity()) {
             case GROUP:
                 // DELETE GROUP
                 LOGGER.trace(":handleDeletion");
-                if(event.getDelivery() != null && event.getDelivery() instanceof  Group){
-                    Group del = (Group)event.getDelivery();
+                if (event.getDelivery() != null && event.getDelivery() instanceof Group) {
+                    Group del = (Group) event.getDelivery();
                     manager.removeGroup(del);
                 }
                 break;
@@ -128,7 +127,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
     }
 
     void handleCreation(CUDEvent event) {
-        switch(event.getTargetEntity() ){
+        switch (event.getTargetEntity()) {
             case GROUP:
                 LOGGER.trace(":handleCreation");
                 // ADD GROUP
@@ -141,51 +140,48 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
         }
     }
 
-
     boolean isGroupNameUnique(String name) {
         return manager.isGroupNameUnique(name);
     }
 
     void handleOpenGroups(ActionEvent actionEvent) {
-        if(!manager.isCatalogueLoaded() ){
+        if (!manager.isCatalogueLoaded()) {
             return;
         }
         FileChooser fc = Utils.createGroupFileChooser("Open");
-        if(manager.hasLastOpenLocation()){
-            fc.setInitialDirectory(manager.getLastOpenLocation() );
+        if (manager.hasLastOpenLocation()) {
+            fc.setInitialDirectory(manager.getLastOpenLocation());
         }
-        List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow() );
-        if(files == null){
+        List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow());
+        if (files == null) {
             return; // USER ABORT
         }
-        if(files.size() == 1){
-                manager.openGroup(files.get(0), () -> {
-                    loadGroupUI(manager.getLastOpenedGroup() );
-                });
+        if (files.size() == 1) {
+            manager.openGroup(files.get(0), this::loadGroupUI);
 
-        }else if(files.size() >= 2){
+        } else if (files.size() >= 2) {
             manager.openGroups(files, this::loadGroupUI);
         }
         // USER ABORT
     }
 
-    private void loadGroupUI(List<Group> groups){
+    private void loadGroupUI(List<Group> groups) {
         groups.forEach(this::loadGroupUI);
     }
 
     private void loadGroupUI(Group g) {
-        LOGGER.trace("Creating UI for group "+g.getName());
-        if(manager.getLastOpenException() != null){
+        LOGGER.trace("Creating UI for group " + g.getName());
+        if (manager.getLastOpenException() != null) {
             LOGGER.warn("Caught Exception");
             Exception e = manager.getLastOpenException();
-            if(e instanceof CatalogueNameMismatchException){
-                CatalogueNameMismatchException cnme = (CatalogueNameMismatchException)e;
+            if (e instanceof CatalogueNameMismatchException) {
+                CatalogueNameMismatchException cnme = (CatalogueNameMismatchException) e;
                 String message = String.format("Could not finish opening group from file %s.\n" +
                         "The specified group (name: %s)'s catalogue signature is: %s\n" +
                         "Current catalogue name: %s", cnme.getGroupFile().getPath(), cnme.getGroupName(), cnme.getGroupCatName(), cnme.getCatName());
                 Utils.showErrorDialog("Catalogue signature mismatch", message);
-            }else if(e instanceof NonUniqueGroupNameException){
-                NonUniqueGroupNameException nugne = (NonUniqueGroupNameException)e;
+            } else if (e instanceof NonUniqueGroupNameException) {
+                NonUniqueGroupNameException nugne = (NonUniqueGroupNameException) e;
                 String message = String.format("Cannot finish opening of group %s, there exists alread a group with that name.", nugne.getName());
                 Utils.showErrorDialog("Duplication error", message);
             }
@@ -195,46 +191,60 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
     }
 
     void handleSaveGroup(ActionEvent actionEvent) {
-
+        Group active = evaluator.getActiveGroup();
+        if(manager.hasGroupFile(active) ){
+            manager.saveGroup(active);
+        }else{
+            handleSaveGroupAs(actionEvent);
+        }
     }
 
-    void handleOpenCatalogue(ActionEvent event){
+    void handleSaveGroupAs(ActionEvent event) {
+        FileChooser fc = Utils.createGroupFileChooser("Save As");
+        if(manager.hasLastSaveLocation() ){
+            fc.setInitialDirectory(manager.getLastSaveLocation() );
+        }
+        File f = fc.showSaveDialog(evaluator.getScene().getWindow());
+        if(f != null){
+            manager.saveGroupAs(evaluator.getActiveGroup(), f);
+        }
+    }
+
+    void handleOpenCatalogue(ActionEvent event) {
         FileChooser fc = Utils.createCatalogueFileChooser("Open");
-        if(manager.hasLastOpenLocation() ){
+        if (manager.hasLastOpenLocation()) {
             fc.setInitialDirectory(manager.getLastOpenLocation());
         }
         File f = fc.showOpenDialog(evaluator.getScene().getWindow());
-        if(f != null){
+        if (f != null) {
             manager.openCatalogue(f, this::catalogueLoaded);
         }
     }
 
-    private void catalogueLoaded(){
-        LOGGER.info("Opened catalogue "+manager.getCatalogueFile().getPath() );
+    private void catalogueLoaded() {
+        LOGGER.info("Opened catalogue " + manager.getCatalogueFile().getPath());
         LOGGER.trace("Enabling all");
         evaluator.enableAll();
-        evaluator.displayCatalogueInfo(manager.getCatalogue() );
+        evaluator.displayCatalogueInfo(manager.getCatalogue());
     }
 
     ObservableList<Group> groupList() {
         return manager.groupList();
     }
 
-    private Milestone activeMS = null;
-
-    private void addGroupToMap(Group group, AssessmentView view){
-        if(view != null){
+    private void addGroupToMap(Group group, AssessmentView view) {
+        if (view != null) {
             LOGGER.trace(":addGroupToMap - Adding pre-existing AV");
             groupViewMap.put(group.getName(), view);
-            if(activeMS != null){
-                LOGGER.trace(":addGroupToInternalStorage - Selecting activeMS: "+activeMS.getName());
+            if (activeMS != null) {
+                LOGGER.trace(":addGroupToInternalStorage - Selecting activeMS: " + activeMS.getName());
                 view.selectMilestone(activeMS);
             }
-        }else{
-            if(activeMS != null){
-                LOGGER.trace(":addGroupToMap - Creating AV with pre-set MS: "+activeMS.getName());
-                groupViewMap.put(group.getName(), new AssessmentView(this, group, activeMS) );
-            }else{
+        } else {
+            if (activeMS != null) {
+                LOGGER.trace(":addGroupToMap - Creating AV with pre-set MS: " + activeMS.getName());
+                groupViewMap.put(group.getName(), new AssessmentView(this, group, activeMS));
+            } else {
                 LOGGER.trace(":addGroupToMap - Creating AV without pre-set MS");
                 groupViewMap.put(group.getName(), new AssessmentView(this, group));
             }
@@ -263,10 +273,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
     }
 
     public void setGlobalMilestoneChoice(Milestone ms) {
-        LOGGER.debug("Set global milestone choice to: "+ms.getName() );
+        LOGGER.debug("Set global milestone choice to: " + ms.getName());
         this.activeMS = ms;
-        for(AssessmentView av : groupViewMap.values()){
-            LOGGER.trace("Setting milestone "+ms.getName() +" for AV: "+av.getActiveGroup().getName() );
+        for (AssessmentView av : groupViewMap.values()) {
+            LOGGER.trace("Setting milestone " + ms.getName() + " for AV: " + av.getActiveGroup().getName());
             av.selectMilestone(ms);
         }
     }
@@ -276,20 +286,29 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
         this.activeMS = null;
     }
 
-    private void addTab(Group active, boolean fresh){
-        if(evaluator.isGroupTabbed(active) ){
+    private void addTab(Group active, boolean fresh) {
+        if (evaluator.isGroupTabbed(active)) {
             // Do not open another tab for already tabbed group.
-        }else{
+        } else {
             evaluator.addGroupTab(groupViewMap.get(active.getName()), fresh);
         }
-        evaluator.setActiveTab(active.getName() );
+        evaluator.setActiveTab(active.getName());
     }
 
     void openGroupTab(Group group) {
         addTab(group, false);
     }
 
-    public ObservableList<Progress> progressList(Group g){
+    public ObservableList<Progress> progressList(Group g) {
         return manager.getObservableProgress(g);
+    }
+
+    public Group getGroupByName(String name) {
+        for (Group g : manager.groupList()) {
+            if (g.getName().equals(name)) {
+                return g;
+            }
+        }
+        return null;
     }
 }
