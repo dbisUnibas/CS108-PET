@@ -1,10 +1,19 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
 
+import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +26,32 @@ import java.util.List;
  */
 public class MenuManager {
 
+    private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
+
+    public static final String ITEM_NEW_CAT = "itemNewCat";
+    public static final String ITEM_NEW_GROUP = "itemNewGroup";
+    public static final String ITEM_OPEN_CAT = "itemOpenCat";
+    public static final String ITEM_OPEN_GROUP = "itemOpenGroup";
+    public static final String ITEM_SAVE_CAT = "itemSaveCat";
+    public static final String ITEM_SAVE_CAT_AS = "itemSaveCatAs";
+    public static final String ITEM_SAVE_GROUP = "itemSaveGroup";
+    public static final String ITEM_SAVE_GROUP_AS = ITEM_SAVE_GROUP + "As";
+    public static final String ITEM_EXPORT_CAT = "itemExportCat";
+    public static final String ITEM_EXPORT_GROUPS = "itemExportGroups";
+    public static final String ITEM_EXPORT_GROUP = "itemExportGroup";
+    public static final String ITEM_QUIT = "itemQuit";
+    public static final String ITEM_NEW_REQ = "itemNewReq";
+    public static final String ITEM_NEW_MS = "itemNewMS";
+    public static final String ITEM_MOD_CAT = "itemModCat";
+    public static final String ITEM_MOD_REQ = "itemModReq";
+    public static final String ITEM_MOD_MS = "itemModMS";
+    public static final String ITEM_MOD_GROUP = "itemModGroup";
+    public static final String ITEM_SHOW_OVERVIEW = "itemShowOverview";
+    public static final String ITEM_EDITOR = "itemEditor";
+    public static final String ITEM_EVALUATOR = "itemEvaluator";
+    public static final String CLEAR_GLOBAL_MS_KEY = "clear";
+
+
     private static MenuManager instance = null;
     private HashMap<String, MenuItem> menuItems = new HashMap<>();
     private HashMap<String, Menu> menus = new HashMap<>();
@@ -25,6 +60,10 @@ public class MenuManager {
     private Menu menuEvaluate;
     private Menu menuView;
     private Menu menuHelp;
+
+    private final ToggleGroup toggleMilestone = new ToggleGroup();
+    private Menu menuGlobalMilestone;
+
     private MenuItem itemNewCat;
     private MenuItem itemNewGroup;
     private MenuItem itemOpenCat;
@@ -53,6 +92,8 @@ public class MenuManager {
     private ArrayList<String> catNeeded = new ArrayList<>();
     private ArrayList<String> groupNeeded = new ArrayList<>();
 
+    private MenuHandler handler = null;
+
     private MenuManager() {
         registerMenu("menuFile", menuFile = new Menu("File"));
         registerMenu("menuEdit", menuEdit = new Menu("Edit"));
@@ -60,39 +101,157 @@ public class MenuManager {
         registerMenu("menuView", menuView = new Menu("View"));
         registerMenu("menuHelp", menuHelp = new Menu("Help"));
 
-        registerMenuItem("itemNewCat", itemNewCat = new MenuItem("New Catalogue..."));
-        registerMenuItem("itemNewGroup", itemNewGroup = new MenuItem("New Group..."));
-        registerMenuItem("itemOpenCat", itemOpenCat = new MenuItem("Open Catalogue..."));
-        registerMenuItem("itemOpenGroup", itemOpenGroup = new MenuItem("Open Group..."));
 
-        registerEditorItem("itemSaveCat", itemSaveCat = new MenuItem("Save Catalogue"), true);
-        registerEvaluatorItem(" itemSaveGroup", itemSaveGroup = new MenuItem("Save Group"), true);
-        registerEditorItem("itemSaveCatAs", itemSaveCatAs = new MenuItem("Save Catalogue As..."), true);
-        registerEvaluatorItem("itemSaveGroupAs", itemSaveGroupAs = new MenuItem("Save Group As..."), true);
+        registerMenuItem(ITEM_NEW_CAT, itemNewCat = new MenuItem("New Catalogue..."));
+        registerMenuItem(ITEM_NEW_GROUP, itemNewGroup = new MenuItem("New Group..."));
+        registerMenuItem(ITEM_OPEN_CAT, itemOpenCat = new MenuItem("Open Catalogue..."));
+        registerMenuItem(ITEM_OPEN_GROUP, itemOpenGroup = new MenuItem("Open Group..."));
 
-        registerEditorItem("itemExportCat", itemExportCat = new MenuItem("Export Catalogue..."), true);
-        registerEvaluatorItem("itemExportGroups", itemExportGroups = new MenuItem("Export Groups..."), true);
-        registerEvaluatorItem("itemExportGroup", itemExportGroup = new MenuItem("Export Group..."), true);
+        registerEditorItem(ITEM_SAVE_CAT, itemSaveCat = new MenuItem("Save Catalogue"), true);
+        registerEvaluatorItem(ITEM_SAVE_GROUP, itemSaveGroup = new MenuItem("Save Group"), true);
+        registerEditorItem(ITEM_SAVE_CAT_AS, itemSaveCatAs = new MenuItem("Save Catalogue As..."), true);
+        registerEvaluatorItem(ITEM_SAVE_GROUP_AS, itemSaveGroupAs = new MenuItem("Save Group As..."), true);
 
-        registerMenuItem("itemQuit", itemQuit = new MenuItem("Quit"));
+        registerEditorItem(ITEM_EXPORT_CAT, itemExportCat = new MenuItem("Export Catalogue..."), true);
+        registerEvaluatorItem(ITEM_EXPORT_GROUPS, itemExportGroups = new MenuItem("Export Groups..."), true);
+        registerEvaluatorItem(ITEM_EXPORT_GROUP, itemExportGroup = new MenuItem("Export Group..."), true);
 
-        registerEditorItem("itemNewReq", itemNewReq = new MenuItem("New Requirement..."), true);
-        registerEditorItem("itemNewMS", itemNewMS = new MenuItem("New Milestone..."), true);
-        registerEditorItem("itemModCat", itemModCat = new MenuItem("Modify Catalogue..."), true);
-        registerEditorItem("itemModReq", itemModReq = new MenuItem("Modify Requirement..."), true);
-        registerEditorItem("itemModMS", itemModMS = new MenuItem("Modify Milestone..."), true);
-        registerEvaluatorItem("itemModGroup", itemModGroup = new MenuItem("Modify Group"), true);
+        registerMenuItem(ITEM_QUIT, itemQuit = new MenuItem("Quit"));
 
-        registerEvaluatorItem("itemShowOverview", itemShowOverview = new MenuItem("Show Overview"), true);
+        registerEditorItem(ITEM_NEW_REQ, itemNewReq = new MenuItem("New Requirement..."), true);
+        registerEditorItem(ITEM_NEW_MS, itemNewMS = new MenuItem("New Milestone..."), true);
+        registerEditorItem(ITEM_MOD_CAT, itemModCat = new MenuItem("Modify Catalogue..."), true);
+        registerEditorItem(ITEM_MOD_REQ, itemModReq = new MenuItem("Modify Requirement..."), true);
+        registerEditorItem(ITEM_MOD_MS, itemModMS = new MenuItem("Modify Milestone..."), true);
+        registerEvaluatorItem(ITEM_MOD_GROUP, itemModGroup = new MenuItem("Modify Group"), true);
 
-        registerMenuItem("itemEditor", itemEditor = new MenuItem("Editor"));
-        registerMenuItem("itemEvaluator", itemEvaluator = new MenuItem("Evaluator"));
+        registerEvaluatorItem(ITEM_SHOW_OVERVIEW, itemShowOverview = new MenuItem("Show Overview"), true);
+        registerEvaluatorItem("menuGlobalMS", menuGlobalMilestone = new Menu("Set Global Milestone"), true);
+
+
+        registerMenuItem(ITEM_EDITOR, itemEditor = new MenuItem("Editor"));
+        registerMenuItem(ITEM_EVALUATOR, itemEvaluator = new MenuItem("Evaluator"));
 
         assembleMenus();
         menuBar.getMenus().addAll(menuFile, menuEdit, menuEvaluate, menuView, menuHelp);
 
         // TEMP
         menuHelp.setDisable(true);
+
+        setOnActionAll();
+    }
+
+    /**
+     * Resets the menu each time.
+     * @param milestones Only a snapshot in time
+     */
+    public void setupGlobalMilestoneMenu(List<Milestone> milestones){
+        menuGlobalMilestone.getItems().clear();
+        for(Milestone ms : milestones){
+            RadioMenuItem itemMilestone = new RadioMenuItem(ms.getName() );
+            itemMilestone.setUserData(ms);
+            itemMilestone.setToggleGroup(toggleMilestone);
+            menuGlobalMilestone.getItems().add(itemMilestone);
+        }
+        RadioMenuItem itemClearMilestone = new RadioMenuItem("Clear Global Milestone");
+        itemClearMilestone.setUserData(CLEAR_GLOBAL_MS_KEY);
+        itemClearMilestone.setToggleGroup(toggleMilestone);
+        menuGlobalMilestone.getItems().add(0, itemClearMilestone);
+    }
+
+    private void setOnActionAll() {
+        menuItems.values().forEach(mi -> mi.setOnAction(this::handle));
+    }
+
+    public MenuHandler setMenuHandler(MenuHandler handler){
+        MenuHandler old = null;
+        if(this.handler != null){
+            old = this.handler;
+        }
+        this.handler = handler;
+        return old;
+    }
+
+    public MenuHandler getMenuHandler(){
+        return handler;
+    }
+
+    private void handle(ActionEvent event){
+        if(event.getSource() != null){
+            if(event.getSource() instanceof  MenuItem){
+                MenuItem mi = (MenuItem) event.getSource();
+                if(mi.getUserData() != null && mi.getUserData() instanceof  String){
+                    String key = (String)mi.getUserData();
+                    switch(key){
+                        case ITEM_NEW_CAT:
+                            handler.handleNewCatalogue(event);
+                            break;
+                        case ITEM_NEW_GROUP:
+                            handler.handleNewGroup(event);
+                            break;
+                        case ITEM_OPEN_CAT:
+                            handler.handleOpenCat(event);
+                            break;
+                        case ITEM_OPEN_GROUP:
+                            handler.handleOpenGroup(event);
+                            break;
+                        case ITEM_SAVE_CAT:
+                            handler.handleSaveCat(event);
+                            break;
+                        case ITEM_SAVE_GROUP:
+                            handler.handleSaveGroup(event);
+                            break;
+                        case ITEM_SAVE_CAT_AS:
+                            handler.handleSaveCatAs(event);
+                            break;
+                        case ITEM_SAVE_GROUP_AS:
+                            handler.handleSaveGroupAs(event);
+                            break;
+                        case ITEM_EXPORT_CAT:
+                            handler.handleExportCat(event);
+                            break;
+                        case ITEM_EXPORT_GROUP:
+                            handler.handleExportGroup(event);
+                            break;
+                        case ITEM_EXPORT_GROUPS:
+                            handler.handleExportGroups(event);
+                            break;
+                        case ITEM_QUIT:
+                            handler.handleQuit(event);
+                            break;
+                        case ITEM_NEW_REQ:
+                            handler.handleNewReq(event);
+                            break;
+                        case ITEM_NEW_MS:
+                            handler.handleNewMS(event);
+                            break;
+                        case ITEM_MOD_CAT:
+                            handler.handleModCat(event);
+                            break;
+                        case ITEM_MOD_REQ:
+                            handler.handleModReq(event);
+                            break;
+                        case ITEM_MOD_MS:
+                            handler.handleModMS(event);
+                            break;
+                        case ITEM_MOD_GROUP:
+                            handler.handleModGroup(event);
+                            break;
+                        case ITEM_SHOW_OVERVIEW:
+                            handler.handleShowOverview(event);
+                            break;
+                        case ITEM_EDITOR:
+                            handler.handleShowEditor(event);
+                            break;
+                        case ITEM_EVALUATOR:
+                            handler.handleShowEvaluator(event);
+                            break;
+                        default:
+                            // Silently ignoring -> may log issue?
+                    }
+                }
+            }
+        }
     }
 
     public static MenuManager getInstance() {
@@ -125,7 +284,59 @@ public class MenuManager {
                 itemModMS,
                 itemModGroup
         );
-        menuEvaluate.getItems().addAll(itemShowOverview);
+
+        // The set-milestone-forall-groups menu related handling
+        toggleMilestone.selectedToggleProperty().addListener( (ObservableValue<? extends Toggle> ov, Toggle oldToggle, Toggle newToggle ) -> {
+            /*
+            Lots of trace logging to understand what is going on
+             */
+
+            if(ov != null){
+                LOGGER.trace("Obesrvable Value: "+ov.toString() );
+                if(ov.getValue() instanceof RadioMenuItem){
+                    RadioMenuItem item = (RadioMenuItem) ov.getValue();
+                    if(item != null && item.getUserData() != null){
+                        if(item.getUserData() instanceof String && ((String)item.getUserData()).equals("clear")){
+                            handler.resetGlobalMilestoneChoice();
+                            return;
+                        }
+                    }
+                }
+            }
+            if(LOGGER.getLevel().equals(Level.TRACE)){
+                // Print stuff only if on trace:
+                if(newToggle != null){
+                    if(newToggle.getUserData() instanceof Milestone){
+                        Milestone newMS = (Milestone) newToggle.getUserData();
+                        LOGGER.trace("newMS: "+newMS.getName());
+                    }else{
+                        LOGGER.trace("newToggle: "+newToggle.toString() );
+                    }
+
+                }
+                if(oldToggle != null){
+                    if(oldToggle.getUserData() instanceof  Milestone){
+                        Milestone oldMS = (Milestone) oldToggle.getUserData();
+                        LOGGER.trace("oldMS: "+oldMS.getName() );
+                    }else{
+                        LOGGER.trace("oldToggle: "+oldToggle.toString());
+                    }
+
+                }
+            }
+
+
+            /*
+            Conclusion: Only if *newly* selected the event is fired and thus handled in here.
+             */
+            if(toggleMilestone.getSelectedToggle() != null && toggleMilestone.getSelectedToggle().getUserData() instanceof Milestone){
+                Milestone ms = (Milestone) toggleMilestone.getSelectedToggle().getUserData();
+                LOGGER.debug("Selected: "+ms.getName());
+                handler.setGlobalMilestoneChoice(ms);
+            }
+        } );
+
+        menuEvaluate.getItems().addAll(itemShowOverview, menuGlobalMilestone);
 
         menuView.getItems().addAll(itemEditor, itemEvaluator);
     }

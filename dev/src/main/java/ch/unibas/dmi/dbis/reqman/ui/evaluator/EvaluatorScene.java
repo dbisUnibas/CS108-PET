@@ -263,6 +263,10 @@ public class EvaluatorScene extends TitledScene {
 
         // The set-milestone-forall-groups menu related handling
         toggleMilestone.selectedToggleProperty().addListener( (ObservableValue<? extends Toggle> ov, Toggle oldToggle, Toggle newToggle ) -> {
+            /*
+            Lots of trace logging to understand what is going on
+             */
+
             if(ov != null){
                 LOGGER.trace("OV: "+ov.toString() );
                 if(ov.getValue() instanceof RadioMenuItem){
