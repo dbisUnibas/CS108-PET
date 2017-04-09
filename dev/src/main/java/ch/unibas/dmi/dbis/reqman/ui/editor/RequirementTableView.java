@@ -3,8 +3,8 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
+import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
+import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.*;
@@ -50,21 +50,21 @@ public class RequirementTableView extends BorderPane {
         layoutComponents();
     }
 
-    public void setOnAdd(EventHandler<EditorEvent> handler){
+    public void setOnAdd(EventHandler<CUDEvent> handler){
         addBtn.setOnAction(event -> {
-            handler.handle(EditorEvent.generateCreationEvent(event, TargetEntity.REQUIREMENT) );
+            handler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.REQUIREMENT) );
         });
     }
 
-    EventHandler<EditorEvent> modifyHandler = null;
+    EventHandler<CUDEvent> modifyHandler = null;
 
-    public void setOnModify(EventHandler<EditorEvent> handler){
+    public void setOnModify(EventHandler<CUDEvent> handler){
         this.modifyHandler = handler;
     }
 
-    public void setOnRemove(EventHandler<EditorEvent> handler){
+    public void setOnRemove(EventHandler<CUDEvent> handler){
         rmBtn.setOnAction(event -> {
-            handler.handle(EditorEvent.generateDeletionEvent(event, TargetEntity.REQUIREMENT, table.getSelectionModel().getSelectedIndex(), table.getSelectionModel().getSelectedItem() ));
+            handler.handle(CUDEvent.generateDeletionEvent(event, TargetEntity.REQUIREMENT, table.getSelectionModel().getSelectedIndex(), table.getSelectionModel().getSelectedItem() ));
         });
     }
 
@@ -153,7 +153,7 @@ public class RequirementTableView extends BorderPane {
             if(modifyHandler != null){
                 ObservableRequirement obsReq = table.getSelectionModel().getSelectedItem();
                 if(obsReq != null){
-                    modifyHandler.handle(EditorEvent.generateModificationEvent(new ActionEvent(evt.getSource(), evt.getTarget()), TargetEntity.REQUIREMENT, obsReq));
+                    modifyHandler.handle(CUDEvent.generateModificationEvent(new ActionEvent(evt.getSource(), evt.getTarget()), TargetEntity.REQUIREMENT, obsReq));
                 }
             }
         }

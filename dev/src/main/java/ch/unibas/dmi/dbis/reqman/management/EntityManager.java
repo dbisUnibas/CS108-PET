@@ -1,10 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
 import ch.unibas.dmi.dbis.reqman.common.Callback;
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Progress;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.core.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
@@ -15,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -26,11 +24,24 @@ public class EntityManager {
 
     private static final Logger LOGGER = LogManager.getLogger(EntityManager.class);
     private static EntityManager instance = null;
+
+    /* === COMMON === */
     private Catalogue catalogue = null;
     private File catalogueFile = null;
+
+    /* === CATALOGUE / EDITOR  RELATED === */
     private ObservableList<Requirement> observableRequirements;
     private ObservableList<Milestone> observableMilestones;
-    private final SimpleDoubleProperty sumProperty = new SimpleDoubleProperty();
+    private final SimpleDoubleProperty maxSumProperty = new SimpleDoubleProperty();
+
+    /* === EVALUATOR RELATED === */
+    private ObservableList<Group> groups = FXCollections.observableArrayList();
+    private HashMap<String, File> groupFileMap = new HashMap<>();
+
+    public ObservableList<Group> groupList(){
+        return groups;
+    }
+
 
     public ObservableList<Requirement> getObservableRequirements() {
         return observableRequirements;
@@ -61,7 +72,7 @@ public class EntityManager {
         observableMilestones = FXCollections.observableList(catalogue.milestoneList());
         lastOrdinal = catalogue.getLastOrdinal();
 
-        sumProperty.set(catalogue.getSum() );
+        maxSumProperty.set(catalogue.getSum() );
 
         observableRequirements.addListener(new ListChangeListener<Requirement>() {
             @Override
@@ -85,13 +96,13 @@ public class EntityManager {
                             double change = removeItem.getMaxPoints();
                             double sumPost = sumPre - change;
                             LOGGER.trace(String.format(":onChanged - Remove: pre:%g, change:%g, post%g", sumPre, change, sumPost));
-                            sumProperty.set(catalogue.getSum()-removeItem.getMaxPoints());
+                            maxSumProperty.set(catalogue.getSum()-removeItem.getMaxPoints());
                         }
                         for (Requirement addItem : c.getAddedSubList()) {
                             if(addItem == null){
                                 continue;
                             }
-                            sumProperty.set(catalogue.getSum()+addItem.getMaxPoints() );
+                            maxSumProperty.set(catalogue.getSum()+addItem.getMaxPoints() );
                         }
                     }
 
@@ -173,7 +184,7 @@ public class EntityManager {
         return catalogue.getLecture();
     }
 
-    public String getName() {
+    public String getCatalogueName() {
         return catalogue.getName();
     }
 
@@ -255,7 +266,7 @@ public class EntityManager {
     }
 
     public SimpleDoubleProperty sumProperty() {
-        return sumProperty;
+        return maxSumProperty;
     }
 
     public boolean isCatalogueLoaded() {
@@ -303,5 +314,14 @@ public class EntityManager {
 
     public Catalogue getCatalogue() {
         return catalogue;
+    }
+
+    public boolean isGroupNameUnique(String name){
+        for(Group g : groups){
+            if(g.getName().equals(name)){
+                return false;
+            }
+        }
+        return true;
     }
 }

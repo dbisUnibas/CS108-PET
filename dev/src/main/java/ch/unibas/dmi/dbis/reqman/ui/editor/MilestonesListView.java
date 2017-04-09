@@ -3,8 +3,8 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListHandler;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
+import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
+import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ListCell;
@@ -32,13 +32,13 @@ public class MilestonesListView  extends ModifiableListView<Milestone> implement
 
     @Override
     public void onRemove(RemoveEvent<Milestone> event) {
-        EditorEvent evt = EditorEvent.generateDeletionEvent(event, TargetEntity.MILESTONE, event.getSelectedIndex(), event.getSelected());
+        CUDEvent evt = CUDEvent.generateDeletionEvent(event, TargetEntity.MILESTONE, event.getSelectedIndex(), event.getSelected());
         handler.handleDeletion(evt);
     }
 
     @Override
     public void onAdd(AddEvent<Milestone> event) {
-        EditorEvent evt = EditorEvent.generateCreationEvent(event, TargetEntity.MILESTONE);
+        CUDEvent evt = CUDEvent.generateCreationEvent(event, TargetEntity.MILESTONE);
         handler.handleCreation(evt);
     }
 
@@ -46,7 +46,7 @@ public class MilestonesListView  extends ModifiableListView<Milestone> implement
         if(mouseEvent.getClickCount() == 2){
             Milestone ms = listView.getSelectionModel().getSelectedItem();
             if(ms != null){
-                EditorEvent mod = EditorEvent.generateModificationEvent(new ActionEvent(mouseEvent.getSource(), mouseEvent.getTarget()), TargetEntity.MILESTONE, ms);
+                CUDEvent mod = CUDEvent.generateModificationEvent(new ActionEvent(mouseEvent.getSource(), mouseEvent.getTarget()), TargetEntity.MILESTONE, ms);
                 handler.handleModification(mod);
             }
         }

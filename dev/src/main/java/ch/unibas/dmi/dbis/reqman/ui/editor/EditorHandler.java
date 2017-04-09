@@ -5,8 +5,8 @@ import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
+import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
+import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,7 +21,7 @@ import java.io.File;
  *
  * @author loris.sauter
  */
-public class EditorHandler implements EventHandler<EditorEvent> {
+public class EditorHandler implements EventHandler<CUDEvent> {
 
     private static final Logger LOGGER = LogManager.getLogger(EditorHandler.class);
 
@@ -38,17 +38,18 @@ public class EditorHandler implements EventHandler<EditorEvent> {
     }
 
     @Override
-    public void handle(EditorEvent event) {
+    public void handle(CUDEvent event) {
         if (event != null) {
-            if (EditorEvent.CREATION.equals(event.getEventType())) {
+            if (CUDEvent.CREATION.equals(event.getEventType())) {
                 handleCreation(event);
-            } else if (EditorEvent.DELETION.equals(event.getEventType())) {
+            } else if (CUDEvent.DELETION.equals(event.getEventType())) {
                 handleDeletion(event);
-            } else if (EditorEvent.MODIFICATION.equals(event.getEventType())) {
+            } else if (CUDEvent.MODIFICATION.equals(event.getEventType())) {
                 handleModification(event);
             } else {
                 throw new IllegalArgumentException("Cannot handle unknown event type: " + event.getEventType().toString());
             }
+            event.consume();
         }
         // Silently ignoring null events
 
@@ -59,7 +60,7 @@ public class EditorHandler implements EventHandler<EditorEvent> {
      *
      * @param evt
      */
-    public void handleCreation(EditorEvent evt) {
+    public void handleCreation(CUDEvent evt) {
         switch (evt.getTargetEntity()) {
             case CATALOGUE:
                 Catalogue cat = EditorPromptFactory.promptNewCatalogue();
@@ -86,7 +87,7 @@ public class EditorHandler implements EventHandler<EditorEvent> {
         }
     }
 
-    public void handleDeletion(EditorEvent evt) {
+    public void handleDeletion(CUDEvent evt) {
         switch (evt.getTargetEntity()) {
             case CATALOGUE:
                 throw new IllegalArgumentException("Cannot delete the catalogue");
@@ -113,7 +114,7 @@ public class EditorHandler implements EventHandler<EditorEvent> {
         }
     }
 
-    public void handleModification(EditorEvent evt) {
+    public void handleModification(CUDEvent evt) {
         switch (evt.getTargetEntity()) {
             case CATALOGUE:
                 Catalogue cat = manager.getCatalogue();
@@ -160,7 +161,7 @@ public class EditorHandler implements EventHandler<EditorEvent> {
     }
 
     private void setupCatalogueInfo() {
-        editor.getCatalogueView().setCatName(manager.getName());
+        editor.getCatalogueView().setCatName(manager.getCatalogueName());
         editor.getCatalogueView().setCatLecture(manager.getLecture());
         editor.getCatalogueView().setCatSemester(manager.getSemester());
         editor.getCatalogueView().maxPointsProperty().bind(manager.sumProperty());

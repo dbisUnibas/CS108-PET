@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.reqman.ui.editor.event;
+package ch.unibas.dmi.dbis.reqman.ui.event;
 
 /**
  * TODO: write JavaDoc

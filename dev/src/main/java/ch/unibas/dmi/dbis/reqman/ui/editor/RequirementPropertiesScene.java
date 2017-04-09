@@ -5,8 +5,8 @@ import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
+import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
+import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -246,12 +246,12 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     }
 
     private void handleNewMaxMS(ActionEvent event) {
-        handler.handleCreation(EditorEvent.generateCreationEvent(event, TargetEntity.MILESTONE));
+        handler.handleCreation(CUDEvent.generateCreationEvent(event, TargetEntity.MILESTONE));
         cbMaxMS.getSelectionModel().select(milestoneList.size() - 1);
     }
 
     private void handleNewMinMS(ActionEvent event) {
-        handler.handleCreation(EditorEvent.generateCreationEvent(event, TargetEntity.MILESTONE));
+        handler.handleCreation(CUDEvent.generateCreationEvent(event, TargetEntity.MILESTONE));
         cbMinMS.getSelectionModel().select(milestoneList.size() - 1);
     }
 

@@ -1,8 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
+import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
+import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.event.ActionEvent;
 import javafx.scene.Cursor;
 import javafx.scene.control.SplitPane;
@@ -28,15 +28,9 @@ public class EditorView extends BorderPane implements TitleProvider{
     private CatalogueInfoPane catInfo;
 
 
-    @Deprecated
-    private EditorController controller;
-
     private final EditorHandler handler;
 
     private String title = "Editor";
-
-    private static int counter = 0;
-    private static volatile  boolean info = false;
 
     public EditorView(EditorHandler handler){
         super();
@@ -76,7 +70,7 @@ public class EditorView extends BorderPane implements TitleProvider{
         // TEMP
         catInfo.setOnMouseClicked(evt -> {
             if(evt.getClickCount() == 2){
-                EditorEvent event = EditorEvent.generateModificationEvent(new ActionEvent(evt.getSource(), evt.getTarget()), TargetEntity.CATALOGUE, null);
+                CUDEvent event = CUDEvent.generateModificationEvent(new ActionEvent(evt.getSource(), evt.getTarget()), TargetEntity.CATALOGUE, null);
                 handler.handleModification(event);
             }
         });

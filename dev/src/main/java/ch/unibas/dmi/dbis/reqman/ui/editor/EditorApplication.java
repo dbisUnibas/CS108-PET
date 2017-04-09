@@ -5,8 +5,8 @@ import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.EditorEvent;
-import ch.unibas.dmi.dbis.reqman.ui.editor.event.TargetEntity;
+import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
+import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -126,7 +126,7 @@ public class EditorApplication extends Application {
             if(handler.isCatalogueLoaded() ){
                 System.out.println("WILL DISCARD PREVIOUS CHANGES");
             }
-            handler.handleCreation(EditorEvent.generateCreationEvent(evt, TargetEntity.CATALOGUE));
+            handler.handleCreation(CUDEvent.generateCreationEvent(evt, TargetEntity.CATALOGUE));
         });
 
         MenuItem itemExport = new MenuItem("Export");

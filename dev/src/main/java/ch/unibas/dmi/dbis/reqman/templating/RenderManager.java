@@ -184,7 +184,7 @@ public class RenderManager {
             new ConditionalField<Requirement>("mandatory", Requirement::isMandatory, b -> "MANDATORY", b -> "BONUS"),
             new ConditionalField<Requirement>("malus", Requirement::isMalus, b -> "-", b -> "+"),
             new ParametrizedField<Requirement, Map<String, String>>("meta", Requirement::getPropertiesMap) {
-                //private final Logger LOGGER = LogManager.getLogger(TemplateParser.class.getName().replace("TemplateParser", "MetaParser"));
+                //private final Logger LOGGER = LogManager.getLogger(TemplateParser.class.getCatalogueName().replace("TemplateParser", "MetaParser"));
                 private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
 
                 @Override
