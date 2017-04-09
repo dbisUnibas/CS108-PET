@@ -110,22 +110,7 @@ public class Group implements Comparable<Group> {
 
         Group group = (Group) o;
 
-        if (getName() != null ? !getName().equals(group.getName()) : group.getName() != null) {
-            return false;
-        }
-        if (getProjectName() != null ? !getProjectName().equals(group.getProjectName()) : group.getProjectName() != null) {
-            return false;
-        }
-        if (members != null ? !members.equals(group.members) : group.members != null) {
-            return false;
-        }
-        if (getCatalogueName() != null ? !getCatalogueName().equals(group.getCatalogueName()) : group.getCatalogueName() != null) {
-            return false;
-        }
-        if (progressList != null ? !progressList.equals(group.progressList) : group.progressList != null) {
-            return false;
-        }
-        return progressSummaries != null ? progressSummaries.equals(group.progressSummaries) : group.progressSummaries == null;
+        return getName().equals(group.getName());
     }
 
     @Override

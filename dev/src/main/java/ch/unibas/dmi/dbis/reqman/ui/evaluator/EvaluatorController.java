@@ -38,6 +38,7 @@ import java.util.TreeMap;
  *
  * @author loris.sauter
  */
+@Deprecated
 public class EvaluatorController {
 
     private EvaluatorScene evaluator;
@@ -107,12 +108,14 @@ public class EvaluatorController {
         if (!isCatalogueSet()) {
             return;
         }
+        throw new RuntimeException("Usage of deprecated class");
+        /*
         Group group = EvaluatorPromptFactory.promptNewGroup(this);
 
         if (group != null) {
             addGroupToInternalStorage(group);
             addGroupTab(group, true);
-        }
+        }*/
     }
 
     public boolean isGroupNameUnique(String name) {
@@ -266,12 +269,13 @@ public class EvaluatorController {
             return;
         }
         LOGGER.debug("Modify requrest for: "+active.getName() );
-        Group newGroup = EvaluatorPromptFactory.promptGroup(active, this);
+        throw new RuntimeException("Usage of deprecated class.");
+        /*Group newGroup = EvaluatorPromptFactory.promptGroup(active, this);
         if(newGroup != null){
             replaceGroup(active, newGroup);
         }else{
             LOGGER.trace("Modification aborted");
-        }
+        }*/
 
     }
 

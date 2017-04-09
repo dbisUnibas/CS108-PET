@@ -28,6 +28,12 @@ public class EntityManager {
     /* === COMMON === */
     private Catalogue catalogue = null;
     private File catalogueFile = null;
+    
+    private File lastOpenLocation = null;
+    
+    private File lastSaveLocation = null;
+    
+    private File lastExportLocation = null;
 
     /* === CATALOGUE / EDITOR  RELATED === */
     private ObservableList<Requirement> observableRequirements;
@@ -323,5 +329,56 @@ public class EntityManager {
             }
         }
         return true;
+    }
+
+    public void replaceGroup(Group gr, Group mod) {
+        // DONT FORGET TO UPDATE **ALL** REFERENCES WHEN NAME CHANGED
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    public void removeGroup(Group del) {
+        throw new UnsupportedOperationException("Not implmented yet");
+    }
+
+    public void addGroup(Group gr) {
+        groups.add(gr);
+    }
+
+    
+    public boolean hasLastOpenLocation() {
+        return lastOpenLocation != null;
+    }
+
+    public File getLastOpenLocation() {
+        return lastOpenLocation;
+    }
+    
+    public boolean hasLastSaveLocation(){
+        return lastSaveLocation != null;
+    }
+    
+    public File getLastSaveLocation(){
+        return lastSaveLocation;
+    }
+    
+    public boolean hasLastExportLocation(){
+        return lastExportLocation != null;
+    }
+    
+    public File getLastExportLocation(){
+        return lastExportLocation;
+    }
+    
+    private File ensureDirectory( File f){
+        if(f.isDirectory() ){
+            return f;
+        }else if(f.isFile() ){
+            return f.getParentFile();
+        }
+        throw new IllegalArgumentException("File is neither directory nor file - symbolik link?");
+    }
+
+    public File getCatalogueFile() {
+        return catalogueFile;
     }
 }

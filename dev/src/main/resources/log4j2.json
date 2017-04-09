@@ -121,6 +121,22 @@
           ]
         },
         {
+          "name":"ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler",
+          "level":"trace",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"}
+          ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorView",
+          "level":"trace",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"}
+          ]
+        },
+        {
           "name":"ch.unibas.dmi.dbis.reqman.ui.evaluator.ProgressView",
           "level":"trace",
           "additivity":false,

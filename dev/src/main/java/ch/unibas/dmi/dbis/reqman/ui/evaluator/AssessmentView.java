@@ -265,11 +265,11 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
             ProgressSummary ps = null;
             boolean replace = false;
             if (hasSummaryForMilestone(ms)) {
-                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getName(), getSummaryForMilestone(ms));
+                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getCatalogueName(), getSummaryForMilestone(ms));
                 EvaluatorPromptFactory.showSummary(ms, group.getName(), summary -> {handleSummaryReceiving(summary, true);}, getSummaryForMilestone(ms));
                 replace = true;
             } else {
-                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getName());
+                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getCatalogueName());
                 EvaluatorPromptFactory.showSummary(ms, group.getName(), progressSummary -> handleSummaryReceiving(progressSummary, false));
             }
             if (ps != null) {

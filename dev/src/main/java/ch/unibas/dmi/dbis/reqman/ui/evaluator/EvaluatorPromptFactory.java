@@ -22,14 +22,13 @@ public class EvaluatorPromptFactory {
         PromptPopup<GroupPropertiesScene.Member> popup = new PromptPopup<>(new MemberScene());
         return popup.prompt();
     }
-
-    public static Group promptNewGroup(EvaluatorController controller) {
-        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(controller));
+    static Group promptGroup(EvaluatorHandler handler){
+        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(handler));
         return popup.prompt();
     }
 
-    public static Group promptGroup(Group group, EvaluatorController controller) {
-        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(controller, group));
+    static Group promptGroup(Group group, EvaluatorHandler handler){
+        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(handler, group));
         return popup.prompt();
     }
 
