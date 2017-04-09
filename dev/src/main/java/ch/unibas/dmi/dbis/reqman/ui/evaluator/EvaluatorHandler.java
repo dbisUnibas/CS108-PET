@@ -142,8 +142,26 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
         return manager.isGroupNameUnique(name);
     }
 
-    public void handleOpenGroup(ActionEvent actionEvent) {
+    public void handleOpenGroups(ActionEvent actionEvent) {
+        if(!manager.isCatalogueLoaded() ){
+            return;
+        }
+        FileChooser fc = Utils.createGroupFileChooser("Open");
+        if(manager.hasLastOpenLocation()){
+            fc.setInitialDirectory(manager.getLastOpenLocation() );
+        }
+        List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow() );
+        if(files.size() == 1){
+            manager.openGroup(files.get(0), this::groupOpened);
+        }else if(files.size() >= 2){
+            throw new UnsupportedOperationException("not impelemnted yet");
+        }
+        // USER ABORT
+    }
 
+    private void groupOpened() {
+        Group g = manager.getLastOpenedGroup();
+        LOGGER.trace("Creating UI for group "+g.getName());
     }
 
     public void handleSaveGroup(ActionEvent actionEvent) {
@@ -157,7 +175,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
         }
         File f = fc.showOpenDialog(evaluator.getScene().getWindow());
         if(f != null){
-            manager.openCatalogue(f, () -> catalogueLoaded());
+            manager.openCatalogue(f, this::catalogueLoaded);
         }
     }
 

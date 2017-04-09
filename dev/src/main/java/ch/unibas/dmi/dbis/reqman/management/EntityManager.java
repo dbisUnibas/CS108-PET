@@ -43,6 +43,8 @@ public class EntityManager {
     /* === EVALUATOR RELATED === */
     private ObservableList<Group> groups = FXCollections.observableArrayList();
     private HashMap<String, File> groupFileMap = new HashMap<>();
+    private Group lastOpenedGroup = null;
+
 
     public ObservableList<Group> groupList(){
         return groups;
@@ -118,11 +120,35 @@ public class EntityManager {
         });
     }
 
-    private static void runTask(ManagementTask task){
+    private static void runTask(ManagementTask task, Callback internalCallback, Callback doneCallback){
         Thread th = new Thread(task);
         th.setDaemon(true); // silently shutsdown upon exiting
         th.start();
+
+        task.setOnFailed(event -> {
+            throw new RuntimeException("Opening failed: ", task.getException());
+        });
+
+        if(internalCallback != null){
+            task.setOnSucceeded(event -> {
+                internalCallback.apply(null);
+
+                if(doneCallback != null){
+                    doneCallback.apply(null);
+                }
+
+            });
+        }
     }
+
+    private static void runTask(ManagementTask task){
+        runTask(task, null, null);
+    }
+
+    private static void runTask(ManagementTask task, Callback internal){
+        runTask(task, internal, null);
+    }
+
     /**
      * @param file nontnull
      */
@@ -131,17 +157,12 @@ public class EntityManager {
 
         OpenCatalogueTask openTask = new OpenCatalogueTask(file);
 
-        openTask.setOnFailed(event -> {
-            throw new RuntimeException("Opening failed: ", openTask.getException());
-        });
-        openTask.setOnSucceeded(event -> {
+        runTask(openTask, () -> {
             setCatalogue(openTask.getValue() );
             catalogueFile = file;
-            LOGGER.trace(":openCatalogue finished");
-            doneCallback.apply(null);
-        });
+            LOGGER.trace(":openCatalogue - Finished");
 
-        runTask(openTask);
+        }, doneCallback);
 
     }
 
@@ -159,16 +180,11 @@ public class EntityManager {
 
     private void saveCatalogue(File file){
         SaveCatalogueTask saveTask = new SaveCatalogueTask(catalogue, file);
-        saveTask.setOnFailed(event -> {
-            throw new RuntimeException("Failed saving catalogue.",saveTask.getException());
-        });
 
-        saveTask.setOnSucceeded(event -> {
+        runTask(saveTask, () -> {
             LOGGER.info("Saved catalogue to: "+file.getPath() );
             catalogueFile = file;
         });
-
-        runTask(saveTask);
     }
 
     public void saveAsCatalogue(File file){
@@ -177,13 +193,10 @@ public class EntityManager {
 
     public void exportCatalogue(File file){
         ExportCatalogueTask task = new ExportCatalogueTask(catalogue, file);
-        task.setOnFailed(event -> {
-            throw new RuntimeException("Failed exporting catalgoue", task.getException());
-        });
-        task.setOnSucceeded(event -> {
+        runTask(task, () -> {
             LOGGER.info("Export done");
+            lastExportLocation = ensureDirectory(file);
         });
-        runTask(task);
     }
 
     public String getLecture() {
@@ -380,5 +393,23 @@ public class EntityManager {
 
     public File getCatalogueFile() {
         return catalogueFile;
+    }
+
+    public void openGroup(File file, Callback done){
+        LOGGER.entry(file);
+        OpenGroupTask task = new OpenGroupTask(file);
+        runTask(task, () -> {
+            lastOpenLocation = ensureDirectory(file);
+            lastOpenedGroup = task.getValue();
+            openedGroup(file, lastOpenedGroup);
+        }, done);
+    }
+
+    private void openedGroup(File file, Group lastOpenedGroup) {
+        LOGGER.trace("Creating stuff for group");
+    }
+
+    public Group getLastOpenedGroup() {
+        return lastOpenedGroup;
     }
 }

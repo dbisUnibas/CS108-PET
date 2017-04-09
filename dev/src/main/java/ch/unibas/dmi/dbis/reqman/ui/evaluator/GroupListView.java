@@ -28,7 +28,6 @@ public class GroupListView  extends ModifiableListView<Group> implements Modifia
         listView.setCellFactory((ListView<Group> l) -> new GroupCell());
         listView.setOnMouseClicked(this::handleModifyRequest);
         listView.setTooltip(new Tooltip("Double-click on Milestone to modify"));
-
     }
 
     @Override

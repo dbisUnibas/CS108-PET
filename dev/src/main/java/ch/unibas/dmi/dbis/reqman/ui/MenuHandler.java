@@ -13,7 +13,7 @@ public interface MenuHandler {
     void handleNewCatalogue(ActionEvent event);
     void handleNewGroup(ActionEvent event);
     void handleOpenCat(ActionEvent event);
-    void handleOpenGroup(ActionEvent event);
+    void handleOpenGroups(ActionEvent event);
     void handleSaveCat(ActionEvent event);
     void handleSaveGroup(ActionEvent event);
     void handleSaveCatAs(ActionEvent event);

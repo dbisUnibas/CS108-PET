@@ -31,7 +31,7 @@ public class MenuManager {
     public static final String ITEM_NEW_CAT = "itemNewCat";
     public static final String ITEM_NEW_GROUP = "itemNewGroup";
     public static final String ITEM_OPEN_CAT = "itemOpenCat";
-    public static final String ITEM_OPEN_GROUP = "itemOpenGroup";
+    public static final String ITEM_OPEN_GROUPS = "itemOpenGroups";
     public static final String ITEM_SAVE_CAT = "itemSaveCat";
     public static final String ITEM_SAVE_CAT_AS = "itemSaveCatAs";
     public static final String ITEM_SAVE_GROUP = "itemSaveGroup";
@@ -105,7 +105,7 @@ public class MenuManager {
         registerMenuItem(ITEM_NEW_CAT, itemNewCat = new MenuItem("New Catalogue..."));
         registerMenuItem(ITEM_NEW_GROUP, itemNewGroup = new MenuItem("New Group..."));
         registerMenuItem(ITEM_OPEN_CAT, itemOpenCat = new MenuItem("Open Catalogue..."));
-        registerMenuItem(ITEM_OPEN_GROUP, itemOpenGroup = new MenuItem("Open Group..."));
+        registerMenuItem(ITEM_OPEN_GROUPS, itemOpenGroup = new MenuItem("Open Group..."));
 
         registerEditorItem(ITEM_SAVE_CAT, itemSaveCat = new MenuItem("Save Catalogue"), true);
         registerEvaluatorItem(ITEM_SAVE_GROUP, itemSaveGroup = new MenuItem("Save Group"), true);
@@ -192,8 +192,8 @@ public class MenuManager {
                         case ITEM_OPEN_CAT:
                             handler.handleOpenCat(event);
                             break;
-                        case ITEM_OPEN_GROUP:
-                            handler.handleOpenGroup(event);
+                        case ITEM_OPEN_GROUPS:
+                            handler.handleOpenGroups(event);
                             break;
                         case ITEM_SAVE_CAT:
                             handler.handleSaveCat(event);

@@ -64,7 +64,7 @@ public class EvaluatorApplication extends Application {
         MenuItem miOpenCat = new MenuItem("Open Cat");
         miOpenCat.setOnAction(handler::handleOpenCatalogue);
         MenuItem miOpenGr = new MenuItem("Open gr");
-        miOpenGr.setOnAction(handler::handleOpenGroup);
+        miOpenGr.setOnAction(handler::handleOpenGroups);
         MenuItem miSaveGr = new MenuItem("Save gr");
         miSaveGr.setOnAction(handler::handleSaveGroup);
 
