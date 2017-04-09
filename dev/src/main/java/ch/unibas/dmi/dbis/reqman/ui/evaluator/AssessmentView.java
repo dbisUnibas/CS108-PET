@@ -24,8 +24,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     private AnchorPane titleAnchor;
     private Label lblChoice;
     private ComboBox<Milestone> cbMilestones;
-    @Deprecated // Added changelistener to cbMilestones
-    private Button btnRefresh;
     private Button btnSummary;
     private HBox statusWrapper;
     private AnchorPane statusBar;
@@ -36,7 +34,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
 
     private final Logger LOGGER = LogManager.getLogger(getClass() );
 
-    private EvaluatorController controller;
+    private final EvaluatorHandler handler;
 
     private Group group;
     private Milestone activeMS = null;
@@ -48,15 +46,15 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     private List<ProgressView> activeProgressViews = new ArrayList<>();
     private Set<Milestone> visitedMilestones = new HashSet<>();
 
-    AssessmentView(EvaluatorController controller, Group active) {
-        this(controller, active, null);
+    AssessmentView(EvaluatorHandler handler, Group activeGroup){
+        this(handler, activeGroup, null);
     }
 
-    AssessmentView(EvaluatorController controller, Group activeGroup, Milestone activeMS){
+    AssessmentView(EvaluatorHandler handler, Group activeGroup, Milestone activeMS){
         super();
         LOGGER.debug("Initializing for group "+activeGroup.getName() );
 
-        this.controller = controller;
+        this.handler = handler;
         this.group = activeGroup;
         this.activeMS = activeMS;
 
@@ -81,7 +79,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     @Override
     public void pointsChanged(double newValue) {
         calcActiveSum();
-        controller.markDirty(getActiveGroup());
+        handler.markDirty(getActiveGroup());
     }
 
     public Group getActiveGroup() {
@@ -189,9 +187,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
      */
     private Map<Integer, Map<String, Progress>> setupProgressMap() {
         Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
-        controller.getMilestones().forEach(ms -> {
+        handler.getMilestones().forEach(ms -> {
             TreeMap<String, Progress> reqProgMap = new TreeMap<String, Progress>();
-            controller.getRequirementsByMilestone(ms.getOrdinal()).forEach(r -> {
+            handler.getRequirementsByMilestone(ms.getOrdinal()).forEach(r -> {
                 reqProgMap.put(r.getName(), new Progress(r.getName(), ms.getOrdinal(), 0));
             });
             progressMap.put(ms.getOrdinal(), reqProgMap);
@@ -221,8 +219,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         titleBar.getChildren().addAll(lblChoice, cbMilestones, btnSummary);
         titleBar.setStyle(titleBar.getStyle() + "-fx-spacing: 10px; -fx-padding: 10px;");
 
-        if (controller != null) {
-            cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
+        if (handler != null) {
+            cbMilestones.setItems(FXCollections.observableList(handler.getMilestones()));
             cbMilestones.setCellFactory(param -> new Utils.MilestoneCell());
             cbMilestones.setButtonCell(new Utils.MilestoneCell());
 
@@ -233,7 +231,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
             });
         }
 
-        if (controller != null) {
+        if (handler != null) {
             btnSummary.setOnAction(this::handleComments);
         }
 
@@ -285,10 +283,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         LOGGER.debug(String.format(":handleSummaryReceiving - Received summary: %s", ps));
         if(ps != null){
             // Case receiving non-null summary
-            ProgressSummary sent = getSummaryForMilestone(controller.getActiveCatalogue().getMilestoneByOrdinal(ps.getMilestoneOrdinal()));
+            ProgressSummary sent = getSummaryForMilestone(handler.getMilestoneByOrdinal(ps.getMilestoneOrdinal()));
             if(replace){
                 // Case have to replace summary
-                summaries.remove(getSummaryForMilestone(controller.getActiveCatalogue().getMilestoneByOrdinal(ps.getMilestoneOrdinal())));
+                summaries.remove(getSummaryForMilestone(handler.getMilestoneByOrdinal(ps.getMilestoneOrdinal())));
             }
             summaries.add(ps);
             if(sent == ps){ // if it is *the same object*
@@ -345,7 +343,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         LOGGER.trace(":loadActiveProgressViews - this.activeMS: "+this.activeMS.getName());
         visitedMilestones.add(this.activeMS);
         activeProgressViews.clear();
-        List<Requirement> reqs = controller.getRequirementsByMilestone(this.activeMS.getOrdinal());
+        List<Requirement> reqs = handler.getRequirementsByMilestone(this.activeMS.getOrdinal());
         reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
         reqs.forEach(r -> {
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
@@ -378,7 +376,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     }
 
     private void verifyPredecessorsAchieved(ProgressView pv){
-        pv.setDisable(!group.isProgressUnlocked(controller.getActiveCatalogue(), pv.getProgress()));
+        pv.setDisable(!group.isProgressUnlocked(handler.getCatalogue(), pv.getProgress()));
     }
 
 
@@ -412,7 +410,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     }
 
     private void calcActiveSum() {
-        double sum = group.getSumForMilestone(activeMS, controller.getActiveCatalogue());
+        double sum = group.getSumForMilestone(activeMS, handler.getCatalogue());
         tfSum.setText(String.valueOf(sum));
     }
 
@@ -444,12 +442,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     @Override
     public void markDirty() {
         calcActiveSum();
-        controller.markDirty(getActiveGroup());
+        handler.markDirty(getActiveGroup());
     }
 
     @Override
     public void unmarkDirty() {
         calcActiveSum();
-        controller.unmarkDirty(getActiveGroup());
+        handler.unmarkDirty(getActiveGroup());
     }
 }

@@ -312,6 +312,8 @@ public class EvaluatorController {
     }
 
     private void addGroupToInternalStorage(Group group, AssessmentView av){
+        throw new RuntimeException("Deprecated class usage");
+        /*
         if(av != null){
             LOGGER.trace(":addGroupToInternalStorage - Adding pre-existing AV");
             groupAVMap.put(group.getName(), av);
@@ -328,7 +330,7 @@ public class EvaluatorController {
                 groupAVMap.put(group.getName(), new AssessmentView(this, group));
             }
         }
-        groups.add(group);
+        groups.add(group);*/
     }
 
     void handleOverview(ActionEvent event){

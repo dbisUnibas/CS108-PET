@@ -3,7 +3,10 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.management.CatalogueNameMismatchException;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
+import ch.unibas.dmi.dbis.reqman.management.NonUniqueGroupNameException;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -16,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,6 +34,8 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
     private final EntityManager manager = EntityManager.getInstance();
 
     private EvaluatorView evaluator;
+
+    private HashMap<String, AssessmentView> groupViewMap = new HashMap<>();
 
     EvaluatorHandler(){
         LOGGER.trace("<init>");
@@ -131,6 +137,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
                 // ADD GROUP
                 Group gr = EvaluatorPromptFactory.promptGroup(this);
                 manager.addGroup(gr);
+                loadGroupUI(gr);
                 break;
             default:
                 // Ignoring
@@ -138,11 +145,11 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
     }
 
 
-    public boolean isGroupNameUnique(String name) {
+    boolean isGroupNameUnique(String name) {
         return manager.isGroupNameUnique(name);
     }
 
-    public void handleOpenGroups(ActionEvent actionEvent) {
+    void handleOpenGroups(ActionEvent actionEvent) {
         if(!manager.isCatalogueLoaded() ){
             return;
         }
@@ -152,23 +159,36 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
         }
         List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow() );
         if(files.size() == 1){
-            manager.openGroup(files.get(0), this::groupOpened);
+            try{
+                manager.openGroup(files.get(0), () -> {
+                    loadGroupUI(manager.getLastOpenedGroup() );
+                });
+            }catch (CatalogueNameMismatchException ex){
+                String message = String.format("Could not finish opening group from file %s.\n" +
+                        "The specified group (name: %s)'s catalogue signature is: %s\n" +
+                        "Current catalogue name: %s", ex.getGroupFile().getPath(), ex.getGroupName(), ex.getGroupCatName(), ex.getCatName());
+                Utils.showErrorDialog("Catalogue signature mismatch", message);
+            }catch (NonUniqueGroupNameException e){
+                String message = String.format("Cannot finish opening of group %s, there exists alread a group with that name.", e.getName());
+                Utils.showErrorDialog("Duplication error", message);
+            }
+
         }else if(files.size() >= 2){
             throw new UnsupportedOperationException("not impelemnted yet");
         }
         // USER ABORT
     }
 
-    private void groupOpened() {
-        Group g = manager.getLastOpenedGroup();
+    private void loadGroupUI(Group g) {
         LOGGER.trace("Creating UI for group "+g.getName());
+        addGroupToMap(g, null);
     }
 
-    public void handleSaveGroup(ActionEvent actionEvent) {
+    void handleSaveGroup(ActionEvent actionEvent) {
 
     }
 
-    public void handleOpenCatalogue(ActionEvent event){
+    void handleOpenCatalogue(ActionEvent event){
         FileChooser fc = Utils.createCatalogueFileChooser("Open");
         if(manager.hasLastOpenLocation() ){
             fc.setInitialDirectory(manager.getLastOpenLocation());
@@ -186,7 +206,72 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
         evaluator.displayCatalogueInfo(manager.getCatalogue() );
     }
 
-    public ObservableList<Group> groupList() {
+    ObservableList<Group> groupList() {
         return manager.groupList();
+    }
+
+    private Milestone activeMS = null;
+
+    private void addGroupToMap(Group group, AssessmentView view){
+        if(view != null){
+            LOGGER.trace(":addGroupToMap - Adding pre-existing AV");
+            groupViewMap.put(group.getName(), view);
+            if(activeMS != null){
+                LOGGER.trace(":addGroupToInternalStorage - Selecting activeMS: "+activeMS.getName());
+                view.selectMilestone(activeMS);
+            }
+        }else{
+            if(activeMS != null){
+                LOGGER.trace(":addGroupToMap - Creating AV with pre-set MS: "+activeMS.getName());
+                groupViewMap.put(group.getName(), new AssessmentView(this, group, activeMS) );
+            }else{
+                LOGGER.trace(":addGroupToMap - Creating AV without pre-set MS");
+                groupViewMap.put(group.getName(), new AssessmentView(this, group));
+            }
+        }
+        addTab(group, false);
+    }
+
+    public Milestone getMilestoneByOrdinal(int ordinal) {
+        return manager.getMilestoneByOrdinal(ordinal);
+    }
+
+    List<Requirement> getRequirementsByMilestone(int ordinal) {
+        return manager.getRequirementsByMilestone(ordinal);
+    }
+
+    public List<Requirement> getRequirementsWithMinMS(int ordinal) {
+        return manager.getRequirementsWithMinMS(ordinal);
+    }
+
+    void markDirty(Group activeGroup) {
+        evaluator.markDirty(activeGroup);
+    }
+
+    void unmarkDirty(Group activeGroup) {
+        evaluator.unmarkDirty(activeGroup);
+    }
+
+    public void setGlobalMilestoneChoice(Milestone ms) {
+        LOGGER.debug("Set global milestone choice to: "+ms.getName() );
+        this.activeMS = ms;
+        for(AssessmentView av : groupViewMap.values()){
+            LOGGER.trace("Setting milestone "+ms.getName() +" for AV: "+av.getActiveGroup().getName() );
+            av.selectMilestone(ms);
+        }
+    }
+
+    public void resetGlobalMilestoneChoice() {
+        LOGGER.debug("Resetting global milestone choice");
+        this.activeMS = null;
+    }
+
+    public void addTab(Group active, boolean fresh){
+        if(evaluator.isGroupTabbed(active) ){
+            // Do not open another tab for already tabbed group.
+        }else{
+            evaluator.addGroupTab(groupViewMap.get(active.getName()), fresh);
+        }
+        evaluator.setActiveTab(active.getName() );
     }
 }

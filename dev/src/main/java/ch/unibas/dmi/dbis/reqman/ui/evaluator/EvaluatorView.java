@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
+import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorView;
 import javafx.geometry.Insets;
@@ -109,5 +110,55 @@ public class EvaluatorView extends HBox implements TitleProvider {
 
     public void displayCatalogueInfo(Catalogue catalogue) {
         catInfoView.displayData(catalogue);
+    }
+
+    public boolean isGroupTabbed(Group active) {
+        return false;
+    }
+
+    public void addGroupTab(AssessmentView view, boolean fresh) {
+        Tab tab = new Tab();
+        tab.setText(view.getActiveGroup().getName());
+        view.bindToParentSize(rightContent);
+        tab.setContent(view);
+        tabPane.getTabs().addAll(tab);
+        groupTabMap.put(view.getActiveGroup().getName(), tab);
+        if(fresh){
+            markDirty(view.getActiveGroup() );
+        }
+
+    }
+
+    public void markDirty(Group group){
+        Tab tab = groupTabMap.get(group.getName());
+        if (tab.getText().indexOf("*") < 0) {
+            tab.setText(tab.getText() + "*");
+        }
+        if (!tab.getStyleClass().contains("modified")) {
+            tab.getStyleClass().add("modified");
+        }
+    }
+
+    public void unmarkDirty(Group modified) {
+        Tab tab = groupTabMap.get(modified.getName());
+        tab.getStyleClass().remove("modified");
+        if (tab.getText().indexOf("*") >= 0) {
+            String text = tab.getText().substring(0, tab.getText().indexOf("*"));
+            tab.setText(text);
+        }
+    }
+
+    public boolean isDirty(Group group){
+        Tab tab = groupTabMap.get(group.getName());
+        return tab.getStyleClass().contains("modified");
+    }
+
+    public void setActiveTab(AssessmentView assessmentView) {
+        Tab toActive = groupTabMap.get(assessmentView.getActiveGroup().getName() );
+        tabPane.getSelectionModel().select(toActive);
+    }
+
+    public void setActiveTab(String name) {
+
     }
 }

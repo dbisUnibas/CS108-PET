@@ -9,7 +9,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -26,8 +25,9 @@ public class GroupListView  extends ModifiableListView<Group> implements Modifia
         addHandler(this);
         listView.setItems(handler.groupList());
         listView.setCellFactory((ListView<Group> l) -> new GroupCell());
-        listView.setOnMouseClicked(this::handleModifyRequest);
-        listView.setTooltip(new Tooltip("Double-click on Milestone to modify"));
+        // Double click will open tab (again) // TODO Tab opening upon doubleclick
+        //listView.setOnMouseClicked(this::handleModifyRequest);
+        //listView.setTooltip(new Tooltip("Double-click on Milestone to modify"));
     }
 
     @Override

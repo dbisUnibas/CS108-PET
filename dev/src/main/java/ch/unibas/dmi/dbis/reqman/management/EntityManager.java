@@ -24,40 +24,22 @@ public class EntityManager {
 
     private static final Logger LOGGER = LogManager.getLogger(EntityManager.class);
     private static EntityManager instance = null;
-
+    private final SimpleDoubleProperty maxSumProperty = new SimpleDoubleProperty();
     /* === COMMON === */
     private Catalogue catalogue = null;
     private File catalogueFile = null;
-    
     private File lastOpenLocation = null;
-    
     private File lastSaveLocation = null;
-    
     private File lastExportLocation = null;
-
     /* === CATALOGUE / EDITOR  RELATED === */
     private ObservableList<Requirement> observableRequirements;
     private ObservableList<Milestone> observableMilestones;
-    private final SimpleDoubleProperty maxSumProperty = new SimpleDoubleProperty();
-
     /* === EVALUATOR RELATED === */
     private ObservableList<Group> groups = FXCollections.observableArrayList();
     private HashMap<String, File> groupFileMap = new HashMap<>();
     private Group lastOpenedGroup = null;
+    private int lastOrdinal = -1;
 
-
-    public ObservableList<Group> groupList(){
-        return groups;
-    }
-
-
-    public ObservableList<Requirement> getObservableRequirements() {
-        return observableRequirements;
-    }
-
-    public ObservableList<Milestone> getObservableMilestones() {
-        return observableMilestones;
-    }
 
     private EntityManager() {
 
@@ -72,55 +54,8 @@ public class EntityManager {
         return instance;
     }
 
-    private int lastOrdinal = -1;
-
-    public void setCatalogue(Catalogue catalogue) {
-        this.catalogue = catalogue;
-        observableRequirements = FXCollections.observableList(catalogue.requirementList());
-        observableMilestones = FXCollections.observableList(catalogue.milestoneList());
-        lastOrdinal = catalogue.getLastOrdinal();
-
-        maxSumProperty.set(catalogue.getSum() );
-
-        observableRequirements.addListener(new ListChangeListener<Requirement>() {
-            @Override
-            public void onChanged(Change<? extends Requirement> c) {
-                LOGGER.trace(":changed");
-                while (c.next()) {
-                    if (c.wasPermutated()) {
-                        // Permutation
-                        for (int i = c.getFrom(); i < c.getTo(); ++i) {
-
-                        }
-                    } else if (c.wasUpdated()) {
-                        // Update
-                        LOGGER.error("UPDATED"); // TODO Handle
-                    } else {
-                        for (Requirement removeItem : c.getRemoved()) {
-                            if(removeItem == null){
-                                continue;
-                            }
-                            double sumPre = catalogue.getSum();
-                            double change = removeItem.getMaxPoints();
-                            double sumPost = sumPre - change;
-                            LOGGER.trace(String.format(":onChanged - Remove: pre:%g, change:%g, post%g", sumPre, change, sumPost));
-                            maxSumProperty.set(catalogue.getSum()-removeItem.getMaxPoints());
-                        }
-                        for (Requirement addItem : c.getAddedSubList()) {
-                            if(addItem == null){
-                                continue;
-                            }
-                            maxSumProperty.set(catalogue.getSum()+addItem.getMaxPoints() );
-                        }
-                    }
-
-                }
-                c.reset();
-            }
-        });
-    }
-
-    private static void runTask(ManagementTask task, Callback internalCallback, Callback doneCallback){
+    private static void runTask(ManagementTask task, Callback internalCallback, Callback doneCallback) {
+        // TODO Exception handling!
         Thread th = new Thread(task);
         th.setDaemon(true); // silently shutsdown upon exiting
         th.start();
@@ -129,11 +64,16 @@ public class EntityManager {
             throw new RuntimeException("Opening failed: ", task.getException());
         });
 
-        if(internalCallback != null){
+        if (internalCallback != null) {
             task.setOnSucceeded(event -> {
-                internalCallback.apply(null);
+                try{
+                    internalCallback.apply(null);
+                }catch(Exception ex){
+                    throw new RuntimeException(ex);
+                }
 
-                if(doneCallback != null){
+
+                if (doneCallback != null) {
                     doneCallback.apply(null);
                 }
 
@@ -141,12 +81,24 @@ public class EntityManager {
         }
     }
 
-    private static void runTask(ManagementTask task){
+    private static void runTask(ManagementTask task) {
         runTask(task, null, null);
     }
 
-    private static void runTask(ManagementTask task, Callback internal){
+    private static void runTask(ManagementTask task, Callback internal) {
         runTask(task, internal, null);
+    }
+
+    public ObservableList<Group> groupList() {
+        return groups;
+    }
+
+    public ObservableList<Requirement> getObservableRequirements() {
+        return observableRequirements;
+    }
+
+    public ObservableList<Milestone> getObservableMilestones() {
+        return observableMilestones;
     }
 
     /**
@@ -158,7 +110,7 @@ public class EntityManager {
         OpenCatalogueTask openTask = new OpenCatalogueTask(file);
 
         runTask(openTask, () -> {
-            setCatalogue(openTask.getValue() );
+            setCatalogue(openTask.getValue());
             catalogueFile = file;
             LOGGER.trace(":openCatalogue - Finished");
 
@@ -166,7 +118,7 @@ public class EntityManager {
 
     }
 
-    public boolean isCatalogueFilePresent(){
+    public boolean isCatalogueFilePresent() {
         return catalogueFile != null;
     }
 
@@ -177,21 +129,20 @@ public class EntityManager {
         saveCatalogue(catalogueFile);
     }
 
-
-    private void saveCatalogue(File file){
+    private void saveCatalogue(File file) {
         SaveCatalogueTask saveTask = new SaveCatalogueTask(catalogue, file);
 
         runTask(saveTask, () -> {
-            LOGGER.info("Saved catalogue to: "+file.getPath() );
+            LOGGER.info("Saved catalogue to: " + file.getPath());
             catalogueFile = file;
         });
     }
 
-    public void saveAsCatalogue(File file){
+    public void saveAsCatalogue(File file) {
         saveCatalogue(file);
     }
 
-    public void exportCatalogue(File file){
+    public void exportCatalogue(File file) {
         ExportCatalogueTask task = new ExportCatalogueTask(catalogue, file);
         runTask(task, () -> {
             LOGGER.info("Export done");
@@ -293,17 +244,17 @@ public class EntityManager {
     }
 
     public void replaceMilestone(Milestone oldMS, Milestone newMS) {
-        if(observableMilestones.remove(oldMS) ){
+        if (observableMilestones.remove(oldMS)) {
             newMS.setOrdinal(oldMS.getOrdinal());
             observableMilestones.add(newMS);
         }
     }
 
-    private List<Requirement> getSuccessors(Requirement requirement){
+    private List<Requirement> getSuccessors(Requirement requirement) {
         ArrayList<Requirement> list = new ArrayList<>();
 
-        observableRequirements.forEach( r -> {
-            if(r.getPredecessorNames().contains(requirement.getName() )){
+        observableRequirements.forEach(r -> {
+            if (r.getPredecessorNames().contains(requirement.getName())) {
                 list.add(r);
             }
         });
@@ -325,19 +276,65 @@ public class EntityManager {
     }
 
     public void modifyCatalogue(Catalogue mod) {
-        catalogue.setName(mod.getName() );
-        catalogue.setDescription(mod.getDescription() );
-        catalogue.setLecture(mod.getLecture() );
-        catalogue.setSemester(mod.getSemester() );
+        catalogue.setName(mod.getName());
+        catalogue.setDescription(mod.getDescription());
+        catalogue.setLecture(mod.getLecture());
+        catalogue.setSemester(mod.getSemester());
     }
 
     public Catalogue getCatalogue() {
         return catalogue;
     }
 
-    public boolean isGroupNameUnique(String name){
-        for(Group g : groups){
-            if(g.getName().equals(name)){
+    public void setCatalogue(Catalogue catalogue) {
+        this.catalogue = catalogue;
+        observableRequirements = FXCollections.observableList(catalogue.requirementList());
+        observableMilestones = FXCollections.observableList(catalogue.milestoneList());
+        lastOrdinal = catalogue.getLastOrdinal();
+
+        maxSumProperty.set(catalogue.getSum());
+
+        observableRequirements.addListener(new ListChangeListener<Requirement>() {
+            @Override
+            public void onChanged(Change<? extends Requirement> c) {
+                LOGGER.trace(":changed");
+                while (c.next()) {
+                    if (c.wasPermutated()) {
+                        // Permutation
+                        for (int i = c.getFrom(); i < c.getTo(); ++i) {
+
+                        }
+                    } else if (c.wasUpdated()) {
+                        // Update
+                        LOGGER.error("UPDATED"); // TODO Handle
+                    } else {
+                        for (Requirement removeItem : c.getRemoved()) {
+                            if (removeItem == null) {
+                                continue;
+                            }
+                            double sumPre = catalogue.getSum();
+                            double change = removeItem.getMaxPoints();
+                            double sumPost = sumPre - change;
+                            LOGGER.trace(String.format(":onChanged - Remove: pre:%g, change:%g, post%g", sumPre, change, sumPost));
+                            maxSumProperty.set(catalogue.getSum() - removeItem.getMaxPoints());
+                        }
+                        for (Requirement addItem : c.getAddedSubList()) {
+                            if (addItem == null) {
+                                continue;
+                            }
+                            maxSumProperty.set(catalogue.getSum() + addItem.getMaxPoints());
+                        }
+                    }
+
+                }
+                c.reset();
+            }
+        });
+    }
+
+    public boolean isGroupNameUnique(String name) {
+        for (Group g : groups) {
+            if (g.getName().equals(name)) {
                 return false;
             }
         }
@@ -357,7 +354,7 @@ public class EntityManager {
         groups.add(gr);
     }
 
-    
+
     public boolean hasLastOpenLocation() {
         return lastOpenLocation != null;
     }
@@ -365,27 +362,27 @@ public class EntityManager {
     public File getLastOpenLocation() {
         return lastOpenLocation;
     }
-    
-    public boolean hasLastSaveLocation(){
+
+    public boolean hasLastSaveLocation() {
         return lastSaveLocation != null;
     }
-    
-    public File getLastSaveLocation(){
+
+    public File getLastSaveLocation() {
         return lastSaveLocation;
     }
-    
-    public boolean hasLastExportLocation(){
+
+    public boolean hasLastExportLocation() {
         return lastExportLocation != null;
     }
-    
-    public File getLastExportLocation(){
+
+    public File getLastExportLocation() {
         return lastExportLocation;
     }
-    
-    private File ensureDirectory( File f){
-        if(f.isDirectory() ){
+
+    private File ensureDirectory(File f) {
+        if (f.isDirectory()) {
             return f;
-        }else if(f.isFile() ){
+        } else if (f.isFile()) {
             return f.getParentFile();
         }
         throw new IllegalArgumentException("File is neither directory nor file - symbolik link?");
@@ -395,18 +392,32 @@ public class EntityManager {
         return catalogueFile;
     }
 
-    public void openGroup(File file, Callback done){
+    public void openGroup(File file, Callback done) throws CatalogueNameMismatchException, NonUniqueGroupNameException {
         LOGGER.entry(file);
         OpenGroupTask task = new OpenGroupTask(file);
-        runTask(task, () -> {
-            lastOpenLocation = ensureDirectory(file);
-            lastOpenedGroup = task.getValue();
-            openedGroup(file, lastOpenedGroup);
-        }, done);
+        try {
+            runTask(task, () -> {
+                lastOpenLocation = ensureDirectory(file);
+                lastOpenedGroup = task.getValue();
+                openedGroup(file, lastOpenedGroup);
+            }, done);
+        }catch(RuntimeException ex){
+            throw ex;
+        }
     }
 
-    private void openedGroup(File file, Group lastOpenedGroup) {
-        LOGGER.trace("Creating stuff for group");
+    private void openedGroup(File file, Group group) throws CatalogueNameMismatchException, NonUniqueGroupNameException {
+        LOGGER.trace(":openedGroup");
+        if (!group.getCatalogueName().equals(catalogue.getName())) {
+            throw new CatalogueNameMismatchException(catalogue.getName(), group.getCatalogueName(), group.getName(), file);
+        }
+        if(!isGroupNameUnique(group.getName()) ){
+            throw new NonUniqueGroupNameException(group.getName() );
+        }
+        groupFileMap.put(group.getName(), file);
+        groups.add(group);
+
+        LOGGER.info("Successfully added opened group to workspace.");
     }
 
     public Group getLastOpenedGroup() {
