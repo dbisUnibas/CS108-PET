@@ -1,9 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Group;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.management.CatalogueNameMismatchException;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.management.NonUniqueGroupNameException;
@@ -158,6 +155,9 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
             fc.setInitialDirectory(manager.getLastOpenLocation() );
         }
         List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow() );
+        if(files == null){
+            return; // USER ABORT
+        }
         if(files.size() == 1){
             try{
                 manager.openGroup(files.get(0), () -> {
@@ -266,12 +266,20 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>{
         this.activeMS = null;
     }
 
-    public void addTab(Group active, boolean fresh){
+    private void addTab(Group active, boolean fresh){
         if(evaluator.isGroupTabbed(active) ){
             // Do not open another tab for already tabbed group.
         }else{
             evaluator.addGroupTab(groupViewMap.get(active.getName()), fresh);
         }
         evaluator.setActiveTab(active.getName() );
+    }
+
+    void openGroupTab(Group group) {
+        addTab(group, false);
+    }
+
+    public ObservableList<Progress> progressList(Group g){
+        return manager.getObservableProgress(g);
     }
 }

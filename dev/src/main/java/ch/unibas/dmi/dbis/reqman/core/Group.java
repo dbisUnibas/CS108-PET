@@ -34,6 +34,11 @@ public class Group implements Comparable<Group> {
         this.version = version;
     }
 
+    public List<Progress> progressList(){
+        return progressList;
+    }
+
+
     public Group(String name, String projectName, List<String> members, String catalogueName) {
 
         this.name = name;

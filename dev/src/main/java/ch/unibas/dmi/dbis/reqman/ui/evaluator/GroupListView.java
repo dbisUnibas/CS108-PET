@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -25,9 +26,8 @@ public class GroupListView  extends ModifiableListView<Group> implements Modifia
         addHandler(this);
         listView.setItems(handler.groupList());
         listView.setCellFactory((ListView<Group> l) -> new GroupCell());
-        // Double click will open tab (again) // TODO Tab opening upon doubleclick
-        //listView.setOnMouseClicked(this::handleModifyRequest);
-        //listView.setTooltip(new Tooltip("Double-click on Milestone to modify"));
+        listView.setOnMouseClicked(this::handleOpenRequest);
+        listView.setTooltip(new Tooltip("Double-click to open tab"));
     }
 
     @Override
@@ -42,12 +42,11 @@ public class GroupListView  extends ModifiableListView<Group> implements Modifia
         handler.handleCreation(evt);
     }
 
-    private void handleModifyRequest(MouseEvent mouseEvent) {
+    private void handleOpenRequest(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
             Group group = listView.getSelectionModel().getSelectedItem();
             if (group != null) {
-                CUDEvent mod = CUDEvent.generateModificationEvent(new ActionEvent(mouseEvent.getSource(), mouseEvent.getTarget()), TargetEntity.GROUP, group);
-                handler.handleModification(mod);
+                handler.openGroupTab(group);
             }
         }
     }

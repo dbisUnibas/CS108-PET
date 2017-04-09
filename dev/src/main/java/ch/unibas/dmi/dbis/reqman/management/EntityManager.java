@@ -423,4 +423,8 @@ public class EntityManager {
     public Group getLastOpenedGroup() {
         return lastOpenedGroup;
     }
+
+    public ObservableList<Progress> getObservableProgress(Group provider){
+        return FXCollections.observableList(provider.progressList());
+    }
 }

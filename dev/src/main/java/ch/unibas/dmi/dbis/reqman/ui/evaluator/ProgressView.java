@@ -54,7 +54,8 @@ public class ProgressView extends VBox {
     /**
      * To track, if the user has reverted its change.
      */
-    private boolean[] previousSavedYesNoConfig = new boolean[]{false, false};
+    private volatile boolean[] previousSavedYesNoConfig = new boolean[]{false, false};
+    private volatile boolean first = true;
 
     private Milestone active = null;
 
@@ -75,11 +76,14 @@ public class ProgressView extends VBox {
 
     @Deprecated
     private boolean hasPointsChanged(double newPoints){
-
         return Double.compare(previousPoints, newPoints) == 0;
     }
 
     private boolean hasYesNoConfigChaned(boolean yesSelected, boolean noSelected){
+        if(first){
+            first = false;
+            return true;
+        }
         return previousSavedYesNoConfig[0] != yesSelected && previousSavedYesNoConfig[1] != noSelected;
     }
 
