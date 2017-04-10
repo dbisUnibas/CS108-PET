@@ -364,4 +364,9 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         PopupStage popupStage = new PopupStage("Overview", webScene);
         popupStage.showAndWait();
     }
+
+    public boolean isGroupLoaded() {
+        return !manager.groupList().isEmpty();
+    }
+
 }

@@ -208,6 +208,11 @@ public class RequirementTableView extends BorderPane {
         return tableData.size();
     }
 
+    public String getSelectedRequirement() {
+        ObservableRequirement req = table.getSelectionModel().getSelectedItem();
+        return req != null ? req.getName() : null;
+    }
+
 
     static class ObservableRequirement {
         private final SimpleStringProperty name;

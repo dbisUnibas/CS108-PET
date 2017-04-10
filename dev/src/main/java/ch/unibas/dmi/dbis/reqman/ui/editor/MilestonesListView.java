@@ -56,6 +56,10 @@ public class MilestonesListView  extends ModifiableListView<Milestone> implement
         setItems(observableList);
     }
 
+    public Milestone getSelectedMS() {
+        return listView.getSelectionModel().getSelectedItem();
+    }
+
     public static class MilestoneCell extends ListCell<Milestone> {
 
         @Override

@@ -33,6 +33,14 @@ public class MainScene extends TitledScene {
 
     private Mode active;
 
+    boolean isEditorActive() {
+        return active == Mode.EDITOR;
+    }
+
+    boolean isEvaluatorActive(){
+        return active == Mode.EVALUATOR;
+    }
+
     enum Mode{
         EDITOR,
         EVALUATOR
@@ -42,6 +50,10 @@ public class MainScene extends TitledScene {
         super(new Region(), 800,600);
         initComponents();
         layoutComponents();
+    }
+
+    Mode getActiveMode(){
+        return active;
     }
 
     private void initComponents(){

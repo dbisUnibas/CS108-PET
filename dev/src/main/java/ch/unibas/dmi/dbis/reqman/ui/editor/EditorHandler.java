@@ -226,4 +226,17 @@ public class EditorHandler implements EventHandler<CUDEvent> {
             editor.indicateWaiting(false);
         }
     }
+
+    public Milestone getSelectedMS() {
+        return editor.getMilestoneView().getSelectedMS();
+    }
+
+    public Requirement getSelectedRequirement(){
+        String name = editor.getRequirementsView().getSelectedRequirement();
+        if(name == null){
+            return null;
+        }else{
+            return manager.getRequirementByName(name);
+        }
+    }
 }

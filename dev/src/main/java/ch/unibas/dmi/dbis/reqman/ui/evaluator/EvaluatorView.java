@@ -172,4 +172,5 @@ public class EvaluatorView extends HBox implements TitleProvider {
         }
         return null;
     }
+
 }
