@@ -53,6 +53,7 @@ public class MainHandler implements MenuHandler {
         if(! mainScene.isEvaluatorActive() ){
             return;
         }
+        manager.enableGroupNeeded();
         evaluatorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.GROUP));
         System.out.println("bmp");
         LOGGER.fatal("========================================");
@@ -68,6 +69,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleOpenGroups(ActionEvent event) {
+        manager.enableGroupNeeded(); // TODO 
         evaluatorHandler.handleOpenGroups(event);
         if(!evaluatorHandler.isGroupLoaded() ){
             return;

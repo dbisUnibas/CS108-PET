@@ -8,6 +8,7 @@ import ch.unibas.dmi.dbis.reqman.management.NonUniqueGroupNameException;
 import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
+import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -106,9 +107,13 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
             case GROUP:
                 LOGGER.trace(":handleModificaiton");
                 Group gr = evaluator.getActiveGroup();
+                assemble(gr);
                 // DONT FORGET TO UPDATE ALL NAME REFERNECES, IF NAME CHANGED!
                 Group mod = EvaluatorPromptFactory.promptGroup(gr, this);
-                manager.replaceGroup(gr, mod);
+                //manager.replaceGroup(gr, mod);
+                CUDEvent.generateDeletionEvent(event, TargetEntity.GROUP,-1, gr);
+
+                CUDEvent.generateCreationEvent(event, TargetEntity.GROUP, mod);
                 break;
             default:
                 // Ignoring
@@ -122,7 +127,9 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
                 LOGGER.trace(":handleDeletion");
                 if (event.getDelivery() != null && event.getDelivery() instanceof Group) {
                     Group del = (Group) event.getDelivery();
-                    manager.removeGroup(del);
+                    if(manager.removeGroup(del) ){
+                        removeGroupFromMap(del);
+                    }
                 }
                 break;
             default:
@@ -133,9 +140,16 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     public void handleCreation(CUDEvent event) {
         switch (event.getTargetEntity()) {
             case GROUP:
+                Group gr;
                 LOGGER.trace(":handleCreation");
+                if(event.getDelivery() instanceof  Group){
+                    LOGGER.trace(":handleCreation - re-create");
+                    gr = (Group)event.getDelivery();
+                }else{
+                    LOGGER.trace(":handleCreation - new create");
+                    gr = EvaluatorPromptFactory.promptGroup(this);
+                }
                 // ADD GROUP
-                Group gr = EvaluatorPromptFactory.promptGroup(this);
                 manager.addGroup(gr);
                 loadGroupUI(gr);
                 break;
@@ -256,6 +270,15 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
             }
         }
         addTab(group, false);
+    }
+
+    private void removeGroupFromMap(Group group){
+        groupViewMap.remove(group.getName() );
+        removeTab(group);
+    }
+
+    private void removeTab(Group g){
+        evaluator.removeTab(g);
     }
 
     public Milestone getMilestoneByOrdinal(int ordinal) {

@@ -173,4 +173,9 @@ public class EvaluatorView extends HBox implements TitleProvider {
         return null;
     }
 
+    public void removeTab(Group g) {
+        Tab tab = groupTabMap.get(g.getName());
+        groupTabMap.remove(g.getName());
+        tabPane.getTabs().remove(tab);
+    }
 }

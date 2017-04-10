@@ -99,4 +99,14 @@ public class CUDEvent extends ActionEvent {
     public static CUDEvent generateCreationEvent(ActionEvent event, TargetEntity targetEntity) {
         return new CUDEvent(event, targetEntity, CREATION);
     }
+
+    private void setDelivery(Object o){
+        this.delivery = o;
+    }
+
+    public static CUDEvent generateCreationEvent(ActionEvent event, TargetEntity target, Object delivery) {
+        CUDEvent evt = generateCreationEvent(event, target);
+        evt.setDelivery(delivery);
+        return evt;
+    }
 }

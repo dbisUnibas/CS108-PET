@@ -381,8 +381,8 @@ public class EntityManager {
         throw new UnsupportedOperationException("Not implemented yet");
     }
 
-    public void removeGroup(Group del) {
-        throw new UnsupportedOperationException("Not implmented yet");
+    public boolean removeGroup(Group del) {
+        return groups.remove(del);
     }
 
     public void addGroup(Group gr) {
