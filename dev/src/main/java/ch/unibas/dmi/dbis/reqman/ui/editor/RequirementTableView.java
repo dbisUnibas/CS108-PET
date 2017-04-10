@@ -145,6 +145,7 @@ public class RequirementTableView extends BorderPane {
         rmBtn.setTooltip(new Tooltip("Removes the currently selected requirement"));
 
         table = initTable();
+        table.setTooltip(new Tooltip("Double-click to modify requirement"));
         table.setOnMouseClicked(this::handleModification);
     }
 
