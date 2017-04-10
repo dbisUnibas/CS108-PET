@@ -522,4 +522,12 @@ public class EntityManager {
             groupFileMap.put(group.getName(), file);
         });
     }
+
+    public void exportAllGroups(File dir) {
+        ExportMultipleGroupTask task = new ExportMultipleGroupTask(dir, groups, catalogue);
+        runTask(task, () -> {
+            lastExportLocation = ensureDirectory(dir);
+            LOGGER.info("All export done");
+        });
+    }
 }

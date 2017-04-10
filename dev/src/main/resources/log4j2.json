@@ -161,6 +161,14 @@
             {"ref":"console"},
             {"ref":"rollingFile","level":"info"}
           ]
+        },
+        {
+          "name":"ch.unibas.dmi.dbis.reqman.ui",
+          "level":"trace",
+          "additivity":false,
+          "AppenderRef":[
+            {"ref":"console"}
+          ]
         }
       ]
     }

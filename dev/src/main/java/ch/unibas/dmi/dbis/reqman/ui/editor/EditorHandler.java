@@ -49,7 +49,6 @@ public class EditorHandler implements EventHandler<CUDEvent> {
             } else {
                 throw new IllegalArgumentException("Cannot handle unknown event type: " + event.getEventType().toString());
             }
-            event.consume();
         }
         // Silently ignoring null events
 

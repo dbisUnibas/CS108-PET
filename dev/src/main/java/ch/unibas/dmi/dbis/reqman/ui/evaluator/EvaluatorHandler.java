@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.management.CatalogueNameMismatchException;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
@@ -10,6 +11,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -89,7 +91,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
             } else {
                 throw new IllegalArgumentException("Cannot handle event type: " + event.getEventType().toString());
             }
-            event.consume();
         }
         // silently ignoring null events
 
@@ -191,6 +192,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     public void handleSaveGroup(ActionEvent actionEvent) {
         Group active = evaluator.getActiveGroup();
         if (manager.hasGroupFile(active)) {
+            assemble(active);
             manager.saveGroup(active);
         } else {
             handleSaveGroupAs(actionEvent);
@@ -204,6 +206,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
         File f = fc.showSaveDialog(evaluator.getScene().getWindow());
         if (f != null) {
+            assemble(evaluator.getActiveGroup());
             manager.saveGroupAs(evaluator.getActiveGroup(), f);
         }
     }
@@ -308,5 +311,36 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
             }
         }
         return null;
+    }
+
+    public void exportAllGroups(){
+        LOGGER.trace(":exportAllGroups");
+        if(!isCatalogueLoaded()){
+            LOGGER.debug(":exportAllGroups - No catalogue set. Returning");
+            return;
+        }
+        DirectoryChooser dc = new DirectoryChooser();
+        if(manager.hasLastExportLocation() ){
+            dc.setInitialDirectory(manager.getLastExportLocation() );
+        }
+        dc.setTitle("Choose an export folder");
+        File dir = dc.showDialog(evaluator.getScene().getWindow() );
+
+        for(Group g : manager.groupList()){
+            assemble(g);
+        }
+
+        manager.exportAllGroups(dir);
+    }
+
+    private void assemble(Group g) {
+        AssessmentView v = groupViewMap.get(g.getName() );
+        g.setProgressList(v.getProgressListForSaving(true)); // TODO not trimming on export?
+        g.setProgressSummaryList(v.getSummaries() );
+        g.setVersion(Version.getInstance().getVersion());
+    }
+
+    public void showOverview(){
+
     }
 }

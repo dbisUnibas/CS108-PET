@@ -159,6 +159,8 @@ public class EvaluatorView extends HBox implements TitleProvider {
     }
 
     public void setActiveTab(String name) {
+        LOGGER.trace(":setActiveTab");
+        LOGGER.entry(name);
         Tab toActive = groupTabMap.get( name);
         tabPane.getSelectionModel().select(toActive);
     }

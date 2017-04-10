@@ -49,6 +49,8 @@ public class MainHandler implements MenuHandler {
     public void handleNewGroup(ActionEvent event) {
         // TODO ensure correct mode
         evaluatorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.GROUP));
+        System.out.println("bmp");
+        LOGGER.fatal("========================================");
         manager.enableGroupNeeded();
     }
 
@@ -98,8 +100,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleExportGroups(ActionEvent event) {
-        // TODO ensure correct mode
-        throw new UnsupportedOperationException("NYI");
+        evaluatorHandler.exportAllGroups();
     }
 
     @Override

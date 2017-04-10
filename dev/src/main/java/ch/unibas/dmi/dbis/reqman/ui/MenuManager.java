@@ -137,6 +137,7 @@ public class MenuManager {
 
         // TEMP
         menuHelp.setDisable(true);
+        LOGGER.debug("Group Needed: "+groupNeeded.toString());
 
         setOnActionAll();
     }
@@ -376,7 +377,10 @@ public class MenuManager {
     }
 
     private void setDisableForItems(List<String> keyProvider, boolean disable) {
-        keyProvider.forEach(key -> menuItems.get(key).setDisable(disable));
+        keyProvider.forEach(key -> {
+            LOGGER.trace(":setDisableForItems - "+String.format("Setting %b for %s", disable, key));
+            menuItems.get(key).setDisable(disable);
+        });
     }
 
     public void disableEditorItems() {
