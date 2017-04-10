@@ -153,8 +153,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleShowOverview(ActionEvent event) {
-        // TODO ensure correct mode
-        throw new UnsupportedOperationException("NYI");
+        evaluatorHandler.showOverview();
     }
 
     @Override

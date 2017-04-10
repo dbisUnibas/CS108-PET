@@ -5,12 +5,17 @@ import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.management.CatalogueNameMismatchException;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.management.NonUniqueGroupNameException;
+import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.layout.HBox;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
@@ -341,6 +346,22 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
 
     public void showOverview(){
-
+        if(!manager.isCatalogueLoaded() || (manager.groupList() == null || manager.groupList().isEmpty())){
+            return;
+        }
+        SimpleOverviewBuilder overview = new SimpleOverviewBuilder(manager.getCatalogue(), manager.groupList());
+        String export = overview.exportOverviewHTML();
+        WebView view = new WebView();
+        WebEngine engine = view.getEngine();
+        engine.loadContent(export);
+        HBox box = new HBox();
+        view.prefWidthProperty().bind(box.widthProperty() );
+        view.prefHeightProperty().bind(box.heightProperty());
+        Scene webScene = new Scene(box, evaluator.getWidth(), evaluator.getHeight());
+        box.prefWidthProperty().bind(webScene.widthProperty());
+        box.prefHeightProperty().bind(webScene.heightProperty());
+        box.getChildren().add(view);
+        PopupStage popupStage = new PopupStage("Overview", webScene);
+        popupStage.showAndWait();
     }
 }
