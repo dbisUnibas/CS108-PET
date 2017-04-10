@@ -152,12 +152,15 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     }
 
     void setupEditor() {
-        editor.getRequirementsView().setRequirements(manager.getObservableRequirements());
-        editor.getMilestoneView().setItems(manager.getObservableMilestones());
+        if (manager.isCatalogueLoaded()) {
+            editor.getRequirementsView().setRequirements(manager.getObservableRequirements());
+            editor.getMilestoneView().setItems(manager.getObservableMilestones());
 
-        setupCatalogueInfo();
+            setupCatalogueInfo();
 
-        editor.enableAll();
+            editor.enableAll();
+        }
+
     }
 
     private void setupCatalogueInfo() {
@@ -169,7 +172,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     }
 
     public void saveCatalogue() {
-        if(manager.isCatalogueLoaded() ){
+        if (manager.isCatalogueLoaded()) {
             editor.indicateWaiting(true);
             manager.saveCatalogue();
             editor.indicateWaiting(false);
@@ -178,10 +181,10 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     }
 
     public void saveAsCatalogue() {
-        if(manager.isCatalogueLoaded()){
+        if (manager.isCatalogueLoaded()) {
             FileChooser sc = Utils.createCatalogueFileChooser("Save As");
             File f = sc.showSaveDialog(editor.getScene().getWindow());
-            if(f!= null){
+            if (f != null) {
                 manager.saveAsCatalogue(f);
             }
         }
@@ -211,14 +214,14 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         return manager.getObservableRequirements();
     }
 
-    public void handleExportCatalogue(ActionEvent event){
-        if(!manager.isCatalogueLoaded() ){
+    public void handleExportCatalogue(ActionEvent event) {
+        if (!manager.isCatalogueLoaded()) {
             return;
         }
         FileChooser fc = new FileChooser();
         fc.setTitle("Export Catalogue");
         File f = fc.showSaveDialog(editor.getScene().getWindow());
-        if(f != null){
+        if (f != null) {
             editor.indicateWaiting(true);
             manager.exportCatalogue(f);
             editor.indicateWaiting(false);

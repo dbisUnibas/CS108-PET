@@ -72,10 +72,12 @@ public class MainScene extends TitledScene {
         switch (mode){
             case EDITOR:
                 root.setCenter(editor);
+                editor.refresh();
                 menuManager.disableEvaluatorItems();
                 break;
             case EVALUATOR:
                 root.setCenter(evaluator);
+                // Should reload catalogue also since may Reqs have changed
                 menuManager.disableEditorItems();
                 break;
         }
