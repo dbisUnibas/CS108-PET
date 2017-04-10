@@ -12,7 +12,6 @@ import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorScene;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
-import javafx.geometry.Rectangle2D;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,16 +33,38 @@ public class ReqmanApplication extends Application {
     private EvaluatorScene evaluator;
     private int currentView = -1;
 
+    private static volatile boolean exp = false;
+
     public static void main(String[] args) {
         Log4J2Fix.applyHotFix();
         version = Version.getInstance();
         LOGGER = LogManager.getLogger(ReqmanApplication.class);
         LOGGER.info("Starting reqman @ v" + version.getFullVersion());
+        if(args.length >= 1){
+            if("--exp".equals(args[0]) || "--experimental".equals(args[0] ) ){
+                exp = true;
+            }
+        }
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
+        if(exp){
+            startExp(primaryStage);
+        }else{
+            startOld(primaryStage);
+        }
+    }
+
+    private void startExp(Stage primaryStage) {
+        MainScene scene = new MainScene();
+        primaryStage.setScene(scene );
+        primaryStage.setTitle(scene.getTitle());
+        primaryStage.show();
+    }
+
+    public void startOld(Stage primaryStage) {
         editor = new EditorScene(primaryStage, 800, 600);
         evaluator = new EvaluatorScene(primaryStage, 800, 600);
 

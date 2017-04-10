@@ -151,7 +151,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         editor.indicateWaiting(false);
     }
 
-    private void setupEditor() {
+    void setupEditor() {
         editor.getRequirementsView().setRequirements(manager.getObservableRequirements());
         editor.getMilestoneView().setItems(manager.getObservableMilestones());
 

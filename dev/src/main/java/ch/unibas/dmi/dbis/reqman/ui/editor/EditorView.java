@@ -39,6 +39,9 @@ public class EditorView extends BorderPane implements TitleProvider{
         this.handler.setEditorView(this);
         initComponents();
         layoutComponents();
+        if(handler.isCatalogueLoaded() ){
+            handler.setupEditor();
+        }
     }
 
     private void initComponents(){

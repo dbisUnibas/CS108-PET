@@ -1,9 +1,10 @@
-package ch.unibas.dmi.dbis.reqman.ui.event;
+package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.ui.MenuHandler;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
+import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
+import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.event.ActionEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -18,6 +19,8 @@ public class MainHandler implements MenuHandler {
     private static final Logger LOGGER = LogManager.getLogger(MainHandler.class);
 
     private static MainHandler instance = null;
+    private MainScene mainScene;
+
     public static MainHandler getInstance(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler){
         if(instance == null){
             instance = new MainHandler(evaluatorHandler,editorHandler);
@@ -27,8 +30,9 @@ public class MainHandler implements MenuHandler {
 
     private final EvaluatorHandler evaluatorHandler;
     private final EditorHandler editorHandler;
+    private MenuManager manager = MenuManager.getInstance();
 
-    private MainHandler(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
+    public MainHandler(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
         this.evaluatorHandler = evaluatorHandler;
         this.editorHandler = editorHandler;
     }
@@ -38,23 +42,28 @@ public class MainHandler implements MenuHandler {
         // TODO ensure correct mode
         editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.CATALOGUE));
         LOGGER.fatal("IMPLEMENT change view");
+        manager.enableCatalogueNeeded();
     }
 
     @Override
     public void handleNewGroup(ActionEvent event) {
         // TODO ensure correct mode
         evaluatorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.GROUP));
+        manager.enableGroupNeeded();
     }
 
     @Override
     public void handleOpenCat(ActionEvent event) {
         evaluatorHandler.handleOpenCatalogue(event);
+        manager.enableCatalogueNeeded();
+
     }
 
     @Override
     public void handleOpenGroups(ActionEvent event) {
         // TODO ensure correct mode
         evaluatorHandler.handleOpenGroups(event);
+        manager.enableGroupNeeded();
     }
 
     @Override
@@ -149,14 +158,12 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleShowEditor(ActionEvent event) {
-        // TODO ensure correct mode
-        throw new UnsupportedOperationException("NYI");
+        mainScene.setActive(MainScene.Mode.EDITOR);
     }
 
     @Override
     public void handleShowEvaluator(ActionEvent event) {
-        // TODO ensure correct mode
-        throw new UnsupportedOperationException("NYI");
+        mainScene.setActive(MainScene.Mode.EVALUATOR);
     }
 
     @Override
@@ -169,5 +176,9 @@ public class MainHandler implements MenuHandler {
     public void setGlobalMilestoneChoice(Milestone ms) {
         // TODO ensure correct mode
         evaluatorHandler.setGlobalMilestoneChoice(ms);
+    }
+
+    public void setMainScene(MainScene mainScene) {
+        this.mainScene = mainScene;
     }
 }

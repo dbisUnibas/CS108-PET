@@ -1,8 +1,12 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
+import ch.unibas.dmi.dbis.reqman.common.Version;
+import ch.unibas.dmi.dbis.reqman.ui.common.TitledScene;
+import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorView;
+import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorView;
-import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -12,24 +16,76 @@ import javafx.scene.layout.VBox;
  *
  * @author loris.sauter
  */
-class MainScene extends Scene {
+public class MainScene extends TitledScene {
 
     private BorderPane root;
 
     private MenuManager menuManager = MenuManager.getInstance();
 
-    private VBox topContainer = new VBox();
+    private VBox topContainer;
 
     private EditorView editor;
+    private EditorHandler editorHandler;
     private EvaluatorView evaluator;
+    private EvaluatorHandler evaluatorHandler;
+
+    private MainHandler mainHandler;
+
+    private Mode active;
+
+    enum Mode{
+        EDITOR,
+        EVALUATOR
+    }
 
     MainScene(){
         super(new Region(), 800,600);
+        initComponents();
+        layoutComponents();
+    }
+
+    private void initComponents(){
         root = new BorderPane();
-        this.setRoot(root);
+        topContainer = new VBox();
+
+        editorHandler = new EditorHandler();
+        editor = new EditorView(editorHandler);
+        evaluatorHandler = new EvaluatorHandler();
+        evaluator = new EvaluatorView(evaluatorHandler);
+
+        mainHandler = new MainHandler(evaluatorHandler,editorHandler);
+        mainHandler.setMainScene(this);
+        menuManager.setMenuHandler(mainHandler);
+
+        setActive(Mode.EVALUATOR);
+        menuManager.disableGroupNeeded();
+    }
+
+    private void layoutComponents(){
+        setRoot(root);
         root.setTop(topContainer);
         topContainer.getChildren().add(menuManager.getMenuBar() );
+        root.setBottom(new Label("Status (COMING SOON)"));
+    }
+
+    void setActive(Mode mode){
+        switch (mode){
+            case EDITOR:
+                root.setCenter(editor);
+                menuManager.disableEvaluatorItems();
+                break;
+            case EVALUATOR:
+                root.setCenter(evaluator);
+                menuManager.disableEditorItems();
+                break;
+        }
+        active = mode;
     }
 
 
+    @Override
+    public String getTitle() {
+        String mode = active.equals(Mode.EDITOR) ? "Editor" : "Evaluator";
+        return String.format("ReqMan %s (%s)", mode, Version.getInstance().getVersion());
+    }
 }

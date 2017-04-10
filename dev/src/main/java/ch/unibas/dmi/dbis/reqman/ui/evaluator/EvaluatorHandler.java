@@ -35,7 +35,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     private HashMap<String, AssessmentView> groupViewMap = new HashMap<>();
     private Milestone activeMS = null;
 
-    EvaluatorHandler() {
+    public EvaluatorHandler() {
         LOGGER.trace("<init>");
     }
 
