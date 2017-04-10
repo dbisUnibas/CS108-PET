@@ -19,29 +19,28 @@ public class MainHandler implements MenuHandler {
     private static final Logger LOGGER = LogManager.getLogger(MainHandler.class);
 
     private static MainHandler instance = null;
-    private MainScene mainScene;
-
-    public static MainHandler getInstance(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler){
-        if(instance == null){
-            instance = new MainHandler(evaluatorHandler,editorHandler);
-        }
-        return instance;
-    }
-
     private final EvaluatorHandler evaluatorHandler;
     private final EditorHandler editorHandler;
+    private MainScene mainScene;
     private MenuManager manager = MenuManager.getInstance();
-
     public MainHandler(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
         this.evaluatorHandler = evaluatorHandler;
+        this.evaluatorHandler.setOnFirstGroup(() -> manager.enableGroupNeeded());
         this.editorHandler = editorHandler;
+    }
+
+    public static MainHandler getInstance(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
+        if (instance == null) {
+            instance = new MainHandler(evaluatorHandler, editorHandler);
+        }
+        return instance;
     }
 
     @Override
     public void handleNewCatalogue(ActionEvent event) {
         // TODO ensure correct mode ?
         editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.CATALOGUE));
-        if (!editorHandler.isCatalogueLoaded()){
+        if (!editorHandler.isCatalogueLoaded()) {
             return;
         }
         mainScene.setActive(MainScene.Mode.EDITOR);
@@ -50,20 +49,17 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleNewGroup(ActionEvent event) {
-        if(! mainScene.isEvaluatorActive() ){
+        if (!mainScene.isEvaluatorActive()) {
             return;
         }
-        manager.enableGroupNeeded();
         evaluatorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.GROUP));
-        System.out.println("bmp");
-        LOGGER.fatal("========================================");
         manager.enableGroupNeeded();
     }
 
     @Override
     public void handleOpenCat(ActionEvent event) {
         evaluatorHandler.handleOpenCatalogue(event);
-        manager.enableCatalogueNeeded();
+
 
     }
 
@@ -71,7 +67,7 @@ public class MainHandler implements MenuHandler {
     public void handleOpenGroups(ActionEvent event) {
         manager.enableGroupNeeded(); // TODO
         evaluatorHandler.handleOpenGroups(event);
-        if(!evaluatorHandler.isGroupLoaded() ){
+        if (!evaluatorHandler.isGroupLoaded()) {
             return;
         }
         manager.enableGroupNeeded();
@@ -85,7 +81,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleSaveGroup(ActionEvent event) {
-        if(!evaluatorHandler.isGroupLoaded() ){
+        if (!evaluatorHandler.isGroupLoaded()) {
             return;
         }
         evaluatorHandler.handleSaveGroup(event);
@@ -99,7 +95,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleSaveGroupAs(ActionEvent event) {
-        if(!evaluatorHandler.isGroupLoaded() ){
+        if (!evaluatorHandler.isGroupLoaded()) {
             return;
         }
         evaluatorHandler.handleSaveGroupAs(event);
@@ -113,7 +109,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleExportGroups(ActionEvent event) {
-        if(!evaluatorHandler.isGroupLoaded() ){
+        if (!evaluatorHandler.isGroupLoaded()) {
             return;
         }
         evaluatorHandler.exportAllGroups();
@@ -121,7 +117,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleExportGroup(ActionEvent event) {
-        if(!evaluatorHandler.isGroupLoaded() ){
+        if (!evaluatorHandler.isGroupLoaded()) {
             return;
         }
         // TODO ensure correct mode
@@ -136,8 +132,8 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleNewReq(ActionEvent event) {
-        if(mainScene.isEditorActive() ){
-            if(editorHandler.isCatalogueLoaded() ){
+        if (mainScene.isEditorActive()) {
+            if (editorHandler.isCatalogueLoaded()) {
                 editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.REQUIREMENT));
             }
         }
@@ -145,8 +141,8 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleNewMS(ActionEvent event) {
-        if(mainScene.isEditorActive() ){
-            if(editorHandler.isCatalogueLoaded() ){
+        if (mainScene.isEditorActive()) {
+            if (editorHandler.isCatalogueLoaded()) {
                 editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.MILESTONE));
             }
         }
@@ -155,8 +151,8 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleModCat(ActionEvent event) {
-        if(mainScene.isEditorActive() ){
-            if(editorHandler.isCatalogueLoaded() ){
+        if (mainScene.isEditorActive()) {
+            if (editorHandler.isCatalogueLoaded()) {
                 editorHandler.handle(CUDEvent.generateModificationEvent(event, TargetEntity.CATALOGUE, null));// By design, can be null
             }
         }
@@ -165,8 +161,8 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleModReq(ActionEvent event) {
-        if(mainScene.isEditorActive() ){
-            if(editorHandler.isCatalogueLoaded() ){
+        if (mainScene.isEditorActive()) {
+            if (editorHandler.isCatalogueLoaded()) {
                 editorHandler.handleModification(CUDEvent.generateModificationEvent(event, TargetEntity.REQUIREMENT, editorHandler.getSelectedRequirement()));
             }
         }
@@ -174,8 +170,8 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleModMS(ActionEvent event) {
-        if(mainScene.isEditorActive() ){
-            if(editorHandler.isCatalogueLoaded() ){
+        if (mainScene.isEditorActive()) {
+            if (editorHandler.isCatalogueLoaded()) {
                 editorHandler.handleModification(CUDEvent.generateModificationEvent(event, TargetEntity.MILESTONE, editorHandler.getSelectedMS()));
             }
         }
@@ -183,8 +179,8 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleModGroup(ActionEvent event) {
-        if(mainScene.isEvaluatorActive() ){
-            if(evaluatorHandler.isGroupLoaded() ){
+        if (mainScene.isEvaluatorActive()) {
+            if (evaluatorHandler.isGroupLoaded()) {
                 evaluatorHandler.handle(CUDEvent.generateModificationEvent(event, TargetEntity.GROUP, null));
             }
         }
@@ -192,8 +188,8 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleShowOverview(ActionEvent event) {
-        if(mainScene.isEvaluatorActive() ){
-            if(evaluatorHandler.isGroupLoaded() ){
+        if (mainScene.isEvaluatorActive()) {
+            if (evaluatorHandler.isGroupLoaded()) {
                 evaluatorHandler.showOverview();
             }
         }
@@ -211,8 +207,8 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void resetGlobalMilestoneChoice() {
-        if(mainScene.isEvaluatorActive() ){
-            if(evaluatorHandler.isGroupLoaded() ){
+        if (mainScene.isEvaluatorActive()) {
+            if (evaluatorHandler.isGroupLoaded()) {
                 evaluatorHandler.resetGlobalMilestoneChoice();
             }
         }
@@ -220,15 +216,18 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void setGlobalMilestoneChoice(Milestone ms) {
-        if(mainScene.isEvaluatorActive() ){
-            if(evaluatorHandler.isGroupLoaded() ){
-                evaluatorHandler.setGlobalMilestoneChoice(ms);
-            }
+        LOGGER.trace(":setGlobalMilestoneChoice");
+        if (mainScene.isEvaluatorActive()) {
+            evaluatorHandler.setGlobalMilestoneChoice(ms);
         }
 
     }
 
     public void setMainScene(MainScene mainScene) {
         this.mainScene = mainScene;
+    }
+
+    void stop() {
+        evaluatorHandler.stop();
     }
 }

@@ -56,9 +56,9 @@ public class ReqmanApplication extends Application {
             startOld(primaryStage);
         }
     }
-
+    MainScene scene;
     private void startExp(Stage primaryStage) {
-        MainScene scene = new MainScene();
+        scene = new MainScene();
         primaryStage.setScene(scene );
         primaryStage.setTitle(scene.getTitle());
         primaryStage.show();
@@ -137,9 +137,14 @@ public class ReqmanApplication extends Application {
 
     @Override
     public void stop() {
-        if (currentView == EVALUATOR_VIEW) {
-            evaluator.stop();
+        if(scene != null){
+            scene.stop();
+        }else if(evaluator != null){
+            if (currentView == EVALUATOR_VIEW) {
+                evaluator.stop();
+            }
         }
+
     }
 
 

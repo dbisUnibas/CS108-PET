@@ -50,6 +50,12 @@ public class MainScene extends TitledScene {
         super(new Region(), 800,600);
         initComponents();
         layoutComponents();
+        evaluatorHandler.openBackups();
+        menuManager.enableGroupNeeded();
+    }
+
+    void stop(){
+        mainHandler.stop();
     }
 
     Mode getActiveMode(){

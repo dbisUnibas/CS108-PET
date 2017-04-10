@@ -1,13 +1,16 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.common.Callback;
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.management.CatalogueNameMismatchException;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.management.NonUniqueGroupNameException;
+import ch.unibas.dmi.dbis.reqman.ui.MenuManager;
 import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
+import ch.unibas.dmi.dbis.reqman.ui.event.CreationHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
@@ -83,6 +86,8 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         return manager.getCatalogue();
     }
 
+    private Callback firstGroupCallback = null;
+
     @Override
     public void handle(CUDEvent event) {
         if (event != null) {
@@ -142,6 +147,35 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
     }
 
+
+    private void handleAddGroup(Group gr){
+        LOGGER.trace(":handleAddGroup");
+        if(gr == null){
+            LOGGER.trace(":handleAddGroup - new create");
+            gr = EvaluatorPromptFactory.promptGroup(this);
+        }else{
+            LOGGER.trace(":handleAddGroup - re-create");
+        }
+        LOGGER.entry(gr);
+        // ADD GROUP
+        manager.addGroup(gr);
+        loadGroupUI(gr);
+
+        if(manager.groupList().size() == 1){
+            LOGGER.trace("First group");
+            if(firstGroupCallback != null){
+                firstGroupCallback.call();
+            }else{
+                LOGGER.debug("No callback set");
+            }
+
+        }
+    }
+
+    public void setOnFirstGroup(Callback callback){
+        this.firstGroupCallback = callback;
+    }
+
     public void handleCreation(CUDEvent event) {
         switch (event.getTargetEntity()) {
             case GROUP:
@@ -154,9 +188,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
                     LOGGER.trace(":handleCreation - new create");
                     gr = EvaluatorPromptFactory.promptGroup(this);
                 }
-                // ADD GROUP
-                manager.addGroup(gr);
-                loadGroupUI(gr);
+                handleAddGroup(gr);
                 break;
             default:
                 // Ignoring
@@ -250,6 +282,8 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         LOGGER.info("Opened catalogue " + manager.getCatalogueFile().getPath());
         LOGGER.trace("Enabling all");
         evaluator.enableAll();
+        MenuManager.getInstance().setupGlobalMilestoneMenu(this.getMilestones());
+        MenuManager.getInstance().enableCatalogueNeeded();
         evaluator.displayCatalogueInfo(manager.getCatalogue());
     }
 
@@ -395,6 +429,24 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         box.getChildren().add(view);
         PopupStage popupStage = new PopupStage("Overview", webScene);
         popupStage.showAndWait();
+    }
+
+    public void stop(){
+        manager.groupList().forEach(g -> {
+            if(evaluator.isDirty(g)){
+                manager.saveAsBackup(g);
+            }
+        });
+    }
+
+    public void openBackups(){
+        manager.openBackupsIfExistent(list -> {
+            list.forEach(obj -> {
+                if(!obj.isCatalogue()){
+                    loadGroupUI(obj.getGroup());
+                }
+            });
+        });
     }
 
     public boolean isGroupLoaded() {

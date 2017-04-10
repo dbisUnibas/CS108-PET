@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,29 @@ import java.util.function.Consumer;
  */
 public class EntityManager {
 
+    public static final String BACKUP_EXTENSION = "backup";
+    public static final String GROUP_KEY = "group";
+    public static final String CATALOGUE_KEY = "catalogue";
     private static final Logger LOGGER = LogManager.getLogger(EntityManager.class);
+    public static final FileFilter BACKUP_FILTER = (file) -> {
+        if (file.isDirectory()) {
+            return false;
+        } else {
+            String name = file.getName();
+            LOGGER.debug("Filtering... " + name);
+            int index = name.lastIndexOf(".");
+            if (index != -1) {
+                String extension = name.substring(name.lastIndexOf("."));
+                LOGGER.debug(" ... with extension: " + extension);
+                if (BACKUP_EXTENSION.equals(extension.substring(1))) { // substring(1) so "." is gone
+                    return true;
+                }
+            } else {
+                LOGGER.debug("... extension-less files are ignored");
+            }
+            return false;
+        }
+    };
     private static EntityManager instance = null;
     private final SimpleDoubleProperty maxSumProperty = new SimpleDoubleProperty();
     /* === COMMON === */
@@ -41,7 +64,7 @@ public class EntityManager {
     private HashMap<String, File> groupFileMap = new HashMap<>();
     private Group lastOpenedGroup = null;
     private int lastOrdinal = -1;
-
+    private Exception lastOpenException = null;
 
     private EntityManager() {
 
@@ -56,7 +79,7 @@ public class EntityManager {
         return instance;
     }
 
-    private static void runTask(ManagementTask task, Callback internalCallback, Callback doneCallback){
+    private static void runTask(ManagementTask task, Callback internalCallback, Callback doneCallback) {
         Thread th = createDeamon(task);
 
 
@@ -78,7 +101,7 @@ public class EntityManager {
         th.start();
     }
 
-    private static Thread createDeamon(ManagementTask task){
+    private static Thread createDeamon(ManagementTask task) {
         Thread thread = new Thread(task);
         thread.setDaemon(true); // silently shutsdown upon exiting
 
@@ -88,7 +111,7 @@ public class EntityManager {
         return thread;
     }
 
-    private static void runTaskThrowing(ThrowingManagementTask task, ThrowingCallback internalCallback, Callback doneCallback){
+    private static void runTaskThrowing(ThrowingManagementTask task, ThrowingCallback internalCallback, Callback doneCallback) {
         Thread deamon = createDeamon(task);
         if (internalCallback != null) {
             task.setThrowingOnSucceeded(event -> {
@@ -103,11 +126,11 @@ public class EntityManager {
         deamon.start();
     }
 
-    private static void runTask(ManagementTask task){
+    private static void runTask(ManagementTask task) {
         runTask(task, null, null);
     }
 
-    private static void runTask(ManagementTask task, Callback internal){
+    private static void runTask(ManagementTask task, Callback internal) {
         runTask(task, internal, null);
     }
 
@@ -126,7 +149,7 @@ public class EntityManager {
     /**
      * @param file nontnull
      */
-    public void openCatalogue(File file, Callback doneCallback){
+    public void openCatalogue(File file, Callback doneCallback) {
         LOGGER.trace(":openCat");
 
         OpenCatalogueTask openTask = new OpenCatalogueTask(file);
@@ -389,7 +412,6 @@ public class EntityManager {
         groups.add(gr);
     }
 
-
     public boolean hasLastOpenLocation() {
         return lastOpenLocation != null;
     }
@@ -427,40 +449,38 @@ public class EntityManager {
         return catalogueFile;
     }
 
-    private Exception lastOpenException = null;
-
     public void openGroup(File file, Consumer<Group> done) {
         LOGGER.entry(file);
         OpenGroupTask task = new OpenGroupTask(file);
-            runTaskThrowing(task, () -> {
-                if(task.getLastException() != null){ // NOT WORKING
-                    lastOpenException = task.getLastException();
-                }
-                openedGroup(file, task.getValue());
-            }, () -> {
-                done.accept(task.getValue());
-            } );
+        runTaskThrowing(task, () -> {
+            if (task.getLastException() != null) { // NOT WORKING
+                lastOpenException = task.getLastException();
+            }
+            openedGroup(file, task.getValue());
+        }, () -> {
+            done.accept(task.getValue());
+        });
     }
 
-    public void openGroups(List<File> files, Consumer<List<Group>> callback){
+    public void openGroups(List<File> files, Consumer<List<Group>> callback) {
         LOGGER.entry(files);
         OpenMultipleGroupsTask task = new OpenMultipleGroupsTask(files);
         runTask(task, () -> {
             openedGroups(files, task.getValue());
-        },() -> {
+        }, () -> {
             callback.accept(task.getValue());
         });
     }
 
-    public Exception getLastOpenException(){
+    public Exception getLastOpenException() {
         return lastOpenException;
     }
 
     private void openedGroup(File file, Group group) throws CatalogueNameMismatchException, NonUniqueGroupNameException {
         LOGGER.trace(":openedGroup");
         LOGGER.entry(file, group);
-        if(group == null || file == null){
-            throw new NullPointerException("Group or file null");
+        if (group == null) {
+            throw new NullPointerException("Group null");
         }
         /*if (!group.getCatalogueName().equals(catalogue.getName())) {
             throw LOGGER.throwing(new CatalogueNameMismatchException(catalogue.getName(), group.getCatalogueName(), group.getName(), file) );
@@ -468,57 +488,63 @@ public class EntityManager {
         if(!isGroupNameUnique(group.getName()) ){
             throw LOGGER.throwing(new NonUniqueGroupNameException(group.getName() ) );
         }*/
-        groupFileMap.put(group.getName(), file);
-        LOGGER.trace(":openedGroup - stored file");
+
         groups.add(group);
         LOGGER.trace(":openedGroup - Added group");
-        lastOpenLocation = ensureDirectory(file);
-        LOGGER.trace(":openedGroup - stored last location");
-        LOGGER.info("Successfully loaded group "+String.format("(%s)", group.getName())+" to workspace.");
+
+        if(file != null){
+            groupFileMap.put(group.getName(), file);
+            LOGGER.trace(":openedGroup - stored file");
+            lastOpenLocation = ensureDirectory(file);
+            LOGGER.trace(":openedGroup - stored last location");
+        }
+
+        LOGGER.info("Successfully loaded group " + String.format("(%s)", group.getName()) + " to workspace.");
     }
 
     /**
      * Contract: files.size()==groups.size();
+     *
      * @param files
      * @param groups
      */
-    private void openedGroups(List<File> files, List<Group> groups){
+    private void openedGroups(List<File> files, List<Group> groups) {
         LOGGER.trace(":openedGroups");
-        for(int i=0; i<files.size(); ++i){
+        for (int i = 0; i < files.size(); ++i) {
             openedGroup(files.get(i), groups.get(i));
         }
         LOGGER.trace("Finished loading of groups");
     }
 
     public Group getLastOpenedGroup() {
-        if(lastOpenedGroup == null){
+        if (lastOpenedGroup == null) {
             throw new NullPointerException();
         }
         return lastOpenedGroup;
     }
 
-    public ObservableList<Progress> getObservableProgress(Group provider){
+    public ObservableList<Progress> getObservableProgress(Group provider) {
         return FXCollections.observableList(provider.progressList());
     }
 
     public boolean hasGroupFile(Group active) {
         LOGGER.trace(":hasGroupFile");
         LOGGER.entry(active);
-        return groupFileMap.containsKey(active.getName() );
+        return groupFileMap.containsKey(active.getName());
     }
 
     public void saveGroup(Group group) {
         File f = groupFileMap.get(group.getName());
         SaveGroupTask task = new SaveGroupTask(f, group);
         runTask(task, () -> {
-            LOGGER.info("Saved group ("+group.getName()+") to "+f.getPath());
+            LOGGER.info("Saved group (" + group.getName() + ") to " + f.getPath());
         });
     }
 
-    public void saveGroupAs(Group group, File file){
+    public void saveGroupAs(Group group, File file) {
         SaveGroupTask task = new SaveGroupTask(file, group);
         runTask(task, () -> {
-            LOGGER.info("SavedAs group ("+group.getName()+") to "+file.getPath());
+            LOGGER.info("SavedAs group (" + group.getName() + ") to " + file.getPath());
             groupFileMap.put(group.getName(), file);
         });
     }
@@ -529,5 +555,70 @@ public class EntityManager {
             lastExportLocation = ensureDirectory(dir);
             LOGGER.info("All export done");
         });
+    }
+
+    public void saveAsBackup(Group g) {
+        Thread th = new Thread(new SaveGroupBackupTask(g, catalogueFile));
+        th.start();
+    }
+
+    public void openBackupsIfExistent(Consumer<List<OpenBackupsTask.BackupObject>> callback) {
+        OpenBackupsTask task = new OpenBackupsTask();
+        runTask(task, () -> {
+            task.getValue().forEach( o -> {
+                if(o.isCatalogue() && o.getCatalogue() != null){
+
+                    setCatalogue(o.getCatalogue() );
+                    catalogueFile = o.getLocation();
+                }else{
+                    openedGroup(null, o.getGroup());
+                }
+            });
+        }, () -> {
+            callback.accept(task.getValue());
+        });
+        /* IMPORTANT: internalCallback:
+            add / load catalogue,
+            add / load groups
+
+           IMPORTANT: externalCallback:
+            setup editor,
+            setup evaluator
+         */
+        /*File dir = ConfigUtils.getCodeSourceLocation().getParentFile();
+        if(dir.isDirectory() ){
+            for(File file : dir.listFiles(BACKUP_FILTER) ) {
+                LOGGER.info("Found .backup file: "+file.getPath() );
+                try {
+                    Map<String, Object> backupObj = JSONUtils.readFromJSONFile(file);
+                    boolean hasCatalogueKey = backupObj.containsKey(CATALOGUE_KEY);
+                    boolean hasGroupKey = backupObj.containsKey(GROUP_KEY);
+
+                    if(hasCatalogueKey && hasGroupKey ){
+                        if(backupObj.get(CATALOGUE_KEY) instanceof String){
+                            File catFile = new File((String)backupObj.get(CATALOGUE_KEY));
+                            loadCatalogue(catFile);
+                            catalogueFile = catFile;
+                            // Catalogue set
+                            if(backupObj.get(GROUP_KEY) instanceof String) {
+                                Group g = JSONUtils.readFromString((String)backupObj.get(GROUP_KEY),Group.class);
+                                loadGroup(null, g);
+                                markDirty(g);
+                                LOGGER.info("Successfully opened group"+g.getName()+" from backupfile "+file.getName() );
+                                boolean deletSucc = file.delete();
+                                LOGGER.info("Removed backup file: "+file.getName() );
+                            }
+                        }else{
+                            LOGGER.error("Expected catalogue property to be of type String.");
+                            return;
+                        }
+                    }else{
+                        LOGGER.error("Found .backup file without expected structure: "+backupObj.toString() );
+                        return;
+                    }
+                } catch (IOException e) {
+                    LOGGER.error("Exception reading .backup file.",e);
+                }
+            }*/
     }
 }
