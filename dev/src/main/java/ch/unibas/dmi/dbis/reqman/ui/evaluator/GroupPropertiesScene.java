@@ -105,6 +105,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         loadMembers();
     }
 
+
     private List<String> memberToStringList(List<Member> members) {
         ArrayList<String> out = new ArrayList<>();
         members.forEach(

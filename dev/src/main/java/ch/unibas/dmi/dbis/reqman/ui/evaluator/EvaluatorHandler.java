@@ -110,10 +110,15 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
                 assemble(gr);
                 // DONT FORGET TO UPDATE ALL NAME REFERNECES, IF NAME CHANGED!
                 Group mod = EvaluatorPromptFactory.promptGroup(gr, this);
+                mod.setProgressList(gr.getProgressList());
+                mod.setVersion(gr.getVersion());
+                mod.setProgressSummaryList(gr.getProgressSummaries());
                 //manager.replaceGroup(gr, mod);
-                CUDEvent.generateDeletionEvent(event, TargetEntity.GROUP,-1, gr);
-
-                CUDEvent.generateCreationEvent(event, TargetEntity.GROUP, mod);
+                CUDEvent del =CUDEvent.generateDeletionEvent(event, TargetEntity.GROUP,-1, gr);
+                handleDeletion(del);
+                CUDEvent add =CUDEvent.generateCreationEvent(event, TargetEntity.GROUP, mod);
+                handleCreation(add);
+                LOGGER.trace(":handleModification - Done");
                 break;
             default:
                 // Ignoring
@@ -363,8 +368,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     private void assemble(Group g) {
         AssessmentView v = groupViewMap.get(g.getName() );
+        LOGGER.trace(":assemble");
+        LOGGER.entry(g);
         g.setProgressList(v.getProgressListForSaving(true)); // TODO not trimming on export?
+        LOGGER.debug("Set progress list");
         g.setProgressSummaryList(v.getSummaries() );
+        LOGGER.debug("Set summaries");
         g.setVersion(Version.getInstance().getVersion());
     }
 
