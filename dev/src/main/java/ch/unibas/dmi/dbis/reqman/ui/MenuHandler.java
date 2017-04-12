@@ -36,4 +36,6 @@ public interface MenuHandler {
     void resetGlobalMilestoneChoice();
 
     void setGlobalMilestoneChoice(Milestone ms);
+
+    void handlePresentationMode(ActionEvent event);
 }

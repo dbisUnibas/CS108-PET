@@ -52,6 +52,7 @@ public class MainScene extends TitledScene {
         layoutComponents();
         evaluatorHandler.openBackups();
         menuManager.enableGroupNeeded();
+        getRoot().getStylesheets().add("style.css");
     }
 
     void stop(){

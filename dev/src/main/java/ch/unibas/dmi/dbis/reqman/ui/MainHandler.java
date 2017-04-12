@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.event.ActionEvent;
+import javafx.scene.control.RadioMenuItem;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -221,6 +222,20 @@ public class MainHandler implements MenuHandler {
             evaluatorHandler.setGlobalMilestoneChoice(ms);
         }
 
+    }
+
+    @Override
+    public void handlePresentationMode(ActionEvent event) {
+        if(event.getSource() instanceof RadioMenuItem){
+            RadioMenuItem rmi = (RadioMenuItem)event.getSource();
+            if(rmi.isSelected()){
+                if(!mainScene.getRoot().getStyleClass().contains("presentation") ){
+                    mainScene.getRoot().getStyleClass().add("presentation");
+                }
+            }else{
+                mainScene.getRoot().getStyleClass().remove("presentation");
+            }
+        }
     }
 
     public void setMainScene(MainScene mainScene) {

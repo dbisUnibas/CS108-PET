@@ -49,6 +49,9 @@ public class MenuManager {
     public static final String ITEM_SHOW_OVERVIEW = "itemShowOverview";
     public static final String ITEM_EDITOR = "itemEditor";
     public static final String ITEM_EVALUATOR = "itemEvaluator";
+    public static final String ITEM_PRESENTATION_MODE = "itemPresentation";
+
+
     public static final String CLEAR_GLOBAL_MS_KEY = "clear";
 
 
@@ -85,12 +88,15 @@ public class MenuManager {
     private MenuItem itemShowOverview;
     private MenuItem itemEditor;
     private MenuItem itemEvaluator;
+    private MenuItem itemPresentation;
     private MenuBar menuBar = new MenuBar();
     private ArrayList<String> editorItems = new ArrayList<>();
     private ArrayList<String> evaluatorItems = new ArrayList<>();
 
     private ArrayList<String> catNeeded = new ArrayList<>();
     private ArrayList<String> groupNeeded = new ArrayList<>();
+
+    private HashMap<String, String> activeKeyBindings = new HashMap<>();
 
     private MenuHandler handler = null;
 
@@ -131,13 +137,13 @@ public class MenuManager {
 
         registerMenuItem(ITEM_EDITOR, itemEditor = new MenuItem("Editor"));
         registerMenuItem(ITEM_EVALUATOR, itemEvaluator = new MenuItem("Evaluator"));
+        registerMenuItem(ITEM_PRESENTATION_MODE, itemPresentation = new RadioMenuItem("Presentation Mode"));
 
         assembleMenus();
         menuBar.getMenus().addAll(menuFile, menuEdit, menuEvaluate, menuView, menuHelp);
 
         // TEMP
         menuHelp.setDisable(true);
-        LOGGER.debug("Group Needed: "+groupNeeded.toString());
 
         setOnActionAll();
     }
@@ -247,6 +253,8 @@ public class MenuManager {
                         case ITEM_EVALUATOR:
                             handler.handleShowEvaluator(event);
                             break;
+                        case ITEM_PRESENTATION_MODE:
+                            handler.handlePresentationMode(event);
                         default:
                             // Silently ignoring -> may log issue?
                     }
@@ -339,7 +347,7 @@ public class MenuManager {
 
         menuEvaluate.getItems().addAll(itemShowOverview, menuGlobalMilestone);
 
-        menuView.getItems().addAll(itemEditor, itemEvaluator);
+        menuView.getItems().addAll(itemEditor, itemEvaluator, new SeparatorMenuItem(), itemPresentation);
     }
 
     private void registerEditorItem(String key, MenuItem item) {

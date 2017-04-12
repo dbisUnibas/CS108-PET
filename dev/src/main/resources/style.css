@@ -7,8 +7,19 @@ Styling to indicate that a tab is not saved yet.
 }
 
 /*
+Presentation mode:
+Adjust later on
+ */
+.root.presentation {
+    -fx-font-size: 1.8em;
+}
+
+.menu-bar {
+    -fx-font-size: 1em;
+}
+
+/*
 Styling for all displays (label which display an information)
-Currently not working
  */
 .label.display {
     -fx-background-color: white !important;
