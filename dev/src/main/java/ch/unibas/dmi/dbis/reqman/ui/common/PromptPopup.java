@@ -19,9 +19,9 @@ public class PromptPopup<T> {
 
     private Consumer<T> consumer = null;
 
-    public PromptPopup(AbstractVisualCreator creator) {
+    private PromptPopup(AbstractVisualCreator creator, boolean modality) {
         this.creator = creator;
-        stage = new PopupStage(creator.getPromptTitle(), creator);
+        stage = new PopupStage(creator.getPromptTitle(), creator, modality);
         stage.setOnHiding(evt -> {
             if(consumer != null){
                 if(getCreation() != null){
@@ -31,8 +31,12 @@ public class PromptPopup<T> {
         });
     }
 
+    public PromptPopup(AbstractVisualCreator creator){
+        this(creator, true);
+    }
+
     public PromptPopup(AbstractVisualCreator creator, Consumer consumer){
-        this(creator);
+        this(creator, false);
         this.consumer = consumer;
 
 

@@ -21,24 +21,31 @@ public class PopupStage extends Stage {
     protected Scene content;
 
     public PopupStage() {
-        this("N/A", null);
+        this("N/A", null, true);
     }
 
-    public PopupStage(String title, Scene content) {
+    public PopupStage(String title, Scene content, boolean modality) {
         this.content = content;
         this.title = title;
 
 
-        initComponents();
+        initComponents(modality);
     }
 
-    protected void initComponents() {
+    public PopupStage(String title, Scene content){
+        this(title, content, true);
+    }
+
+    protected void initComponents(boolean modal) {
         if (content != null) {
             setScene(content);
         }
         if (title != null) {
             setTitle(title);
         }
-        initModality(Modality.APPLICATION_MODAL);
+        if(modal){
+            initModality(Modality.APPLICATION_MODAL);
+        }
+
     }
 }

@@ -20,6 +20,7 @@ Adjust later on
 
 /*
 Styling for all displays (label which display an information)
+TODO: Needs re-styling (margin?)
  */
 .label.display {
     -fx-background-color: white !important;
