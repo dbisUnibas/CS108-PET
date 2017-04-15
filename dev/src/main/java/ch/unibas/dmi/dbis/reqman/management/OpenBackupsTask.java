@@ -20,6 +20,17 @@ public class OpenBackupsTask extends ManagementTask<List<OpenBackupsTask.BackupO
 
 
     public static class BackupObject{
+        @Override
+        public String toString() {
+            final StringBuffer sb = new StringBuffer("BackupObject{");
+            sb.append("cat=").append(cat);
+            sb.append(", catalogue=").append(catalogue);
+            sb.append(", group=").append(group);
+            sb.append(", location=").append(location);
+            sb.append('}');
+            return sb.toString();
+        }
+
         final boolean cat;
 
         private BackupObject(boolean catalogue) {
@@ -34,7 +45,7 @@ public class OpenBackupsTask extends ManagementTask<List<OpenBackupsTask.BackupO
         }
 
         static BackupObject createGroupBackup(Group group){
-            BackupObject obj = new BackupObject(true);
+            BackupObject obj = new BackupObject(false);
             obj.setGroup(group);
             return obj;
         }
@@ -123,4 +134,6 @@ public class OpenBackupsTask extends ManagementTask<List<OpenBackupsTask.BackupO
         }
         return list;
     }
+
+
 }

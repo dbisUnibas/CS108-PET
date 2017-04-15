@@ -26,7 +26,10 @@ public class MainHandler implements MenuHandler {
     private MenuManager manager = MenuManager.getInstance();
     public MainHandler(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
         this.evaluatorHandler = evaluatorHandler;
-        this.evaluatorHandler.setOnFirstGroup(() -> manager.enableGroupNeeded());
+        this.evaluatorHandler.setOnFirstGroup(() -> {
+            manager.enableGroupNeeded();
+            evaluatorHandler.enableEvalautor();
+        });
         this.editorHandler = editorHandler;
     }
 
@@ -244,5 +247,11 @@ public class MainHandler implements MenuHandler {
 
     void stop() {
         evaluatorHandler.stop();
+    }
+
+    void checkGroupsPresent(){
+        if(evaluatorHandler.isGroupLoaded() ){
+            MenuManager.getInstance().enableGroupNeeded();
+        }
     }
 }

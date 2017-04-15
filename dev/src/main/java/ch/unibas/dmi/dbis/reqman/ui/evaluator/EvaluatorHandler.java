@@ -10,7 +10,6 @@ import ch.unibas.dmi.dbis.reqman.ui.MenuManager;
 import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
-import ch.unibas.dmi.dbis.reqman.ui.event.CreationHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
@@ -48,6 +47,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     public EvaluatorHandler() {
         LOGGER.trace("<init>");
+        openBackups();
     }
 
     void setEvaluatorView(EvaluatorView view) {
@@ -161,14 +161,19 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         manager.addGroup(gr);
         loadGroupUI(gr);
 
+        handleFirstGroupPresent();
+
+    }
+
+    private void handleFirstGroupPresent(){
+        LOGGER.trace(":handleFirstGroupPresent");
         if(manager.groupList().size() == 1){
-            LOGGER.trace("First group");
+            LOGGER.trace(":handleFirstGroupPresent"+" - First group");
             if(firstGroupCallback != null){
                 firstGroupCallback.call();
             }else{
-                LOGGER.debug("No callback set");
+                LOGGER.debug(":handleFirstGroupPresent - No callback set");
             }
-
         }
     }
 
@@ -212,10 +217,16 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
             return; // USER ABORT
         }
         if (files.size() == 1) {
-            manager.openGroup(files.get(0), this::loadGroupUI);
+            manager.openGroup(files.get(0), (g) -> {
+                handleFirstGroupPresent();
+                loadGroupUI(g);
+            });
 
         } else if (files.size() >= 2) {
-            manager.openGroups(files, this::loadGroupUI);
+            manager.openGroups(files, (list) -> {
+                handleFirstGroupPresent();
+                loadGroupUI(list);
+            });
         }
         // USER ABORT
     }
@@ -441,7 +452,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     public void openBackups(){
         manager.openBackupsIfExistent(list -> {
+            if(!list.isEmpty()){
+                MenuManager.getInstance().enableGroupNeeded();
+                evaluator.enableAll();
+            }
             list.forEach(obj -> {
+                LOGGER.trace(":openBackups - Aftermath: Processing: "+obj.toString());
                 if(!obj.isCatalogue()){
                     loadGroupUI(obj.getGroup());
                 }
@@ -453,4 +469,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         return !manager.groupList().isEmpty();
     }
 
+    public void enableEvalautor() {
+        evaluator.enableAll();
+    }
 }

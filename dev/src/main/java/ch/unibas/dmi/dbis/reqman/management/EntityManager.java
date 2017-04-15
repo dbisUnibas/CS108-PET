@@ -345,6 +345,7 @@ public class EntityManager {
     }
 
     public void setCatalogue(Catalogue catalogue) {
+        LOGGER.debug("Setting catalogue %s", catalogue);
         this.catalogue = catalogue;
         observableRequirements = FXCollections.observableList(catalogue.requirementList());
         observableMilestones = FXCollections.observableList(catalogue.milestoneList());

@@ -50,8 +50,6 @@ public class MainScene extends TitledScene {
         super(new Region(), 800,600);
         initComponents();
         layoutComponents();
-        evaluatorHandler.openBackups();
-        menuManager.enableGroupNeeded();
         getRoot().getStylesheets().add("style.css");
     }
 
@@ -85,6 +83,7 @@ public class MainScene extends TitledScene {
         root.setTop(topContainer);
         topContainer.getChildren().add(menuManager.getMenuBar() );
         root.setBottom(new Label("Status (COMING SOON)"));
+        mainHandler.checkGroupsPresent();
     }
 
     void setActive(Mode mode){

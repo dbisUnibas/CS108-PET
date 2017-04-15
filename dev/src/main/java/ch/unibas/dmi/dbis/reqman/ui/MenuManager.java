@@ -4,13 +4,8 @@ package ch.unibas.dmi.dbis.reqman.ui;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.RadioMenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.Toggle;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCombination;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -110,8 +105,10 @@ public class MenuManager {
 
         registerMenuItem(ITEM_NEW_CAT, itemNewCat = new MenuItem("New Catalogue..."));
         registerMenuItem(ITEM_NEW_GROUP, itemNewGroup = new MenuItem("New Group..."));
+        catNeeded.add(ITEM_NEW_GROUP);
         registerMenuItem(ITEM_OPEN_CAT, itemOpenCat = new MenuItem("Open Catalogue..."));
         registerMenuItem(ITEM_OPEN_GROUPS, itemOpenGroup = new MenuItem("Open Group..."));
+        catNeeded.add(ITEM_OPEN_GROUPS);
 
         registerEditorItem(ITEM_SAVE_CAT, itemSaveCat = new MenuItem("Save Catalogue"), true);
         registerEvaluatorItem(ITEM_SAVE_GROUP, itemSaveGroup = new MenuItem("Save Group"), true);
@@ -145,7 +142,23 @@ public class MenuManager {
         // TEMP
         menuHelp.setDisable(true);
 
+        loadDefaultKeyBindings();
+
         setOnActionAll();
+        setKeyBindings();
+
+        disableAllButInitial();
+    }
+
+    private void loadDefaultKeyBindings() {
+        activeKeyBindings.put(ITEM_OPEN_CAT, "Ctrl+L");
+        activeKeyBindings.put(ITEM_SAVE_CAT, "Alt+S");
+        activeKeyBindings.put(ITEM_SAVE_CAT_AS,"Alt+Shift+S");
+        activeKeyBindings.put(ITEM_OPEN_GROUPS, "Ctrl+O");
+        activeKeyBindings.put(ITEM_SAVE_GROUP, "Ctrl+S");
+        activeKeyBindings.put(ITEM_SAVE_GROUP_AS, "Ctrl+Shift+S");
+        activeKeyBindings.put(ITEM_EXPORT_CAT, "Alt+E");
+        activeKeyBindings.put(ITEM_EXPORT_GROUPS, "Ctrl+E");
     }
 
     /**
@@ -168,6 +181,15 @@ public class MenuManager {
 
     private void setOnActionAll() {
         menuItems.values().forEach(mi -> mi.setOnAction(this::handle));
+    }
+
+    private void setKeyBindings(){
+        activeKeyBindings.forEach((miKey, combination) -> {
+            MenuItem mi = menuItems.get(miKey);
+            if(mi != null){
+                mi.setAccelerator(KeyCombination.keyCombination(combination));
+            }
+        });
     }
 
     public MenuHandler setMenuHandler(MenuHandler handler){

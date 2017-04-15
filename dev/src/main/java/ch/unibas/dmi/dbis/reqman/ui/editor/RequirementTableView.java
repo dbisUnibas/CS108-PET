@@ -23,7 +23,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -82,11 +81,14 @@ public class RequirementTableView extends BorderPane {
                     if (c.wasPermutated()) {
                         // Permutation
                         for (int i = c.getFrom(); i < c.getTo(); ++i) {
-
+                            // With c.getPermutation(i) new index is provided
                         }
                     } else if (c.wasUpdated()) {
                         // Update
-
+                        for(int i=c.getFrom(); i<c.getTo(); ++i){
+                            // are updated
+                            // Was updated: c.getList().get(i);
+                        }
                     } else {
                         for (Requirement removeItem : c.getRemoved()) {
                             tableData.remove(ObservableRequirement.fromRequirement(removeItem));
