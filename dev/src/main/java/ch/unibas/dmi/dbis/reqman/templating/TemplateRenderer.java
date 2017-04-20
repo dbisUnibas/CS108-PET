@@ -40,7 +40,7 @@ public class TemplateRenderer {
             LOGGER.debug("Calculated region: <" + calcStart + "," + calcEnd + ">");
             LOGGER.trace("PreReplacement: " + out.toString());
             String repl = field.render(instance);
-            if (field instanceof ParametrizedField && !(field instanceof ConditionalField) ){
+            if (field instanceof ParametrizedField && !(field instanceof ConditionalField)) {
                 repl = ((ParametrizedField) field).renderCarefully(instance, ((ParametrizedField) field).getParameter());
             }
             out.replace(calcStart, calcEnd, repl);

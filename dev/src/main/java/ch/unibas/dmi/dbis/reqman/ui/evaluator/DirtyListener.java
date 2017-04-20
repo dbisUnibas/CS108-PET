@@ -7,10 +7,10 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
  */
 public interface DirtyListener {
 
-    default void mark(boolean dirty){
-        if(dirty){
+    default void mark(boolean dirty) {
+        if (dirty) {
             markDirty();
-        }else{
+        } else {
             unmarkDirty();
         }
     }

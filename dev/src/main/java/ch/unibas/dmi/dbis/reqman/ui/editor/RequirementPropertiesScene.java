@@ -326,49 +326,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         }
     }
 
-    public static class MetaKeyValuePair {
-        private final SimpleStringProperty key;
-        private final SimpleStringProperty value;
-
-        public MetaKeyValuePair(String key, String value) {
-            this.key = new SimpleStringProperty(key);
-            this.value = new SimpleStringProperty(value);
-        }
-
-        /**
-         * Returns if this {@link MetaKeyValuePair} consits of an empty key AND empty value.
-         *
-         * @return TRUE if key and value are empty strings, FALSE otherwise
-         */
-        public boolean isEmpty() {
-            return key.getValue().isEmpty() && value.getValue().isEmpty();
-        }
-
-        public String getKey() {
-            return key.get();
-        }
-
-        public void setKey(String key) {
-            this.key.set(key);
-        }
-
-        public SimpleStringProperty keyProperty() {
-            return key;
-        }
-
-        public String getValue() {
-            return value.get();
-        }
-
-        public void setValue(String value) {
-            this.value.set(value);
-        }
-
-        public SimpleStringProperty valueProperty() {
-            return value;
-        }
-    }
-
     @Override
     protected void populateScene() {
         ScrollPane scrollPane = new ScrollPane();
@@ -524,6 +481,49 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
 
         grid.setPrefHeight(700); // Hacky solution, due to strangely incresed height.
         grid.setAlignment(Pos.CENTER);
+    }
+
+    public static class MetaKeyValuePair {
+        private final SimpleStringProperty key;
+        private final SimpleStringProperty value;
+
+        public MetaKeyValuePair(String key, String value) {
+            this.key = new SimpleStringProperty(key);
+            this.value = new SimpleStringProperty(value);
+        }
+
+        /**
+         * Returns if this {@link MetaKeyValuePair} consits of an empty key AND empty value.
+         *
+         * @return TRUE if key and value are empty strings, FALSE otherwise
+         */
+        public boolean isEmpty() {
+            return key.getValue().isEmpty() && value.getValue().isEmpty();
+        }
+
+        public String getKey() {
+            return key.get();
+        }
+
+        public void setKey(String key) {
+            this.key.set(key);
+        }
+
+        public SimpleStringProperty keyProperty() {
+            return key;
+        }
+
+        public String getValue() {
+            return value.get();
+        }
+
+        public void setValue(String value) {
+            this.value.set(value);
+        }
+
+        public SimpleStringProperty valueProperty() {
+            return value;
+        }
     }
 
 }

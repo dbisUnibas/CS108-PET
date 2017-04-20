@@ -44,12 +44,12 @@ public class EvaluatorPromptFactory {
     }
 
 
-    static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor){
+    static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor) {
         PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName), acceptor);
         popup.showPrompt();
     }
 
-    static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor, ProgressSummary summary){
+    static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor, ProgressSummary summary) {
         PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName, summary), acceptor);
         popup.showPrompt();
     }

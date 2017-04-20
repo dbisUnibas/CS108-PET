@@ -75,6 +75,7 @@ public class StringUtils {
 
     /**
      * Prints a given timestamp with the {@link SimpleDateFormat} {@code dd.MM.YYYY HH:mm:ss:SSS}
+     *
      * @param timestamp The timestamp to pretty print
      * @return The formatted timestamp, as a string.
      */
@@ -85,11 +86,12 @@ public class StringUtils {
     /**
      * Prints a given timestamp with the specified format.
      * The format ist then used to setup a {@link SimpleDateFormat} which formats the timestamp.
+     *
      * @param timestamp The timestamp to pretty print.
-     * @param format The format expression to pass to the {@link SimpleDateFormat} constructor.
+     * @param format    The format expression to pass to the {@link SimpleDateFormat} constructor.
      * @return The formatted timestamp in its string representation
      */
-    public static String prettyPrintTimestamp(long timestamp, String format){
+    public static String prettyPrintTimestamp(long timestamp, String format) {
         Date d = new Date(timestamp);
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(d);

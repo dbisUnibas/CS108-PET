@@ -11,6 +11,7 @@ import java.util.Date;
  */
 public class Progress {
 
+    public static final double NO_POINTS = -999;
     private String requirementName;
     private int milestoneOrdinal;
     private double points = 0;
@@ -101,10 +102,8 @@ public class Progress {
         this.points = points;
     }
 
-    public static final double NO_POINTS = -999;
-
     public void setPoints(double points, double max) {
-        if(points == NO_POINTS){
+        if (points == NO_POINTS) {
             percentage = 0d;
             this.points = -1;
             return;

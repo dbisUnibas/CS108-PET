@@ -29,7 +29,7 @@ public class EvaluatorApplication extends Application {
     }
 
     @Override
-    public void stop(){
+    public void stop() {
         scene.stop();
     }
 }

@@ -11,11 +11,16 @@ import java.io.IOException;
 public interface GroupUpdatingStrategy {
 
     boolean open(File file);
+
     boolean update();
+
     void save() throws IOException;
+
     boolean save(File file) throws IOException;
+
     void setCatalogue(File file);
 
     String fromVersion();
+
     String toVersion();
 }

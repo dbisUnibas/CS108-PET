@@ -336,6 +336,14 @@ public class Field<E, T> {
         return sb.toString();
     }
 
+    protected Function<T, String> getRenderer() {
+        return renderer;
+    }
+
+    protected void setRenderer(Function<T, String> renderer) {
+        this.renderer = renderer;
+    }
+
     /**
      * The enumeration {@link Type} is used to differentiate between different types of {@link Field}s.
      */
@@ -374,13 +382,5 @@ public class Field<E, T> {
          * To indicate that the field represented by the {@link Field} with this type is a list and therefore cannot be rendered.
          */
         LIST
-    }
-
-    protected Function<T, String> getRenderer() {
-        return renderer;
-    }
-
-    protected void setRenderer(Function<T, String> renderer) {
-        this.renderer = renderer;
     }
 }

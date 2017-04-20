@@ -30,35 +30,28 @@ import java.util.TreeMap;
  */
 public class EvaluatorScene extends TitledScene {
 
+    private final ToggleGroup toggleMilestone = new ToggleGroup();
+    private final Logger LOGGER = LogManager.getLogger(getClass());
     private BorderPane root;
-
     private SplitPane horizontalSplitter = new SplitPane();
     private SplitPane verticalSplitter = new SplitPane();
-
     private HBox leftContent = new HBox();
     private VBox rightContent = new VBox();
     private TabPane tabPane = new TabPane();
-
     private String title = "Evaluator";
-
     private EvaluatorController controller;
-
     private GroupView groupView;
     private CatalogueInfoView catInfoView;
     private TreeMap<Group, Tab> groupTabMap = new TreeMap<>();
     private EventHandler<ReqmanApplication.ChangeEvent> changeHandler = null;
-
-    private final ToggleGroup toggleMilestone = new ToggleGroup();
     private Menu menuGlobalMilestone;
-
-    private final Logger LOGGER = LogManager.getLogger(getClass());
+    private Stage parent;
 
     public EvaluatorScene(Stage parent, String title, int width, int height) {
         this(parent, width, height);
         this.title = title;
 
     }
-    private Stage parent;
 
     public EvaluatorScene(Stage parent, int width, int height) {
         super(new BorderPane(), width, height);
@@ -76,15 +69,15 @@ public class EvaluatorScene extends TitledScene {
         return catInfoView;
     }
 
-    void addGroupTab(AssessmentView av, boolean unsafed){
+    void addGroupTab(AssessmentView av, boolean unsafed) {
         Tab tab = new Tab();
         tab.setText(av.getActiveGroup().getName());
         av.bindToParentSize(rightContent);
         tab.setContent(av);
         tabPane.getTabs().add(tab);
         groupTabMap.put(av.getActiveGroup(), tab);
-        if(unsafed){
-            markDirty(av.getActiveGroup() );
+        if (unsafed) {
+            markDirty(av.getActiveGroup());
         }
     }
 
@@ -126,7 +119,7 @@ public class EvaluatorScene extends TitledScene {
 
     }
 
-    void removeGroupTab(Group oldGroup){
+    void removeGroupTab(Group oldGroup) {
         Tab oldTab = groupTabMap.get(oldGroup);
         tabPane.getTabs().remove(oldTab);
     }
@@ -170,7 +163,7 @@ public class EvaluatorScene extends TitledScene {
 
     }
 
-    boolean isDirty(Group group){
+    boolean isDirty(Group group) {
         Tab tab = groupTabMap.get(group);
         return tab.getStyleClass().contains("modified");
     }
@@ -180,8 +173,8 @@ public class EvaluatorScene extends TitledScene {
     }
 
     public void setActiveTab(AssessmentView assessmentView) {
-        for(int i=0; i<tabPane.getTabs().size(); i++){
-            if(tabPane.getTabs().get(i).getText().equals(assessmentView.getActiveGroup().getName())){
+        for (int i = 0; i < tabPane.getTabs().size(); i++) {
+            if (tabPane.getTabs().get(i).getText().equals(assessmentView.getActiveGroup().getName())) {
                 tabPane.getSelectionModel().select(i);
             }
         }
@@ -262,34 +255,34 @@ public class EvaluatorScene extends TitledScene {
 
 
         // The set-milestone-forall-groups menu related handling
-        toggleMilestone.selectedToggleProperty().addListener( (ObservableValue<? extends Toggle> ov, Toggle oldToggle, Toggle newToggle ) -> {
-            if(ov != null){
-                LOGGER.trace("OV: "+ov.toString() );
-                if(ov.getValue() instanceof RadioMenuItem){
+        toggleMilestone.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> ov, Toggle oldToggle, Toggle newToggle) -> {
+            if (ov != null) {
+                LOGGER.trace("OV: " + ov.toString());
+                if (ov.getValue() instanceof RadioMenuItem) {
                     RadioMenuItem item = (RadioMenuItem) ov.getValue();
-                    if(item != null && item.getUserData() != null){
-                        if(item.getUserData() instanceof String && ((String)item.getUserData()).equals("clear")){
+                    if (item != null && item.getUserData() != null) {
+                        if (item.getUserData() instanceof String && ((String) item.getUserData()).equals("clear")) {
                             controller.resetGlobalMilestoneChoice();
                             return;
                         }
                     }
                 }
             }
-            if(newToggle != null){
-                if(newToggle.getUserData() instanceof Milestone){
+            if (newToggle != null) {
+                if (newToggle.getUserData() instanceof Milestone) {
                     Milestone newMS = (Milestone) newToggle.getUserData();
-                    LOGGER.trace("newMS: "+newMS.getName());
-                }else{
-                    LOGGER.trace("newToggle: "+newToggle.toString() );
+                    LOGGER.trace("newMS: " + newMS.getName());
+                } else {
+                    LOGGER.trace("newToggle: " + newToggle.toString());
                 }
 
             }
-            if(oldToggle != null){
-                if(oldToggle.getUserData() instanceof  Milestone){
+            if (oldToggle != null) {
+                if (oldToggle.getUserData() instanceof Milestone) {
                     Milestone oldMS = (Milestone) oldToggle.getUserData();
-                    LOGGER.trace("oldMS: "+oldMS.getName() );
-                }else{
-                    LOGGER.trace("oldToggle: "+oldToggle.toString());
+                    LOGGER.trace("oldMS: " + oldMS.getName());
+                } else {
+                    LOGGER.trace("oldToggle: " + oldToggle.toString());
                 }
 
             }
@@ -297,12 +290,12 @@ public class EvaluatorScene extends TitledScene {
             /*
             Conclusion: Only if *newly* selected the event is fired and thus handled in here.
              */
-            if(toggleMilestone.getSelectedToggle() != null && toggleMilestone.getSelectedToggle().getUserData() instanceof Milestone){
+            if (toggleMilestone.getSelectedToggle() != null && toggleMilestone.getSelectedToggle().getUserData() instanceof Milestone) {
                 Milestone ms = (Milestone) toggleMilestone.getSelectedToggle().getUserData();
-                LOGGER.debug("Selected: "+ms.getName());
+                LOGGER.debug("Selected: " + ms.getName());
                 controller.setGlobalMilestoneChoice(ms);
             }
-        } );
+        });
 
 
         menuEdit.getItems().addAll(itemModify, menuGlobalMilestone);
@@ -328,9 +321,9 @@ public class EvaluatorScene extends TitledScene {
         }
     }
 
-    void setupGlobalMilestoneMenu(){
-        for(Milestone ms : controller.getMilestones()){
-            RadioMenuItem itemMilestone = new RadioMenuItem(ms.getName() );
+    void setupGlobalMilestoneMenu() {
+        for (Milestone ms : controller.getMilestones()) {
+            RadioMenuItem itemMilestone = new RadioMenuItem(ms.getName());
             itemMilestone.setUserData(ms);
             itemMilestone.setToggleGroup(toggleMilestone);
             menuGlobalMilestone.getItems().add(itemMilestone);

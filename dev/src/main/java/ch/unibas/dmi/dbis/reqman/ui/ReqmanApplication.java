@@ -12,7 +12,6 @@ import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorScene;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventType;
-import javafx.geometry.Rectangle2D;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -110,8 +109,8 @@ public class ReqmanApplication extends Application {
         primaryStage.show();
     }
 
-    private String setupTitle(String title){
-        return "ReqMan: "+title + " ("+version.getVersion()+")";
+    private String setupTitle(String title) {
+        return "ReqMan: " + title + " (" + version.getVersion() + ")";
     }
 
     @Override

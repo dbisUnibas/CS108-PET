@@ -30,8 +30,8 @@ public class SimpleOverviewBuilder {
         this.groups = new ArrayList<>(groups);
         initMilestoneMapping();
         initTotalMapping();
-        LOGGER.debug("totalMappings: "+totalMapping.toString() );
-        LOGGER.debug("milestoneMappings: "+milestoneMapping.toString() );
+        LOGGER.debug("totalMappings: " + totalMapping.toString());
+        LOGGER.debug("milestoneMappings: " + milestoneMapping.toString());
     }
 
     private DoubleStream points() {

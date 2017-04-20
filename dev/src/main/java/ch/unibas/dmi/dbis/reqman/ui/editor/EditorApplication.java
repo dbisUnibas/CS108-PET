@@ -37,7 +37,7 @@ public class EditorApplication extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("ReqMan: Editor");
-        EditorScene editor = new EditorScene(primaryStage,800, 600);
+        EditorScene editor = new EditorScene(primaryStage, 800, 600);
         primaryStage.setScene(editor);
         primaryStage.setTitle(editor.getTitle());
         primaryStage.show();

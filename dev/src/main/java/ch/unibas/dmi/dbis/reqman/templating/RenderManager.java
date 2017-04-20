@@ -5,7 +5,6 @@ import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.net.ProgressEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
@@ -202,7 +201,7 @@ public class RenderManager {
                     }
                 }
             },
-            new ConditionalField<Requirement>("singularMS", r -> r.getMinMilestoneOrdinal() == r.getMaxMilestoneOrdinal(), b-> "YES", b-> "NO")
+            new ConditionalField<Requirement>("singularMS", r -> r.getMinMilestoneOrdinal() == r.getMaxMilestoneOrdinal(), b -> "YES", b -> "NO")
     );
 
 
@@ -273,7 +272,7 @@ public class RenderManager {
         this.catalogue = catalogue;
         parser = new TemplateParser();
         renderer = new TemplateRenderer();
-        LOGGER.debug("Catalogue: "+catalogue.getName() );
+        LOGGER.debug("Catalogue: " + catalogue.getName());
     }
 
     public RenderManager(Catalogue catalogue, Group group) {
