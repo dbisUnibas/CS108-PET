@@ -12,18 +12,10 @@
         "filters": [
           {
             "MarkerFilter": {
-              "marker": "PREDECESSOR_CHECK"
-            }
-          },
-          {
-            "MarkerFilter":{
-              "marker":"LOAD_PROGRESS_MAP"
+              "marker": "ASSESSMENT"
             }
           }
-        ],
-        "MarkerFilter": {
-          "marker": "LOAD_PROGRESS_MAP"
-        }
+        ]
       },
       "RollingFile": {
         "name": "rollingFile",
