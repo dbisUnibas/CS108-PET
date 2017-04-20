@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.management;
 import ch.unibas.dmi.dbis.reqman.common.Callback;
 import ch.unibas.dmi.dbis.reqman.common.ThrowingCallback;
 import ch.unibas.dmi.dbis.reqman.core.*;
+import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
@@ -65,6 +66,7 @@ public class EntityManager {
     private Group lastOpenedGroup = null;
     private int lastOrdinal = -1;
     private Exception lastOpenException = null;
+    private StatusBar statusBar;
 
     private EntityManager() {
 
@@ -153,7 +155,7 @@ public class EntityManager {
         LOGGER.trace(":openCat");
 
         OpenCatalogueTask openTask = new OpenCatalogueTask(file);
-
+        bindMessages(openTask);
         try {
             runTask(openTask, () -> {
                 setCatalogue(openTask.getValue());
@@ -179,8 +181,21 @@ public class EntityManager {
         saveCatalogue(catalogueFile);
     }
 
+    @Deprecated // Remove when fully async implemented
+    public void setStatusBar(StatusBar statusBar) {
+        this.statusBar = statusBar;
+    }
+
+    private void bindMessages(ManagementTask task){
+        if(statusBar != null){
+            statusBar.messageProperty().bind(task.messageProperty() );
+        }
+
+    }
+
     private void saveCatalogue(File file) {
         SaveCatalogueTask saveTask = new SaveCatalogueTask(catalogue, file);
+        bindMessages(saveTask);
 
         try {
             runTask(saveTask, () -> {
@@ -198,6 +213,7 @@ public class EntityManager {
 
     public void exportCatalogue(File file) {
         ExportCatalogueTask task = new ExportCatalogueTask(catalogue, file);
+        bindMessages(task);
         try {
             runTask(task, () -> {
                 LOGGER.info("Export done");
@@ -453,6 +469,7 @@ public class EntityManager {
     public void openGroup(File file, Consumer<Group> done) {
         LOGGER.entry(file);
         OpenGroupTask task = new OpenGroupTask(file);
+        bindMessages(task);
         runTaskThrowing(task, () -> {
             if (task.getLastException() != null) { // NOT WORKING
                 lastOpenException = task.getLastException();
@@ -466,6 +483,7 @@ public class EntityManager {
     public void openGroups(List<File> files, Consumer<List<Group>> callback) {
         LOGGER.entry(files);
         OpenMultipleGroupsTask task = new OpenMultipleGroupsTask(files);
+        bindMessages(task);
         runTask(task, () -> {
             openedGroups(files, task.getValue());
         }, () -> {
@@ -541,6 +559,7 @@ public class EntityManager {
     public void saveGroup(Group group) {
         File f = groupFileMap.get(group.getName());
         SaveGroupTask task = new SaveGroupTask(f, group);
+        bindMessages(task);
         runTask(task, () -> {
             LOGGER.info("Saved group (" + group.getName() + ") to " + f.getPath());
         });
@@ -548,6 +567,7 @@ public class EntityManager {
 
     public void saveGroupAs(Group group, File file) {
         SaveGroupTask task = new SaveGroupTask(file, group);
+        bindMessages(task);
         runTask(task, () -> {
             LOGGER.info("SavedAs group (" + group.getName() + ") to " + file.getPath());
             groupFileMap.put(group.getName(), file);
@@ -555,7 +575,9 @@ public class EntityManager {
     }
 
     public void exportAllGroups(File dir) {
+
         ExportMultipleGroupTask task = new ExportMultipleGroupTask(dir, groups, catalogue);
+        bindMessages(task);
         runTask(task, () -> {
             lastExportLocation = ensureDirectory(dir);
             LOGGER.info("All export done");
@@ -563,12 +585,16 @@ public class EntityManager {
     }
 
     public void saveAsBackup(Group g) {
-        Thread th = new Thread(new SaveGroupBackupTask(g, catalogueFile));
+        SaveGroupBackupTask task = new SaveGroupBackupTask(g, catalogueFile);
+        bindMessages(task);
+        Thread th = new Thread(task);
+
         th.start();
     }
 
     public void openBackupsIfExistent(Consumer<List<OpenBackupsTask.BackupObject>> callback) {
         OpenBackupsTask task = new OpenBackupsTask();
+        bindMessages(task);
         runTask(task, () -> {
             task.getValue().forEach( o -> {
                 if(o.isCatalogue() && o.getCatalogue() != null){

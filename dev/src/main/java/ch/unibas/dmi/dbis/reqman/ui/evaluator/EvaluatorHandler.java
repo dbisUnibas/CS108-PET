@@ -173,7 +173,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         loadGroupUI(gr);
 
         handleFirstGroupPresent();
-        statusBar.setMessage("Added group: "+gr.getName());
     }
 
     private void handleFirstGroupPresent(){
@@ -231,14 +230,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
             manager.openGroup(files.get(0), (g) -> {
                 handleFirstGroupPresent();
                 loadGroupUI(g);
-                statusBar.setMessage("Loaded group: "+g.getName());
             });
 
         } else if (files.size() >= 2) {
             manager.openGroups(files, (list) -> {
                 handleFirstGroupPresent();
                 loadGroupUI(list);
-                statusBar.setMessage("Loaded multiple groups");
             });
         }
         // USER ABORT
@@ -298,7 +295,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
         File f = fc.showOpenDialog(evaluator.getScene().getWindow());
         if (f != null) {
-            statusBar.setMessage("Loading catalogue from "+f.getPath());
             manager.openCatalogue(f, this::catalogueLoaded);
         }
     }
@@ -310,7 +306,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         MenuManager.getInstance().setupGlobalMilestoneMenu(this.getMilestones());
         MenuManager.getInstance().enableCatalogueNeeded();
         evaluator.displayCatalogueInfo(manager.getCatalogue());
-        statusBar.setMessage("Loaded catalogue");
     }
 
     ObservableList<Group> groupList() {

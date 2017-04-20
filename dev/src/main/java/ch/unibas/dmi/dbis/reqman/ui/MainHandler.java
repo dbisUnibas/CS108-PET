@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
@@ -251,7 +252,8 @@ public class MainHandler implements MenuHandler {
         this.statusBar = statusBar;
         evaluatorHandler.setStatusBar(statusBar);
         editorHandler.setStatusBar(statusBar);
-
+        // TODO Change to async
+        EntityManager.getInstance().setStatusBar(statusBar);
     }
 
     void stop() {
