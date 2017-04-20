@@ -318,7 +318,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         for(Progress p : actives){
             activeProgressViews.add( new ProgressView(p, handler.getCatalogue().getRequirementForProgress(p)));
         }
-        activeProgressViews.forEach(pv -> pv.setActiveMilestone(activeMS));
+        activeProgressViews.forEach(pv -> {
+            pv.setActiveMilestone(activeMS);
+            verifyPredecessorsAchieved(pv);
+            pv.addDirtyListener(this);
+            pv.addDirtyListener(this);
+        });
 
     }
 
@@ -338,7 +343,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
             this.activeMS = cbMilestones.getItems().get(0);
         }
         loadActiveProgressViews(this.activeMS);
-        activeProgressViews.forEach(this::verifyPredecessorsAchieved);
+
         attachProgressViews();
         calcActiveSum();
         if (cbMilestones.getSelectionModel().getSelectedItem() == null) {
