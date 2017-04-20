@@ -7,8 +7,6 @@ package ch.unibas.dmi.dbis.reqman.ui;/**
 import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
 import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import ch.unibas.dmi.dbis.reqman.common.Version;
-import ch.unibas.dmi.dbis.reqman.ui.editor.EditorScene;
-import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorScene;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -26,12 +24,12 @@ public class ReqmanApplication extends Application {
     public static final int EVALUATOR_VIEW = 2000;
     private static Logger LOGGER;
     private static Version version;
-    private Stage primaryStage;
-    private EditorScene editor;
-    private EvaluatorScene evaluator;
     private int currentView = -1;
 
     private static volatile boolean exp = false;
+
+    public ReqmanApplication() {
+    }
 
     public static void main(String[] args) {
         Log4J2Fix.applyHotFix();
@@ -43,22 +41,18 @@ public class ReqmanApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        MainScene scene = new MainScene();
+        scene = new MainScene();
         primaryStage.setScene(scene);
         primaryStage.setTitle(scene.getTitle() );
         primaryStage.show();
     }
-    MainScene scene;
+    private MainScene scene;
 
 
     @Override
     public void stop() {
         if(scene != null){
             scene.stop();
-        }else if(evaluator != null){
-            if (currentView == EVALUATOR_VIEW) {
-                evaluator.stop();
-            }
         }
 
     }

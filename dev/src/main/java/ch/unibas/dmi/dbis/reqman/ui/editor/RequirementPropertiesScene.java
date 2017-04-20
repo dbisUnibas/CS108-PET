@@ -208,11 +208,11 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         Button rmPred = Utils.createMinusButton();
 
         ListView<Requirement> predList = new ListView<>();
-        predList.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
+        predList.setCellFactory((ListView<Requirement> l) -> new RequirementCell());
         predList.setItems(predecessors);
         ComboBox<Requirement> reqBox = new ComboBox<>();
-        reqBox.setButtonCell(new RequirementsView.RequirementCell());
-        reqBox.setCellFactory((ListView<Requirement> l) -> new RequirementsView.RequirementCell());
+        reqBox.setButtonCell(new RequirementCell());
+        reqBox.setCellFactory((ListView<Requirement> l) -> new RequirementCell());
         reqBox.setItems(handler.getObservableRequirements());
 
         upper.getChildren().addAll(reqBox, addPred, rmPred);
@@ -402,7 +402,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         Button newMaxMS = new Button("New ...");
         newMaxMS.setOnAction(this::handleNewMaxMS);
         maxMSBox.getChildren().addAll(cbMaxMS, newMaxMS);
-        cbMinMS.setCellFactory((ListView<Milestone> l) -> new MilestonesView.MilestoneCell());
+        cbMinMS.setCellFactory((ListView<Milestone> l) -> new MilestoneCell());
         cbMinMS.setOnAction(event -> {
             // Make so that the maxMS is set to the same value as this one. (initially as soon as this one is set)
             Milestone selected = cbMinMS.getSelectionModel().getSelectedItem();
@@ -411,9 +411,9 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
                 cbMaxMS.getSelectionModel().select(selected);
             }
         });
-        cbMinMS.setButtonCell(new MilestonesView.MilestoneCell());
-        cbMaxMS.setCellFactory((ListView<Milestone> lv) -> new MilestonesView.MilestoneCell());
-        cbMaxMS.setButtonCell(new MilestonesView.MilestoneCell());
+        cbMinMS.setButtonCell(new MilestoneCell());
+        cbMaxMS.setCellFactory((ListView<Milestone> lv) -> new MilestoneCell());
+        cbMaxMS.setButtonCell(new MilestoneCell());
 
         cbMinMS.setItems(milestoneList);
         cbMaxMS.setItems(milestoneList); // NOTE: This is intentionally the same list

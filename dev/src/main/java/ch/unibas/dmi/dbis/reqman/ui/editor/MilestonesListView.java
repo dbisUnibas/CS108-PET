@@ -24,7 +24,7 @@ public class MilestonesListView  extends ModifiableListView<Milestone> implement
         super("Milestones");
         this.handler = handler;
         addHandler(this);
-        listView.setCellFactory((ListView<Milestone> l) -> new MilestonesView.MilestoneCell());
+        listView.setCellFactory((ListView<Milestone> l) -> new ch.unibas.dmi.dbis.reqman.ui.editor.MilestoneCell());
         listView.setOnMouseClicked(this::handleModifyRequest);
         listView.setTooltip(new Tooltip("Double-click on Milestone to modify"));
 
