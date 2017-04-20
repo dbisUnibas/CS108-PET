@@ -127,6 +127,7 @@ public class ProgressView extends VBox {
         if (hasYesNoConfigChaned(yesBtn.isSelected(), noBtn.isSelected())) {
             LOG.trace(":configChanged");
             progress.setPoints(points, requirement.getMaxPoints());
+
             progress.setDate(active.getDate());
             progress.setMilestoneOrdinal(active.getOrdinal());
             notifyDirtyListeners(true);

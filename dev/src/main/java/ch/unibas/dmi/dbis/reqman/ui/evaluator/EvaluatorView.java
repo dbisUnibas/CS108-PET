@@ -68,6 +68,7 @@ public class EvaluatorView extends HBox implements TitleProvider {
 
         rightContent.setPadding(new Insets(10));
         rightContent.setSpacing(10);
+        rightContent.prefHeightProperty().bind(heightProperty());
 
         tabPane.setPadding(new Insets(10));
         tabPane.getStylesheets().add("style.css");
@@ -118,11 +119,13 @@ public class EvaluatorView extends HBox implements TitleProvider {
 
     public void addGroupTab(AssessmentView view, boolean fresh) {
         Tab tab = new Tab();
+
         tab.setUserData(view.getActiveGroup().getName() );
         tab.setText(view.getActiveGroup().getName());
         view.bindToParentSize(rightContent);
         tab.setContent(view);
         tabPane.getTabs().addAll(tab);
+
         groupTabMap.put(view.getActiveGroup().getName(), tab);
         if(fresh){
             markDirty(view.getActiveGroup() );

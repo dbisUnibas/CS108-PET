@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
@@ -72,6 +72,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     public void bindToParentSize(Region parent) {
         prefWidthProperty().bind(parent.widthProperty());
         prefHeightProperty().bind(parent.heightProperty());
+        scrollPane.prefWidthProperty().bind(widthProperty());
+        scrollPane.prefHeightProperty().bind(heightProperty());
+        bindContent();
     }
 
     @Override
@@ -83,15 +86,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
 
     public Group getActiveGroup() {
         return group;
-    }
-
-    /**
-     * ONLY if group has to be saved. Grabs ALL progress objects
-     *
-     * @return
-     */
-    public List<Progress> getProgressListForSaving() {
-        return getProgressListForSaving(false);
     }
 
     /**
@@ -170,68 +164,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
             map.values().forEach(p -> handler.progressList(group).add(p));
         });
         LOGGER.debug("Presenting the progress list: "+handler.progressList(getActiveGroup()));
-    }
-
-    @Deprecated
-    private void mergeCatalogueProgress(Map<Integer, Map<String, Progress>> catalogueMap, Map<Integer, Map<String, Progress>> groupMap) {
-        catalogueMap.keySet().forEach(ordinal -> {
-            LOGGER.debug(":mergeCatalogueProgress - Merging for MS: " + ordinal);
-            Map<String, Progress> groupProgress = groupMap.get(ordinal);
-            Map<String, Progress> catalogueProgress = catalogueMap.get(ordinal);
-            Set<String> tempSet = new HashSet<String>(catalogueProgress.keySet());
-            if (groupProgress != null) { // may be null if the group was stored to disk and a milestone was not yet tracked.
-                tempSet.removeAll(groupProgress.keySet());
-                for (String reqName : tempSet) {
-                    progressMap.get(ordinal).put(reqName, catalogueProgress.get(reqName));
-                }
-            } else {
-                LOGGER.debug(":mergeCatalogueProgress - " + String.format("%s", catalogueProgress));
-                LOGGER.debug(":mergeCatalogueProgress - " + String.format("%s", progressMap.get(ordinal)));
-                progressMap.put(ordinal, new TreeMap<>(catalogueProgress));
-            }
-
-        });
-    }
-
-    @Deprecated
-    private Map<Integer, Map<String, Progress>> loadProgress(List<Progress> list) {
-        Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
-        for (Progress p : list) {
-            int ordinal = p.getMilestoneOrdinal();
-            String reqName = p.getRequirementName();
-            LOGGER.debug(LoggingUtils.LOAD_PROGRESS_MAP, String.format("Loading progress (%s)", p.toString()));
-            if (progressMap.containsKey(ordinal)) {
-                // MS entry exists already
-                Map<String, Progress> rpMap = progressMap.get(ordinal);
-                if (rpMap == null || rpMap.containsKey(reqName)) {
-                    // no map, but ordinal OR requirement is already existing. THIS IS A SEVERE ERROR
-                } else {
-                    rpMap.put(reqName, p);
-                }
-            } else {
-                // FIRST time this MS occurs:
-                TreeMap<String, Progress> rpMap = new TreeMap<>();
-                rpMap.put(reqName, p);
-                progressMap.put(ordinal, rpMap);
-            }
-        }
-        return progressMap;
-    }
-
-    /**
-     * Sets up the map as if the group was newly created
-     */
-    @Deprecated
-    private Map<Integer, Map<String, Progress>> setupProgressMap() {
-        Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
-        handler.getMilestones().forEach(ms -> {
-            TreeMap<String, Progress> reqProgMap = new TreeMap<String, Progress>();
-            handler.getRequirementsByMilestone(ms.getOrdinal()).forEach(r -> {
-                reqProgMap.put(r.getName(), new Progress(r.getName(), ms.getOrdinal(), 0));
-            });
-            progressMap.put(ms.getOrdinal(), reqProgMap);
-        });
-        return progressMap;
     }
 
     private void initComponents() {
@@ -382,10 +314,11 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         LOGGER.trace(":loadActiveProgressViews - this.activeMS: " + this.activeMS.getName());
         visitedMilestones.add(this.activeMS);
         activeProgressViews.clear();
-        List<Progress> actives = getActiveProgresses();
+        List<Progress> actives = getActiveProgresses(activeMS);
         for(Progress p : actives){
             activeProgressViews.add( new ProgressView(p, handler.getCatalogue().getRequirementForProgress(p)));
         }
+        activeProgressViews.forEach(pv -> pv.setActiveMilestone(activeMS));
 
     }
 
@@ -405,6 +338,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
             this.activeMS = cbMilestones.getItems().get(0);
         }
         loadActiveProgressViews(this.activeMS);
+        activeProgressViews.forEach(this::verifyPredecessorsAchieved);
         attachProgressViews();
         calcActiveSum();
         if (cbMilestones.getSelectionModel().getSelectedItem() == null) {
@@ -414,7 +348,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
 
     private void calcActiveSum() {
         double sum = group.getSumForMilestone(activeMS, handler.getCatalogue());
-        tfSum.setText(String.valueOf(sum));
+        tfSum.setText(StringUtils.prettyPrint(sum));
+        activeProgressViews.forEach(this::verifyPredecessorsAchieved);
     }
 
     private void attachProgressViews() {
@@ -513,7 +448,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         }
     }
 
-    private List<Progress> getActiveProgresses(){
+    private List<Progress> getActiveProgresses(Milestone activeMS){
         LOGGER.trace(":getActiveProgresses - MS: "+activeMS.toString());
         List<Progress> active = new ArrayList<>();
 
