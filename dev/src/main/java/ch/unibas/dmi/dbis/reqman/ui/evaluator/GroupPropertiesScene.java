@@ -26,7 +26,6 @@ import java.util.List;
 public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.core.Group> {
 
     private final String catalogueName;
-    private final EvaluatorController controller;
     private TextField tfName;
     private TextField tfProjectName;
     private TextField tfExportFileName;
@@ -36,15 +35,18 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
     private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GroupPropertiesScene.class );
 
-    public GroupPropertiesScene(EvaluatorController controller) {
-        this.controller = controller;
-        this.catalogueName = controller.getActiveCatalogue().getName();
+
+    private final EvaluatorHandler handler;
+
+    GroupPropertiesScene(EvaluatorHandler handler){
+        this.handler = handler;
+        this.catalogueName = handler.getName();
 
         populateScene();
     }
 
-    public GroupPropertiesScene(EvaluatorController controller, Group group) {
-        this(controller);
+    GroupPropertiesScene(EvaluatorHandler handler, Group group){
+        this(handler);
         this.group = group;
         loadGroup();
     }
@@ -60,7 +62,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         String projectName = tfProjectName.getText();
 
         if (StringUtils.isNotEmpty(name)) {
-            if (!controller.isGroupNameUnique(name)) {
+            if (!handler.isGroupNameUnique(name)) {
                 Utils.showWarningDialog("Invalid group name", "Group names must be unique. There is already another group with name: \n\n" + name);
                 return;
             }
@@ -102,6 +104,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
         loadMembers();
     }
+
 
     private List<String> memberToStringList(List<Member> members) {
         ArrayList<String> out = new ArrayList<>();

@@ -36,13 +36,7 @@ public class Milestone {
 
         Milestone milestone = (Milestone) o;
 
-        if (getOrdinal() != milestone.getOrdinal()) {
-            return false;
-        }
-        if (getName() != null ? !getName().equals(milestone.getName()) : milestone.getName() != null) {
-            return false;
-        }
-        return getDate() != null ? getDate().equals(milestone.getDate()) : milestone.getDate() == null;
+        return this.getOrdinal() == milestone.getOrdinal();
     }
 
     @Override
@@ -57,6 +51,7 @@ public class Milestone {
         return ordinal;
     }
 
+    // TODO reduce visibility
     public void setOrdinal(int ordinal) {
         this.ordinal = ordinal;
     }
@@ -75,5 +70,15 @@ public class Milestone {
 
     public void setDate(Date date) {
         this.date = date;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Milestone{");
+        sb.append("ordinal=").append(ordinal);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", date=").append(date);
+        sb.append('}');
+        return sb.toString();
     }
 }

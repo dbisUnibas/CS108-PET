@@ -4,6 +4,8 @@ import javafx.event.ActionEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+import java.util.function.Consumer;
+
 /**
  * TODO: write JavaDoc
  *
@@ -14,11 +16,29 @@ public class PromptPopup<T> {
     protected AbstractVisualCreator<T> creator;
     protected PopupStage stage;
 
-    public PromptPopup(AbstractVisualCreator creator) {
-        this.creator = creator;
-        stage = new PopupStage(creator.getPromptTitle(), creator);
 
-        //creator.getRoot().setOnKeyReleased(this::handleKeyEvent);
+    private Consumer<T> consumer = null;
+
+    private PromptPopup(AbstractVisualCreator creator, boolean modality) {
+        this.creator = creator;
+        stage = new PopupStage(creator.getPromptTitle(), creator, modality);
+        stage.setOnHiding(evt -> {
+            if(consumer != null){
+                if(getCreation() != null){
+                    consumer.accept(getCreation() );
+                }
+            }
+        });
+    }
+
+    public PromptPopup(AbstractVisualCreator creator){
+        this(creator, true);
+    }
+
+    public PromptPopup(AbstractVisualCreator creator, Consumer consumer){
+        this(creator, false);
+        this.consumer = consumer;
+
 
     }
 
@@ -31,6 +51,10 @@ public class PromptPopup<T> {
     public T prompt() {
         stage.showAndWait();
         return getCreation();
+    }
+
+    public void showPrompt(){
+        stage.show();
     }
 
     /**
@@ -46,16 +70,4 @@ public class PromptPopup<T> {
         }
     }
 
-    private void handleKeyEvent(KeyEvent event) {
-        // TODO Move to abstract visual creator and filter
-        if (KeyCode.ESCAPE.equals(event.getCode())) {
-            stage.hide();
-        } else if (KeyCode.ENTER.equals(event.getCode())) {
-            System.out.println("Source: " + event.getSource().toString());
-            if (event.getTarget() == this) {
-                creator.handleSaving(new ActionEvent(event.getSource(), event.getTarget())); // Create own event?
-            }
-
-        }
-    }
 }

@@ -1,3 +1,36 @@
+/* reqman: style.css */
+/*
+Styling to indicate that a tab is not saved yet.
+ */
 .modified .tab-label {
     -fx-font-weight: bold;
 }
+
+/*
+Presentation mode:
+Adjust later on
+ */
+.root.presentation {
+    -fx-font-size: 1.8em;
+}
+
+.menu-bar {
+    -fx-font-size: 1em;
+}
+
+/*
+Removing style of checkbox:
+ */
+
+.check-box.silent > .box {
+    -fx-background-color: crimson;
+}
+
+/*
+Styling for all displays (label which display an information)
+TODO: Needs re-styling (margin?)
+ */
+.label.display {
+    -fx-background-color: white !important;
+}
+

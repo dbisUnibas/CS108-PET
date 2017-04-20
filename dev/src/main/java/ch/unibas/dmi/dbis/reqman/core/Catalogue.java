@@ -114,6 +114,8 @@ public class Catalogue {
     }
 
     public boolean addMilestone(Milestone milestone) {
+        // TODO: uncomment as soon as all done
+        // milestone.setOrdinal(getLastOrdinal()+1);
         return milestones.add(milestone);
     }
 
@@ -150,6 +152,11 @@ public class Catalogue {
 
     public List<Requirement> getRequirements() {
         return new ArrayList<>(requirements);
+    }
+
+    @JsonIgnore
+    public List<Requirement> requirementList(){
+        return requirements;
     }
 
     public void setRequirements(List<Requirement> requirements) {
@@ -258,5 +265,19 @@ public class Catalogue {
         } else {
             reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement)));
         }
+    }
+
+    @JsonIgnore
+    public int getLastOrdinal() {
+        if(milestones.isEmpty() ){
+            return 0;
+        }
+        ArrayList<Milestone> list = new ArrayList<>(getMilestones());
+        list.sort(Comparator.comparingInt(Milestone::getOrdinal));
+        return list.get(list.size()-1).getOrdinal();
+    }
+
+    public List<Milestone> milestoneList() {
+        return milestones;
     }
 }

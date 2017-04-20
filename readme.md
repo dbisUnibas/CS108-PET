@@ -1,4 +1,4 @@
-# ReqMan - branch: reqman-exp
+# ReqMan - branch: experimental
 
 ReqMan (Requirements Manager) is an application to manage requirements.
 
@@ -34,22 +34,6 @@ To build `ReqMan` run:
 
 ```
 gradlew build
-```
-
-### Editor
-
-To exclusively have the `editor` application executable in a jar, run:
-
-```
-gradlew deployEditor
-```
-
-### Evaluator
-
-To exclusively have the `evaluator` application executable in a jar, run:
-
-```
-graldew deployEvaluator
 ```
 
 ## Usage

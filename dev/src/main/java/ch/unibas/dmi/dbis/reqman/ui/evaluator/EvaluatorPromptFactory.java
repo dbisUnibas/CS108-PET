@@ -5,6 +5,8 @@ import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.ProgressSummary;
 import ch.unibas.dmi.dbis.reqman.ui.common.PromptPopup;
 
+import java.util.function.Consumer;
+
 /**
  * TODO: Write JavaDoc
  *
@@ -20,14 +22,13 @@ public class EvaluatorPromptFactory {
         PromptPopup<GroupPropertiesScene.Member> popup = new PromptPopup<>(new MemberScene());
         return popup.prompt();
     }
-
-    public static Group promptNewGroup(EvaluatorController controller) {
-        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(controller));
+    static Group promptGroup(EvaluatorHandler handler){
+        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(handler));
         return popup.prompt();
     }
 
-    public static Group promptGroup(Group group, EvaluatorController controller) {
-        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(controller, group));
+    static Group promptGroup(Group group, EvaluatorHandler handler){
+        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(handler, group));
         return popup.prompt();
     }
 
@@ -40,4 +41,16 @@ public class EvaluatorPromptFactory {
         PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName, summary));
         return popup.prompt();
     }
+
+
+    static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor){
+        PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName), acceptor);
+        popup.showPrompt();
+    }
+
+    static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor, ProgressSummary summary){
+        PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName, summary), acceptor);
+        popup.showPrompt();
+    }
+
 }

@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
@@ -18,14 +19,14 @@ import java.util.*;
  *
  * @author loris.sauter
  */
-public class AssessmentView extends BorderPane implements PointsChangeListener {
+public class AssessmentView extends BorderPane implements PointsChangeListener, DirtyListener {
 
+    private final Logger LOGGER = LogManager.getLogger(getClass());
+    private final EvaluatorHandler handler;
     private HBox titleBar;
     private AnchorPane titleAnchor;
     private Label lblChoice;
     private ComboBox<Milestone> cbMilestones;
-    @Deprecated // Added changelistener to cbMilestones
-    private Button btnRefresh;
     private Button btnSummary;
     private HBox statusWrapper;
     private AnchorPane statusBar;
@@ -33,11 +34,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private TextField tfSum;
     private VBox content;
     private ScrollPane scrollPane;
-
-    private final Logger LOGGER = LogManager.getLogger(getClass() );
-
-    private EvaluatorController controller;
-
     private Group group;
     private Milestone activeMS = null;
     /**
@@ -48,19 +44,19 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     private List<ProgressView> activeProgressViews = new ArrayList<>();
     private Set<Milestone> visitedMilestones = new HashSet<>();
 
-    AssessmentView(EvaluatorController controller, Group active) {
-        this(controller, active, null);
+    AssessmentView(EvaluatorHandler handler, Group activeGroup) {
+        this(handler, activeGroup, null);
     }
 
-    AssessmentView(EvaluatorController controller, Group activeGroup, Milestone activeMS){
+    AssessmentView(EvaluatorHandler handler, Group activeGroup, Milestone activeMS) {
         super();
-        LOGGER.debug("Initializing for group "+activeGroup.getName() );
+        LOGGER.debug("Initializing for group " + activeGroup.getName());
 
-        this.controller = controller;
+        this.handler = handler;
         this.group = activeGroup;
         this.activeMS = activeMS;
 
-        LOGGER.debug("Active MS: "+(this.activeMS != null ? this.activeMS.getName() : "null"));
+        LOGGER.debug("Active MS: " + (this.activeMS != null ? this.activeMS.getName() : "null"));
 
         initComponents();
         layoutComponents();
@@ -80,8 +76,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     @Override
     public void pointsChanged(double newValue) {
+        LOGGER.trace("Points changed");
         calcActiveSum();
-        controller.markDirty(getActiveGroup());
+        handler.markDirty(getActiveGroup());
     }
 
     public Group getActiveGroup() {
@@ -99,20 +96,22 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     /**
      * Grabs all progress' objects and returns the list of them.
+     *
      * @param trim It true, only those progresses with !hasDefaultPercentage are grabbed
      * @return
      */
-    public List<Progress> getProgressListForSaving(boolean trim){
+    public List<Progress> getProgressListForSaving(boolean trim) {
         List<Progress> list = new ArrayList<>();
-        if(trim){
-            progressMap.values().forEach(consumer-> consumer.values().forEach( p -> {
-                if(!p.hasDefaultPercentage() ){
+        if (trim) {
+            progressMap.values().forEach(consumer -> consumer.values().forEach(p -> {
+                if (!p.hasDefaultPercentage()) {
                     list.add(p);
                 }
             }));
-        }else{
+        } else {
             progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
         }
+        activeProgressViews.forEach(pv -> pv.markSaved());
         return list;
     }
 
@@ -135,24 +134,33 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         } else {
             progressMap = loadProgress(progressList);
             mergeCatalogueProgress(setupProgressMap(), progressMap);
-        }
 
+        }
+        syncProgressList();
+    }
+
+    private void syncProgressList() {
+        LOGGER.trace(":syncProgressList");
+        handler.progressList(group).clear(); // Ensure empty list
+        progressMap.values().forEach(map -> {
+            map.values().forEach(p -> handler.progressList(group).add(p));
+        });
     }
 
     private void mergeCatalogueProgress(Map<Integer, Map<String, Progress>> catalogueMap, Map<Integer, Map<String, Progress>> groupMap) {
         catalogueMap.keySet().forEach(ordinal -> {
-            LOGGER.debug(":mergeCatalogueProgress - Merging for MS: "+ordinal);
+            LOGGER.debug(":mergeCatalogueProgress - Merging for MS: " + ordinal);
             Map<String, Progress> groupProgress = groupMap.get(ordinal);
             Map<String, Progress> catalogueProgress = catalogueMap.get(ordinal);
             Set<String> tempSet = new HashSet<String>(catalogueProgress.keySet());
-            if(groupProgress != null){ // may be null if the group was stored to disk and a milestone was not yet tracked.
+            if (groupProgress != null) { // may be null if the group was stored to disk and a milestone was not yet tracked.
                 tempSet.removeAll(groupProgress.keySet());
                 for (String reqName : tempSet) {
                     progressMap.get(ordinal).put(reqName, catalogueProgress.get(reqName));
                 }
-            }else{
-                LOGGER.debug(":mergeCatalogueProgress - "+String.format("%s", catalogueProgress));
-                LOGGER.debug(":mergeCatalogueProgress - "+String.format("%s", progressMap.get(ordinal)));
+            } else {
+                LOGGER.debug(":mergeCatalogueProgress - " + String.format("%s", catalogueProgress));
+                LOGGER.debug(":mergeCatalogueProgress - " + String.format("%s", progressMap.get(ordinal)));
                 progressMap.put(ordinal, new TreeMap<>(catalogueProgress));
             }
 
@@ -164,7 +172,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         for (Progress p : list) {
             int ordinal = p.getMilestoneOrdinal();
             String reqName = p.getRequirementName();
-
+            LOGGER.debug(LoggingUtils.LOAD_PROGRESS_MAP, String.format("Loading progress (%s)",p.toString() ) );
             if (progressMap.containsKey(ordinal)) {
                 // MS entry exists already
                 Map<String, Progress> rpMap = progressMap.get(ordinal);
@@ -188,9 +196,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
      */
     private Map<Integer, Map<String, Progress>> setupProgressMap() {
         Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
-        controller.getMilestones().forEach(ms -> {
+        handler.getMilestones().forEach(ms -> {
             TreeMap<String, Progress> reqProgMap = new TreeMap<String, Progress>();
-            controller.getRequirementsByMilestone(ms.getOrdinal()).forEach(r -> {
+            handler.getRequirementsByMilestone(ms.getOrdinal()).forEach(r -> {
                 reqProgMap.put(r.getName(), new Progress(r.getName(), ms.getOrdinal(), 0));
             });
             progressMap.put(ms.getOrdinal(), reqProgMap);
@@ -220,8 +228,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         titleBar.getChildren().addAll(lblChoice, cbMilestones, btnSummary);
         titleBar.setStyle(titleBar.getStyle() + "-fx-spacing: 10px; -fx-padding: 10px;");
 
-        if (controller != null) {
-            cbMilestones.setItems(FXCollections.observableList(controller.getMilestones()));
+        if (handler != null) {
+            cbMilestones.setItems(FXCollections.observableList(handler.getMilestones()));
             cbMilestones.setCellFactory(param -> new Utils.MilestoneCell());
             cbMilestones.setButtonCell(new Utils.MilestoneCell());
 
@@ -232,7 +240,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
             });
         }
 
-        if (controller != null) {
+        if (handler != null) {
             btnSummary.setOnAction(this::handleComments);
         }
 
@@ -264,10 +272,14 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
             ProgressSummary ps = null;
             boolean replace = false;
             if (hasSummaryForMilestone(ms)) {
-                ps = EvaluatorPromptFactory.promptSummary(ms, group.getName(), getSummaryForMilestone(ms));
+                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getCatalogueName(), getSummaryForMilestone(ms));
+                EvaluatorPromptFactory.showSummary(ms, group.getName(), summary -> {
+                    handleSummaryReceiving(summary, true);
+                }, getSummaryForMilestone(ms));
                 replace = true;
             } else {
-                ps = EvaluatorPromptFactory.promptSummary(ms, group.getName());
+                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getCatalogueName());
+                EvaluatorPromptFactory.showSummary(ms, group.getName(), progressSummary -> handleSummaryReceiving(progressSummary, false));
             }
             if (ps != null) {
                 if (replace) {
@@ -275,6 +287,39 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
                 }
                 summaries.add(ps);
             }
+        }
+    }
+
+    private void handleSummaryReceiving(ProgressSummary ps, boolean replace) {
+        LOGGER.debug(String.format(":handleSummaryReceiving - Received summary: %s", ps));
+        if (ps != null) {
+            // Case receiving non-null summary
+            ProgressSummary sent = getSummaryForMilestone(handler.getMilestoneByOrdinal(ps.getMilestoneOrdinal()));
+            if (replace) {
+                // Case have to replace summary
+                summaries.remove(getSummaryForMilestone(handler.getMilestoneByOrdinal(ps.getMilestoneOrdinal())));
+            }
+            summaries.add(ps);
+            if (sent == ps) { // if it is *the same object*
+                // No changes, since exactly the same as before
+                LOGGER.debug(":handleSummaryReceiving - Received is same as sent");
+                boolean equalExternal = ps.getExternalComment().equals(sent.getExternalComment());
+                boolean equalInternal = ps.getInternalComment().equals(sent.getInternalComment());
+                LOGGER.debug(":handleSummaryReceiving - " + String.format("Equal external=%s and internal=%s", equalExternal, equalInternal));
+                if (equalExternal && equalInternal) {
+                    // no changes
+                    LOGGER.debug(":handleSummaryReceiving - No changes");
+                } else {
+                    // changes
+                    LOGGER.debug(":handleSummaryReceiving - Changes detected");
+                    markDirty();
+                }
+            } else {
+                // first time recevining summary for this ms
+                LOGGER.debug(":handleSummaryReceiving - Received differs form sent");
+                markDirty();
+            }
+
         }
     }
 
@@ -304,33 +349,37 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
         return null;
     }
 
-    private void loadActiveProgressViews(Milestone activeMS){
-        LOGGER.trace(":loadActiveProgressViews - MS: "+activeMS.getName());
-        LOGGER.trace(":loadActiveProgressViews - this.activeMS: "+this.activeMS.getName());
+    private void loadActiveProgressViews(Milestone activeMS) {
+        LOGGER.trace(":loadActiveProgressViews - MS: " + activeMS.getName());
+        LOGGER.trace(":loadActiveProgressViews - this.activeMS: " + this.activeMS.getName());
         visitedMilestones.add(this.activeMS);
         activeProgressViews.clear();
-        List<Requirement> reqs = controller.getRequirementsByMilestone(this.activeMS.getOrdinal());
+        List<Requirement> reqs = handler.getRequirementsByMilestone(this.activeMS.getOrdinal());
         reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
         reqs.forEach(r -> {
             Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
 
             ProgressView pv = new ProgressView(p, r);
+
             pv.setActiveMilestone(activeMS);
             verifyPredecessorsAchieved(pv);
-            pv.addPointsChangeListener(this);
 
+            pv.addPointsChangeListener(this);
+            pv.addDirtyListener(this);
+
+            LOGGER.debug(LoggingUtils.PREDECESSOR_CHECK_MARKER, String.format("Checking: Progress(%s) with active MS (%s)", p.toString(), activeMS.toString() ) );
             // Filter the ones that are not really on this milestone and are already assessed
-            if(p.getDate() == null){
+            if (p.getDate() == null) {
                 // progress was not yet tracked.
                 activeProgressViews.add(pv);
-            }else if(p.getDate().before(activeMS.getDate() ) ){
+            } else if (p.getDate().before(activeMS.getDate())) {
                 // progress was made STRICTLY before active milestone
                 // this ProgressView must not be shown now
-            }else if(p.getDate().equals(activeMS.getDate() )){
+            } else if (p.getDate().equals(activeMS.getDate())) {
                 // comparison possible - always a ms date is used.
                 // the progress date matches the current milestone -> show pv
                 activeProgressViews.add(pv);
-            }else{
+            } else {
                 activeProgressViews.add(pv);
             }
             //activeProgressViews.add(pv);
@@ -338,42 +387,42 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
 
     }
 
-    private void verifyPredecessorsAchieved(ProgressView pv){
-        pv.setDisable(!group.isProgressUnlocked(controller.getActiveCatalogue(), pv.getProgress()));
+    private void verifyPredecessorsAchieved(ProgressView pv) {
+        pv.setDisable(!group.isProgressUnlocked(handler.getCatalogue(), pv.getProgress()));
     }
 
 
     /**
-     *
      * @param activeMS If {@code == null}, the first entry in the choice is set.
      */
-    private void updateProgressViews(Milestone activeMS){
-        LOGGER.trace(":updateProgressViews - MS: "+ (activeMS != null ? activeMS.getName() : "null") );
+    private void updateProgressViews(Milestone activeMS) {
+        LOGGER.trace(":updateProgressViews - MS: " + (activeMS != null ? activeMS.getName() : "null"));
         detachProgressViews();
         tfSum.setText("0");
-        if(activeMS == null){
+        if (activeMS == null) {
             LOGGER.trace(":updateProgressViews - Setting default active ms");
             this.activeMS = cbMilestones.getItems().get(0);
         }
         loadActiveProgressViews(this.activeMS);
         attachProgressViews();
         calcActiveSum();
-        if(cbMilestones.getSelectionModel().getSelectedItem() == null){
+        if (cbMilestones.getSelectionModel().getSelectedItem() == null) {
             cbMilestones.getSelectionModel().select(this.activeMS);
         }
     }
 
     /**
      * Also updates the view
+     *
      * @param ms
      */
-    public void selectMilestone(Milestone ms){
+    public void selectMilestone(Milestone ms) {
         this.activeMS = ms;
         cbMilestones.getSelectionModel().select(ms);
     }
 
     private void calcActiveSum() {
-        double sum = group.getSumForMilestone(activeMS, controller.getActiveCatalogue());
+        double sum = group.getSumForMilestone(activeMS, handler.getCatalogue());
         tfSum.setText(String.valueOf(sum));
     }
 
@@ -402,4 +451,17 @@ public class AssessmentView extends BorderPane implements PointsChangeListener {
     }
 
 
+    @Override
+    public void markDirty() {
+        LOGGER.trace("Dirty");
+        calcActiveSum();
+        handler.markDirty(getActiveGroup());
+    }
+
+    @Override
+    public void unmarkDirty() {
+        LOGGER.trace("Undirty");
+        calcActiveSum();
+        handler.unmarkDirty(getActiveGroup());
+    }
 }

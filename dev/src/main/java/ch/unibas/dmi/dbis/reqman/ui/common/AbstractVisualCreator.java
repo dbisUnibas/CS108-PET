@@ -20,6 +20,8 @@ public abstract class AbstractVisualCreator<T> extends AbstractPopulatedGridScen
 
     public abstract void handleSaving(ActionEvent event);
 
+
+
     /**
      * Dismisses the visual creator: It hides the parental window und thus cancels the creation.
      */

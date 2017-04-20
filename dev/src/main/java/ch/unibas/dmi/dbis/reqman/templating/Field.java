@@ -21,7 +21,7 @@ import java.util.function.Function;
  *         this.age = age;
  *     }
  *
- *     public String getName(){
+ *     public String getCatalogueName(){
  *         return name;
  *     }
  *
@@ -33,7 +33,7 @@ import java.util.function.Function;
  * <p>
  * The class could be seen as an entity with the following fields:
  * <pre>
- *     Field<Person, String> nameField = new Filed<>("name", Field.Type.NORMAL, Field::getName);
+ *     Field<Person, String> nameField = new Filed<>("name", Field.Type.NORMAL, Field::getCatalogueName);
  *     Field<Person, Integer> ageField = new Field<>("age", Field.Type.NORMAL, Field::getAge);
  * </pre>
  * <p>
@@ -48,7 +48,7 @@ import java.util.function.Function;
  *         this.age = age;
  *     }
  *
- *     public Name getName(){
+ *     public Name getCatalogueName(){
  *         return name;
  *     }
  *
@@ -79,7 +79,7 @@ import java.util.function.Function;
  * Since the attribute {@code name} of the class {@code Person} is an instance of {@code Name} on its own, one must provide a {@code renderer}:
  * <pre>
  *     Function<Name, String> nameRenderer = name -> name.getFirst() + " " + name.getLast();
- *     Field<Person, Name> nameField = new Field<>("name", Field.Type.OBJECT, Person::getName, nameRenderer);
+ *     Field<Person, Name> nameField = new Field<>("name", Field.Type.OBJECT, Person::getCatalogueName, nameRenderer);
  * </pre>
  * If no {@code renderer} would have been provided, an {@link IllegalArgumentException} would have been thrown.
  *
