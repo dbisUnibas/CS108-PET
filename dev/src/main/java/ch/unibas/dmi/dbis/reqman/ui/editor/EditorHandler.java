@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
+import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
@@ -28,9 +29,18 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     private EntityManager manager = EntityManager.getInstance();
 
     private EditorView editor = null;
+    private StatusBar statusBar;
 
     private final static void throwInappropriateTargetEntity(TargetEntity entity) {
         throw new IllegalArgumentException("EditorHandler can only handle TargetEntity.CATALOGUE, TargetEntity.REQUIREMENT, TargetEntity.MILESTONE, but " + entity.toString() + " was given");
+    }
+
+    public void setStatusBar(StatusBar statusBar) {
+        this.statusBar = statusBar;
+    }
+
+    public StatusBar getStatusBar() {
+        return statusBar;
     }
 
     void setEditorView(EditorView view) {

@@ -6,7 +6,6 @@ import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorView;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorView;
-import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -28,6 +27,7 @@ public class MainScene extends TitledScene {
     private EditorHandler editorHandler;
     private EvaluatorView evaluator;
     private EvaluatorHandler evaluatorHandler;
+    private StatusBar statusBar;
 
     private MainHandler mainHandler;
 
@@ -70,9 +70,14 @@ public class MainScene extends TitledScene {
         evaluatorHandler = new EvaluatorHandler();
         evaluator = new EvaluatorView(evaluatorHandler);
 
+        statusBar = new StatusBar();
+
         mainHandler = new MainHandler(evaluatorHandler,editorHandler);
         mainHandler.setMainScene(this);
+        mainHandler.setStatusBar(statusBar);
+
         menuManager.setMenuHandler(mainHandler);
+
 
         setActive(Mode.EVALUATOR);
         menuManager.disableGroupNeeded();
@@ -82,7 +87,7 @@ public class MainScene extends TitledScene {
         setRoot(root);
         root.setTop(topContainer);
         topContainer.getChildren().add(menuManager.getMenuBar() );
-        root.setBottom(new Label("Status (COMING SOON)"));
+        root.setBottom(statusBar);
         mainHandler.checkGroupsPresent();
     }
 

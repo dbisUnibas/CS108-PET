@@ -24,6 +24,8 @@ public class MainHandler implements MenuHandler {
     private final EditorHandler editorHandler;
     private MainScene mainScene;
     private MenuManager manager = MenuManager.getInstance();
+    private StatusBar statusBar;
+
     public MainHandler(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
         this.evaluatorHandler = evaluatorHandler;
         this.evaluatorHandler.setOnFirstGroup(() -> {
@@ -243,6 +245,13 @@ public class MainHandler implements MenuHandler {
 
     public void setMainScene(MainScene mainScene) {
         this.mainScene = mainScene;
+    }
+
+    public void setStatusBar(StatusBar statusBar) {
+        this.statusBar = statusBar;
+        evaluatorHandler.setStatusBar(statusBar);
+        editorHandler.setStatusBar(statusBar);
+
     }
 
     void stop() {
