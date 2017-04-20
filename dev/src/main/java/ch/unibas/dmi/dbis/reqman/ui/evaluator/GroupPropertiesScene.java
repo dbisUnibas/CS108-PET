@@ -25,7 +25,6 @@ import java.util.List;
  */
 public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.core.Group> {
 
-    private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GroupPropertiesScene.class);
     private final String catalogueName;
     private TextField tfName;
     private TextField tfProjectName;
@@ -34,7 +33,6 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     private ch.unibas.dmi.dbis.reqman.core.Group group = null;
     private ObservableList<Member> tableData;
 
-<<<<<<< HEAD
     private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GroupPropertiesScene.class );
 
 
@@ -43,11 +41,6 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     GroupPropertiesScene(EvaluatorHandler handler){
         this.handler = handler;
         this.catalogueName = handler.getName();
-=======
-    public GroupPropertiesScene(EvaluatorController controller) {
-        this.controller = controller;
-        this.catalogueName = controller.getActiveCatalogue().getName();
->>>>>>> ae4f5057d1de49a374e94ef0fec6678b21e0f3d0
 
         populateScene();
     }

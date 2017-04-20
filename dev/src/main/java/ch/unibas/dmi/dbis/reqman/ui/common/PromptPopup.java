@@ -27,17 +27,12 @@ public class PromptPopup<T> {
         });
     }
 
-<<<<<<< HEAD
-    public PromptPopup(AbstractVisualCreator creator){
+    public PromptPopup(AbstractVisualCreator creator) {
         this(creator, true);
     }
 
-    public PromptPopup(AbstractVisualCreator creator, Consumer consumer){
-        this(creator, false);
-=======
     public PromptPopup(AbstractVisualCreator creator, Consumer consumer) {
-        this(creator);
->>>>>>> ae4f5057d1de49a374e94ef0fec6678b21e0f3d0
+        this(creator, false);
         this.consumer = consumer;
 
 

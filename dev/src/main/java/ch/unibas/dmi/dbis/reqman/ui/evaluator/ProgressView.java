@@ -75,7 +75,6 @@ public class ProgressView extends VBox {
     }
 
     @Deprecated
-<<<<<<< HEAD
     private boolean hasPointsChanged(double newPoints){
         return Double.compare(previousPoints, newPoints) == 0;
     }
@@ -85,14 +84,6 @@ public class ProgressView extends VBox {
             first = false;
             return true;
         }
-=======
-    private boolean hasPointsChanged(double newPoints) {
-
-        return Double.compare(previousPoints, newPoints) == 0;
-    }
-
-    private boolean hasYesNoConfigChaned(boolean yesSelected, boolean noSelected) {
->>>>>>> ae4f5057d1de49a374e94ef0fec6678b21e0f3d0
         return previousSavedYesNoConfig[0] != yesSelected && previousSavedYesNoConfig[1] != noSelected;
     }
 
