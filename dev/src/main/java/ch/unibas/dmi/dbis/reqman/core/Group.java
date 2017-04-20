@@ -15,17 +15,17 @@ import java.util.Vector;
  */
 public class Group implements Comparable<Group> {
 
+    private static final Logger LOG = LogManager.getLogger(Group.class);
     private String name;
     private String projectName;
     private List<String> members;
     private String catalogueName;
     private List<Progress> progressList = new ArrayList<>();
     private List<ProgressSummary> progressSummaries = new ArrayList<>();
-
     private String exportFileName;
-
     private String version;
 
+<<<<<<< HEAD
     public String getVersion() {
         return version;
     }
@@ -39,6 +39,8 @@ public class Group implements Comparable<Group> {
     }
 
 
+=======
+>>>>>>> ae4f5057d1de49a374e94ef0fec6678b21e0f3d0
     public Group(String name, String projectName, List<String> members, String catalogueName) {
 
         this.name = name;
@@ -51,14 +53,20 @@ public class Group implements Comparable<Group> {
 
     }
 
-    private static final Logger LOG = LogManager.getLogger(Group.class);
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 
     public double getSumForMilestone(Milestone ms, Catalogue catalogue) {
         ArrayList<Double> points = new ArrayList<>();
 
-        for(Progress p : getProgressByMilestoneOrdinal(ms.getOrdinal() ) ){
+        for (Progress p : getProgressByMilestoneOrdinal(ms.getOrdinal())) {
             double summand = p.hasProgress() ? p.getPointsSensitive(catalogue) : 0;
-            LOG.debug(String.format("[%s] Has progress: %b, points: %f, sensitive=%f, summand=%g",catalogue.getRequirementForProgress(p).getName(), p.hasProgress(), p.getPoints(), p.getPointsSensitive(catalogue), summand));
+            LOG.debug(String.format("[%s] Has progress: %b, points: %f, sensitive=%f, summand=%g", catalogue.getRequirementForProgress(p).getName(), p.hasProgress(), p.getPoints(), p.getPointsSensitive(catalogue), summand));
             points.add(summand);// only add points if progress
         }
 
@@ -201,8 +209,8 @@ public class Group implements Comparable<Group> {
         HashSet<Progress> set = new HashSet<>();
         for (Progress p : getProgressList()) {
             if (p.getMilestoneOrdinal() == ordinal) {
-                if(!set.add(p)){
-                    LOG.debug("WARN: "+p.getRequirementName()+" already in set");
+                if (!set.add(p)) {
+                    LOG.debug("WARN: " + p.getRequirementName() + " already in set");
                 }
             }
         }

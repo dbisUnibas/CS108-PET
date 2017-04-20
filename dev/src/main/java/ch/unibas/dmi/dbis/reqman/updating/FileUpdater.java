@@ -11,19 +11,26 @@ import java.util.Arrays;
  */
 public class FileUpdater {
 
+    public static final String GROUP_OPTION = "group";
     private GroupUpdater updater;
 
-    public static final String GROUP_OPTION = "group";
+    FileUpdater() {
 
-    public static void main(String[] args){
+    }
+
+    FileUpdater(GroupUpdater updater) {
+        this.updater = updater;
+    }
+
+    public static void main(String[] args) {
         FileUpdater updater = new FileUpdater();
-        if(args.length < 1){
+        if (args.length < 1) {
             System.out.println(updater.getUsage());
-        }else{
-            try{
-                switch(args[0] ){
+        } else {
+            try {
+                switch (args[0]) {
                     case GROUP_OPTION:
-                        ArrayList<String> argList = new ArrayList<>(Arrays.asList(args) );
+                        ArrayList<String> argList = new ArrayList<>(Arrays.asList(args));
                         argList.remove(0);
                         updater.setUpdater(new GroupUpdater(new GroupAllProgressToAsessedStrategy()));
                         updater.perform(argList.toArray(new String[0]));
@@ -31,22 +38,14 @@ public class FileUpdater {
                     default:
                         System.out.println("Not implemented yet");
                 }
-            }catch(Throwable t){
-                System.err.println("An exception occured: "+t.getMessage()+"\n");
+            } catch (Throwable t) {
+                System.err.println("An exception occured: " + t.getMessage() + "\n");
                 t.printStackTrace();
             }
 
         }
 
 
-    }
-
-    FileUpdater(){
-
-    }
-
-    FileUpdater(GroupUpdater updater){
-        this.updater = updater;
     }
 
     public GroupUpdater getUpdater() {
@@ -58,27 +57,27 @@ public class FileUpdater {
     }
 
     private void perform(String[] args) throws IOException {
-        if(updater != null){
+        if (updater != null) {
             updater.perform(args);
         }
     }
 
-    private String getBasicUsage(){
+    private String getBasicUsage() {
         return "CLI program to update ReqMan savefiles (groups or catalogues) from a version to another.";
     }
 
-    private String getDetailedUsage(){
-        if (updater != null){
-            return "Usage: java -jar updater.jar group <group-args>\n\n"+
-                    "With <group-args>: \n"+
+    private String getDetailedUsage() {
+        if (updater != null) {
+            return "Usage: java -jar updater.jar group <group-args>\n\n" +
+                    "With <group-args>: \n" +
                     updater.getUsage();
-        }else {
+        } else {
             return "No usage yet";
         }
     }
 
-    private String getUsage(){
-        return getBasicUsage()+"\n"+getDetailedUsage();
+    private String getUsage() {
+        return getBasicUsage() + "\n" + getDetailedUsage();
     }
 
 }

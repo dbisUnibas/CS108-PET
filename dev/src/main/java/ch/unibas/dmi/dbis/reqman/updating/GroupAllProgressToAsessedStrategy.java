@@ -16,16 +16,17 @@ import java.util.List;
  *
  * @author loris.sauter
  */
-public class GroupAllProgressToAsessedStrategy implements  GroupUpdatingStrategy{
+public class GroupAllProgressToAsessedStrategy implements GroupUpdatingStrategy {
 
     private Group g;
+    private Catalogue catalogue;
 
     @Override
     public boolean open(File file) {
         try {
             g = JSONUtils.readGroupJSONFile(file);
-            System.out.println("Successfully loaded "+file.getPath());
-            System.out.println("Group: "+g.getName() );
+            System.out.println("Successfully loaded " + file.getPath());
+            System.out.println("Group: " + g.getName());
             return true;
         } catch (IOException e) {
             return false;
@@ -37,15 +38,15 @@ public class GroupAllProgressToAsessedStrategy implements  GroupUpdatingStrategy
         // Removing all with default percentage
         List<Progress> progressList = g.getProgressList();
         List<Progress> out = new ArrayList<>(progressList);
-        progressList.forEach( progress -> {
-            if(progress.hasDefaultPercentage() ){
+        progressList.forEach(progress -> {
+            if (progress.hasDefaultPercentage()) {
                 out.remove(progress);
             }
         });
 
         // Setting assessment date to milestone date
         out.forEach(p -> {
-            Milestone ms = catalogue.getMilestoneByOrdinal(p.getMilestoneOrdinal() );
+            Milestone ms = catalogue.getMilestoneByOrdinal(p.getMilestoneOrdinal());
             p.setDate(ms.getDate());
         });
         g.setProgressList(out);
@@ -60,11 +61,9 @@ public class GroupAllProgressToAsessedStrategy implements  GroupUpdatingStrategy
     @Override
     public boolean save(File file) throws IOException {
         JSONUtils.writeToJSONFile(g, file);
-        System.out.println("Successfully wrote "+file.getPath());
+        System.out.println("Successfully wrote " + file.getPath());
         return true;
     }
-
-    private Catalogue catalogue;
 
     @Override
     public void setCatalogue(File file) {

@@ -26,6 +26,7 @@ public class TemplatingConfigurationManager {
     private final Logger LOGGER = LogManager.getLogger(TemplatingConfigurationManager.class);
     private Templates templates = null;
     private TemplatingConfiguration config;
+    private File configFile = null;
 
     public void loadConfig(String configJSON) {
         try {
@@ -50,13 +51,11 @@ public class TemplatingConfigurationManager {
         return config.getExtension();
     }
 
-    private File configFile = null;
-
     public void loadConfig(File config) {
-        if(config == null){
+        if (config == null) {
             throw LOGGER.throwing(new NullPointerException("Cannot load config if the specified file is null"));
         }
-        LOGGER.info("Loading templating config for file: "+config.getPath() );
+        LOGGER.info("Loading templating config for file: " + config.getPath());
         TemplatingConfiguration cnfg = null;
         try {
             cnfg = JSONUtils.readFromJSONFile(config, TemplatingConfiguration.class);
@@ -101,18 +100,18 @@ public class TemplatingConfigurationManager {
     }
 
     private File buildTemplateFile(String file) {
-        LOGGER.debug("Building template file for: "+file);
+        LOGGER.debug("Building template file for: " + file);
         File template = new File(file);
         if (template.isAbsolute()) {
-            LOGGER.debug("Absolute path: "+template.getPath() );
+            LOGGER.debug("Absolute path: " + template.getPath());
             return template;
         } else {
-            if(configFile != null){
-                LOGGER.debug("Config file directly specified. Resolving relative path of "+configFile.getPath());
+            if (configFile != null) {
+                LOGGER.debug("Config file directly specified. Resolving relative path of " + configFile.getPath());
                 File f = configFile.toPath().resolveSibling(file).toFile(); // assuming relative to config file
-                LOGGER.debug("Resolved template file: "+f.getPath());
+                LOGGER.debug("Resolved template file: " + f.getPath());
                 return f;
-            }else if (ConfigUtils.isJARexecuted()) {
+            } else if (ConfigUtils.isJARexecuted()) {
                 // The environemnt is a jar.
                 File jarFile = ConfigUtils.getCodeSourceLocation();
                 // May add check if jarFile really is a file?

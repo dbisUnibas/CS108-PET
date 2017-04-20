@@ -25,6 +25,7 @@ import java.util.List;
  */
 public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.core.Group> {
 
+    private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GroupPropertiesScene.class);
     private final String catalogueName;
     private TextField tfName;
     private TextField tfProjectName;
@@ -33,6 +34,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     private ch.unibas.dmi.dbis.reqman.core.Group group = null;
     private ObservableList<Member> tableData;
 
+<<<<<<< HEAD
     private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GroupPropertiesScene.class );
 
 
@@ -41,6 +43,11 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     GroupPropertiesScene(EvaluatorHandler handler){
         this.handler = handler;
         this.catalogueName = handler.getName();
+=======
+    public GroupPropertiesScene(EvaluatorController controller) {
+        this.controller = controller;
+        this.catalogueName = controller.getActiveCatalogue().getName();
+>>>>>>> ae4f5057d1de49a374e94ef0fec6678b21e0f3d0
 
         populateScene();
     }
@@ -259,6 +266,13 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         tableData = FXCollections.observableArrayList(new Member("", "", ""));
     }
 
+    @Override
+    protected void populateScene() {
+        initComponents();
+
+        loadGroup();
+    }
+
     public static class Member {
         private static final String DELIMETER = ",";
         private final SimpleStringProperty name, surname, email;
@@ -282,26 +296,26 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         }
 
         public static Member convertFromString(String m) {
-            LOGGER.debug("Member:convertFormString - "+m);
+            LOGGER.debug("Member:convertFormString - " + m);
             int firstDelim = m.indexOf(DELIMETER);
-            LOGGER.debug("Member:convertFormString - First delim: "+firstDelim);
+            LOGGER.debug("Member:convertFormString - First delim: " + firstDelim);
             if (firstDelim < 0) {
                 throw new IllegalArgumentException("Member invalid: " + m);
             }
             String name = m.substring(0, firstDelim);
-            LOGGER.debug("Member:convertFormString - Extracted name: "+name);
+            LOGGER.debug("Member:convertFormString - Extracted name: " + name);
             int secondDelim = m.lastIndexOf(DELIMETER);
-            LOGGER.debug("Member:convertFormString - Second delim: "+secondDelim);
+            LOGGER.debug("Member:convertFormString - Second delim: " + secondDelim);
             String surname = "";
             String email = "";
             if (secondDelim < 0 || secondDelim == firstDelim) {
                 surname = m.substring(firstDelim + 1);
-                LOGGER.debug("Member:convertFormString - Surname: "+surname);
+                LOGGER.debug("Member:convertFormString - Surname: " + surname);
             } else {
                 surname = m.substring(firstDelim + 1, secondDelim);
-                LOGGER.debug("Member:convertFormString - Surname: "+surname);
+                LOGGER.debug("Member:convertFormString - Surname: " + surname);
                 email = m.substring(secondDelim + 1);
-                LOGGER.debug("Member:convertFormString - Email: "+email);
+                LOGGER.debug("Member:convertFormString - Email: " + email);
             }
 
             return new Member(name, surname, email);
@@ -311,20 +325,20 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
             return name.getValue();
         }
 
-        public String getSurname() {
-            return surname.getValue();
-        }
-
-        public String getEmail() {
-            return email.getValue();
-        }
-
         public void setName(String name) {
             this.name.setValue(name);
         }
 
+        public String getSurname() {
+            return surname.getValue();
+        }
+
         public void setSurname(String surname) {
             this.surname.setValue(surname);
+        }
+
+        public String getEmail() {
+            return email.getValue();
         }
 
         public void setEmail(String email) {
@@ -414,13 +428,6 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
                 }
             });
         }
-    }
-
-    @Override
-    protected void populateScene() {
-        initComponents();
-
-        loadGroup();
     }
 
 

@@ -22,10 +22,12 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
     private TextField tfName = new TextField();
     private TextArea taDesc = new TextArea();
     private TextField tfSemester = new TextField();
+
     public CataloguePropertiesScene() {
         super();
         populateScene();
     }
+
     public CataloguePropertiesScene(Catalogue catalogue) {
         this();
         this.catalogue = catalogue;

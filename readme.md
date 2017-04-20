@@ -1,6 +1,6 @@
 # ReqMan - branch: experimental
 
-ReqMan (Requirements Manager) is an application to manage requirements.
+ReqMan (Requirements Manager) is a JavaFX application to manage requirements.
 
 **Requirement**s are grouped in **milestone**s and the collection of **requirement**s
 with their respective **milestone**s is called **catalogue**. **Catalogue**s are 
@@ -16,6 +16,7 @@ assess their voyage on achieving the **requirement**s with so called **progress*
 
  - Build
  - Usage
+ - Dependencies
  - Issues
  - Contributors
  - License
@@ -52,6 +53,10 @@ use the following command (where X stands for the complete version string
 java -jar build/libs/reqman-X.jar
 ```
 	
+## Dependencies
+
+Beside using JavaFX 8 (from java 1.8.0_121) all dependencies are handled by the gradle build script.
+
 ## Issues
 
 Please use Maniphest to report issues. Create a task and set the tag to 

@@ -190,15 +190,15 @@ public class Catalogue {
 
     public List<Requirement> getRequirementsByMilestone(int ordinal) {
         ArrayList<Requirement> reqs = new ArrayList<>();
-        for(Requirement r : requirements){
-            if(r.getMinMilestoneOrdinal() <= ordinal && ordinal <= r.getMaxMilestoneOrdinal() ){
+        for (Requirement r : requirements) {
+            if (r.getMinMilestoneOrdinal() <= ordinal && ordinal <= r.getMaxMilestoneOrdinal()) {
                 reqs.add(r);
             }
         }
         return reqs;
     }
 
-    public List<Requirement> getRequirementsWithMinMS(int ordinal){
+    public List<Requirement> getRequirementsWithMinMS(int ordinal) {
         if (reqsPerMinMS.containsKey(ordinal)) {
             return new ArrayList<Requirement>(reqsPerMinMS.get(ordinal));
         } else {

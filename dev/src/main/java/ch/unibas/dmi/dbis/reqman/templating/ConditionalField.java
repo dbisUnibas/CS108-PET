@@ -41,12 +41,12 @@ public class ConditionalField<E> extends ParametrizedField<E, Boolean> {
         return getRenderer();
     }
 
-    public Function<Boolean, String> getFalseRenderer() {
-        return falseRenderer;
-    }
-
     public void setTrueRenderer(Function<Boolean, String> trueRenderer) {
         setRenderer(trueRenderer);
+    }
+
+    public Function<Boolean, String> getFalseRenderer() {
+        return falseRenderer;
     }
 
     public void setFalseRenderer(Function<Boolean, String> falseRenderer) {
@@ -57,9 +57,9 @@ public class ConditionalField<E> extends ParametrizedField<E, Boolean> {
     public String render(E instance) {
         LOGGER.trace(":render$Conditional");
         boolean fieldValue = getter.apply(instance);
-        LOGGER.trace(":render$Conditional - Condition: "+fieldValue);
-        LOGGER.trace(":render$Conditional - trueRenderer: "+getTrueRenderer().apply(fieldValue ) );
-        LOGGER.trace(":render$Conditional - falseRenderer: "+getFalseRenderer().apply(fieldValue ) );
+        LOGGER.trace(":render$Conditional - Condition: " + fieldValue);
+        LOGGER.trace(":render$Conditional - trueRenderer: " + getTrueRenderer().apply(fieldValue));
+        LOGGER.trace(":render$Conditional - falseRenderer: " + getFalseRenderer().apply(fieldValue));
         if (fieldValue) {
             return getTrueRenderer().apply(fieldValue);
         } else {

@@ -1,9 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
-import javafx.event.ActionEvent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-
 import java.util.function.Consumer;
 
 /**
@@ -23,20 +19,25 @@ public class PromptPopup<T> {
         this.creator = creator;
         stage = new PopupStage(creator.getPromptTitle(), creator, modality);
         stage.setOnHiding(evt -> {
-            if(consumer != null){
-                if(getCreation() != null){
-                    consumer.accept(getCreation() );
+            if (consumer != null) {
+                if (getCreation() != null) {
+                    consumer.accept(getCreation());
                 }
             }
         });
     }
 
+<<<<<<< HEAD
     public PromptPopup(AbstractVisualCreator creator){
         this(creator, true);
     }
 
     public PromptPopup(AbstractVisualCreator creator, Consumer consumer){
         this(creator, false);
+=======
+    public PromptPopup(AbstractVisualCreator creator, Consumer consumer) {
+        this(creator);
+>>>>>>> ae4f5057d1de49a374e94ef0fec6678b21e0f3d0
         this.consumer = consumer;
 
 
@@ -53,7 +54,7 @@ public class PromptPopup<T> {
         return getCreation();
     }
 
-    public void showPrompt(){
+    public void showPrompt() {
         stage.show();
     }
 

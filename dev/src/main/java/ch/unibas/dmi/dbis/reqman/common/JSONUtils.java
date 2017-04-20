@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,7 +22,7 @@ public class JSONUtils {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    static{
+    static {
         MAPPER.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
@@ -52,7 +51,7 @@ public class JSONUtils {
         return readFromJSONFile(file, Group.class);
     }
 
-    public static Map<String, Object> readFromJSONFile(File file) throws IOException{
+    public static Map<String, Object> readFromJSONFile(File file) throws IOException {
         return MAPPER.readValue(file, new TypeReference<Map<String, Object>>() {
         });
     }

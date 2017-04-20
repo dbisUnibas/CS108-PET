@@ -46,55 +46,12 @@ public class ModifiableListView<T> extends BorderPane {
         handlers.remove(handler);
     }
 
-    public void setItems(ObservableList<T> items) {
-        listView.setItems(items);
-    }
-
     public ObservableList<T> getItems() {
         return listView.getItems();
     }
 
-    public static class RemoveEvent<T> extends ActionEvent {
-        public static final EventType<RemoveEvent> REMOVE = new EventType<>(ActionEvent.ACTION, "remove");
-        private T selected;
-        private int index;
-
-        public RemoveEvent(ActionEvent source, T selected, int index) {
-            super(source.getSource(), source.getTarget());
-            this.selected = selected;
-            this.index = index;
-        }
-
-        @Override
-        public EventType<? extends ActionEvent> getEventType() {
-            return REMOVE;
-        }
-
-        public T getSelected() {
-            return selected;
-        }
-
-        public int getSelectedIndex() {
-            return index;
-        }
-    }
-
-    /**
-     * Rather a flag event
-     *
-     * @param <T>
-     */
-    public static class AddEvent<T> extends ActionEvent {
-        public static final EventType<AddEvent> ADD = new EventType<>(ActionEvent.ACTION, "add");
-
-        public AddEvent(ActionEvent source) {
-            super(source.getSource(), source.getTarget());
-        }
-
-        @Override
-        public EventType<? extends ActionEvent> getEventType() {
-            return ADD;
-        }
+    public void setItems(ObservableList<T> items) {
+        listView.setItems(items);
     }
 
     protected void setOnAddAction(ActionEvent event) {
@@ -160,6 +117,49 @@ public class ModifiableListView<T> extends BorderPane {
         this.setTop(titleBar);
         this.setCenter(content);
 
+    }
+
+    public static class RemoveEvent<T> extends ActionEvent {
+        public static final EventType<RemoveEvent> REMOVE = new EventType<>(ActionEvent.ACTION, "remove");
+        private T selected;
+        private int index;
+
+        public RemoveEvent(ActionEvent source, T selected, int index) {
+            super(source.getSource(), source.getTarget());
+            this.selected = selected;
+            this.index = index;
+        }
+
+        @Override
+        public EventType<? extends ActionEvent> getEventType() {
+            return REMOVE;
+        }
+
+        public T getSelected() {
+            return selected;
+        }
+
+        public int getSelectedIndex() {
+            return index;
+        }
+    }
+
+    /**
+     * Rather a flag event
+     *
+     * @param <T>
+     */
+    public static class AddEvent<T> extends ActionEvent {
+        public static final EventType<AddEvent> ADD = new EventType<>(ActionEvent.ACTION, "add");
+
+        public AddEvent(ActionEvent source) {
+            super(source.getSource(), source.getTarget());
+        }
+
+        @Override
+        public EventType<? extends ActionEvent> getEventType() {
+            return ADD;
+        }
     }
 
 }
