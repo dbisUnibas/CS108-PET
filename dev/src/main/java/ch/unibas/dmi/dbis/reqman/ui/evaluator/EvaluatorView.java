@@ -10,6 +10,7 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -73,6 +74,8 @@ public class EvaluatorView extends HBox implements TitleProvider {
         tabPane.setPadding(new Insets(10));
         tabPane.getStylesheets().add("style.css");
         rightContent.getChildren().addAll(tabPane); // TODO Iff no catalogue loaded display usage message like intellij
+        VBox.setVgrow(tabPane, Priority.ALWAYS);
+
 
         horizontalSplit.setDividerPositions(0.33);
         horizontalSplit.getItems().addAll(leftContent, rightContent);
