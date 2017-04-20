@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
@@ -171,7 +172,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         for (Progress p : list) {
             int ordinal = p.getMilestoneOrdinal();
             String reqName = p.getRequirementName();
-
+            LOGGER.debug(LoggingUtils.LOAD_PROGRESS_MAP, String.format("Loading progress (%s)",p.toString() ) );
             if (progressMap.containsKey(ordinal)) {
                 // MS entry exists already
                 Map<String, Progress> rpMap = progressMap.get(ordinal);
@@ -366,6 +367,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
             pv.addPointsChangeListener(this);
             pv.addDirtyListener(this);
 
+            LOGGER.debug(LoggingUtils.PREDECESSOR_CHECK_MARKER, String.format("Checking: Progress(%s) with active MS (%s)", p.toString(), activeMS.toString() ) );
             // Filter the ones that are not really on this milestone and are already assessed
             if (p.getDate() == null) {
                 // progress was not yet tracked.

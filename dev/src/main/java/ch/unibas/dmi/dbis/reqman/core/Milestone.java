@@ -71,4 +71,14 @@ public class Milestone {
     public void setDate(Date date) {
         this.date = date;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Milestone{");
+        sb.append("ordinal=").append(ordinal);
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", date=").append(date);
+        sb.append('}');
+        return sb.toString();
+    }
 }

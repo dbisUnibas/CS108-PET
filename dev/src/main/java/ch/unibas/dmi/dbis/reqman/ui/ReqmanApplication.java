@@ -5,6 +5,7 @@ package ch.unibas.dmi.dbis.reqman.ui;/**
  */
 
 import ch.unibas.dmi.dbis.reqman.common.Log4J2Fix;
+import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitledScene;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorScene;
@@ -39,7 +40,7 @@ public class ReqmanApplication extends Application {
         Log4J2Fix.applyHotFix();
         version = Version.getInstance();
         LOGGER = LogManager.getLogger(ReqmanApplication.class);
-        LOGGER.info("Starting reqman @ v" + version.getFullVersion());
+        LOGGER.info(LoggingUtils.REQMAN_MARKER, "Starting reqman @ v" + version.getFullVersion());
         if(args.length >= 1){
             if("--exp".equals(args[0]) || "--experimental".equals(args[0] ) ){
                 exp = true;
