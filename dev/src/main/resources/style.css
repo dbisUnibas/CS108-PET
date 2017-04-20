@@ -19,6 +19,14 @@ Adjust later on
 }
 
 /*
+Removing style of checkbox:
+ */
+
+.check-box.silent > .box {
+    -fx-background-color: crimson;
+}
+
+/*
 Styling for all displays (label which display an information)
 TODO: Needs re-styling (margin?)
  */

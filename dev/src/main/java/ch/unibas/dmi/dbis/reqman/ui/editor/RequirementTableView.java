@@ -23,6 +23,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.util.Callback;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -192,20 +193,17 @@ public class RequirementTableView extends BorderPane {
         binaryColumn.setCellValueFactory(c -> c.getValue().binaryProperty() );
 
         /*
-        Not Working
+        //Not Working
         binaryColumn.setCellFactory(new Callback<TableColumn<ObservableRequirement, Boolean>, TableCell<ObservableRequirement, Boolean>>() {
             @Override
             public TableCell<ObservableRequirement, Boolean> call(TableColumn<ObservableRequirement, Boolean> param) {
                 Callback<TableColumn<ObservableRequirement, Boolean>, TableCell<ObservableRequirement, Boolean>> factory = CheckBoxTableCell.forTableColumn(param);
                 TableCell<ObservableRequirement, Boolean> cell = factory.call(param);
-                if(cell instanceof CheckBoxTableCell){
-                    CheckBoxTableCell<ObservableRequirement, Boolean> check = (CheckBoxTableCell<ObservableRequirement, Boolean>)cell;
-                    check.setStyle("-fx-border-color: null!important;");
-                    System.out.println("set style");
-                }
+                cell.getStyleClass().add("silent");
                 return cell;
             }
-        });*/
+        });
+        */
 
         binaryColumn.setCellFactory(CheckBoxTableCell.forTableColumn(binaryColumn));
 
@@ -222,6 +220,11 @@ public class RequirementTableView extends BorderPane {
         table.setItems(tableData);
 
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        // DEBUG
+
+
+
         return table;
     }
 
