@@ -40,6 +40,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     private final EntityManager manager = EntityManager.getInstance();
 
+
     private EvaluatorView evaluator;
 
     private HashMap<String, AssessmentView> groupViewMap = new HashMap<>();
@@ -380,6 +381,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     public ObservableList<Progress> progressList(Group g) {
         return manager.getObservableProgress(g);
+    }
+
+    public Progress getProgressForRequirement(Group group, Requirement requirement) {
+        return manager.getProgressForRequirement(group, requirement);
     }
 
     public Group getGroupByName(String name) {

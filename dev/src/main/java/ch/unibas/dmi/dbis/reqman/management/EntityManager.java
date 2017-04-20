@@ -528,6 +528,10 @@ public class EntityManager {
         return FXCollections.observableList(provider.progressList());
     }
 
+    public Progress getProgressForRequirement(Group group, Requirement requirement){
+        return group.getProgressForRequirement(requirement);
+    }
+
     public boolean hasGroupFile(Group active) {
         LOGGER.trace(":hasGroupFile");
         LOGGER.entry(active);

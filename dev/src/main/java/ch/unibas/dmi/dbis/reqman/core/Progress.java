@@ -28,6 +28,10 @@ public class Progress {
         this.points = points;
     }
 
+    public Progress(Requirement req){
+        this(req.getName(), req.getMinMilestoneOrdinal(), 0);
+    }
+
     public Date getDate() {
         return date;
     }

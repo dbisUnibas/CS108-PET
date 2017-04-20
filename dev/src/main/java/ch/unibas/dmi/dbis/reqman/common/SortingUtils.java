@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
+import ch.unibas.dmi.dbis.reqman.core.Catalogue;
+import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 
 import java.util.Comparator;
@@ -44,6 +46,10 @@ public class SortingUtils {
             .thenComparing(Requirement::isMandatory, TRUE_FIRST_COMPARATOR)
             .thenComparing(Requirement::isMalus, FALSE_FIRST_COMPARATOR)
             .thenComparing(Requirement::getName);
+
+    public static final Comparator<Progress> getProgressComparator(Catalogue cat){
+        return Comparator.comparing(cat::getRequirementForProgress, REQUIREMENT_COMPARATOR);
+    }
 
     /**
      * Utility class, no instance needed.

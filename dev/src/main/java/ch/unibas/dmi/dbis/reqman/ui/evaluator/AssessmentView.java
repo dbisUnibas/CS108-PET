@@ -39,7 +39,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     /**
      * Maps MS ordinal to a map of Req.name <-> Progress (obj)
      */
-    private Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
+    private Map<Integer, Map<String, Progress>> progressMap;
     private List<ProgressSummary> summaries = new ArrayList<>();
     private List<ProgressView> activeProgressViews = new ArrayList<>();
     private Set<Milestone> visitedMilestones = new HashSet<>();
@@ -119,6 +119,30 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         this.activeMS = activeMilestone;
     }
 
+    /**
+     * Also updates the view
+     *
+     * @param ms
+     */
+    public void selectMilestone(Milestone ms) {
+        this.activeMS = ms;
+        cbMilestones.getSelectionModel().select(ms);
+    }
+
+    @Override
+    public void markDirty() {
+        LOGGER.trace("Dirty");
+        calcActiveSum();
+        handler.markDirty(getActiveGroup());
+    }
+
+    @Override
+    public void unmarkDirty() {
+        LOGGER.trace("Undirty");
+        calcActiveSum();
+        handler.unmarkDirty(getActiveGroup());
+    }
+
     void replaceGroup(Group newGroup) {
         this.group = newGroup;
     }
@@ -129,12 +153,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         }
 
         List<Progress> progressList = group.getProgressList();
+        Map<Integer, Map<String, Progress>> origin = generateOriginMap(handler.getCatalogue().getRequirements() );
         if (progressList == null || progressList.isEmpty()) {
-            progressMap = setupProgressMap();
+            progressMap = origin;
         } else {
-            progressMap = loadProgress(progressList);
-            mergeCatalogueProgress(setupProgressMap(), progressMap);
-
+            Map<Integer, Map<String, Progress>> loaded = generateMap(progressList, handler.getCatalogue());
+            progressMap = mergeMaps(origin, loaded);
         }
         syncProgressList();
     }
@@ -145,8 +169,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         progressMap.values().forEach(map -> {
             map.values().forEach(p -> handler.progressList(group).add(p));
         });
+        LOGGER.debug("Presenting the progress list: "+handler.progressList(getActiveGroup()));
     }
 
+    @Deprecated
     private void mergeCatalogueProgress(Map<Integer, Map<String, Progress>> catalogueMap, Map<Integer, Map<String, Progress>> groupMap) {
         catalogueMap.keySet().forEach(ordinal -> {
             LOGGER.debug(":mergeCatalogueProgress - Merging for MS: " + ordinal);
@@ -167,12 +193,13 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         });
     }
 
+    @Deprecated
     private Map<Integer, Map<String, Progress>> loadProgress(List<Progress> list) {
         Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
         for (Progress p : list) {
             int ordinal = p.getMilestoneOrdinal();
             String reqName = p.getRequirementName();
-            LOGGER.debug(LoggingUtils.LOAD_PROGRESS_MAP, String.format("Loading progress (%s)",p.toString() ) );
+            LOGGER.debug(LoggingUtils.LOAD_PROGRESS_MAP, String.format("Loading progress (%s)", p.toString()));
             if (progressMap.containsKey(ordinal)) {
                 // MS entry exists already
                 Map<String, Progress> rpMap = progressMap.get(ordinal);
@@ -194,6 +221,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     /**
      * Sets up the map as if the group was newly created
      */
+    @Deprecated
     private Map<Integer, Map<String, Progress>> setupProgressMap() {
         Map<Integer, Map<String, Progress>> progressMap = new TreeMap<>();
         handler.getMilestones().forEach(ms -> {
@@ -354,43 +382,16 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         LOGGER.trace(":loadActiveProgressViews - this.activeMS: " + this.activeMS.getName());
         visitedMilestones.add(this.activeMS);
         activeProgressViews.clear();
-        List<Requirement> reqs = handler.getRequirementsByMilestone(this.activeMS.getOrdinal());
-        reqs.sort(SortingUtils.REQUIREMENT_COMPARATOR);
-        reqs.forEach(r -> {
-            Progress p = progressMap.get(activeMS.getOrdinal()).get(r.getName());
-
-            ProgressView pv = new ProgressView(p, r);
-
-            pv.setActiveMilestone(activeMS);
-            verifyPredecessorsAchieved(pv);
-
-            pv.addPointsChangeListener(this);
-            pv.addDirtyListener(this);
-
-            LOGGER.debug(LoggingUtils.PREDECESSOR_CHECK_MARKER, String.format("Checking: Progress(%s) with active MS (%s)", p.toString(), activeMS.toString() ) );
-            // Filter the ones that are not really on this milestone and are already assessed
-            if (p.getDate() == null) {
-                // progress was not yet tracked.
-                activeProgressViews.add(pv);
-            } else if (p.getDate().before(activeMS.getDate())) {
-                // progress was made STRICTLY before active milestone
-                // this ProgressView must not be shown now
-            } else if (p.getDate().equals(activeMS.getDate())) {
-                // comparison possible - always a ms date is used.
-                // the progress date matches the current milestone -> show pv
-                activeProgressViews.add(pv);
-            } else {
-                activeProgressViews.add(pv);
-            }
-            //activeProgressViews.add(pv);
-        });
+        List<Progress> actives = getActiveProgresses();
+        for(Progress p : actives){
+            activeProgressViews.add( new ProgressView(p, handler.getCatalogue().getRequirementForProgress(p)));
+        }
 
     }
 
     private void verifyPredecessorsAchieved(ProgressView pv) {
         pv.setDisable(!group.isProgressUnlocked(handler.getCatalogue(), pv.getProgress()));
     }
-
 
     /**
      * @param activeMS If {@code == null}, the first entry in the choice is set.
@@ -409,16 +410,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         if (cbMilestones.getSelectionModel().getSelectedItem() == null) {
             cbMilestones.getSelectionModel().select(this.activeMS);
         }
-    }
-
-    /**
-     * Also updates the view
-     *
-     * @param ms
-     */
-    public void selectMilestone(Milestone ms) {
-        this.activeMS = ms;
-        cbMilestones.getSelectionModel().select(ms);
     }
 
     private void calcActiveSum() {
@@ -451,17 +442,107 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     }
 
 
-    @Override
-    public void markDirty() {
-        LOGGER.trace("Dirty");
-        calcActiveSum();
-        handler.markDirty(getActiveGroup());
+    private static Map<Integer, Map<String, Progress>> generateOriginMap(List<Requirement> requirements){
+        Map<Integer, Map<String, Progress>> map = new HashMap<>();
+        for(Requirement r : requirements){
+            if(! map.containsKey(r.getMinMilestoneOrdinal() )){
+                // case 1 r's ms nonexistent:
+                Map<String, Progress> msMap = new HashMap<>();
+                msMap.put(r.getName(), new Progress(r));
+                map.put(r.getMinMilestoneOrdinal(), msMap);
+            }else{
+                map.get(r.getMinMilestoneOrdinal() ).put(r.getName(), new Progress(r) );
+            }
+        }
+        return map;
     }
 
-    @Override
-    public void unmarkDirty() {
-        LOGGER.trace("Undirty");
-        calcActiveSum();
-        handler.unmarkDirty(getActiveGroup());
+    private static Map<Integer, Map<String, Progress>> generateMap(List<Progress> progressList, Catalogue cat){
+        Map<Integer, Map<String, Progress>> map = new HashMap<>();
+
+        for(Progress p : progressList){
+            Requirement r = cat.getRequirementByName(p.getRequirementName() );
+            if(!map.containsKey(r.getMinMilestoneOrdinal() ) ){
+                Map<String, Progress> msMap = new HashMap<>();
+                msMap.put(r.getName(), p);
+                map.put(r.getMinMilestoneOrdinal(), msMap);
+            }else{
+                map.get(r.getMinMilestoneOrdinal() ).put(r.getName(), p);
+            }
+        }
+
+        return map;
     }
+
+    private static Map<Integer, Map<String, Progress>> mergeMaps(Map<Integer, Map<String, Progress>> origin, Map<Integer, Map<String, Progress>> loaded){
+        Map<Integer, Map<String, Progress>> map = new HashMap<>();
+        for(int ordinal : origin.keySet()){
+            Map<String, Progress> oMS = origin.get(ordinal);
+            Map<String, Progress> lMS = loaded.get(ordinal);
+            if(lMS == null || lMS.isEmpty()){
+                // CASE 0: Iff group has no progress entries for that milestone: add generated reqname-progress-map
+                map.put(ordinal, oMS);
+                continue;
+            }
+
+            Map<String, Progress> working = new HashMap<>();
+
+            for(String reqName : oMS.keySet() ){
+                /*
+                If loaded does not contain entry to requirement -> catalogue has new requirement which
+                probably needs to be assessed. Thus->
+                 */
+                if(!lMS.containsKey(reqName) ){
+                    working.put(reqName, oMS.get(reqName ) );
+                }else{
+                    working.put(reqName, lMS.get(reqName));
+                }
+            }
+            map.put(ordinal, working);
+        }
+        return map;
+    }
+
+    private boolean isProgressActive(Progress p){
+        if(p.hasDefaultPercentage() || p.getDate() == null){
+            return true;
+        }else if(p.getDate().before(activeMS.getDate())){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+    private List<Progress> getActiveProgresses(){
+        LOGGER.trace(":getActiveProgresses - MS: "+activeMS.toString());
+        List<Progress> active = new ArrayList<>();
+
+        List<Requirement> activeReqs = handler.getCatalogue().getRequirementsByMilestone(activeMS.getOrdinal());
+        LOGGER.trace(String.format("Active reqs: %s",activeReqs));
+        Map<String, Progress> map = progressMap.get(activeMS.getOrdinal() );
+        LOGGER.trace(String.format("Found progresses: %s", map));
+        for(Requirement r : activeReqs){
+            boolean progressExistent = map.containsKey(r.getName());
+            LOGGER.debug(String.format("Scanning for %s", r));
+            if(progressExistent ){
+                Progress p = map.get(r.getName() );
+                boolean activeProgress = isProgressActive(p);
+                LOGGER.debug(String.format("Checking: %s 's date: %b",p, activeProgress));
+                if(activeProgress){
+                    active.add(p);
+                }
+            }else{
+                Progress p = handler.getProgressForRequirement(group, r);
+                boolean activeProgress = isProgressActive(p);
+                LOGGER.debug(String.format("Checking: %s 's date: %b", p, activeProgress));
+                if(activeProgress){
+                    active.add(p);
+                }
+
+            }
+        }
+        active.sort(SortingUtils.getProgressComparator(handler.getCatalogue()));
+        return active;
+    }
+
 }
