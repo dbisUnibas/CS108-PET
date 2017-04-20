@@ -36,22 +36,6 @@ To build `ReqMan` run:
 gradlew build
 ```
 
-### Editor
-
-To exclusively have the `editor` application executable in a jar, run:
-
-```
-gradlew deployEditor
-```
-
-### Evaluator
-
-To exclusively have the `evaluator` application executable in a jar, run:
-
-```
-graldew deployEvaluator
-```
-
 ## Usage
 
 `ReqMan` (and its modes `editor` and `evaluator`) is a JavaFX application
