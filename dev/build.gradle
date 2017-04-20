@@ -131,10 +131,6 @@ gradle.taskGraph.whenReady {
     taskGraph ->
         jar.appendix = ''
         jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication')
-        if (taskGraph.hasTask(applySnapshotEvaluator) || taskGraph.hasTask(applySnapshotEditor)) {
-            jar.classifier = 'SNAPSHOT'
-        }
-
 }
 
 /**
