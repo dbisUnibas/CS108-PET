@@ -1,4 +1,4 @@
-# ReqMan - branch: experimental
+# ReqMan - branch: reqman-exp
 
 ReqMan (Requirements Manager) is a JavaFX application to manage requirements.
 
