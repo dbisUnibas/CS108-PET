@@ -228,18 +228,29 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
             return; // USER ABORT
         }
         if (files.size() == 1) {
+            if(!manager.isAnyGroupFilePresent(files).isEmpty()){
+                Utils.showErrorDialog("Duplicate group files", "Cannot open a group twice");
+                return;
+            }
             manager.openGroup(files.get(0), (g) -> {
                 handleFirstGroupPresent();
                 loadGroupUI(g);
-            });
+            }, this::handleOpenGroupException);
 
         } else if (files.size() >= 2) {
-            manager.openGroups(files, (list) -> {
+            List<File> dupes = manager.isAnyGroupFilePresent(files);
+            List<File> noDupes = new ArrayList<>(files);
+            noDupes.removeAll(dupes);
+            manager.openGroups(noDupes, (list) -> {
                 handleFirstGroupPresent();
                 loadGroupUI(list);
-            });
+            }, this::handleOpenGroupException);
         }
         // USER ABORT
+    }
+
+    private void handleOpenGroupException(Exception ex){
+        Utils.showErrorDialog("Open group(s) failed", "Could not open group due to: \n"+ex.getMessage());
     }
 
     private void loadGroupUI(List<Group> groups) {

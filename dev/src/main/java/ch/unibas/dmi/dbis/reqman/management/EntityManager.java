@@ -188,7 +188,7 @@ public class EntityManager {
         this.statusBar = statusBar;
     }
 
-    private void bindMessages(ManagementTask task){
+    @Deprecated  private void bindMessages(ManagementTask task){
         if(statusBar != null){
             statusBar.messageProperty().bind(task.messageProperty() );
         }
@@ -454,29 +454,51 @@ public class EntityManager {
         return catalogueFile;
     }
 
-    public void openGroup(File file, Consumer<Group> done) {
+    public void openGroup(File file, Consumer<Group> done, Consumer<Exception> exHandler) {
         LOGGER.entry(file);
-        OpenGroupTask task = new OpenGroupTask(file);
-        bindMessages(task);
-        runTaskThrowing(task, () -> {
-            if (task.getLastException() != null) { // NOT WORKING
-                lastOpenException = task.getLastException();
-            }
-            openedGroup(file, task.getValue());
-        }, () -> {
-            done.accept(task.getValue());
-        });
+
+        CheckedAsynchronousOperation<Group> op = OperationFactory.createOpenGroupOperation(file);
+        op.addProcessor(group -> this.openedGroup(file, group), -10);
+        op.addProcessor(done);
+
+        op.addValidator(group -> checkGroupConstraints(op, group));
+        op.setExceptionHandler(exHandler);
+
+
+        op.start();
+
     }
 
-    public void openGroups(List<File> files, Consumer<List<Group>> callback) {
+    private <T> boolean checkGroupConstraints(CheckedAsynchronousOperation<T> op, Group group){
+        if(!group.getCatalogueName().equals(catalogue.getName() ) ){
+            op.setExceptionMessage("Invalid catalogue signature\n" +
+                    "Expected: "+catalogue.getName()+"\n" +
+                    "Found:    "+group.getCatalogueName());
+            return false;
+        }
+        if(!isGroupNameUnique(group.getName())){
+            op.setExceptionMessage("Group name not unique");
+            return false;
+        }
+        return true;
+    }
+
+    public void openGroups(List<File> files, Consumer<List<Group>> callback, Consumer<Exception> exHandler) {
         LOGGER.entry(files);
-        OpenMultipleGroupsTask task = new OpenMultipleGroupsTask(files);
-        bindMessages(task);
-        runTask(task, () -> {
-            openedGroups(files, task.getValue());
-        }, () -> {
-            callback.accept(task.getValue());
+
+        CheckedAsynchronousOperation<List<Group>> op = OperationFactory.createOpenMultipleGroupOperation(files);
+
+        op.addProcessor(groups -> openedGroups(files, groups),-10);
+        op.addProcessor(callback);
+
+        op.addValidator(groups -> {
+            for(Group g : groups) {
+                return checkGroupConstraints(op, g);
+            }
+            return true; // Actually unreachable?
         });
+
+        op.start();
     }
 
     public Exception getLastOpenException() {
@@ -639,5 +661,17 @@ public class EntityManager {
                     LOGGER.error("Exception reading .backup file.",e);
                 }
             }*/
+    }
+
+    public List<File> isAnyGroupFilePresent(List<File> files) {
+        List<File> out = new ArrayList<>();
+        for (File file : files) {
+            for (File f : groupFileMap.values()) {
+                if (f.equals(file)) {
+                    out.add(file);
+                }
+            }
+        }
+        return out;
     }
 }

@@ -86,7 +86,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleOpenGroups(ActionEvent event) {
-        manager.enableGroupNeeded(); // TODO
+        //manager.enableGroupNeeded(); // TODO
         evaluatorHandler.handleOpenGroups(event);
         if (!evaluatorHandler.isGroupLoaded()) {
             return;
