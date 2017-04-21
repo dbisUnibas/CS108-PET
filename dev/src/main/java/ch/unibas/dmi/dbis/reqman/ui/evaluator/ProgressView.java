@@ -235,6 +235,7 @@ public class ProgressView extends VBox {
             initYesNoButtons();
         } else {
             spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1d);
+            spinnerPoints.setEditable(true);
             controlWrapper.getChildren().add(spinnerPoints);
             // Solution by: http://stackoverflow.com/a/39380146
             spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {

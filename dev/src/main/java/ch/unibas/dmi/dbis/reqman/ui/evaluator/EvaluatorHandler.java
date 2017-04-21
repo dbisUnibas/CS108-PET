@@ -290,7 +290,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
 
     public void handleOpenCatalogue(ActionEvent event) {
-        FileChooser fc = Utils.createCatalogueFileChooser("Open");
+        FileChooser fc = Utils.createCatalogueFileChooser("Load");
         if (manager.hasLastOpenLocation()) {
             fc.setInitialDirectory(manager.getLastOpenLocation());
         }
