@@ -52,6 +52,21 @@ public class OperationFactory {
         return createOperationForTask(task, true);
     }
 
+    public static CheckedAsynchronousOperation<Boolean> createExportMultipleGroupsOperation(File dir, List<Group> groups, Catalogue catalogue){
+        ExportMultipleGroupTask task = new ExportMultipleGroupTask(dir, groups, catalogue);
+        return createOperationForTask(task, true);
+    }
+
+    public static CheckedAsynchronousOperation<Boolean> createSaveAsBackupOperation(Group group, File catFile){
+        SaveGroupBackupTask task = new SaveGroupBackupTask(group,catFile);
+        return createOperationForTask(task, false); // deamon=false ensures finish execution before closing application
+    }
+
+    public static CheckedAsynchronousOperation<List<OpenBackupsTask.BackupObject>> createOpenBackupsOperation(){
+        OpenBackupsTask task = new OpenBackupsTask();
+        return createOperationForTask(task, true);
+    }
+
     private static <T> CheckedAsynchronousOperation<T> createOperationForTask(ManagementTask<T> task, boolean deamon) {
         CheckedAsynchronousOperation<T> op = new CheckedAsynchronousOperation<T>(task, deamon);
         bindStatusBar(op);

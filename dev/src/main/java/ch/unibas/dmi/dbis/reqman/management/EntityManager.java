@@ -586,82 +586,32 @@ public class EntityManager {
     }
 
     public void exportAllGroups(File dir) {
-
-        ExportMultipleGroupTask task = new ExportMultipleGroupTask(dir, groups, catalogue);
-        bindMessages(task);
-        runTask(task, () -> {
+        CheckedAsynchronousOperation<Boolean> op = OperationFactory.createExportMultipleGroupsOperation(dir, groups, catalogue);
+        op.addProcessor(b -> {
             lastExportLocation = ensureDirectory(dir);
             LOGGER.info("All export done");
         });
+        op.start();
     }
 
     public void saveAsBackup(Group g) {
-        SaveGroupBackupTask task = new SaveGroupBackupTask(g, catalogueFile);
-        bindMessages(task);
-        Thread th = new Thread(task);
-
-        th.start();
+        OperationFactory.createSaveAsBackupOperation(g, catalogueFile).start();
     }
 
     public void openBackupsIfExistent(Consumer<List<OpenBackupsTask.BackupObject>> callback) {
-        OpenBackupsTask task = new OpenBackupsTask();
-        bindMessages(task);
-        runTask(task, () -> {
-            task.getValue().forEach( o -> {
-                if(o.isCatalogue() && o.getCatalogue() != null){
+        CheckedAsynchronousOperation<List<OpenBackupsTask.BackupObject>> op = OperationFactory.createOpenBackupsOperation();
+        op.addProcessor(list -> list.forEach(o -> {
+            if(o.isCatalogue() && o.getCatalogue() != null){
 
-                    setCatalogue(o.getCatalogue() );
-                    catalogueFile = o.getLocation();
-                }else{
-                    openedGroup(null, o.getGroup());
-                }
-            });
-        }, () -> {
-            callback.accept(task.getValue());
-        });
-        /* IMPORTANT: internalCallback:
-            add / load catalogue,
-            add / load groups
+                setCatalogue(o.getCatalogue() );
+                catalogueFile = o.getLocation();
+            }else{
+                openedGroup(null, o.getGroup());
+            }
+        }), -10);
 
-           IMPORTANT: externalCallback:
-            setup editor,
-            setup evaluator
-         */
-        /*File dir = ConfigUtils.getCodeSourceLocation().getParentFile();
-        if(dir.isDirectory() ){
-            for(File file : dir.listFiles(BACKUP_FILTER) ) {
-                LOGGER.info("Found .backup file: "+file.getPath() );
-                try {
-                    Map<String, Object> backupObj = JSONUtils.readFromJSONFile(file);
-                    boolean hasCatalogueKey = backupObj.containsKey(CATALOGUE_KEY);
-                    boolean hasGroupKey = backupObj.containsKey(GROUP_KEY);
-
-                    if(hasCatalogueKey && hasGroupKey ){
-                        if(backupObj.get(CATALOGUE_KEY) instanceof String){
-                            File catFile = new File((String)backupObj.get(CATALOGUE_KEY));
-                            loadCatalogue(catFile);
-                            catalogueFile = catFile;
-                            // Catalogue set
-                            if(backupObj.get(GROUP_KEY) instanceof String) {
-                                Group g = JSONUtils.readFromString((String)backupObj.get(GROUP_KEY),Group.class);
-                                loadGroup(null, g);
-                                markDirty(g);
-                                LOGGER.info("Successfully opened group"+g.getName()+" from backupfile "+file.getName() );
-                                boolean deletSucc = file.delete();
-                                LOGGER.info("Removed backup file: "+file.getName() );
-                            }
-                        }else{
-                            LOGGER.error("Expected catalogue property to be of type String.");
-                            return;
-                        }
-                    }else{
-                        LOGGER.error("Found .backup file without expected structure: "+backupObj.toString() );
-                        return;
-                    }
-                } catch (IOException e) {
-                    LOGGER.error("Exception reading .backup file.",e);
-                }
-            }*/
+        op.addProcessor(callback);
+        op.start();
     }
 
     public List<File> isAnyGroupFilePresent(List<File> files) {
