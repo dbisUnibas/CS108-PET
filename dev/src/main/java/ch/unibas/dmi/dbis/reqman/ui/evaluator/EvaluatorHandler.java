@@ -152,6 +152,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
                     if(manager.removeGroup(del) ){
                         removeGroupFromMap(del);
                     }
+                    LOGGER.debug(":handleDeletion - Remaining: "+manager.groupList().toString());
                 }
                 break;
             default:
@@ -347,6 +348,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     private void removeGroupFromMap(Group group){
         groupViewMap.remove(group.getName() );
         removeTab(group);
+        dirtyMap.remove(group.getName() );
     }
 
     private void removeTab(Group g){

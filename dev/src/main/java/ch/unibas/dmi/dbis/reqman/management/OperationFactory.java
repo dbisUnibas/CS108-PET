@@ -47,11 +47,17 @@ public class OperationFactory {
         return createOperationForTask(task, true);
     }
 
+    public static CheckedAsynchronousOperation<Boolean> createSaveGroupOperation(File file, Group group){
+        SaveGroupTask task = new SaveGroupTask(file,group);
+        return createOperationForTask(task, true);
+    }
+
     private static <T> CheckedAsynchronousOperation<T> createOperationForTask(ManagementTask<T> task, boolean deamon) {
         CheckedAsynchronousOperation<T> op = new CheckedAsynchronousOperation<T>(task, deamon);
         bindStatusBar(op);
         return op;
     }
+
 
     public static CheckedAsynchronousOperation<List<Group>> createOpenMultipleGroupOperation(List<File> files) {
         OpenMultipleGroupsTask task = new OpenMultipleGroupsTask(files);

@@ -410,6 +410,7 @@ public class EntityManager {
     }
 
     public boolean removeGroup(Group del) {
+        groupFileMap.remove(del.getName());
         return groups.remove(del);
     }
 
@@ -568,20 +569,20 @@ public class EntityManager {
 
     public void saveGroup(Group group) {
         File f = groupFileMap.get(group.getName());
-        SaveGroupTask task = new SaveGroupTask(f, group);
-        bindMessages(task);
-        runTask(task, () -> {
-            LOGGER.info("Saved group (" + group.getName() + ") to " + f.getPath());
-        });
+        saveGroup(group, f);
+    }
+
+    private void saveGroup(Group group, File file){
+        CheckedAsynchronousOperation<Boolean> op = OperationFactory.createSaveGroupOperation(file,group);
+        op.addProcessor(b ->{
+            LOGGER.info("SavedAs group (" + group.getName() + ") to " + file.getPath());
+            groupFileMap.put(group.getName(), file);
+        } );
+        op.start();
     }
 
     public void saveGroupAs(Group group, File file) {
-        SaveGroupTask task = new SaveGroupTask(file, group);
-        bindMessages(task);
-        runTask(task, () -> {
-            LOGGER.info("SavedAs group (" + group.getName() + ") to " + file.getPath());
-            groupFileMap.put(group.getName(), file);
-        });
+        saveGroup(group, file);
     }
 
     public void exportAllGroups(File dir) {
