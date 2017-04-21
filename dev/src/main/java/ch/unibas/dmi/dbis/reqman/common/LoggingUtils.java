@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -10,6 +11,10 @@ import org.apache.logging.log4j.MarkerManager;
  */
 public class LoggingUtils {
 
+    private LoggingUtils(){
+        // no costructor needed
+    }
+
 
     public static final Marker REQMAN_MARKER = MarkerManager.getMarker("REQMAN");
     public static final Marker EVALUATOR_MARKER = MarkerManager.getMarker("EVALUATOR").setParents(REQMAN_MARKER);
@@ -19,4 +24,5 @@ public class LoggingUtils {
     public static final Marker PREDECESSOR_CHECK_MARKER = MarkerManager.getMarker("PREDECESSOR_CHECK").setParents(ASSESSMENT_MARKER);
     public static final Marker LOAD_PROGRESS_MAP = MarkerManager.getMarker("LOAD_PROGRESS_MAP").setParents(ASSESSMENT_MARKER);
     public static final Marker DIRTY_MARKER = MarkerManager.getMarker("DIRTY").setParents(ASSESSMENT_MARKER);
+    public static final Marker SUM_MARKER = MarkerManager.getMarker("SUM").setParents(ASSESSMENT_MARKER);
 }

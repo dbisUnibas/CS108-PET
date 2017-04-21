@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.core;
 
+import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,7 +57,7 @@ public class Group implements Comparable<Group> {
 
         for (Progress p : getProgressByMilestoneOrdinal(ms.getOrdinal())) {
             double summand = p.hasProgress() ? p.getPointsSensitive(catalogue) : 0;
-            LOG.debug(String.format("[%s] Has progress: %b, points: %f, sensitive=%f, summand=%g", catalogue.getRequirementForProgress(p).getName(), p.hasProgress(), p.getPoints(), p.getPointsSensitive(catalogue), summand));
+            LOG.debug(LoggingUtils.SUM_MARKER, String.format("[%s] Has progress: %b, points: %f, sensitive=%f, summand=%g", catalogue.getRequirementForProgress(p).getName(), p.hasProgress(), p.getPoints(), p.getPointsSensitive(catalogue), summand));
             points.add(summand);// only add points if progress
         }
 

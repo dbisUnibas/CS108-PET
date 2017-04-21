@@ -57,6 +57,7 @@ public class ProgressView extends VBox {
      */
     private volatile boolean[] previousSavedYesNoConfig = new boolean[]{false, false};
     private volatile boolean first = true;
+    private volatile double previousSavedPoints = -1d;
 
     private Milestone active = null;
 

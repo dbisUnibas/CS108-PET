@@ -126,7 +126,7 @@ public class Progress {
     public double getPointsSensitive(Catalogue catalogue) {
         Requirement r = catalogue.getRequirementByName(requirementName);
         double factor = (r.isMalus() ? -1d : 1d) * percentage;
-        return factor * points;
+        return factor * r.getMaxPoints();
     }
 
     @JsonIgnore
