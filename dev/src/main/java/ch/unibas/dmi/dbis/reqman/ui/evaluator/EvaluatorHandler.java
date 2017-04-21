@@ -483,6 +483,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
                 LOGGER.trace(":openBackups - Aftermath: Processing: "+obj.toString());
                 if(!obj.isCatalogue()){
                     loadGroupUI(obj.getGroup());
+                    markDirty(obj.getGroup() );
                 }
             });
         });

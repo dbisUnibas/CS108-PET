@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
+import ch.unibas.dmi.dbis.reqman.core.Catalogue;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
@@ -57,28 +58,24 @@ public class ProgressView extends VBox {
      */
     private volatile boolean[] previousSavedYesNoConfig = new boolean[]{false, false};
     private volatile boolean first = true;
-    private volatile double previousSavedPoints = -1d;
+    private volatile double previousSavedFraction = -1d;
 
     private Milestone active = null;
 
-    public ProgressView(Requirement requirement) {
-        this(null, requirement);
-    }
+    private Catalogue catalogue = null;
 
-
-    public ProgressView(Progress progress, Requirement requirement) {
+    public ProgressView(Progress progress, Requirement requirement, Catalogue catalogue) {
         super();
         this.progress = progress == null ? new Progress() : progress;
         this.requirement = requirement;
-
+        this.catalogue = catalogue;
         initComponents();
         initCollapsible();
         loadProgress();
     }
 
-    @Deprecated
-    private boolean hasPointsChanged(double newPoints){
-        return Double.compare(previousPoints, newPoints) == 0;
+    private boolean hasPercentageChanged(){
+        return Double.compare(previousSavedFraction, progress.getPercentage()) != 0;
     }
 
     private boolean hasYesNoConfigChaned(boolean yesSelected, boolean noSelected){
@@ -183,7 +180,8 @@ public class ProgressView extends VBox {
                 previousSavedYesNoConfig[0] = yesBtn.isSelected();
                 previousSavedYesNoConfig[1] = noBtn.isSelected();
             } else {
-                spinnerPoints.getValueFactory().setValue(progress.getPoints());
+                spinnerPoints.getValueFactory().setValue(progress.getPointsSensitive(catalogue));
+                previousSavedFraction = progress.getPercentage();
             }
         }
     }
@@ -247,6 +245,7 @@ public class ProgressView extends VBox {
                 if (Double.compare(oldValue, newValue) != 0) { // Only if really new value
                     progress.setPoints(newValue, requirement.getMaxPoints());
                     notifyPointsListener();
+                    notifyDirtyListeners(hasPercentageChanged());
                 }
             });
         }
@@ -332,6 +331,8 @@ public class ProgressView extends VBox {
             previousSavedYesNoConfig[0] = yesBtn.isSelected();
             previousSavedYesNoConfig[1] = noBtn.isSelected();
             LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: -> last: %b/%b", progress.getRequirementName(), previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
+        }else if(spinnerPoints != null){
+            previousSavedFraction = progress.getPercentage();
         }
     }
 }

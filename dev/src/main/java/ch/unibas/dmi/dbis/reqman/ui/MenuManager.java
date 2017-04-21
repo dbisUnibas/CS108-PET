@@ -106,7 +106,7 @@ public class MenuManager {
         registerMenuItem(ITEM_NEW_CAT, itemNewCat = new MenuItem("New Catalogue..."));
         registerMenuItem(ITEM_NEW_GROUP, itemNewGroup = new MenuItem("New Group..."));
         catNeeded.add(ITEM_NEW_GROUP);
-        registerMenuItem(ITEM_OPEN_CAT, itemOpenCat = new MenuItem("Open Catalogue..."));
+        registerMenuItem(ITEM_OPEN_CAT, itemOpenCat = new MenuItem("Load Catalogue..."));
         registerMenuItem(ITEM_OPEN_GROUPS, itemOpenGroup = new MenuItem("Open Group..."));
         catNeeded.add(ITEM_OPEN_GROUPS);
 
