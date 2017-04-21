@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Progress;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
@@ -80,11 +81,12 @@ public class ProgressView extends VBox {
     }
 
     private boolean hasYesNoConfigChaned(boolean yesSelected, boolean noSelected){
-        if(first){
+        LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: selected: %b/%b (%b) - last: %b/%b", progress.getRequirementName(), yesSelected, noSelected, first, previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
+        /*if(first){
             first = false;
             return true;
-        }
-        return previousSavedYesNoConfig[0] != yesSelected && previousSavedYesNoConfig[1] != noSelected;
+        }*/
+        return previousSavedYesNoConfig[0] != yesSelected || previousSavedYesNoConfig[1] != noSelected;
     }
 
     private void initYesNoButtons() {
@@ -322,9 +324,12 @@ public class ProgressView extends VBox {
     }
 
     void markSaved() {
+        // TODO: Implement for spinner
+        LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: selected: %b/%b -> last: %b/%b", progress.getRequirementName(), yesBtn.isSelected(), noBtn.isSelected(), previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
         if (yesBtn != null && noBtn != null) {
             previousSavedYesNoConfig[0] = yesBtn.isSelected();
             previousSavedYesNoConfig[1] = noBtn.isSelected();
+            LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: -> last: %b/%b", progress.getRequirementName(), previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
         }
     }
 }

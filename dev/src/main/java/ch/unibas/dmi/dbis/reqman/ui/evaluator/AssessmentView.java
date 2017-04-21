@@ -106,6 +106,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
             progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
         }
         activeProgressViews.forEach(pv -> pv.markSaved());
+        handler.unmarkDirty(group);
         return list;
     }
 

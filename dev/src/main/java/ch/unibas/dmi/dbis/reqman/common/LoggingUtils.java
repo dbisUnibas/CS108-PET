@@ -18,4 +18,5 @@ public class LoggingUtils {
 
     public static final Marker PREDECESSOR_CHECK_MARKER = MarkerManager.getMarker("PREDECESSOR_CHECK").setParents(ASSESSMENT_MARKER);
     public static final Marker LOAD_PROGRESS_MAP = MarkerManager.getMarker("LOAD_PROGRESS_MAP").setParents(ASSESSMENT_MARKER);
+    public static final Marker DIRTY_MARKER = MarkerManager.getMarker("DIRTY").setParents(ASSESSMENT_MARKER);
 }

@@ -45,6 +45,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     private EvaluatorView evaluator;
 
     private HashMap<String, AssessmentView> groupViewMap = new HashMap<>();
+    private HashMap<String, Boolean> dirtyMap = new HashMap<>();
     private Milestone activeMS = null;
     private StatusBar statusBar;
 
@@ -354,10 +355,14 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
 
     void markDirty(Group activeGroup) {
+        dirtyMap.put(activeGroup.getName(), true);
         evaluator.markDirty(activeGroup);
     }
 
     void unmarkDirty(Group activeGroup) {
+        if(dirtyMap.containsKey(activeGroup.getName() ) ){
+            dirtyMap.put(activeGroup.getName(), false);
+        }
         evaluator.unmarkDirty(activeGroup);
     }
 
@@ -458,10 +463,14 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     public void stop(){
         manager.groupList().forEach(g -> {
-            if(evaluator.isDirty(g)){
+            if(isDirty(g)){
                 manager.saveAsBackup(g);
             }
         });
+    }
+
+    public boolean isDirty(Group group){
+        return dirtyMap.containsKey(group.getName() ) && dirtyMap.get(group.getName());
     }
 
     public void openBackups(){

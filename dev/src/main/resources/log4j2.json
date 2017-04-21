@@ -1,7 +1,7 @@
 {
   "configuration": {
     "name": "Default",
-    "status": "debug",
+    "status": "WARN",
     "appenders": {
       "Console": {
         "name": "console",
@@ -10,9 +10,7 @@
           "pattern": "[%d{MM-dd-yyyy HH:mm:ss.SSS}][%t] %-5level %logger{36}: %msg%n"
         },
         "filters": [
-          {
 
-          }
         ]
       },
       "RollingFile": {
@@ -51,7 +49,8 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console"
+              "ref": "console",
+              "level": "info"
             },
             {
               "ref": "rollingFile",
@@ -65,7 +64,8 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console"
+              "ref": "console",
+              "level": "info"
             }
           ]
         },
@@ -112,21 +112,12 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console"
+              "ref": "console",
+              "level": "info"
             },
             {
               "ref": "rollingFile",
               "level": "info"
-            }
-          ]
-        },
-        {
-          "name": "ch.unibas.dmi.dbis.reqman.ui.editor.EditorApplication",
-          "level": "trace",
-          "additivity": false,
-          "AppenderRef": [
-            {
-              "ref": "console"
             }
           ]
         },
@@ -160,7 +151,8 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console"
+              "ref": "console",
+              "level": "debug"
             }
           ]
         },
@@ -214,7 +206,8 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console"
+              "ref": "console",
+              "level": "debug"
             },
             {
               "ref": "rollingFile",
@@ -228,7 +221,8 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console"
+              "ref": "console",
+              "level": "debug"
             }
           ]
         }
