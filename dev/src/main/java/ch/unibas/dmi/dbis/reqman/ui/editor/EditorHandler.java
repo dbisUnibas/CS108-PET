@@ -156,7 +156,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     public void openCatalogue(File file) {
         LOGGER.trace(":openCatalogue " + String.format("File: %s", file.getPath()));
         editor.indicateWaiting(true);
-        manager.openCatalogue(file, () -> setupEditor());
+        manager.openCatalogue(file, (cat) -> setupEditor());
         editor.indicateWaiting(false);
     }
 

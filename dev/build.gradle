@@ -79,6 +79,7 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'reqman.properties'
     }
+    outputs.upToDateWhen{false}
 }
 
 /**

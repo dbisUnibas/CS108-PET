@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.management;
 import javafx.concurrent.WorkerStateEvent;
 
 import java.util.PriorityQueue;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -13,11 +14,11 @@ import java.util.function.Predicate;
  */
 public class CheckedAsynchronousOperation<T> {
 
-    private static final Consumer<Exception> DEFAULT_EXCEPTION_HANDLER = System.err::println;
+    private static final Consumer<Exception> DEFAULT_EXCEPTION_HANDLER = Throwable::printStackTrace;
     private final ManagementTask<T> task;
 
-    private PriorityQueue<Predicate<T>> validators = new PriorityQueue<>();
-    private PriorityQueue<Consumer<T>> processors = new PriorityQueue<>();
+    private TreeMap<Integer, Predicate<T>> validators = new TreeMap<>();
+    private TreeMap<Integer, Consumer<T>> processors = new TreeMap<>();
 
     private Consumer<Exception> exceptionHandler;
 
@@ -49,13 +50,13 @@ public class CheckedAsynchronousOperation<T> {
     private void done(WorkerStateEvent event) throws IllegalStateException{
         T result = task.getValue();
 
-        validators.forEach( v -> {
+        validators.values().forEach( v -> {
             if(!v.test(result)){
                 throw new IllegalStateException();
             }
         });
 
-        processors.forEach(p -> p.accept(result));
+        processors.values().forEach(p -> p.accept(result));
     }
 
     public CheckedAsynchronousOperation(final ManagementTask<T> task, boolean background){
@@ -68,6 +69,28 @@ public class CheckedAsynchronousOperation<T> {
     }
 
     public void addValidator(Predicate<T> validator){
-
+        validators.put(10, validator);
     }
+
+    public void addProcessor(Consumer<T> processor){
+        processors.put(10, processor);
+    }
+
+    /**
+     *
+     * @param validator
+     * @param weight, the lower the higher priorty
+     */
+    public void addValidator(Predicate<T> validator, int weight){
+        validators.put(weight, validator);
+    }
+
+    public void addProcessor(Consumer<T> processor, int weight){
+        processors.put(weight, processor);
+    }
+
+    ManagementTask<T> getTask(){
+        return task;
+    }
+
 }

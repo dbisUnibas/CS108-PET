@@ -151,22 +151,21 @@ public class EntityManager {
     /**
      * @param file nontnull
      */
-    public void openCatalogue(File file, Callback doneCallback) {
+    public void openCatalogue(File file, Consumer<Catalogue> doneProcessor) {
         LOGGER.trace(":openCat");
 
-        OpenCatalogueTask openTask = new OpenCatalogueTask(file);
-        bindMessages(openTask);
-        try {
-            runTask(openTask, () -> {
-                setCatalogue(openTask.getValue());
-                catalogueFile = file;
-                lastOpenLocation = ensureDirectory(file);
-                LOGGER.trace(":openCatalogue - Finished");
+        CheckedAsynchronousOperation<Catalogue> operation = OperationFactory.createLoadCatalogueOperation(file, doneProcessor);
 
-            }, doneCallback);
-        } catch (Exception e) {
-            e.printStackTrace(); // TODO handle
-        }
+        operation.addProcessor(c -> {
+            setCatalogue(c);
+            catalogueFile = file;
+            lastOpenLocation = ensureDirectory(file);
+            LOGGER.trace(":openCatalogue - Finished");
+        }, 0);
+
+        bindMessages(operation.getTask());
+        operation.start();
+
 
     }
 

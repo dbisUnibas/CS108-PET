@@ -300,7 +300,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
     }
 
-    private void catalogueLoaded() {
+    private void catalogueLoaded(Catalogue cat) {
         LOGGER.info("Opened catalogue " + manager.getCatalogueFile().getPath());
         LOGGER.trace("Enabling all");
         evaluator.enableAll();
