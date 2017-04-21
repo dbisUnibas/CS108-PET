@@ -64,7 +64,7 @@ public class ExportCatalogueTask extends ManagementTask<Boolean> {
         LOGGER.info(" D O N E   Catalogue Export @ " + StringUtils.prettyPrintTimestamp(System.currentTimeMillis()));
         LOGGER.info(" " + eFile.getPath() );
         LOGGER.info("==============================");
-        updateAll("Finished exporting catalogue.", 1.0);
+        updateAll("Finished exporting catalogue ("+ eFile.getPath()+")", 1.0);
         return null;
     }
 }

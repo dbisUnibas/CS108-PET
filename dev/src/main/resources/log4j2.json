@@ -10,11 +10,7 @@
           "pattern": "[%d{MM-dd-yyyy HH:mm:ss.SSS}][%t] %-5level %logger{36}: %msg%n"
         },
         "filters": [
-          {
-            "MarkerFilter":{
-              "marker":"SUM"
-            }
-          }
+
         ]
       },
       "RollingFile": {
@@ -141,7 +137,7 @@
         },
         {
           "name": "ch.unibas.dmi.dbis.reqman.core",
-          "level": "debug",
+          "level": "info",
           "additivity": false,
           "AppenderRef": [
             {

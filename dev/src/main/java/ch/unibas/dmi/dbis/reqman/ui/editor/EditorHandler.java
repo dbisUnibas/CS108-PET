@@ -224,17 +224,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     }
 
     public void handleExportCatalogue(ActionEvent event) {
-        if (!manager.isCatalogueLoaded()) {
-            return;
-        }
-        FileChooser fc = new FileChooser();
-        fc.setTitle("Export Catalogue");
-        File f = fc.showSaveDialog(editor.getScene().getWindow());
-        if (f != null) {
-            editor.indicateWaiting(true);
-            manager.exportCatalogue(f);
-            editor.indicateWaiting(false);
-        }
+
     }
 
     public Milestone getSelectedMS() {

@@ -66,7 +66,7 @@ public class EntityManager {
     private Group lastOpenedGroup = null;
     private int lastOrdinal = -1;
     private Exception lastOpenException = null;
-    private StatusBar statusBar;
+    @Deprecated  private StatusBar statusBar;
 
     private EntityManager() {
 
@@ -151,8 +151,12 @@ public class EntityManager {
     /**
      * @param file nontnull
      */
-    public void openCatalogue(File file, Consumer<Catalogue> doneProcessor) {
+    public void openCatalogue(File file, Consumer<Catalogue> doneProcessor) throws IllegalStateException {
         LOGGER.trace(":openCat");
+
+        if(catalogue != null){
+            throw new IllegalStateException("There is already a catalogue open");
+        }
 
         CheckedAsynchronousOperation<Catalogue> operation = OperationFactory.createLoadCatalogueOperation(file, doneProcessor);
 
@@ -163,7 +167,6 @@ public class EntityManager {
             LOGGER.trace(":openCatalogue - Finished");
         }, 0);
 
-        bindMessages(operation.getTask());
         operation.start();
 
 
@@ -193,17 +196,7 @@ public class EntityManager {
     }
 
     private void saveCatalogue(File file) {
-        SaveCatalogueTask saveTask = new SaveCatalogueTask(catalogue, file);
-        bindMessages(saveTask);
-
-        try {
-            runTask(saveTask, () -> {
-                LOGGER.info("Saved catalogue to: " + file.getPath());
-                catalogueFile = file;
-            });
-        } catch (Exception e) {
-            e.printStackTrace(); // TODO Handle
-        }
+        OperationFactory.createSaveCatalogueOperation(catalogue, file).start();
     }
 
     public void saveAsCatalogue(File file) {
@@ -211,16 +204,12 @@ public class EntityManager {
     }
 
     public void exportCatalogue(File file) {
-        ExportCatalogueTask task = new ExportCatalogueTask(catalogue, file);
-        bindMessages(task);
-        try {
-            runTask(task, () -> {
-                LOGGER.info("Export done");
-                lastExportLocation = ensureDirectory(file);
-            });
-        } catch (Exception e) {
-            e.printStackTrace(); // TODO handle
-        }
+        CheckedAsynchronousOperation<Boolean> op = OperationFactory.createExportCatalogueOperation(catalogue, file);
+        op.addProcessor(b -> {
+            LOGGER.info("Export done");
+            lastExportLocation = ensureDirectory(file);
+        });
+        op.start();
     }
 
     public String getLecture() {

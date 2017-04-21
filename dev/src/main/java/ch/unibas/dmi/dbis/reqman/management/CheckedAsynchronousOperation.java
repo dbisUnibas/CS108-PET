@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
+import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
 import javafx.concurrent.WorkerStateEvent;
 
 import java.util.PriorityQueue;
@@ -23,6 +24,7 @@ public class CheckedAsynchronousOperation<T> {
     private Consumer<Exception> exceptionHandler;
 
     private final Thread worker;
+    private StatusBar statusBar;
 
     public CheckedAsynchronousOperation(final ManagementTask<T> task){
         this.worker = new Thread(task);
@@ -91,6 +93,11 @@ public class CheckedAsynchronousOperation<T> {
 
     ManagementTask<T> getTask(){
         return task;
+    }
+
+    void setStatusBar(StatusBar bar){
+        this.statusBar = bar;
+        statusBar.messageProperty().bind(task.messageProperty());
     }
 
 }

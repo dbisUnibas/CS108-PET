@@ -1,15 +1,22 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
+import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
+import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
+import com.sun.corba.se.spi.orb.Operation;
 import javafx.event.ActionEvent;
 import javafx.scene.control.RadioMenuItem;
+import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.File;
 
 /**
  * TODO: Write JavaDoc
@@ -65,8 +72,15 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleOpenCat(ActionEvent event) {
-        evaluatorHandler.handleOpenCatalogue(event);
-
+        if(EntityManager.getInstance().isCatalogueLoaded() ){
+            Utils.showErrorDialog("Cannot load another catalogue", "Currently (ReqMan v"+ Version.getInstance().getVersion()+") cannot switch catalgoues during runitme.\n Please save your work and restart the application. ");
+            return;
+        }
+        try {
+            evaluatorHandler.handleOpenCatalogue(event);
+        }catch(IllegalStateException ex){
+            Utils.showErrorDialog("Error on loading catalgoue", ex.getMessage());
+        }
 
     }
 
@@ -110,8 +124,17 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleExportCat(ActionEvent event) {
-        // TODO ensure correct mode
-        editorHandler.handleExportCatalogue(event);
+        if (!EntityManager.getInstance().isCatalogueLoaded()) {
+            return;
+        }
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Export Catalogue");
+        File f = fc.showSaveDialog(mainScene.getWindow());
+        if (f != null) {
+            mainScene.indicateWaiting(true);
+            EntityManager.getInstance().exportCatalogue(f);
+            mainScene.indicateWaiting(false);
+        }
     }
 
     @Override
@@ -252,6 +275,7 @@ public class MainHandler implements MenuHandler {
         this.statusBar = statusBar;
         evaluatorHandler.setStatusBar(statusBar);
         editorHandler.setStatusBar(statusBar);
+        OperationFactory.registerStatusBar(statusBar);
         // TODO Change to async
         EntityManager.getInstance().setStatusBar(statusBar);
     }

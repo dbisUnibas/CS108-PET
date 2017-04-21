@@ -6,6 +6,7 @@ import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorView;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorView;
+import javafx.scene.Cursor;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -112,5 +113,9 @@ public class MainScene extends TitledScene {
     public String getTitle() {
         String mode = active.equals(Mode.EDITOR) ? "Editor" : "Evaluator";
         return String.format("ReqMan %s (%s)", mode, Version.getInstance().getVersion());
+    }
+
+    void indicateWaiting(boolean waiting) {
+        getRoot().setCursor(waiting ? Cursor.WAIT : Cursor.DEFAULT);
     }
 }
