@@ -253,6 +253,7 @@ public class MainHandler implements MenuHandler {
     public void handleShowEvaluator(ActionEvent event) {
         if(mainScene.isEditorActive() ){
             mainScene.setActive(MainScene.Mode.EVALUATOR);
+            evaluatorHandler.reloadRequirements();
         }
 
     }

@@ -138,6 +138,21 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         handler.unmarkDirty(getActiveGroup());
     }
 
+    public void reloadRequirements(boolean refreshAll) {
+        List<Progress> progressList = group.getProgressList();
+        Map<Integer, Map<String, Progress>> origin = generateOriginMap(handler.getCatalogue().getRequirements() );
+        if (progressList == null || progressList.isEmpty()) {
+            progressMap = origin;
+        } else {
+            Map<Integer, Map<String, Progress>> loaded = generateMap(progressList, handler.getCatalogue());
+            progressMap = mergeMaps(origin, loaded);
+        }
+        if(refreshAll){
+            LOGGER.debug(":reloadReqs:refreshAll");
+            updateProgressViews(activeMS);
+        }
+    }
+
     void replaceGroup(Group newGroup) {
         this.group = newGroup;
     }
@@ -147,14 +162,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
             summaries.addAll(group.getProgressSummaries());
         }
 
-        List<Progress> progressList = group.getProgressList();
-        Map<Integer, Map<String, Progress>> origin = generateOriginMap(handler.getCatalogue().getRequirements() );
-        if (progressList == null || progressList.isEmpty()) {
-            progressMap = origin;
-        } else {
-            Map<Integer, Map<String, Progress>> loaded = generateMap(progressList, handler.getCatalogue());
-            progressMap = mergeMaps(origin, loaded);
-        }
+        reloadRequirements(false);
         syncProgressList();
     }
 
@@ -316,8 +324,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         visitedMilestones.add(this.activeMS);
         activeProgressViews.clear();
         List<Progress> actives = getActiveProgresses(activeMS);
+        LOGGER.debug("Active Progresses: "+actives.toString() );
         for(Progress p : actives){
             activeProgressViews.add( new ProgressView(p, handler.getCatalogue().getRequirementForProgress(p), handler.getCatalogue()));
+            LOGGER.debug("Added PV for "+p.getRequirementName());
         }
         activeProgressViews.forEach(pv -> {
             pv.setActiveMilestone(activeMS);
@@ -445,9 +455,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     }
 
     private boolean isProgressActive(Progress p){
-        if(p.hasDefaultPercentage() || p.getDate() == null){
+        if(p.hasDefaultPercentage() || p.getDate() == null ){
             return true;
-        }else if(p.getDate().before(activeMS.getDate())){
+        }else if( p.getDate().before(activeMS.getDate())){
             return false;
         }else{
             return true;

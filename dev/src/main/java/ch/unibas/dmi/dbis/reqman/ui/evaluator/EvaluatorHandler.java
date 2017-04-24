@@ -312,6 +312,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
     }
 
+    public void reloadRequirements(){
+        groupViewMap.values().forEach(av ->{
+            av.reloadRequirements(true);
+        });
+    }
+
     public void processCatalogueOpened(Catalogue cat) {
         LOGGER.info("Opened catalogue " + manager.getCatalogueFile().getPath());
         LOGGER.trace("Enabling all");
