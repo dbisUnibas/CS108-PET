@@ -77,7 +77,9 @@ public class MainHandler implements MenuHandler {
             return;
         }
         try {
+            //TODO handle T746
             evaluatorHandler.handleOpenCatalogue(event);
+
         }catch(IllegalStateException ex){
             Utils.showErrorDialog("Error on loading catalgoue", ex.getMessage());
         }
