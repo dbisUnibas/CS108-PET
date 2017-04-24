@@ -34,6 +34,7 @@ public class MainHandler implements MenuHandler {
     private StatusBar statusBar;
 
     public MainHandler(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
+        LOGGER.trace(":<init>");
         this.evaluatorHandler = evaluatorHandler;
         this.evaluatorHandler.setOnFirstGroup(() -> {
             manager.enableGroupNeeded();
@@ -76,8 +77,23 @@ public class MainHandler implements MenuHandler {
             return;
         }
         try {
-            //TODO handle T746
-            evaluatorHandler.handleOpenCatalogue(event);
+            FileChooser fc = Utils.createCatalogueFileChooser("Load");
+            if (EntityManager.getInstance().hasLastOpenLocation()) {
+                fc.setInitialDirectory(EntityManager.getInstance().getLastOpenLocation());
+            }
+            File f = fc.showOpenDialog(mainScene.getWindow());
+            if (f != null) {
+                if(mainScene.isEditorActive() ){
+                    LOGGER.debug("Opening catalogue in editor");
+                    // EDITOR
+                    EntityManager.getInstance().openCatalogue(f, (cat) -> editorHandler.setupEditor() );
+                }else{
+                    // EVALUATOR
+                    LOGGER.debug("Opening catalogue in evalautor");
+                    EntityManager.getInstance().openCatalogue(f, evaluatorHandler::processCatalogueOpened);
+                }
+
+            }
 
         }catch(IllegalStateException ex){
             Utils.showErrorDialog("Error on loading catalgoue", ex.getMessage());

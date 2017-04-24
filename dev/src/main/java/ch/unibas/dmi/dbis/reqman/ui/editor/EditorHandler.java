@@ -160,7 +160,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         editor.indicateWaiting(false);
     }
 
-    void setupEditor() {
+    public void setupEditor() {
         if (manager.isCatalogueLoaded()) {
             editor.getRequirementsView().setRequirements(manager.getObservableRequirements());
             editor.getMilestoneView().setItems(manager.getObservableMilestones());

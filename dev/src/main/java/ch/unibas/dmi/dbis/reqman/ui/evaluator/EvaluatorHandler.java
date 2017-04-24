@@ -308,11 +308,11 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
         File f = fc.showOpenDialog(evaluator.getScene().getWindow());
         if (f != null) {
-            manager.openCatalogue(f, this::catalogueLoaded);
+            manager.openCatalogue(f, this::processCatalogueOpened);
         }
     }
 
-    private void catalogueLoaded(Catalogue cat) {
+    public void processCatalogueOpened(Catalogue cat) {
         LOGGER.info("Opened catalogue " + manager.getCatalogueFile().getPath());
         LOGGER.trace("Enabling all");
         evaluator.enableAll();
