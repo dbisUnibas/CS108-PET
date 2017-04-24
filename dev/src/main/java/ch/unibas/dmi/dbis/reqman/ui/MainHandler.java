@@ -9,7 +9,6 @@ import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
-import com.sun.corba.se.spi.orb.Operation;
 import javafx.event.ActionEvent;
 import javafx.scene.control.RadioMenuItem;
 import javafx.stage.FileChooser;
@@ -229,12 +228,17 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleShowEditor(ActionEvent event) {
-        mainScene.setActive(MainScene.Mode.EDITOR);
+        if(mainScene.isEvaluatorActive() ){
+            mainScene.setActive(MainScene.Mode.EDITOR);
+        }
     }
 
     @Override
     public void handleShowEvaluator(ActionEvent event) {
-        mainScene.setActive(MainScene.Mode.EVALUATOR);
+        if(mainScene.isEditorActive() ){
+            mainScene.setActive(MainScene.Mode.EVALUATOR);
+        }
+
     }
 
     @Override
