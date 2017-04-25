@@ -34,7 +34,7 @@ public class MainHandler implements MenuHandler {
     private StatusBar statusBar;
 
     public MainHandler(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
-        LOGGER.trace(":<init>");
+        LOGGER.traceEntry();
         this.evaluatorHandler = evaluatorHandler;
         this.evaluatorHandler.setOnFirstGroup(() -> {
             manager.enableGroupNeeded();
@@ -72,8 +72,8 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleOpenCat(ActionEvent event) {
-        if(EntityManager.getInstance().isCatalogueLoaded() ){
-            Utils.showErrorDialog("Cannot load another catalogue", "Currently (ReqMan v"+ Version.getInstance().getVersion()+") cannot switch catalgoues during runitme.\n Please save your work and restart the application. ");
+        if (EntityManager.getInstance().isCatalogueLoaded()) {
+            Utils.showErrorDialog("Cannot load another catalogue", "Currently (ReqMan v" + Version.getInstance().getVersion() + ") cannot switch catalgoues during runitme.\n Please save your work and restart the application. ");
             return;
         }
         try {
@@ -83,11 +83,11 @@ public class MainHandler implements MenuHandler {
             }
             File f = fc.showOpenDialog(mainScene.getWindow());
             if (f != null) {
-                if(mainScene.isEditorActive() ){
+                if (mainScene.isEditorActive()) {
                     LOGGER.debug("Opening catalogue in editor");
                     // EDITOR
-                    EntityManager.getInstance().openCatalogue(f, (cat) -> editorHandler.setupEditor() );
-                }else{
+                    EntityManager.getInstance().openCatalogue(f, (cat) -> editorHandler.setupEditor());
+                } else {
                     // EVALUATOR
                     LOGGER.debug("Opening catalogue in evalautor");
                     EntityManager.getInstance().openCatalogue(f, evaluatorHandler::processCatalogueOpened);
@@ -95,7 +95,7 @@ public class MainHandler implements MenuHandler {
 
             }
 
-        }catch(IllegalStateException ex){
+        } catch (IllegalStateException ex) {
             Utils.showErrorDialog("Error on loading catalgoue", ex.getMessage());
         }
 
@@ -244,14 +244,14 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleShowEditor(ActionEvent event) {
-        if(mainScene.isEvaluatorActive() ){
+        if (mainScene.isEvaluatorActive()) {
             mainScene.setActive(MainScene.Mode.EDITOR);
         }
     }
 
     @Override
     public void handleShowEvaluator(ActionEvent event) {
-        if(mainScene.isEditorActive() ){
+        if (mainScene.isEditorActive()) {
             mainScene.setActive(MainScene.Mode.EVALUATOR);
             evaluatorHandler.reloadRequirements();
         }
@@ -269,7 +269,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void setGlobalMilestoneChoice(Milestone ms) {
-        LOGGER.trace(":setGlobalMilestoneChoice");
+        LOGGER.traceEntry();
         if (mainScene.isEvaluatorActive()) {
             evaluatorHandler.setGlobalMilestoneChoice(ms);
         }
@@ -278,13 +278,13 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handlePresentationMode(ActionEvent event) {
-        if(event.getSource() instanceof RadioMenuItem){
-            RadioMenuItem rmi = (RadioMenuItem)event.getSource();
-            if(rmi.isSelected()){
-                if(!mainScene.getRoot().getStyleClass().contains("presentation") ){
+        if (event.getSource() instanceof RadioMenuItem) {
+            RadioMenuItem rmi = (RadioMenuItem) event.getSource();
+            if (rmi.isSelected()) {
+                if (!mainScene.getRoot().getStyleClass().contains("presentation")) {
                     mainScene.getRoot().getStyleClass().add("presentation");
                 }
-            }else{
+            } else {
                 mainScene.getRoot().getStyleClass().remove("presentation");
             }
         }
@@ -307,8 +307,8 @@ public class MainHandler implements MenuHandler {
         evaluatorHandler.stop();
     }
 
-    void checkGroupsPresent(){
-        if(evaluatorHandler.isGroupLoaded() ){
+    void checkGroupsPresent() {
+        if (evaluatorHandler.isGroupLoaded()) {
             MenuManager.getInstance().enableGroupNeeded();
         }
     }
