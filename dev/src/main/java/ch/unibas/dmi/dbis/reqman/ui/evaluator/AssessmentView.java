@@ -413,6 +413,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
 
         for(Progress p : progressList){
             Requirement r = cat.getRequirementByName(p.getRequirementName() );
+            if(r == null){
+                // Group has progress of a req that is not existent anymore. just ignore it (progress still tracked in file)
+                continue;
+            }
             if(!map.containsKey(r.getMinMilestoneOrdinal() ) ){
                 Map<String, Progress> msMap = new HashMap<>();
                 msMap.put(r.getName(), p);

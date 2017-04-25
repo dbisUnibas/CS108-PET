@@ -103,7 +103,9 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleOpenGroups(ActionEvent event) {
-        //manager.enableGroupNeeded(); // TODO
+        if(mainScene.isEditorActive() ){
+            handleShowEvaluator(event);
+        }
         evaluatorHandler.handleOpenGroups(event);
         if (!evaluatorHandler.isGroupLoaded()) {
             return;

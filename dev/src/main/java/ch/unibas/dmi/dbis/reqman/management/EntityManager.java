@@ -263,17 +263,28 @@ public class EntityManager {
     }
 
     public void replaceRequirement(Requirement oldReq, Requirement newReq) {
-        LOGGER.traceEntry();
+        LOGGER.traceEntry("Params: {}, {}");
         // Case name changed: have to update all reqs, which use oldReq as predecessor
         if (!oldReq.getName().equals(newReq.getName())) {
             getSuccessors(oldReq).forEach(r -> {
                 r.removePredecessorName(oldReq.getName());
                 r.addPredecessorName(newReq.getName());
             });
+            // Also, update the progress
+            updateProgress(oldReq, newReq);
         }
         if (observableRequirements.remove(oldReq)) {
             observableRequirements.add(newReq);
         }
+    }
+
+    private void updateProgress(Requirement oldReq, Requirement newReq) {
+        groups.forEach(g -> {
+            Progress p = getProgressForRequirement(g, oldReq);
+            if(p != null){
+                p.setRequirementName(newReq.getName() );
+            }
+        });
     }
 
     public void modifyCatalogue(Catalogue mod) {

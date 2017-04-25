@@ -120,6 +120,35 @@
               "level": "info"
             }
           ]
+        },{
+          "name": "ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler",
+          "level": "trace",
+          "additivity": false,
+          "AppenderRef": [
+            {
+              "ref": "console",
+              "level": "trace"
+            },
+            {
+              "ref": "rollingFile",
+              "level": "info"
+            }
+          ]
+        },
+        {
+          "name": "ch.unibas.dmi.dbis.reqman.ui.editor.RequirementTableView",
+          "level": "trace",
+          "additivity": false,
+          "AppenderRef": [
+            {
+              "ref": "console",
+              "level": "trace"
+            },
+            {
+              "ref": "rollingFile",
+              "level": "info"
+            }
+          ]
         },
         {
           "name": "ch.unibas.dmi.dbis.reqman.ui.evaluator",
@@ -207,7 +236,7 @@
           "AppenderRef": [
             {
               "ref": "console",
-              "level": "debug"
+              "level": "trace"
             },
             {
               "ref": "rollingFile",

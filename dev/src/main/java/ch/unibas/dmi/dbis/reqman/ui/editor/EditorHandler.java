@@ -129,7 +129,11 @@ public class EditorHandler implements EventHandler<CUDEvent> {
                     RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement) evt.getDelivery();
                     Requirement r = manager.getRequirementByName(obsReq.getName());
                     Requirement mod = EditorPromptFactory.promptRequirement(this, r);
-                    if (mod != null) {
+                    LOGGER.debug("Origin: "+r+", mod: "+mod);
+                    if(r == mod){
+                        LOGGER.debug("Modification aborted");
+                        return;
+                    }else if (mod != null) {
                         manager.replaceRequirement(r, mod);
                     }
                 }
