@@ -116,9 +116,10 @@ public class SimpleOverviewBuilder {
         value = pointsPerMS(ms).average();
         cells.add(td(StringUtils.prettyPrint(value.orElse(-1))));
         // max
+        value = pointsPerMS(ms).max();
         g = milestoneMapping.get(ms.getOrdinal()).get(value.orElse(-1));
         groupName = g != null ? g.getName() : "null";
-        value = pointsPerMS(ms).max();
+
         cells.add(td(StringUtils.prettyPrint(value.orElse(-1)) + String.format(" [%s]", groupName)));
         return tr().with(cells.toArray(new Tag[0]));
     }
@@ -135,9 +136,10 @@ public class SimpleOverviewBuilder {
         value = points().average();
         cells.add(td(StringUtils.prettyPrint(value.orElse(-1))));
         // max
+        value = points().max();
         g = totalMapping.get(value.orElse(-1));
         name = g != null ? g.getName() : "null";
-        value = points().max();
+
         cells.add(td(StringUtils.prettyPrint(value.orElse(-1)) + String.format(" [%s]", name)));
 
         return tr().with(cells.toArray(new Tag[0]));
