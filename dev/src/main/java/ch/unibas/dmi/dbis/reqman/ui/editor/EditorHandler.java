@@ -39,14 +39,6 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         this.statusBar = statusBar;
     }
 
-    public StatusBar getStatusBar() {
-        return statusBar;
-    }
-
-    void setEditorView(EditorView view) {
-        this.editor = view;
-    }
-
     @Override
     public void handle(CUDEvent event) {
         if (event != null) {
@@ -153,14 +145,8 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         }
     }
 
-    public void openCatalogue(File file) {
-        LOGGER.trace(":openCatalogue " + String.format("File: %s", file.getPath()));
-        editor.indicateWaiting(true);
-        manager.openCatalogue(file, (cat) -> setupEditor());
-        editor.indicateWaiting(false);
-    }
-
     public void setupEditor() {
+        LOGGER.traceEntry();
         if (manager.isCatalogueLoaded()) {
             editor.getRequirementsView().setRequirements(manager.getObservableRequirements());
             editor.getMilestoneView().setItems(manager.getObservableMilestones());
@@ -172,19 +158,10 @@ public class EditorHandler implements EventHandler<CUDEvent> {
 
     }
 
-    private void setupCatalogueInfo() {
-        editor.getCatalogueView().setCatName(manager.getCatalogueName());
-        editor.getCatalogueView().setCatLecture(manager.getLecture());
-        editor.getCatalogueView().setCatSemester(manager.getSemester());
-        editor.getCatalogueView().maxPointsProperty().bind(manager.sumProperty());
-
-    }
-
     public void saveCatalogue() {
+        LOGGER.traceEntry();
         if (manager.isCatalogueLoaded()) {
-            editor.indicateWaiting(true);
             manager.saveCatalogue();
-            editor.indicateWaiting(false);
         }
 
     }
@@ -199,44 +176,48 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         }
     }
 
-    public boolean isCatalogueFilePresent() {
-        return manager.isCatalogueFilePresent();
-    }
-
     public boolean isCatalogueLoaded() {
         return manager.isCatalogueLoaded();
     }
 
-    public Milestone getMilestoneByOrdinal(int ordinal) {
+    Milestone getMilestoneByOrdinal(int ordinal) {
         return manager.getMilestoneByOrdinal(ordinal);
     }
 
-    public Requirement getRequirementByName(String name) {
+    Requirement getRequirementByName(String name) {
         return manager.getRequirementByName(name);
     }
 
-    public ObservableList<Milestone> getObservableMilestones() {
+    ObservableList<Milestone> getObservableMilestones() {
         return manager.getObservableMilestones();
     }
 
-    public ObservableList<Requirement> getObservableRequirements() {
+    ObservableList<Requirement> getObservableRequirements() {
         return manager.getObservableRequirements();
-    }
-
-    public void handleExportCatalogue(ActionEvent event) {
-
     }
 
     public Milestone getSelectedMS() {
         return editor.getMilestoneView().getSelectedMS();
     }
 
-    public Requirement getSelectedRequirement(){
+    public Requirement getSelectedRequirement() {
         String name = editor.getRequirementsView().getSelectedRequirement();
-        if(name == null){
+        if (name == null) {
             return null;
-        }else{
+        } else {
             return manager.getRequirementByName(name);
         }
+    }
+
+    void setEditorView(EditorView view) {
+        this.editor = view;
+    }
+
+    private void setupCatalogueInfo() {
+        editor.getCatalogueView().setCatName(manager.getCatalogueName());
+        editor.getCatalogueView().setCatLecture(manager.getLecture());
+        editor.getCatalogueView().setCatSemester(manager.getSemester());
+        editor.getCatalogueView().maxPointsProperty().bind(manager.sumProperty());
+
     }
 }
