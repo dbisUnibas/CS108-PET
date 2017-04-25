@@ -443,6 +443,7 @@ public class MenuManager {
     }
 
     public void enableGroupNeeded() {
+        LOGGER.traceEntry();
         setDisableForItems(groupNeeded, false);
     }
 

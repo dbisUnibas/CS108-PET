@@ -194,8 +194,8 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
             List<File> noDupes = new ArrayList<>(files);
             noDupes.removeAll(dupes);
             manager.openGroups(noDupes, (list) -> {
-                handleFirstGroupPresent();
                 loadGroupUI(list);
+                handleFirstGroupPresent();
             }, this::handleOpenGroupException);
         }
         // USER ABORT
@@ -230,7 +230,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
 
     public void processCatalogueOpened(Catalogue cat) {
-        LOGGER.traceEntry("Param: %s", cat);
+        LOGGER.traceEntry("Param: {}", cat);
         LOGGER.info("Opened catalogue " + manager.getCatalogueFile().getPath());
         evaluator.enableAll();
         MenuManager.getInstance().setupGlobalMilestoneMenu(this.getMilestones());
@@ -243,7 +243,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
 
     public void setGlobalMilestoneChoice(Milestone ms) {
-        LOGGER.traceEntry("Ms: %s", ms);
+        LOGGER.traceEntry("Ms: {}", ms);
         this.activeMS = ms;
         for (AssessmentView av : groupViewMap.values()) {
             LOGGER.trace("Setting milestone " + ms.getName() + " for AV: " + av.getActiveGroup().getName());
@@ -392,7 +392,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     private void handleFirstGroupPresent() {
         LOGGER.traceEntry();
-        if (manager.groupList().size() == 1) {
+        if (manager.groupList().size() >= 1) {
             LOGGER.trace(":handleFirstGroupPresent" + " - First group");
             if (firstGroupCallback != null) {
                 firstGroupCallback.call();
@@ -411,7 +411,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
 
     private void loadGroupUI(Group g) {
-        LOGGER.traceEntry("Group: %s", g);
+        LOGGER.traceEntry("Group: {}", g);
         if (manager.getLastOpenException() != null) {
             LOGGER.warn("Caught Exception");
             Exception e = manager.getLastOpenException();
