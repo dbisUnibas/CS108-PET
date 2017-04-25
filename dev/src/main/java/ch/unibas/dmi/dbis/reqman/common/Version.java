@@ -76,6 +76,10 @@ public class Version {
         if (version.equals(NO_VERSION)) {
             return NO_VERSION;
         }
-        return version.substring(0, version.indexOf("-"));
+        int index = version.indexOf("-");
+        if(index > 0){
+            return version.substring(0, index);
+        }
+        return version;
     }
 }

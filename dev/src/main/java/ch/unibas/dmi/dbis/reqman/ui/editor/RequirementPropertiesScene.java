@@ -65,6 +65,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         this(handler);
         this.requirement = requirement;
         loadRequirement();
+        Utils.showWarningDialog("Tracked progress potentloss", "In the instance, that there are no groups open and a requirement's name is changed. Any progress a group has made so far is lost.\n\n" +
+                "There are two ways to save that progress:\n\n" +
+                "\t1) Open all groups before changing the name - then the progress is automatically updated.[recommended]\n" +
+                "\t2) Open the group files and rename the progress manually [not recommended]");
     }
 
 

@@ -210,7 +210,7 @@ task incrementBuildNumber() {
 }
 
 build.doLast {
-    incrementVersion('BuildNumber')
+    //incrementVersion('BuildNumber')
 }
 
 /**
@@ -224,11 +224,11 @@ static String readVersion() {
     Properties p = new Properties()
     File f = new File('version.properties')
     p.load(f.newDataInputStream())
-    Integer build = (p.getProperty('artifactBuildNumber') as Integer)
+    //Integer build = (p.getProperty('artifactBuildNumber') as Integer)
     Integer fix = (p.getProperty('artifactFixVersion') as Integer)
     Integer minor = (p.getProperty('artifactMinorVersion') as Integer)
     Integer major = (p.getProperty('artifactMajorVersion') as Integer)
-    return major.toString() + '.' + minor + '.' + fix + '-b' + build.toString()
+    return major.toString() + '.' + minor + '.' + fix /*+ '-b' + build.toString()*/
 }
 
 void printVersion() {
