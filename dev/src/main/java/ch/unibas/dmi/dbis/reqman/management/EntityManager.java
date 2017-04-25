@@ -66,41 +66,20 @@ public class EntityManager {
     private Group lastOpenedGroup = null;
     private int lastOrdinal = -1;
     private Exception lastOpenException = null;
-    @Deprecated  private StatusBar statusBar;
+    @Deprecated
+    private StatusBar statusBar;
 
     private EntityManager() {
 
     }
 
     public static EntityManager getInstance() {
-        LOGGER.trace(":getInstance");
+        LOGGER.traceEntry();
         if (instance == null) {
             LOGGER.trace(":getInstance - creating new");
             instance = new EntityManager();
         }
         return instance;
-    }
-
-    private static void runTask(ManagementTask task, Callback internalCallback, Callback doneCallback) {
-        Thread th = createDeamon(task);
-
-
-        task.setOnFailed(event -> {
-            throw new RuntimeException("Opening failed: ", task.getException());
-        });
-
-        if (internalCallback != null) {
-            task.setOnSucceeded(event -> {
-                internalCallback.apply(null);
-
-
-                if (doneCallback != null) {
-                    doneCallback.apply(null);
-                }
-
-            });
-        }
-        th.start();
     }
 
     private static Thread createDeamon(ManagementTask task) {
@@ -128,14 +107,6 @@ public class EntityManager {
         deamon.start();
     }
 
-    private static void runTask(ManagementTask task) {
-        runTask(task, null, null);
-    }
-
-    private static void runTask(ManagementTask task, Callback internal) {
-        runTask(task, internal, null);
-    }
-
     public ObservableList<Group> groupList() {
         return groups;
     }
@@ -152,9 +123,9 @@ public class EntityManager {
      * @param file nontnull
      */
     public void openCatalogue(File file, Consumer<Catalogue> doneProcessor) throws IllegalStateException {
-        LOGGER.trace(":openCat");
+        LOGGER.traceEntry();
 
-        if(catalogue != null){
+        if (catalogue != null) {
             throw new IllegalStateException("There is already a catalogue open");
         }
 
@@ -188,22 +159,12 @@ public class EntityManager {
         this.statusBar = statusBar;
     }
 
-    @Deprecated  private void bindMessages(ManagementTask task){
-        if(statusBar != null){
-            statusBar.messageProperty().bind(task.messageProperty() );
-        }
-
-    }
-
-    private void saveCatalogue(File file) {
-        OperationFactory.createSaveCatalogueOperation(catalogue, file).start();
-    }
-
     public void saveAsCatalogue(File file) {
         saveCatalogue(file);
     }
 
     public void exportCatalogue(File file) {
+        LOGGER.traceEntry();
         CheckedAsynchronousOperation<Boolean> op = OperationFactory.createExportCatalogueOperation(catalogue, file);
         op.addProcessor(b -> {
             LOGGER.info("Export done");
@@ -229,6 +190,7 @@ public class EntityManager {
     }
 
     public boolean addMilestone(Milestone milestone) {
+        LOGGER.traceEntry();
         milestone.setOrdinal(++lastOrdinal);
         return observableMilestones.add(milestone);
     }
@@ -237,22 +199,15 @@ public class EntityManager {
         return observableMilestones.remove(milestone);
     }
 
-    List<Milestone> getMilestones() {
-        return catalogue.getMilestones();
-    }
-
     public boolean addRequirement(Requirement requirement) {
         return observableRequirements.add(requirement);
     }
 
     public boolean removeRequirement(Requirement requirement) {
+        LOGGER.traceEntry();
         boolean result = observableRequirements.remove(requirement);
         LOGGER.debug(String.format("Removing %s, success: %b. CatReq.size: %d, Mng.size: %d", requirement.getName(), result, catalogue.getRequirements().size(), observableRequirements.size()));
         return result;
-    }
-
-    public List<Requirement> getRequirements() {
-        return catalogue.getRequirements();
     }
 
     public Milestone getMilestoneByOrdinal(int ordinal) {
@@ -267,32 +222,26 @@ public class EntityManager {
         return catalogue.getRequirementsWithMinMS(ordinal);
     }
 
-    @JsonIgnore
     public double getSum(int msOrdinal) {
         return catalogue.getSum(msOrdinal);
     }
 
-    @JsonIgnore
     public double getSum() {
         return catalogue.getSum();
     }
 
-    @JsonIgnore
     public Requirement getRequirementByName(String name) {
         return catalogue.getRequirementByName(name);
     }
 
-    @JsonIgnore
     public boolean containsRequirement(String name) {
         return catalogue.containsRequirement(name);
     }
 
-    @JsonIgnore
     public Requirement getRequirementForProgress(Progress progress) {
         return catalogue.getRequirementForProgress(progress);
     }
 
-    @JsonIgnore
     public Milestone getMilestoneForProgress(Progress progress) {
         return catalogue.getMilestoneForProgress(progress);
     }
@@ -306,25 +255,15 @@ public class EntityManager {
     }
 
     public void replaceMilestone(Milestone oldMS, Milestone newMS) {
+        LOGGER.traceEntry();
         if (observableMilestones.remove(oldMS)) {
             newMS.setOrdinal(oldMS.getOrdinal());
             observableMilestones.add(newMS);
         }
     }
 
-    private List<Requirement> getSuccessors(Requirement requirement) {
-        ArrayList<Requirement> list = new ArrayList<>();
-
-        observableRequirements.forEach(r -> {
-            if (r.getPredecessorNames().contains(requirement.getName())) {
-                list.add(r);
-            }
-        });
-
-        return list;
-    }
-
     public void replaceRequirement(Requirement oldReq, Requirement newReq) {
+        LOGGER.traceEntry();
         // Case name changed: have to update all reqs, which use oldReq as predecessor
         if (!oldReq.getName().equals(newReq.getName())) {
             getSuccessors(oldReq).forEach(r -> {
@@ -338,6 +277,7 @@ public class EntityManager {
     }
 
     public void modifyCatalogue(Catalogue mod) {
+        LOGGER.traceEntry();
         catalogue.setName(mod.getName());
         catalogue.setDescription(mod.getDescription());
         catalogue.setLecture(mod.getLecture());
@@ -360,7 +300,7 @@ public class EntityManager {
         observableRequirements.addListener(new ListChangeListener<Requirement>() {
             @Override
             public void onChanged(Change<? extends Requirement> c) {
-                LOGGER.trace(":changed");
+                LOGGER.traceEntry();
                 while (c.next()) {
                     if (c.wasPermutated()) {
                         // Permutation
@@ -442,21 +382,12 @@ public class EntityManager {
         return lastExportLocation;
     }
 
-    private File ensureDirectory(File f) {
-        if (f.isDirectory()) {
-            return f;
-        } else if (f.isFile()) {
-            return f.getParentFile();
-        }
-        throw new IllegalArgumentException("File is neither directory nor file - symbolik link?");
-    }
-
     public File getCatalogueFile() {
         return catalogueFile;
     }
 
     public void openGroup(File file, Consumer<Group> done, Consumer<Exception> exHandler) {
-        LOGGER.entry(file);
+        LOGGER.traceEntry("param: %s", file);
 
         CheckedAsynchronousOperation<Group> op = OperationFactory.createOpenGroupOperation(file);
         op.addProcessor(group -> this.openedGroup(file, group), -10);
@@ -465,35 +396,19 @@ public class EntityManager {
         op.addValidator(group -> checkGroupConstraints(op, group));
         op.setExceptionHandler(exHandler);
 
-
         op.start();
-
-    }
-
-    private <T> boolean checkGroupConstraints(CheckedAsynchronousOperation<T> op, Group group){
-        if(!group.getCatalogueName().equals(catalogue.getName() ) ){
-            op.setExceptionMessage("Invalid catalogue signature\n" +
-                    "Expected: "+catalogue.getName()+"\n" +
-                    "Found:    "+group.getCatalogueName());
-            return false;
-        }
-        if(!isGroupNameUnique(group.getName())){
-            op.setExceptionMessage("Group name not unique");
-            return false;
-        }
-        return true;
     }
 
     public void openGroups(List<File> files, Consumer<List<Group>> callback, Consumer<Exception> exHandler) {
-        LOGGER.entry(files);
+        LOGGER.traceEntry("Param: %s",files);
 
         CheckedAsynchronousOperation<List<Group>> op = OperationFactory.createOpenMultipleGroupOperation(files);
 
-        op.addProcessor(groups -> openedGroups(files, groups),-10);
+        op.addProcessor(groups -> openedGroups(files, groups), -10);
         op.addProcessor(callback);
 
         op.addValidator(groups -> {
-            for(Group g : groups) {
+            for (Group g : groups) {
                 return checkGroupConstraints(op, g);
             }
             return true; // Actually unreachable?
@@ -504,46 +419,6 @@ public class EntityManager {
 
     public Exception getLastOpenException() {
         return lastOpenException;
-    }
-
-    private void openedGroup(File file, Group group) throws CatalogueNameMismatchException, NonUniqueGroupNameException {
-        LOGGER.trace(":openedGroup");
-        LOGGER.entry(file, group);
-        if (group == null) {
-            throw new NullPointerException("Group null");
-        }
-        /*if (!group.getCatalogueName().equals(catalogue.getName())) {
-            throw LOGGER.throwing(new CatalogueNameMismatchException(catalogue.getName(), group.getCatalogueName(), group.getName(), file) );
-        }
-        if(!isGroupNameUnique(group.getName()) ){
-            throw LOGGER.throwing(new NonUniqueGroupNameException(group.getName() ) );
-        }*/
-
-        groups.add(group);
-        LOGGER.trace(":openedGroup - Added group");
-
-        if(file != null){
-            groupFileMap.put(group.getName(), file);
-            LOGGER.trace(":openedGroup - stored file");
-            lastOpenLocation = ensureDirectory(file);
-            LOGGER.trace(":openedGroup - stored last location");
-        }
-
-        LOGGER.info("Successfully loaded group " + String.format("(%s)", group.getName()) + " to workspace.");
-    }
-
-    /**
-     * Contract: files.size()==groups.size();
-     *
-     * @param files
-     * @param groups
-     */
-    private void openedGroups(List<File> files, List<Group> groups) {
-        LOGGER.trace(":openedGroups");
-        for (int i = 0; i < files.size(); ++i) {
-            openedGroup(files.get(i), groups.get(i));
-        }
-        LOGGER.trace("Finished loading of groups");
     }
 
     public Group getLastOpenedGroup() {
@@ -557,28 +432,18 @@ public class EntityManager {
         return FXCollections.observableList(provider.progressList());
     }
 
-    public Progress getProgressForRequirement(Group group, Requirement requirement){
+    public Progress getProgressForRequirement(Group group, Requirement requirement) {
         return group.getProgressForRequirement(requirement);
     }
 
-    public boolean hasGroupFile(Group active) {
-        LOGGER.trace(":hasGroupFile");
-        LOGGER.entry(active);
-        return groupFileMap.containsKey(active.getName());
+    public boolean hasGroupFile(Group group) {
+        LOGGER.traceEntry("Param: %s", group);
+        return groupFileMap.containsKey(group.getName());
     }
 
     public void saveGroup(Group group) {
         File f = groupFileMap.get(group.getName());
         saveGroup(group, f);
-    }
-
-    private void saveGroup(Group group, File file){
-        CheckedAsynchronousOperation<Boolean> op = OperationFactory.createSaveGroupOperation(file,group);
-        op.addProcessor(b ->{
-            LOGGER.info("SavedAs group (" + group.getName() + ") to " + file.getPath());
-            groupFileMap.put(group.getName(), file);
-        } );
-        op.start();
     }
 
     public void saveGroupAs(Group group, File file) {
@@ -601,11 +466,11 @@ public class EntityManager {
     public void openBackupsIfExistent(Consumer<List<OpenBackupsTask.BackupObject>> callback) {
         CheckedAsynchronousOperation<List<OpenBackupsTask.BackupObject>> op = OperationFactory.createOpenBackupsOperation();
         op.addProcessor(list -> list.forEach(o -> {
-            if(o.isCatalogue() && o.getCatalogue() != null){
+            if (o.isCatalogue() && o.getCatalogue() != null) {
 
-                setCatalogue(o.getCatalogue() );
+                setCatalogue(o.getCatalogue());
                 catalogueFile = o.getLocation();
-            }else{
+            } else {
                 openedGroup(null, o.getGroup());
             }
         }), -10);
@@ -624,5 +489,92 @@ public class EntityManager {
             }
         }
         return out;
+    }
+
+    private void saveCatalogue(File file) {
+        OperationFactory.createSaveCatalogueOperation(catalogue, file).start();
+    }
+
+    private List<Requirement> getSuccessors(Requirement requirement) {
+        ArrayList<Requirement> list = new ArrayList<>();
+
+        observableRequirements.forEach(r -> {
+            if (r.getPredecessorNames().contains(requirement.getName())) {
+                list.add(r);
+            }
+        });
+
+        return list;
+    }
+
+    private File ensureDirectory(File f) {
+        if (f.isDirectory()) {
+            return f;
+        } else if (f.isFile()) {
+            return f.getParentFile();
+        }
+        throw new IllegalArgumentException("File is neither directory nor file - symbolik link?");
+    }
+
+    private <T> boolean checkGroupConstraints(CheckedAsynchronousOperation<T> op, Group group) {
+        if (!group.getCatalogueName().equals(catalogue.getName())) {
+            op.setExceptionMessage("Invalid catalogue signature\n" +
+                    "Expected: " + catalogue.getName() + "\n" +
+                    "Found:    " + group.getCatalogueName());
+            return false;
+        }
+        if (!isGroupNameUnique(group.getName())) {
+            op.setExceptionMessage("Group name not unique");
+            return false;
+        }
+        return true;
+    }
+
+    private void openedGroup(File file, Group group) throws CatalogueNameMismatchException, NonUniqueGroupNameException {
+        LOGGER.traceEntry("File: %s, Group: %s", file, group);
+        if (group == null) {
+            throw new NullPointerException("Group null");
+        }
+        /*if (!group.getCatalogueName().equals(catalogue.getName())) {
+            throw LOGGER.throwing(new CatalogueNameMismatchException(catalogue.getName(), group.getCatalogueName(), group.getName(), file) );
+        }
+        if(!isGroupNameUnique(group.getName()) ){
+            throw LOGGER.throwing(new NonUniqueGroupNameException(group.getName() ) );
+        }*/
+
+        groups.add(group);
+        LOGGER.trace(":openedGroup - Added group");
+
+        if (file != null) {
+            groupFileMap.put(group.getName(), file);
+            LOGGER.trace(":openedGroup - stored file");
+            lastOpenLocation = ensureDirectory(file);
+            LOGGER.trace(":openedGroup - stored last location");
+        }
+
+        LOGGER.info("Successfully loaded group " + String.format("(%s)", group.getName()) + " to workspace.");
+    }
+
+    /**
+     * Contract: files.size()==groups.size();
+     *
+     * @param files
+     * @param groups
+     */
+    private void openedGroups(List<File> files, List<Group> groups) {
+        LOGGER.traceEntry();
+        for (int i = 0; i < files.size(); ++i) {
+            openedGroup(files.get(i), groups.get(i));
+        }
+        LOGGER.trace("Finished loading of groups");
+    }
+
+    private void saveGroup(Group group, File file) {
+        CheckedAsynchronousOperation<Boolean> op = OperationFactory.createSaveGroupOperation(file, group);
+        op.addProcessor(b -> {
+            LOGGER.info("SavedAs group (" + group.getName() + ") to " + file.getPath());
+            groupFileMap.put(group.getName(), file);
+        });
+        op.start();
     }
 }
