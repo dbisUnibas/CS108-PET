@@ -102,6 +102,7 @@ public class EvaluatorView extends HBox implements TitleProvider {
     }
 
     void enableAll(){
+        LOGGER.traceEntry();
         groupView.setDisable(false);
         catInfoView.setDisable(false);
         tabPane.setDisable(false);
