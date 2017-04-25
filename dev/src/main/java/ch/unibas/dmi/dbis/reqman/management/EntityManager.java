@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -411,7 +412,7 @@ public class EntityManager {
     }
 
     public void openGroups(List<File> files, Consumer<List<Group>> callback, Consumer<Exception> exHandler) {
-        LOGGER.traceEntry("Param: %s",files);
+        LOGGER.traceEntry("Param: {}",files);
 
         CheckedAsynchronousOperation<List<Group>> op = OperationFactory.createOpenMultipleGroupOperation(files);
 
@@ -425,6 +426,13 @@ public class EntityManager {
             return true; // Actually unreachable?
         });
 
+        op.start();
+    }
+
+    public void exportOverview(File exportFile){
+        LOGGER.traceEntry("Params: {}", exportFile);
+        CheckedAsynchronousOperation<Boolean> op = OperationFactory.createExportOverviewOperation(new OverviewSnapshot(catalogue, groups.toArray(new Group[0])), exportFile);
+        op.setExceptionHandler(ex -> LOGGER.catching(Level.ERROR, ex));
         op.start();
     }
 

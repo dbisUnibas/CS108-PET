@@ -30,6 +30,8 @@ class TemplatingConfiguration {
     @JsonIgnore
     public static final String TEMPLATE = "template";
     @JsonIgnore
+    public static final String OVERVIEW = "overview";
+    @JsonIgnore
     public static final Map<String, String> DEFAULT_TEMPLATING_CONFIGURATION = generateDefaultTemplatesMap();
     private String extension;
     private Map<String, String> templates;
@@ -59,6 +61,7 @@ class TemplatingConfiguration {
         map.put(PROGRESS, StringUtils.concatWithPeriodDelimeter(PROGRESS, TEMPLATE));
         map.put(GROUP_MILESTONE, StringUtils.concatWithPeriodDelimeter(GROUP_MILESTONE, TEMPLATE));
         map.put(GROUP, StringUtils.concatWithPeriodDelimeter(GROUP, TEMPLATE));
+        map.put(OVERVIEW, StringUtils.concatWithPeriodDelimeter(OVERVIEW, TEMPLATE));
 
         return map;
     }
@@ -100,7 +103,10 @@ class TemplatingConfiguration {
     public String getGroupMilestoneEntry() {
         return getTemplatesEntry(GROUP_MILESTONE);
     }
-
+    @JsonIgnore
+    public String getOverviewEntry() {
+        return getTemplatesEntry(OVERVIEW);
+    }
     @JsonIgnore
     public String getGroupEntry() {
         return getTemplatesEntry(GROUP);
@@ -128,6 +134,7 @@ class TemplatingConfiguration {
             nbFixes += validateAndFixEntry(PROGRESS);
             nbFixes += validateAndFixEntry(GROUP_MILESTONE);
             nbFixes += validateAndFixEntry(GROUP);
+            nbFixes += validateAndFixEntry(OVERVIEW);
         }
 
         return nbFixes != 0;
@@ -141,6 +148,8 @@ class TemplatingConfiguration {
         sb.append('}');
         return sb.toString();
     }
+
+
 
     /**
      * Validates and fixes the entry of the templates map.

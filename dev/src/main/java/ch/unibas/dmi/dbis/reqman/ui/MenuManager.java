@@ -42,6 +42,7 @@ public class MenuManager {
     public static final String ITEM_MOD_MS = "itemModMS";
     public static final String ITEM_MOD_GROUP = "itemModGroup";
     public static final String ITEM_SHOW_OVERVIEW = "itemShowOverview";
+    public static final String ITEM_EXPORT_OVERVIEW = "itemExportOverview";
     public static final String ITEM_EDITOR = "itemEditor";
     public static final String ITEM_EVALUATOR = "itemEvaluator";
     public static final String ITEM_PRESENTATION_MODE = "itemPresentation";
@@ -81,6 +82,7 @@ public class MenuManager {
     private MenuItem itemModMS;
     private MenuItem itemModGroup;
     private MenuItem itemShowOverview;
+    private MenuItem itemExportOverview;
     private MenuItem itemEditor;
     private MenuItem itemEvaluator;
     private MenuItem itemPresentation;
@@ -130,6 +132,7 @@ public class MenuManager {
 
         registerEvaluatorItem(ITEM_SHOW_OVERVIEW, itemShowOverview = new MenuItem("Show Overview"), true);
         registerEvaluatorItem("menuGlobalMS", menuGlobalMilestone = new Menu("Set Global Milestone"), true);
+        registerEvaluatorItem(ITEM_EXPORT_OVERVIEW, itemExportOverview = new MenuItem("Export Overview..."), true);
 
 
         registerMenuItem(ITEM_EDITOR, itemEditor = new MenuItem("Editor"));
@@ -277,6 +280,10 @@ public class MenuManager {
                             break;
                         case ITEM_PRESENTATION_MODE:
                             handler.handlePresentationMode(event);
+                            break;
+                        case ITEM_EXPORT_OVERVIEW:
+                            handler.handleExportOverview(event);
+                            break;
                         default:
                             // Silently ignoring -> may log issue?
                     }
@@ -367,7 +374,7 @@ public class MenuManager {
             }
         } );
 
-        menuEvaluate.getItems().addAll(itemShowOverview, menuGlobalMilestone);
+        menuEvaluate.getItems().addAll(itemShowOverview,itemExportOverview, new SeparatorMenuItem(), menuGlobalMilestone);
 
         menuView.getItems().addAll(itemEditor, itemEvaluator, new SeparatorMenuItem(), itemPresentation);
     }

@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.templating;
 import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.core.*;
+import ch.unibas.dmi.dbis.reqman.management.OverviewSnapshot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,15 +21,106 @@ import java.util.Map;
 public class RenderManager {
     private static Logger LOGGER = LogManager.getLogger(RenderManager.class);
 
-
+    /**
+     * Existent:
+     * overview
+     *  .minTotal
+     *  .avgTotal
+     *  .maxTotla
+     *  .minMS[]
+     *  .avgMS[]
+     *  .maxMS[]
+     *  .sumTotal[]
+     *  .sumMS[ms=,group=]
+     *  .minTotalGroups
+     *  .avgTotalGroups
+     *  .maxTotalGroups
+     *  .minMSGroups[]
+     *  .avgMSGroups[]
+     *  .maxMSGroups[]
+     *  .nameMS[]
+     *  .name
+     */
+    private final Entity<OverviewSnapshot> OVERVIEW_ENTITY = new Entity<OverviewSnapshot>("overview",
+            new Field<OverviewSnapshot, Double>("minTotal", Field.Type.NORMAL, OverviewSnapshot::getTotalMin),
+            new Field<OverviewSnapshot, Double>("avgTotal", Field.Type.NORMAL, OverviewSnapshot::getTotalAvg),
+            new Field<OverviewSnapshot, Double>("maxTotal", Field.Type.NORMAL, OverviewSnapshot::getTotalMax),
+            new Field<OverviewSnapshot, List<Group>>("minTotalGroups", Field.Type.LIST, OverviewSnapshot::getTotalMinList, RenderManager::renderGroupNameList),
+            new Field<OverviewSnapshot, List<Group>>("maxTotalGroups", Field.Type.LIST, OverviewSnapshot::getTotalMaxList, RenderManager::renderGroupNameList),
+            new ParametrizedField<OverviewSnapshot, Double>("minMS", null) {
+                @Override
+                public String renderCarefully(OverviewSnapshot instance, String parameter) {
+                    return StringUtils.prettyPrint(instance.getMsMin(Integer.valueOf(parameter)));
+                }
+            },
+            new ParametrizedField<OverviewSnapshot, Double>("avgMS", null) {
+                @Override
+                public String renderCarefully(OverviewSnapshot instance, String parameter) {
+                    return StringUtils.prettyPrint(instance.getMsAvg(Integer.valueOf(parameter)));
+                }
+            },
+            new ParametrizedField<OverviewSnapshot, Double>("maxMS", null) {
+                @Override
+                public String renderCarefully(OverviewSnapshot instance, String parameter) {
+                    return StringUtils.prettyPrint(instance.getMsMax(Integer.valueOf(parameter)));
+                }
+            },
+            new ParametrizedField<OverviewSnapshot, List<Group>>("minMSGroups", null) {
+                @Override
+                public String renderCarefully(OverviewSnapshot instance, String parameter) {
+                    return RenderManager.renderGroupNameList(instance.getMsMinList(Integer.valueOf(parameter)));
+                }
+            },
+            new ParametrizedField<OverviewSnapshot, List<Group>>("maxMSGroups", null) {
+                @Override
+                public String renderCarefully(OverviewSnapshot instance, String parameter) {
+                    return RenderManager.renderGroupNameList(instance.getMsMaxList(Integer.valueOf(parameter)));
+                }
+            },
+            new ParametrizedField<OverviewSnapshot, String>("sumTotal", null) {
+                @Override
+                public String renderCarefully(OverviewSnapshot instance, String parameter) {
+                    return StringUtils.prettyPrint(instance.getTotalSum(instance.getGroup(parameter)));
+                }
+            },
+            new ParametrizedField<OverviewSnapshot, String>("sumMS", null) {
+                @Override
+                public String renderCarefully(OverviewSnapshot instance, String parameter) {
+                    if (!parameter.contains(",")) {
+                        return "[INVALID FORMAT]";
+                    }
+                    String sub1 = parameter.substring(0, parameter.indexOf(","));
+                    String sb2 = parameter.substring(parameter.indexOf(",") + 1);
+                    if (sub1.startsWith("ms=") && sb2.startsWith("group=")) {
+                        int ord = Integer.valueOf(sub1.substring(sub1.indexOf("=") + 1));
+                        String gr = sb2.substring(sb2.indexOf("=") + 1);
+                        return StringUtils.prettyPrint(instance.getMsSum(instance.getGroup(gr), ord));
+                    } else if (sub1.startsWith("group=") && sb2.startsWith("ms=")) {
+                        int ord = Integer.valueOf(sb2.substring(sb2.indexOf("=") + 1));
+                        String gr = sub1.substring(sub1.indexOf("=") + 1);
+                        return StringUtils.prettyPrint(instance.getMsSum(instance.getGroup(gr), ord));
+                    } else {
+                        return "[INVALID OPTIONS]";
+                    }
+                }
+            },
+            new ParametrizedField<OverviewSnapshot, String>("nameMS", null) {
+                @Override
+                public String renderCarefully(OverviewSnapshot instance, String parameter) {
+                    return instance.getMilestoneName(Integer.valueOf(parameter));
+                }
+            },
+            new Field<OverviewSnapshot, String>("name", Field.Type.NORMAL, OverviewSnapshot::getCatalogueName)
+    );
     private Template<Requirement> templateReq = null;
     private Template<Milestone> templateMS = null;
     private Template<Catalogue> templateCat = null;
     private Template<Milestone> templateGroupMS = null;
     private Template<Group> templateGroup = null;
     private Template<Progress> templateProgress = null;
-    private TemplateParser parser = null;
-    private TemplateRenderer renderer = null;
+    private Template<OverviewSnapshot> templateOverview = null;
+    private TemplateParser parser = new TemplateParser();
+    private TemplateRenderer renderer = new TemplateRenderer();
     /**
      * Existing:
      * .name
@@ -108,7 +200,6 @@ public class RenderManager {
             new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal),
             new Field<Milestone, Double>("sumMax", Field.Type.NORMAL, ms -> catalogue.getSum(ms.getOrdinal()))
     );
-
     /**
      * Existing:
      * progress
@@ -203,8 +294,6 @@ public class RenderManager {
             },
             new ConditionalField<Requirement>("singularMS", r -> r.getMinMilestoneOrdinal() == r.getMaxMilestoneOrdinal(), b -> "YES", b -> "NO")
     );
-
-
     /**
      * Existing:
      * groupMilestone
@@ -270,14 +359,26 @@ public class RenderManager {
 
     public RenderManager(Catalogue catalogue) {
         this.catalogue = catalogue;
-        parser = new TemplateParser();
-        renderer = new TemplateRenderer();
         LOGGER.debug("Catalogue: " + catalogue.getName());
     }
 
     public RenderManager(Catalogue catalogue, Group group) {
         this(catalogue);
         this.group = group;
+    }
+
+    public RenderManager(OverviewSnapshot overview) {
+
+    }
+
+    private static final String renderGroupNameList(List<Group> list) {
+        StringBuilder sb = new StringBuilder();
+        list.forEach(g -> {
+            sb.append(g.getName());
+            sb.append(", ");
+        });
+        sb.deleteCharAt(sb.length() - 1); // remove last comma
+        return sb.toString();
     }
 
     private static <E> String renderCarefully(TemplateRenderer renderer, Template<E> template, E instance) throws IllegalArgumentException, IllegalStateException {
@@ -350,6 +451,10 @@ public class RenderManager {
         return renderCarefully(renderer, templateGroupCat, catalogue);
     }
 
+    public String renderOverview(OverviewSnapshot overview){
+        return renderCarefully(renderer, templateOverview, overview);
+    }
+
     public void parseRequirementTemplate(String reqTemplate) {
         parseTemplateCarefully(REQUIREMENT_ENTITY, reqTemplate);
     }
@@ -368,6 +473,10 @@ public class RenderManager {
 
     public void parseCatalogueTemplate(String catTemplate) {
         parseTemplateCarefully(CATALOGUE_ENTITY, catTemplate);
+    }
+
+    public void parseOverviewTemplate(String template){
+        parseTemplateCarefully(OVERVIEW_ENTITY, template);
     }
 
     public void setGroup(Group group) {
@@ -395,7 +504,9 @@ public class RenderManager {
             templateGroup = parser.parseTemplate(template);
         } else if (PROGRESS_ENTITY.getEntityName().equals(entity.getEntityName())) {
             templateProgress = parser.parseTemplate(template);
-        } else {
+        } else if(OVERVIEW_ENTITY.getEntityName().equals(entity.getEntityName())) {
+            templateOverview = parser.parseTemplate(template);
+        }else {
             throw LOGGER.throwing(new UnsupportedOperationException("Cannot parse a template for entity: " + entity.toString()));
         }
         return true;

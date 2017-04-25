@@ -31,7 +31,7 @@ public interface MenuHandler {
     void handleShowOverview(ActionEvent event);
     void handleShowEditor(ActionEvent event);
     void handleShowEvaluator(ActionEvent event);
-
+    void handleExportOverview(ActionEvent event);
 
     void resetGlobalMilestoneChoice();
 

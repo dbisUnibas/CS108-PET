@@ -59,6 +59,7 @@ public class TemplatingConfigurationManager {
         TemplatingConfiguration cnfg = null;
         try {
             cnfg = JSONUtils.readFromJSONFile(config, TemplatingConfiguration.class);
+            LOGGER.debug("JSON read");
             setConfig(cnfg);
             configFile = config;
         } catch (IOException ioe) {
@@ -125,6 +126,7 @@ public class TemplatingConfigurationManager {
     }
 
     private Templates createTemplateConfig() throws FileNotFoundException {
+        LOGGER.traceEntry();
         TemplatingConfiguration config = getConfig();
 
         Templates tc = new Templates();
@@ -135,6 +137,8 @@ public class TemplatingConfigurationManager {
         tc.setProgressTemplate(readTemplateFile(config.getProgressEntry()));
         tc.setGroupMilestoneTemplate(readTemplateFile(config.getGroupMilestoneEntry()));
         tc.setGroupTemplate(readTemplateFile(config.getGroupEntry()));
+
+        tc.setOverviewTemplate(readTemplateFile(config.getOverviewEntry() ));
         return tc;
     }
 

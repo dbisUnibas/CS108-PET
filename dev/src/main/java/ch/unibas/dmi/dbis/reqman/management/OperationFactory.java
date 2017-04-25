@@ -79,6 +79,11 @@ public class OperationFactory {
         return createOperationForTask(task, true);
     }
 
+    public static CheckedAsynchronousOperation<Boolean> createExportOverviewOperation(OverviewSnapshot snapshot, File exportFile){
+        ExportOverviewTask task = new ExportOverviewTask(snapshot, exportFile);
+        return createOperationForTask(task, true);
+    }
+
     private static <T> void bindStatusBar(CheckedAsynchronousOperation<T> operation) {
         if (statusBar != null) {
             operation.setStatusBar(statusBar);
