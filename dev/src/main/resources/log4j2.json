@@ -76,7 +76,7 @@
           "AppenderRef": [
             {
               "ref": "console",
-              "level": "trace"
+              "level": "info"
             }
           ]
         },
@@ -87,7 +87,7 @@
           "AppenderRef": [
             {
               "ref": "console",
-              "level": "trace"
+              "level": "info"
             }
           ]
         },
@@ -98,7 +98,7 @@
           "AppenderRef": [
             {
               "ref": "console",
-              "level": "info"
+              "level": "trace"
             },
             {
               "ref": "rollingFile",

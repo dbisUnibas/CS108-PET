@@ -377,6 +377,7 @@ public class RenderManager {
             sb.append(g.getName());
             sb.append(", ");
         });
+        sb.deleteCharAt(sb.length() - 1); // remove last spcae
         sb.deleteCharAt(sb.length() - 1); // remove last comma
         return sb.toString();
     }
