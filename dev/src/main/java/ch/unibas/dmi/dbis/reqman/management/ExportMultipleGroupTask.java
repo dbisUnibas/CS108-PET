@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
+import ch.unibas.dmi.dbis.reqman.configuration.ConfigUtils;
 import ch.unibas.dmi.dbis.reqman.configuration.Templates;
 import ch.unibas.dmi.dbis.reqman.configuration.TemplatingConfigurationManager;
 import ch.unibas.dmi.dbis.reqman.core.Catalogue;
@@ -51,18 +52,19 @@ public class ExportMultipleGroupTask extends ManagementTask<Boolean> {
 
             updateAll("Rendered group...", calcAfterRender(i));
 
-            String exportFile = exportDir.getPath() + System.getProperty("file.separator") + g.getExportFileName();
+            String exportName = g.getExportFileName() == null ? g.getName() : g.getExportFileName();
+            String exportFile = exportDir.getPath() + ConfigUtils.getFileSeparator() + exportName;
             // If the file has no extension // TODO: REMOVE extension in exportfilename of group
-            if (!exportFile.substring(exportFile.lastIndexOf(System.getProperty("file.separator"))).contains(".")) {
-                exportFile += extension;
+            if (!exportFile.substring(exportFile.lastIndexOf(ConfigUtils.getFileSeparator())).contains(".")) {
+                exportFile += "."+extension;
             }
-            File eFile = new File(exportDir.getPath() + System.getProperty("file.separator") + g.getExportFileName());
+            File eFile = new File(exportFile);
             PrintWriter pw = new PrintWriter(eFile);
             pw.write(export);
             pw.flush();
             pw.close();
 
-            updateAll("Wrote export to disk", calcAfterWrite(i));
+            updateAll("Wrote export to disk ("+eFile.getPath()+")", calcAfterWrite(i));
 
             LOGGER.info("============================");
             LOGGER.info(" FINISHED : " + g.getName() + " @ " + ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrintTimestamp(System.currentTimeMillis()));
