@@ -163,6 +163,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
     }
 
+
     boolean isGroupNameUnique(String name) {
         return manager.isGroupNameUnique(name);
     }

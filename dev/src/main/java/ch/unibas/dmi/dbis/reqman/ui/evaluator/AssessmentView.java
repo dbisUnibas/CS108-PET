@@ -487,7 +487,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
                     active.add(p);
                 }
             }else{
-                Progress p = handler.getProgressForRequirement(group, r);
+                Progress p = group.getProgressForRequirement(r);
+                LOGGER.error(String.format("Could not find a progress for %s", r.getName()));
+                LOGGER.error(String.format("Dumping all known progress:\n%s", group.progressList().toString() ));
                 boolean activeProgress = isProgressActive(p);
                 LOGGER.debug(String.format("Checking: %s 's date: %b", p, activeProgress));
                 if(activeProgress){

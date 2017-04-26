@@ -98,11 +98,13 @@ public class MainScene extends TitledScene {
                 root.setCenter(editor);
                 editor.refresh();
                 menuManager.disableEvaluatorItems();
+                menuManager.enableEditorItems();
                 break;
             case EVALUATOR:
                 root.setCenter(evaluator);
                 // Should reload catalogue also since may Reqs have changed
                 menuManager.disableEditorItems();
+                menuManager.enableEvaluaotrItems();
                 break;
         }
         active = mode;
