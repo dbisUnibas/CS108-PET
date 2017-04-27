@@ -4,10 +4,7 @@ import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * TODO: write JavaDoc
@@ -75,7 +72,7 @@ public class Group implements Comparable<Group> {
                 // Milestone already in list.
             }
         }
-
+        list.sort(Comparator.comparingInt(Milestone::getOrdinal));
         return list;
     }
 
