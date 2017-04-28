@@ -58,7 +58,7 @@ public class SimpleOverviewBuilder {
     private Tag totalSumMSRow(Milestone ms) {
         ArrayList<Tag> cells = new ArrayList<>();
         groups.forEach(group -> {
-            cells.add(td(StringUtils.prettyPrint(group.getSumForMilestone(ms, catalogue))));
+            cells.add(td(StringUtils.roundTo2Digits(group.getSumForMilestone(ms, catalogue))));
         });
         cells.add(0, td().with(b(ms.getName())));
         return tr().with(cells.toArray(new Tag[0]));
@@ -92,7 +92,7 @@ public class SimpleOverviewBuilder {
     private Tag totalSumRow() {
         ArrayList<Tag> cells = new ArrayList<>();
         groups.forEach(group -> {
-            cells.add(td(StringUtils.prettyPrint(group.getTotalSum(catalogue))));
+            cells.add(td(StringUtils.roundTo2Digits(group.getTotalSum(catalogue))));
         });
         cells.add(0, td().with(b("Total:")));
 
@@ -111,16 +111,16 @@ public class SimpleOverviewBuilder {
         OptionalDouble value = pointsPerMS(ms).min();
         Group g = milestoneMapping.get(ms.getOrdinal()).get(value.orElse(-1));
         String groupName = g != null ? g.getName() : "null";
-        cells.add(td(StringUtils.prettyPrint(value.orElse(-1)) + String.format(" [%s]", groupName)));
+        cells.add(td(StringUtils.roundTo2Digits(value.orElse(-1)) + String.format(" [%s]", groupName)));
         // avg
         value = pointsPerMS(ms).average();
-        cells.add(td(StringUtils.prettyPrint(value.orElse(-1))));
+        cells.add(td(StringUtils.roundTo2Digits(value.orElse(-1))));
         // max
         value = pointsPerMS(ms).max();
         g = milestoneMapping.get(ms.getOrdinal()).get(value.orElse(-1));
         groupName = g != null ? g.getName() : "null";
 
-        cells.add(td(StringUtils.prettyPrint(value.orElse(-1)) + String.format(" [%s]", groupName)));
+        cells.add(td(StringUtils.roundTo2Digits(value.orElse(-1)) + String.format(" [%s]", groupName)));
         return tr().with(cells.toArray(new Tag[0]));
     }
 
@@ -131,16 +131,16 @@ public class SimpleOverviewBuilder {
         OptionalDouble value = points().min();
         Group g = totalMapping.get(value.orElse(-1));
         String name = g != null ? g.getName() : "null";
-        cells.add(td(StringUtils.prettyPrint(value.orElse(-1)) + String.format(" [%s]", name)));
+        cells.add(td(StringUtils.roundTo2Digits(value.orElse(-1)) + String.format(" [%s]", name)));
         // avg
         value = points().average();
-        cells.add(td(StringUtils.prettyPrint(value.orElse(-1))));
+        cells.add(td(StringUtils.roundTo2Digits(value.orElse(-1))));
         // max
         value = points().max();
         g = totalMapping.get(value.orElse(-1));
         name = g != null ? g.getName() : "null";
 
-        cells.add(td(StringUtils.prettyPrint(value.orElse(-1)) + String.format(" [%s]", name)));
+        cells.add(td(StringUtils.roundTo2Digits(value.orElse(-1)) + String.format(" [%s]", name)));
 
         return tr().with(cells.toArray(new Tag[0]));
     }

@@ -50,19 +50,19 @@ public class RenderManager {
             new ParametrizedField<OverviewSnapshot, Double>("minMS", null) {
                 @Override
                 public String renderCarefully(OverviewSnapshot instance, String parameter) {
-                    return StringUtils.prettyPrint(instance.getMsMin(Integer.valueOf(parameter)));
+                    return StringUtils.roundTo2Digits(instance.getMsMin(Integer.valueOf(parameter)));
                 }
             },
             new ParametrizedField<OverviewSnapshot, Double>("avgMS", null) {
                 @Override
                 public String renderCarefully(OverviewSnapshot instance, String parameter) {
-                    return StringUtils.prettyPrint(instance.getMsAvg(Integer.valueOf(parameter)));
+                    return StringUtils.roundTo2Digits(instance.getMsAvg(Integer.valueOf(parameter)));
                 }
             },
             new ParametrizedField<OverviewSnapshot, Double>("maxMS", null) {
                 @Override
                 public String renderCarefully(OverviewSnapshot instance, String parameter) {
-                    return StringUtils.prettyPrint(instance.getMsMax(Integer.valueOf(parameter)));
+                    return StringUtils.roundTo2Digits(instance.getMsMax(Integer.valueOf(parameter)));
                 }
             },
             new ParametrizedField<OverviewSnapshot, List<Group>>("minMSGroups", null) {
@@ -80,7 +80,7 @@ public class RenderManager {
             new ParametrizedField<OverviewSnapshot, String>("sumTotal", null) {
                 @Override
                 public String renderCarefully(OverviewSnapshot instance, String parameter) {
-                    return StringUtils.prettyPrint(instance.getTotalSum(instance.getGroup(parameter)));
+                    return StringUtils.roundTo2Digits(instance.getTotalSum(instance.getGroup(parameter)));
                 }
             },
             new ParametrizedField<OverviewSnapshot, String>("sumMS", null) {
@@ -94,11 +94,11 @@ public class RenderManager {
                     if (sub1.startsWith("ms=") && sb2.startsWith("group=")) {
                         int ord = Integer.valueOf(sub1.substring(sub1.indexOf("=") + 1));
                         String gr = sb2.substring(sb2.indexOf("=") + 1);
-                        return StringUtils.prettyPrint(instance.getMsSum(instance.getGroup(gr), ord));
+                        return StringUtils.roundTo2Digits(instance.getMsSum(instance.getGroup(gr), ord));
                     } else if (sub1.startsWith("group=") && sb2.startsWith("ms=")) {
                         int ord = Integer.valueOf(sb2.substring(sb2.indexOf("=") + 1));
                         String gr = sub1.substring(sub1.indexOf("=") + 1);
-                        return StringUtils.prettyPrint(instance.getMsSum(instance.getGroup(gr), ord));
+                        return StringUtils.roundTo2Digits(instance.getMsSum(instance.getGroup(gr), ord));
                     } else {
                         return "[INVALID OPTIONS]";
                     }

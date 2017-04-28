@@ -19,6 +19,16 @@ public class StringUtils {
     }
 
     /**
+     * Rounds the provided value to 2 digits.
+     * @param value The value to round
+     * @return A string representing the new value
+     */
+    public static String roundTo2Digits(double value){
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(value);
+    }
+
+    /**
      * Pretty prints a double value (with maximal necessary precision or as integer, if so).
      *
      * @param value
@@ -32,7 +42,7 @@ public class StringUtils {
             value *= -1d;
         }
         /*
-        Algorithm by: http://stackoverflow.com/a/25308216
+        Solution by: http://stackoverflow.com/a/25308216
          */
         DecimalFormat df = new DecimalFormat("0", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
         df.setMaximumFractionDigits(340); //340 = DecimalFormat.DOUBLE_FRACTION_DIGITS
