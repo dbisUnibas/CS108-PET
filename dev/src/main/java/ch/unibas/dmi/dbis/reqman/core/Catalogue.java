@@ -5,7 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.*;
 
 /**
- * TODO: write JavaDoc
+ * A catalogue is a collection of {@link Milestone}s and {@link Requirement}s.
+ *
+ * It represents the logical superset of associated milestones and requirements, forming a namespace.
+ * A catalogue must have a name and may is associated with a lecture and date.
+ *
+ * The catalogue class will be written serialized as a json object with jackson library.
  *
  * @author loris.sauter
  */
@@ -16,16 +21,32 @@ public class Catalogue {
     private String description;
     private String semester;
 
+    /**
+     * The very list of milestones
+     */
     private List<Milestone> milestones = new Vector<Milestone>();
+    /**
+     * The very list of requirements
+     */
     private List<Requirement> requirements = new Vector<Requirement>();
 
     @JsonIgnore
     private Map<Integer, List<Requirement>> reqsPerMinMS = new TreeMap<>();
 
+    /**
+     * The default constructor
+     */
     public Catalogue() {
 
     }
 
+    /**
+     * A constructor for creating a new catalogue with specified name, lecture and semester as well as a description provided.
+     * @param lecture The name of the lecture
+     * @param name The  name of the catalogue
+     * @param description A description of a catalogue
+     * @param semester The semester for which this catalogue was designed
+     */
     public Catalogue(String lecture, String name, String description, String semester) {
         this.lecture = lecture;
         this.name = name;
@@ -33,46 +54,78 @@ public class Catalogue {
         this.semester = semester;
     }
 
+    /**
+     * Returns the lecture name this catalogue is associated with
+     * @return The lecture name this catalogue is associated with
+     */
     public String getLecture() {
         return lecture;
     }
 
+    /**
+     * Sets the lecture name for which this catalogue is made
+     * @param lecture The lecture name
+     */
     public void setLecture(String lecture) {
         this.lecture = lecture;
     }
 
+    /**
+     * Returns this catalogue's name.
+     * It will be referenced in {@link Group}s with this name.
+     * @return The  name of this catalogue
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Sets the name of this catalogue
+     * @param name The (new) name of the catalogue
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Returns the description of this catalogue
+     * @return The description of this catalogue
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Sets (new) the description of this catalogue
+     * @param description The (new) description of the catalogue
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Returns the semester of this catalogue
+     * @return The semester of this catalogue
+     */
     public String getSemester() {
         return semester;
     }
 
+    /**
+     * Sets the semester of this catalogue
+     * @param semester The semester represented as a string
+     */
     public void setSemester(String semester) {
         this.semester = semester;
     }
 
-    public void clearMilestones() {
-        milestones = new ArrayList<>();
-    }
-
-    public void clearRequirements() {
-        requirements = new ArrayList<>();
-    }
-
+    /**
+     * Checks if the given object and this object are equal.
+     * In case the specified object is a catalogue, then the catalogue name's are checked if they are equal
+     * @param o The object to test
+     * @return TRUE if the specified catalogue's name is similar to this catalogue's name
+     * @see Object#equals(Object)
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -84,24 +137,15 @@ public class Catalogue {
 
         Catalogue catalogue = (Catalogue) o;
 
-        if (getLecture() != null ? !getLecture().equals(catalogue.getLecture()) : catalogue.getLecture() != null) {
-            return false;
-        }
-        if (getName() != null ? !getName().equals(catalogue.getName()) : catalogue.getName() != null) {
-            return false;
-        }
-        if (getDescription() != null ? !getDescription().equals(catalogue.getDescription()) : catalogue.getDescription() != null) {
-            return false;
-        }
-        if (getSemester() != null ? !getSemester().equals(catalogue.getSemester()) : catalogue.getSemester() != null) {
-            return false;
-        }
-        if (milestones != null ? !milestones.equals(catalogue.milestones) : catalogue.milestones != null) {
-            return false;
-        }
-        return requirements != null ? requirements.equals(catalogue.requirements) : catalogue.requirements == null;
+        return getName().equals(catalogue.getName() );
     }
 
+    /**
+     * Returns the hashcode of this object
+     * IntelliJ default implementation,
+     * @return the haschode of this object
+     * @see Object#hashCode()
+     */
     @Override
     public int hashCode() {
         int result = getLecture() != null ? getLecture().hashCode() : 0;
@@ -113,9 +157,12 @@ public class Catalogue {
         return result;
     }
 
+    /**
+     * Adds the given milestone to the list of milestones.
+     * @param milestone The milestone to add
+     * @return the result: TRUE if the addition successfully has been performed
+     */
     public boolean addMilestone(Milestone milestone) {
-        // TODO: uncomment as soon as all done
-        // milestone.setOrdinal(getLastOrdinal()+1);
         return milestones.add(milestone);
     }
 
