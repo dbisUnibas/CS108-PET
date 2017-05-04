@@ -161,23 +161,35 @@ public class Catalogue {
      * Adds the given milestone to the list of milestones.
      * @param milestone The milestone to add
      * @return the result: TRUE if the addition successfully has been performed
+     * @see List#add(Object)
      */
     public boolean addMilestone(Milestone milestone) {
         return milestones.add(milestone);
     }
 
+    /**
+     * Removes the given milestone from the list of of milestones.
+     * @param milestone The milestone to remove
+     * @return The result: TURE if the operation was successful
+     * @see List#remove(Object)
+     */
     public boolean removeMilestone(Milestone milestone) {
         return milestones.remove(milestone);
     }
 
+    /**
+     * Returns a copy of the milestone list
+     * @return List of milestones
+     */
     public List<Milestone> getMilestones() {
         return new ArrayList<>(milestones);
     }
 
-    public void setMilestones(List<Milestone> milestones) {
-        this.milestones = milestones;
-    }
-
+    /**
+     * Adds a requirement to the list of requirements.
+     * @param requirement The requirement to add
+     * @return The result of the {@link List#add(Object)} operation
+     */
     public boolean addRequirement(Requirement requirement) {
 
         if (reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()) != null) {
@@ -189,6 +201,11 @@ public class Catalogue {
         return requirements.add(requirement);
     }
 
+    /**
+     * Removes the specified requirements
+     * @param requirement The requirement to remove
+     * @return The result of the {@link List#remove(Object)} operation
+     */
     public boolean removeRequirement(Requirement requirement) {
         if (reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()) != null) {
             reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).remove(requirement);
@@ -197,34 +214,36 @@ public class Catalogue {
 
     }
 
+    /**
+     * Returns a copy of the requirements list
+     * @return The list of requirements
+     */
     public List<Requirement> getRequirements() {
         return new ArrayList<>(requirements);
     }
 
+    /**
+     * Returns the requirements list itself
+     * @return The list of requirements
+     */
     @JsonIgnore
     public List<Requirement> requirementList(){
         return requirements;
     }
 
-    public void setRequirements(List<Requirement> requirements) {
-        this.requirements = requirements;
-        this.reqsPerMinMS = new TreeMap<>();
-        requirements.forEach(this::addRequirementToMSMap);
-    }
-
-    public void addAllRequirements(Requirement... requirements) {
-        List<Requirement> list = new ArrayList<>(Arrays.asList(requirements));
-
-        this.requirements.addAll(list);
-
-        list.forEach(this::addRequirementToMSMap);
-
-    }
-
+    /**
+     * Adds all milestones passed to this method to the list of milestones.
+     * @param milestones The milestones to add to the list of milestones
+     */
     public void addAllMilestones(Milestone... milestones) {
         this.milestones.addAll(Arrays.asList(milestones));
     }
 
+    /**
+     * Returns the milestone which is identified by the given ordinal.
+     * @param ordinal The oridnal of the milestone
+     * @return The milestone with the ordinal specified or NULL if no such milestone exists
+     */
     public Milestone getMilestoneByOrdinal(int ordinal) {
         Milestone result = null;
         for (Milestone ms : milestones) {
@@ -235,6 +254,16 @@ public class Catalogue {
         return result;
     }
 
+    /**
+     * Returns a list of requirements which are associated with the specified milestone ordinal.
+     * A requirement is associated to a milestone ordinal iff:
+     * <ul>
+     *     <li>{@link Requirement#getMinMilestoneOrdinal()} is less or equals the specified ordinal <b>and</b></li>
+     *     <li>{@link Requirement#getMaxMilestoneOrdinal()} is greater or equals the specified ordinal</li>
+     * </ul>
+     * @param ordinal The ordinal of a milestone to get the requirements for
+     * @return The list of requirements associated with this ordinal or an empty list if no such associated requirements exist
+     */
     public List<Requirement> getRequirementsByMilestone(int ordinal) {
         ArrayList<Requirement> reqs = new ArrayList<>();
         for (Requirement r : requirements) {
@@ -245,14 +274,25 @@ public class Catalogue {
         return reqs;
     }
 
+    /**
+     * Returns a list of requirements which are available from the specified milestone ordinal on
+     * @param ordinal The oridnal of a milestone to get the requirements for
+     * @return The resulting list or NULL if no such milestone with the specified oridnal exists
+     */
     public List<Requirement> getRequirementsWithMinMS(int ordinal) {
         if (reqsPerMinMS.containsKey(ordinal)) {
-            return new ArrayList<Requirement>(reqsPerMinMS.get(ordinal));
+            return new ArrayList<>(reqsPerMinMS.get(ordinal));
         } else {
             return null;
         }
     }
 
+    /**
+     * Returns the sum of maximal available points of the specified milestone.
+     * Requirements which are malus or are not mandatory are ignored
+     * @param msOrdinal The milestone ordinal to get the sum of
+     * @return The sum of maximal available points of the specified milestone or 0 if no such milestone exists
+     */
     @JsonIgnore
     public double getSum(int msOrdinal) {
         List<Requirement> reqs = reqsPerMinMS.get(msOrdinal);
@@ -265,6 +305,12 @@ public class Catalogue {
         }
     }
 
+    /**
+     * Returns the sum of total maximal available points.
+     * Internally this method sums over all known milestones and their sums.
+     * @return The sum of total maximal available points or 0 if no requirements are present
+     * @see Catalogue#getSum(int)
+     */
     @JsonIgnore
     public double getSum() {
         List<Double> points = new ArrayList<>();
@@ -274,6 +320,11 @@ public class Catalogue {
         return points.stream().mapToDouble(Double::doubleValue).sum();
     }
 
+    /**
+     * Returns the requirement with the specified name
+     * @param name The name of the requirement to get
+     * @return The requirement with the specified name or NULL if no such requirement exists
+     */
     @JsonIgnore
     public Requirement getRequirementByName(String name) {
         for (Requirement r : requirements) {
@@ -284,6 +335,11 @@ public class Catalogue {
         return null;
     }
 
+    /**
+     * Checks if a requirement with that name already exists
+     * @param name The name to test
+     * @return TRUE if a requirement with the specified name already exists - FALSE otherwise
+     */
     @JsonIgnore
     public boolean containsRequirement(String name) {
         for (Requirement r : requirements) {
@@ -294,26 +350,31 @@ public class Catalogue {
         return false;
     }
 
+    /**
+     * Returns the requirement for the specified progress
+     * @param progress The progress for which the requirement is
+     * @return The requirement or NULL if no such requirement exists
+     */
     @JsonIgnore
     public Requirement getRequirementForProgress(Progress progress) {
         return getRequirementByName(progress.getRequirementName());
     }
 
+    /**
+     * Returns the milestone the progress was made on
+     * @param progress The progress to get the milestone for
+     * @return The milestone the progress was made on or NULL if no such milestone exists
+     */
     @JsonIgnore
     public Milestone getMilestoneForProgress(Progress progress) {
         return getMilestoneByOrdinal(progress.getMilestoneOrdinal());
     }
 
-    private void addRequirementToMSMap(Requirement requirement) {
-        int ordinal = requirement.getMinMilestoneOrdinal();
-        if (reqsPerMinMS.get(ordinal) != null) {
-            reqsPerMinMS.get(ordinal).add(requirement);
 
-        } else {
-            reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement)));
-        }
-    }
-
+    /**
+     * Returns the lastly used ordinal
+     * @return the lastyl used ordinal
+     */
     @JsonIgnore
     public int getLastOrdinal() {
         if(milestones.isEmpty() ){
@@ -324,6 +385,10 @@ public class Catalogue {
         return list.get(list.size()-1).getOrdinal();
     }
 
+    /**
+     * Returns the list of milestones
+     * @return The list of milestones
+     */
     public List<Milestone> milestoneList() {
         return milestones;
     }
