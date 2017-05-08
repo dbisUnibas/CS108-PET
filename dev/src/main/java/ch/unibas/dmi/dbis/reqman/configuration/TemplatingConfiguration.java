@@ -103,10 +103,12 @@ class TemplatingConfiguration {
     public String getGroupMilestoneEntry() {
         return getTemplatesEntry(GROUP_MILESTONE);
     }
+
     @JsonIgnore
     public String getOverviewEntry() {
         return getTemplatesEntry(OVERVIEW);
     }
+
     @JsonIgnore
     public String getGroupEntry() {
         return getTemplatesEntry(GROUP);
@@ -148,7 +150,6 @@ class TemplatingConfiguration {
         sb.append('}');
         return sb.toString();
     }
-
 
 
     /**

@@ -18,30 +18,30 @@ public class StatusBar extends HBox {
     private Label statusLabel;
 
 
-    public StatusBar(){
+    public StatusBar() {
         initComponents();
         layoutComponents();
     }
 
-    private void initComponents(){
+    public StringProperty messageProperty() {
+        return messageProperty;
+    }
+
+    public String getMessage() {
+        return messageProperty.get();
+    }
+
+    public void setMessage(String message) {
+        messageProperty.set(message);
+    }
+
+    private void initComponents() {
         messageLabel = new Label();
         statusLabel = new Label("Status: ");
         messageLabel.textProperty().bindBidirectional(messageProperty);
     }
 
-    private void layoutComponents(){
+    private void layoutComponents() {
         getChildren().addAll(statusLabel, messageLabel);
-    }
-
-    public StringProperty messageProperty(){
-        return messageProperty;
-    }
-
-    public void setMessage(String message){
-        messageProperty.set(message);
-    }
-
-    public String getMessage(){
-        return messageProperty.get();
     }
 }

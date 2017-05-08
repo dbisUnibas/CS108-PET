@@ -32,7 +32,7 @@ public class PopupStage extends Stage {
         initComponents(modality);
     }
 
-    public PopupStage(String title, Scene content){
+    public PopupStage(String title, Scene content) {
         this(title, content, true);
     }
 
@@ -43,7 +43,7 @@ public class PopupStage extends Stage {
         if (title != null) {
             setTitle(title);
         }
-        if(modal){
+        if (modal) {
             initModality(Modality.APPLICATION_MODAL);
         }
 

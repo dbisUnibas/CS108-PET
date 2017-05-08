@@ -27,7 +27,7 @@ public class ExportCatalogueTask extends ManagementTask<Boolean> {
 
     @Override
     protected Boolean call() throws Exception {
-        updateAll("Started catalogue export...",0.1);
+        updateAll("Started catalogue export...", 0.1);
 
         RenderManager renderManager = new RenderManager(catalogue); // assembles the catalogue
         TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
@@ -62,9 +62,9 @@ public class ExportCatalogueTask extends ManagementTask<Boolean> {
 
         LOGGER.info("==============================");
         LOGGER.info(" D O N E   Catalogue Export @ " + StringUtils.prettyPrintTimestamp(System.currentTimeMillis()));
-        LOGGER.info(" " + eFile.getPath() );
+        LOGGER.info(" " + eFile.getPath());
         LOGGER.info("==============================");
-        updateAll("Finished exporting catalogue ("+ eFile.getPath()+")", 1.0);
+        updateAll("Finished exporting catalogue (" + eFile.getPath() + ")", 1.0);
         return null;
     }
 }

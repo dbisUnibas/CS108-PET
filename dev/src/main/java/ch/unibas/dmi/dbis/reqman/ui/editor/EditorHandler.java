@@ -9,7 +9,6 @@ import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
@@ -129,11 +128,11 @@ public class EditorHandler implements EventHandler<CUDEvent> {
                     RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement) evt.getDelivery();
                     Requirement r = manager.getRequirementByName(obsReq.getName());
                     Requirement mod = EditorPromptFactory.promptRequirement(this, r);
-                    LOGGER.debug("Origin: "+r+", mod: "+mod);
-                    if(r == mod){
+                    LOGGER.debug("Origin: " + r + ", mod: " + mod);
+                    if (r == mod) {
                         LOGGER.debug("Modification aborted");
                         return;
-                    }else if (mod != null) {
+                    } else if (mod != null) {
                         manager.replaceRequirement(r, mod);
                     }
                 }
@@ -184,6 +183,19 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         return manager.isCatalogueLoaded();
     }
 
+    public Milestone getSelectedMS() {
+        return editor.getMilestoneView().getSelectedMS();
+    }
+
+    public Requirement getSelectedRequirement() {
+        String name = editor.getRequirementsView().getSelectedRequirement();
+        if (name == null) {
+            return null;
+        } else {
+            return manager.getRequirementByName(name);
+        }
+    }
+
     Milestone getMilestoneByOrdinal(int ordinal) {
         return manager.getMilestoneByOrdinal(ordinal);
     }
@@ -198,19 +210,6 @@ public class EditorHandler implements EventHandler<CUDEvent> {
 
     ObservableList<Requirement> getObservableRequirements() {
         return manager.getObservableRequirements();
-    }
-
-    public Milestone getSelectedMS() {
-        return editor.getMilestoneView().getSelectedMS();
-    }
-
-    public Requirement getSelectedRequirement() {
-        String name = editor.getRequirementsView().getSelectedRequirement();
-        if (name == null) {
-            return null;
-        } else {
-            return manager.getRequirementByName(name);
-        }
     }
 
     void setEditorView(EditorView view) {

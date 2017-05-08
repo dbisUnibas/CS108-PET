@@ -24,9 +24,9 @@ class SaveCatalogueTask extends ManagementTask<Boolean> {
     @Override
     protected Boolean call() throws Exception {
         LOGGER.trace(":call");
-        updateAll("Saving catalogue ("+saveFile.getPath()+")",0.2);
+        updateAll("Saving catalogue (" + saveFile.getPath() + ")", 0.2);
         JSONUtils.writeToJSONFile(catalogue, saveFile);
-        updateAll("Successfully saved catalogue to ("+saveFile.getPath()+")", 1.0);
+        updateAll("Successfully saved catalogue to (" + saveFile.getPath() + ")", 1.0);
         return LOGGER.traceExit(true);
     }
 }

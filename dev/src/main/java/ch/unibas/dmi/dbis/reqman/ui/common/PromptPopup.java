@@ -15,6 +15,17 @@ public class PromptPopup<T> {
 
     private Consumer<T> consumer = null;
 
+    public PromptPopup(AbstractVisualCreator creator) {
+        this(creator, true);
+    }
+
+    public PromptPopup(AbstractVisualCreator creator, Consumer consumer) {
+        this(creator, false);
+        this.consumer = consumer;
+
+
+    }
+
     private PromptPopup(AbstractVisualCreator creator, boolean modality) {
         this.creator = creator;
         stage = new PopupStage(creator.getPromptTitle(), creator, modality);
@@ -25,17 +36,6 @@ public class PromptPopup<T> {
                 }
             }
         });
-    }
-
-    public PromptPopup(AbstractVisualCreator creator) {
-        this(creator, true);
-    }
-
-    public PromptPopup(AbstractVisualCreator creator, Consumer consumer) {
-        this(creator, false);
-        this.consumer = consumer;
-
-
     }
 
     /**

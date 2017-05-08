@@ -73,6 +73,41 @@ public class TemplatingConfigurationManager {
         loadConfig(getConfigFile());
     }
 
+    TemplatingConfiguration getConfig() {
+        if (config == null) {
+            throw LOGGER.throwing(new IllegalStateException("Cannot provide a config which was not yet loaded"));
+        }
+        return config;
+    }
+
+    File getConfigFile() {
+        if (!ConfigUtils.isJARexecuted()) {
+            return new File(getClass().getClassLoader().getResource(CONFIG_FILE_NAME).getPath());
+        } else {
+            File dir = ConfigUtils.getCodeSourceLocation().getParentFile();
+            return new File(dir.getPath() + ConfigUtils.getFileSeparator() + CONFIG_FILE_NAME);
+        }
+    }
+
+    /**
+     * @param file If the hash symbol is used for a file name, the template is set to be the empty string.
+     * @return
+     * @throws FileNotFoundException
+     */
+    String readTemplateFile(String file) throws FileNotFoundException {
+        if (IGNORE_TEMPLATE.equals(file)) {
+            return "";
+        }
+        BufferedReader br = new BufferedReader(new FileReader(buildTemplateFile(file)));
+        StringBuilder sb = new StringBuilder();
+        br.lines().forEach(line -> {
+            sb.append(line);
+            sb.append("\n");
+        });
+
+        return sb.toString();
+    }
+
     private void loadTemplateConfig() {
         try {
             templates = createTemplateConfig();
@@ -80,7 +115,6 @@ public class TemplatingConfigurationManager {
             throw new ConfigurationException("Could not find template file: ", e);
         }
     }
-
 
     private void handleExceptionDuringLoading(IOException e) {
         if (e instanceof UnrecognizedPropertyException) {
@@ -138,43 +172,8 @@ public class TemplatingConfigurationManager {
         tc.setGroupMilestoneTemplate(readTemplateFile(config.getGroupMilestoneEntry()));
         tc.setGroupTemplate(readTemplateFile(config.getGroupEntry()));
 
-        tc.setOverviewTemplate(readTemplateFile(config.getOverviewEntry() ));
+        tc.setOverviewTemplate(readTemplateFile(config.getOverviewEntry()));
         return tc;
-    }
-
-    TemplatingConfiguration getConfig() {
-        if (config == null) {
-            throw LOGGER.throwing(new IllegalStateException("Cannot provide a config which was not yet loaded"));
-        }
-        return config;
-    }
-
-    File getConfigFile() {
-        if (!ConfigUtils.isJARexecuted()) {
-            return new File(getClass().getClassLoader().getResource(CONFIG_FILE_NAME).getPath());
-        } else {
-            File dir = ConfigUtils.getCodeSourceLocation().getParentFile();
-            return new File(dir.getPath() + ConfigUtils.getFileSeparator() + CONFIG_FILE_NAME);
-        }
-    }
-
-    /**
-     * @param file If the hash symbol is used for a file name, the template is set to be the empty string.
-     * @return
-     * @throws FileNotFoundException
-     */
-    String readTemplateFile(String file) throws FileNotFoundException {
-        if (IGNORE_TEMPLATE.equals(file)) {
-            return "";
-        }
-        BufferedReader br = new BufferedReader(new FileReader(buildTemplateFile(file)));
-        StringBuilder sb = new StringBuilder();
-        br.lines().forEach(line -> {
-            sb.append(line);
-            sb.append("\n");
-        });
-
-        return sb.toString();
     }
 
 

@@ -25,7 +25,9 @@ import java.util.List;
  */
 public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.core.Group> {
 
+    private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GroupPropertiesScene.class);
     private final String catalogueName;
+    private final EvaluatorHandler handler;
     private TextField tfName;
     private TextField tfProjectName;
     private TextField tfExportFileName;
@@ -33,19 +35,14 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     private ch.unibas.dmi.dbis.reqman.core.Group group = null;
     private ObservableList<Member> tableData;
 
-    private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GroupPropertiesScene.class );
-
-
-    private final EvaluatorHandler handler;
-
-    GroupPropertiesScene(EvaluatorHandler handler){
+    GroupPropertiesScene(EvaluatorHandler handler) {
         this.handler = handler;
         this.catalogueName = handler.getName();
 
         populateScene();
     }
 
-    GroupPropertiesScene(EvaluatorHandler handler, Group group){
+    GroupPropertiesScene(EvaluatorHandler handler, Group group) {
         this(handler);
         this.group = group;
         loadGroup();
@@ -95,6 +92,13 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         return group != null;
     }
 
+    @Override
+    protected void populateScene() {
+        initComponents();
+
+        loadGroup();
+    }
+
     private void loadGroup() {
         if (group != null) {
             tfName.setText(group.getName());
@@ -104,7 +108,6 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
         loadMembers();
     }
-
 
     private List<String> memberToStringList(List<Member> members) {
         ArrayList<String> out = new ArrayList<>();
@@ -257,13 +260,6 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
     private void setMemberListOnlyEmpty() {
         tableData = FXCollections.observableArrayList(new Member("", "", ""));
-    }
-
-    @Override
-    protected void populateScene() {
-        initComponents();
-
-        loadGroup();
     }
 
     public static class Member {

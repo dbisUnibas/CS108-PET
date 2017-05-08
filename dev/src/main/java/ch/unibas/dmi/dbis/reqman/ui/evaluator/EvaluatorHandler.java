@@ -12,7 +12,6 @@ import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -163,11 +162,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         }
     }
 
-
-    boolean isGroupNameUnique(String name) {
-        return manager.isGroupNameUnique(name);
-    }
-
     public void handleOpenGroups(ActionEvent actionEvent) {
         if (!manager.isCatalogueLoaded()) {
             return;
@@ -237,10 +231,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         MenuManager.getInstance().setupGlobalMilestoneMenu(this.getMilestones());
         MenuManager.getInstance().enableCatalogueNeeded();
         evaluator.displayCatalogueInfo(manager.getCatalogue());
-    }
-
-    Milestone getMilestoneByOrdinal(int ordinal) {
-        return manager.getMilestoneByOrdinal(ordinal);
     }
 
     public void setGlobalMilestoneChoice(Milestone ms) {
@@ -349,6 +339,14 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
 
     public void enableEvalautor() {
         evaluator.enableAll();
+    }
+
+    boolean isGroupNameUnique(String name) {
+        return manager.isGroupNameUnique(name);
+    }
+
+    Milestone getMilestoneByOrdinal(int ordinal) {
+        return manager.getMilestoneByOrdinal(ordinal);
     }
 
     void setEvaluatorView(EvaluatorView view) {

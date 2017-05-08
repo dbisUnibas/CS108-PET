@@ -67,11 +67,11 @@ public class Templates {
         this.groupTemplate = groupTemplate;
     }
 
-    public void setOverviewTemplate(String template){
-        this.overviewTemplate = template;
+    public String getOverviewTemplate() {
+        return overviewTemplate;
     }
 
-    public String getOverviewTemplate(){
-        return overviewTemplate;
+    public void setOverviewTemplate(String template) {
+        this.overviewTemplate = template;
     }
 }

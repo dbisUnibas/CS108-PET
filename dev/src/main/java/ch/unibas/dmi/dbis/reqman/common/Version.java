@@ -51,11 +51,6 @@ public class Version {
         return instance;
     }
 
-    private void handleInvalidVersion() {
-        LOGGER.error("Setting verstion to N/A, which is in general pretty bad. Check your build!");
-        version = NO_VERSION;
-    }
-
     /**
      * Returns the full version String. This matches the version suffix of the executed jar, when reqman was correctly built.
      *
@@ -77,9 +72,14 @@ public class Version {
             return NO_VERSION;
         }
         int index = version.indexOf("-");
-        if(index > 0){
+        if (index > 0) {
             return version.substring(0, index);
         }
         return version;
+    }
+
+    private void handleInvalidVersion() {
+        LOGGER.error("Setting verstion to N/A, which is in general pretty bad. Check your build!");
+        version = NO_VERSION;
     }
 }

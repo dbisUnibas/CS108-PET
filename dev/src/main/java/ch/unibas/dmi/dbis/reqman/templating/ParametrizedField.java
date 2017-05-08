@@ -11,12 +11,12 @@ public abstract class ParametrizedField<E, T> extends Field<E, T> {
 
     private String parameter;
 
-    protected ParametrizedField(String name, Type type, Function<E, T> getter, Function<T, String> renderer) {
-        super(name, type, getter, renderer);
-    }
-
     public ParametrizedField(String name, Function<E, T> getter) {
         super(name, Type.PARAMETRIZED, getter);
+    }
+
+    protected ParametrizedField(String name, Type type, Function<E, T> getter, Function<T, String> renderer) {
+        super(name, type, getter, renderer);
     }
 
     public static <E, T> ParametrizedField<E, T> copy(ParametrizedField<E, T> source) {

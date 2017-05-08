@@ -21,6 +21,7 @@ public class CheckedAsynchronousOperation<T> {
     private TreeMap<Integer, Consumer<T>> processors = new TreeMap<>();
     private Consumer<Exception> exceptionHandler;
     private StatusBar statusBar;
+    private String message = null;
 
     public CheckedAsynchronousOperation(final ManagementTask<T> task) {
         this.worker = new Thread(task);
@@ -38,37 +39,8 @@ public class CheckedAsynchronousOperation<T> {
         this.exceptionHandler = handler;
     }
 
-    private void prepare() {
-        task.setOnSucceeded(event -> {
-            try {
-                done(event);
-            } catch (IllegalStateException ex) {
-                if (exceptionHandler != null) {
-                    exceptionHandler.accept(ex);
-                } else {
-                    DEFAULT_EXCEPTION_HANDLER.accept(ex);
-                }
-            }
-        });
-
-    }
-
-    private String message = null;
-
-    public void setExceptionMessage(String message){
+    public void setExceptionMessage(String message) {
         this.message = message;
-    }
-
-    private void done(WorkerStateEvent event) throws IllegalStateException {
-        T result = task.getValue();
-
-        validators.values().forEach(v -> {
-            if (!v.test(result)) {
-                throw new IllegalStateException(message);
-            }
-        });
-
-        processors.values().forEach(p -> p.accept(result));
     }
 
     public void start() {
@@ -102,6 +74,33 @@ public class CheckedAsynchronousOperation<T> {
     void setStatusBar(StatusBar bar) {
         this.statusBar = bar;
         statusBar.messageProperty().bind(task.messageProperty());
+    }
+
+    private void prepare() {
+        task.setOnSucceeded(event -> {
+            try {
+                done(event);
+            } catch (IllegalStateException ex) {
+                if (exceptionHandler != null) {
+                    exceptionHandler.accept(ex);
+                } else {
+                    DEFAULT_EXCEPTION_HANDLER.accept(ex);
+                }
+            }
+        });
+
+    }
+
+    private void done(WorkerStateEvent event) throws IllegalStateException {
+        T result = task.getValue();
+
+        validators.values().forEach(v -> {
+            if (!v.test(result)) {
+                throw new IllegalStateException(message);
+            }
+        });
+
+        processors.values().forEach(p -> p.accept(result));
     }
 
 }

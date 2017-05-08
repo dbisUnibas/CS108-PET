@@ -24,22 +24,22 @@ public class RenderManager {
     /**
      * Existent:
      * overview
-     *  .minTotal
-     *  .avgTotal
-     *  .maxTotla
-     *  .minMS[]
-     *  .avgMS[]
-     *  .maxMS[]
-     *  .sumTotal[]
-     *  .sumMS[ms=,group=]
-     *  .minTotalGroups
-     *  .avgTotalGroups
-     *  .maxTotalGroups
-     *  .minMSGroups[]
-     *  .avgMSGroups[]
-     *  .maxMSGroups[]
-     *  .nameMS[]
-     *  .name
+     * .minTotal
+     * .avgTotal
+     * .maxTotla
+     * .minMS[]
+     * .avgMS[]
+     * .maxMS[]
+     * .sumTotal[]
+     * .sumMS[ms=,group=]
+     * .minTotalGroups
+     * .avgTotalGroups
+     * .maxTotalGroups
+     * .minMSGroups[]
+     * .avgMSGroups[]
+     * .maxMSGroups[]
+     * .nameMS[]
+     * .name
      */
     private final Entity<OverviewSnapshot> OVERVIEW_ENTITY = new Entity<OverviewSnapshot>("overview",
             new Field<OverviewSnapshot, Double>("minTotal", Field.Type.NORMAL, OverviewSnapshot::getTotalMin),
@@ -452,7 +452,7 @@ public class RenderManager {
         return renderCarefully(renderer, templateGroupCat, catalogue);
     }
 
-    public String renderOverview(OverviewSnapshot overview){
+    public String renderOverview(OverviewSnapshot overview) {
         return renderCarefully(renderer, templateOverview, overview);
     }
 
@@ -476,7 +476,7 @@ public class RenderManager {
         parseTemplateCarefully(CATALOGUE_ENTITY, catTemplate);
     }
 
-    public void parseOverviewTemplate(String template){
+    public void parseOverviewTemplate(String template) {
         parseTemplateCarefully(OVERVIEW_ENTITY, template);
     }
 
@@ -505,9 +505,9 @@ public class RenderManager {
             templateGroup = parser.parseTemplate(template);
         } else if (PROGRESS_ENTITY.getEntityName().equals(entity.getEntityName())) {
             templateProgress = parser.parseTemplate(template);
-        } else if(OVERVIEW_ENTITY.getEntityName().equals(entity.getEntityName())) {
+        } else if (OVERVIEW_ENTITY.getEntityName().equals(entity.getEntityName())) {
             templateOverview = parser.parseTemplate(template);
-        }else {
+        } else {
             throw LOGGER.throwing(new UnsupportedOperationException("Cannot parse a template for entity: " + entity.toString()));
         }
         return true;

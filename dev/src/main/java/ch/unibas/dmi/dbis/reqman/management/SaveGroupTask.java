@@ -22,9 +22,9 @@ public class SaveGroupTask extends ManagementTask<Boolean> {
 
     @Override
     protected Boolean call() throws Exception {
-        updateAll("Start writing "+group.getName()+" to disk", 0.2);
+        updateAll("Start writing " + group.getName() + " to disk", 0.2);
         JSONUtils.writeToJSONFile(group, file);
-        updateAll("Done writing "+group.getName()+" to "+file.getPath(), 1.0);
+        updateAll("Done writing " + group.getName() + " to " + file.getPath(), 1.0);
         return true;
     }
 }

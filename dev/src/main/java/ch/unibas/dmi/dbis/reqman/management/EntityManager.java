@@ -4,7 +4,6 @@ import ch.unibas.dmi.dbis.reqman.common.Callback;
 import ch.unibas.dmi.dbis.reqman.common.ThrowingCallback;
 import ch.unibas.dmi.dbis.reqman.core.*;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -279,15 +278,6 @@ public class EntityManager {
         }
     }
 
-    private void updateProgress(Requirement oldReq, Requirement newReq) {
-        groups.forEach(g -> {
-            Progress p = getProgressForRequirement(g, oldReq);
-            if(p != null){
-                p.setRequirementName(newReq.getName() );
-            }
-        });
-    }
-
     public void modifyCatalogue(Catalogue mod) {
         LOGGER.traceEntry();
         catalogue.setName(mod.getName());
@@ -412,7 +402,7 @@ public class EntityManager {
     }
 
     public void openGroups(List<File> files, Consumer<List<Group>> callback, Consumer<Exception> exHandler) {
-        LOGGER.traceEntry("Param: {}",files);
+        LOGGER.traceEntry("Param: {}", files);
 
         CheckedAsynchronousOperation<List<Group>> op = OperationFactory.createOpenMultipleGroupOperation(files);
 
@@ -429,7 +419,7 @@ public class EntityManager {
         op.start();
     }
 
-    public void exportOverview(File exportFile){
+    public void exportOverview(File exportFile) {
         LOGGER.traceEntry("Params: {}", exportFile);
         CheckedAsynchronousOperation<Boolean> op = OperationFactory.createExportOverviewOperation(new OverviewSnapshot(catalogue, groups.toArray(new Group[0])), exportFile);
         op.setExceptionHandler(ex -> LOGGER.catching(Level.ERROR, ex));
@@ -508,6 +498,15 @@ public class EntityManager {
             }
         }
         return out;
+    }
+
+    private void updateProgress(Requirement oldReq, Requirement newReq) {
+        groups.forEach(g -> {
+            Progress p = getProgressForRequirement(g, oldReq);
+            if (p != null) {
+                p.setRequirementName(newReq.getName());
+            }
+        });
     }
 
     private void saveCatalogue(File file) {

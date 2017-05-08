@@ -34,6 +34,18 @@ public class SimpleOverviewBuilder {
         LOGGER.debug("milestoneMappings: " + milestoneMapping.toString());
     }
 
+    String exportOverviewHTML() {
+        String html = html().with(
+                overviewHeader(),
+                body().with(
+                        heading(),
+                        totalSumTable(),
+                        statisticsTable()
+                )
+        ).render();
+        return prependDoctype(html);
+    }
+
     private DoubleStream points() {
         ArrayList<Double> points = new ArrayList<>();
         groups.forEach(g -> points.add(g.getTotalSum(catalogue)));
@@ -179,17 +191,5 @@ public class SimpleOverviewBuilder {
             });
             milestoneMapping.put(ms.getOrdinal(), map);
         });
-    }
-
-    String exportOverviewHTML() {
-        String html = html().with(
-                overviewHeader(),
-                body().with(
-                        heading(),
-                        totalSumTable(),
-                        statisticsTable()
-                )
-        ).render();
-        return prependDoctype(html);
     }
 }

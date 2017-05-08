@@ -47,14 +47,14 @@ public class SortingUtils {
             .thenComparing(Requirement::isMalus, FALSE_FIRST_COMPARATOR)
             .thenComparing(Requirement::getName);
 
-    public static final Comparator<Progress> getProgressComparator(Catalogue cat){
-        return Comparator.comparing(cat::getRequirementForProgress, REQUIREMENT_COMPARATOR);
-    }
-
     /**
      * Utility class, no instance needed.
      */
     private SortingUtils() {
         // No constructor needed
+    }
+
+    public static final Comparator<Progress> getProgressComparator(Catalogue cat) {
+        return Comparator.comparing(cat::getRequirementForProgress, REQUIREMENT_COMPARATOR);
     }
 }

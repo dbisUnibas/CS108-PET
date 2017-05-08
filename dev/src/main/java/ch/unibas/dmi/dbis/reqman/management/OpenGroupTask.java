@@ -12,7 +12,7 @@ import java.io.File;
  *
  * @author loris.sauter
  */
-public class OpenGroupTask extends ThrowingManagementTask<Group>{
+public class OpenGroupTask extends ThrowingManagementTask<Group> {
 
     private static final Logger LOGGER = LogManager.getLogger(OpenGroupTask.class);
 
@@ -24,9 +24,9 @@ public class OpenGroupTask extends ThrowingManagementTask<Group>{
 
     @Override
     protected Group call() throws Exception {
-        updateAll("Opening group "+file.getName()+"...", 0.2);
+        updateAll("Opening group " + file.getName() + "...", 0.2);
         Group gr = JSONUtils.readGroupJSONFile(file);
-        updateAll("Succsessfully opened group "+gr.getName()+".", 1.0);
+        updateAll("Succsessfully opened group " + gr.getName() + ".", 1.0);
         return gr;
     }
 }

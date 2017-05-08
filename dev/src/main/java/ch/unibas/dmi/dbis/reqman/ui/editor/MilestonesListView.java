@@ -17,7 +17,7 @@ import javafx.scene.input.MouseEvent;
  *
  * @author loris.sauter
  */
-public class MilestonesListView  extends ModifiableListView<Milestone> implements ModifiableListHandler<Milestone> {
+public class MilestonesListView extends ModifiableListView<Milestone> implements ModifiableListHandler<Milestone> {
     private EditorHandler handler;
 
     public MilestonesListView(EditorHandler handler) {
@@ -42,22 +42,22 @@ public class MilestonesListView  extends ModifiableListView<Milestone> implement
         handler.handleCreation(evt);
     }
 
+    public Milestone getSelectedMS() {
+        return listView.getSelectionModel().getSelectedItem();
+    }
+
+    void setMilestones(ObservableList<Milestone> observableList) {
+        setItems(observableList);
+    }
+
     private void handleModifyRequest(MouseEvent mouseEvent) {
-        if(mouseEvent.getClickCount() == 2){
+        if (mouseEvent.getClickCount() == 2) {
             Milestone ms = listView.getSelectionModel().getSelectedItem();
-            if(ms != null){
+            if (ms != null) {
                 CUDEvent mod = CUDEvent.generateModificationEvent(new ActionEvent(mouseEvent.getSource(), mouseEvent.getTarget()), TargetEntity.MILESTONE, ms);
                 handler.handleModification(mod);
             }
         }
-    }
-
-    void setMilestones(ObservableList<Milestone> observableList){
-        setItems(observableList);
-    }
-
-    public Milestone getSelectedMS() {
-        return listView.getSelectionModel().getSelectedItem();
     }
 
     public static class MilestoneCell extends ListCell<Milestone> {

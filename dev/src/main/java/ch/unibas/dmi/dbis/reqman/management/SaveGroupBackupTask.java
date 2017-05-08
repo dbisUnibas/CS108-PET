@@ -34,7 +34,7 @@ public class SaveGroupBackupTask extends ManagementTask<Boolean> {
         backupObj.put(EntityManager.GROUP_KEY, JSONUtils.toJSON(group));
 
         JSONUtils.writeToJSONFile(backupObj, backup);
-        updateAll("Wrote backup of group "+group.getName()+" to "+backup.getPath(),1.0 );
+        updateAll("Wrote backup of group " + group.getName() + " to " + backup.getPath(), 1.0);
         LOGGER.info("Saved backup of group " + group.getName() + " to " + backup.getPath());
         return true;
     }

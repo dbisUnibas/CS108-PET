@@ -23,10 +23,10 @@ class OpenCatalogueTask extends ManagementTask<Catalogue> {
     @Override
     protected Catalogue call() throws Exception {
         LOGGER.trace(":call");
-        updateAll("Started to read... ("+openFile.getPath()+")", 0.2);
+        updateAll("Started to read... (" + openFile.getPath() + ")", 0.2);
         Catalogue cat = JSONUtils.readCatalogueJSONFile(openFile);
-        LOGGER.info("Successfully read catalogue file "+openFile.getPath());
-        updateAll("Successfully read catalogue from ("+openFile.getPath()+")", 1.0);
+        LOGGER.info("Successfully read catalogue file " + openFile.getPath());
+        updateAll("Successfully read catalogue from (" + openFile.getPath() + ")", 1.0);
         return LOGGER.traceExit(cat);
     }
 
