@@ -206,14 +206,22 @@ public class Catalogue {
      * @return The result of the {@link List#add(Object)} operation
      */
     public boolean addRequirement(Requirement requirement) {
+        addReqToInternalMap(requirement);
+        return requirements.add(requirement);
+    }
 
+    /**
+     * Adds the given requirement to the internal storage.
+     * Internal storage references the map of minimal milestone <-> requirements
+     * @param requirement The requirement to add
+     */
+    private void addReqToInternalMap(Requirement requirement){
         if (reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()) != null) {
             reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).add(requirement);
         } else {
             List<Requirement> list = new ArrayList<>(Arrays.asList(requirement));
             reqsPerMinMS.put(requirement.getMinMilestoneOrdinal(), list);
         }
-        return requirements.add(requirement);
     }
 
     /**
@@ -421,5 +429,15 @@ public class Catalogue {
      */
     public List<Milestone> milestoneList() {
         return milestones;
+    }
+
+    /**
+     * Re-syncs the requirements and ensures that all internal references of and to requirements are set correctly.
+     *
+     * When loading a catalogue from a JSON file the internal structure is not completely set up. Invoking
+     * this method after reading from a JSON file it is ensured that those internal structure is correct.
+     */
+    public void resyncRequirements(){
+        requirements.forEach(this::addReqToInternalMap);
     }
 }
