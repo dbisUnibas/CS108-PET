@@ -34,7 +34,7 @@ public class ExportMultipleGroupTask extends ManagementTask<Boolean> {
         RenderManager manager = new RenderManager(catalogue);
         TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
         configManager.loadConfig();
-        String extension = configManager.getTemplatesExtension();
+        String extension = configManager.getExportExtension();
         Templates templates = configManager.getTemplates();
 
         updateAll("Loaded templating config...", 0.05);

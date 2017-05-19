@@ -33,7 +33,7 @@ public class ExportCatalogueTask extends ManagementTask<Boolean> {
         TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
         configManager.loadConfig();
         Templates templates = configManager.getTemplates();
-        String extension = configManager.getTemplatesExtension();
+        String extension = configManager.getExportExtension();
 
         updateAll("Successfully loaded templating config...", 0.2);
 

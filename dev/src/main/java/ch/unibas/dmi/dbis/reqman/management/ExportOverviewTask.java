@@ -29,7 +29,7 @@ class ExportOverviewTask extends ManagementTask<Boolean> {
 
         TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
         configManager.loadConfig();
-        String extension = configManager.getTemplatesExtension();
+        String extension = configManager.getExportExtension();
         Templates templates = configManager.getTemplates();
 
         updateAll("Loaded templating config...", 0.2);
