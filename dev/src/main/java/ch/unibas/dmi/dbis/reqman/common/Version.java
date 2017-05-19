@@ -78,7 +78,7 @@ public class Version {
         return version;
     }
 
-    
+
     private void handleInvalidVersion() {
         LOGGER.error("Setting verstion to N/A, which is in general pretty bad. Check your build!");
         version = NO_VERSION;
