@@ -9,6 +9,7 @@ import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.RadioMenuItem;
 import javafx.stage.FileChooser;
@@ -178,8 +179,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleQuit(ActionEvent event) {
-        // TODO ensure correct mode
-        throw new UnsupportedOperationException("NYI");
+        Platform.exit();
     }
 
     @Override
