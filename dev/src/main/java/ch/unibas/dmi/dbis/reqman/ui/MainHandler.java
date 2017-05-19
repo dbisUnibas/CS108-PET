@@ -326,8 +326,6 @@ public class MainHandler implements MenuHandler {
         evaluatorHandler.setStatusBar(statusBar);
         editorHandler.setStatusBar(statusBar);
         OperationFactory.registerStatusBar(statusBar);
-        // TODO Change to async
-        EntityManager.getInstance().setStatusBar(statusBar);
     }
 
     void stop() {
