@@ -24,9 +24,17 @@ import java.util.function.Function;
 @FunctionalInterface
 public interface Callback extends Function<Void, Void> {
 
+    /**
+     * The ecextuable body of the callback.
+     */
     void call();
 
 
+    /**
+     * Invokes {@link #call()} and returns <code>null</code>.
+     * @param aVoid Will be ignroed
+     * @return <code>null</code>
+     */
     @Override
     default Void apply(Void aVoid) {
         call();
