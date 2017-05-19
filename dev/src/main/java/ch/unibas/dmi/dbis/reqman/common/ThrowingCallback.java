@@ -1,11 +1,12 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
 /**
- * TODO: Write JavaDoc
+ *
  *
  * @author loris.sauter
  */
 @FunctionalInterface
+@Deprecated
 public interface ThrowingCallback extends ThrowingFunction<Void, Void> {
 
     void callThrowing() throws Exception;
