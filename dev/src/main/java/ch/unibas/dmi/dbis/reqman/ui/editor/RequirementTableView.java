@@ -1,6 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
+import ch.unibas.dmi.dbis.reqman.core.Catalogue;
+import ch.unibas.dmi.dbis.reqman.core.Milestone;
 import ch.unibas.dmi.dbis.reqman.core.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
@@ -40,6 +42,7 @@ public class RequirementTableView extends BorderPane {
     private Button rmBtn;
     private TableView<ObservableRequirement> table;
     private ObservableList<ObservableRequirement> tableData = FXCollections.observableArrayList();
+    private Catalogue cat;
 
     RequirementTableView() {
         initComponents();
@@ -62,11 +65,12 @@ public class RequirementTableView extends BorderPane {
         });
     }
 
-    public void setRequirements(ObservableList<Requirement> requirements) {
+    public void setRequirements(ObservableList<Requirement> requirements, Catalogue catalogue) {
+        cat = catalogue;
         // Ensures that this view is really simply view - and nothing more!
         LOGGER.traceEntry();
         tableData.clear();
-        requirements.forEach(r -> tableData.add(ObservableRequirement.fromRequirement(r)));
+        requirements.forEach(r -> tableData.add(ObservableRequirement.fromRequirement(r, catalogue)));
         LOGGER.trace(":setRequirements - Created " + tableData.size() + " observable requirements");
         requirements.addListener(new ListChangeListener<Requirement>() {
             @Override
@@ -88,11 +92,11 @@ public class RequirementTableView extends BorderPane {
                     } else {
                         for (Requirement removeItem : c.getRemoved()) {
                             LOGGER.trace("Removed {}", c.getRemoved());
-                            tableData.remove(ObservableRequirement.fromRequirement(removeItem));
+                            tableData.remove(ObservableRequirement.fromRequirement(removeItem, catalogue));
                         }
                         for (Requirement addItem : c.getAddedSubList()) {
                             LOGGER.trace("Added  {}", c.getAddedSubList());
-                            ObservableRequirement obsReq = ObservableRequirement.fromRequirement(addItem);
+                            ObservableRequirement obsReq = ObservableRequirement.fromRequirement(addItem, catalogue);
                             LOGGER.debug("Table contains to add: {}", tableData.contains(obsReq));
                             if (!tableData.contains(obsReq)) {
                                 tableData.add(obsReq);
@@ -191,6 +195,15 @@ public class RequirementTableView extends BorderPane {
             }
         }));
 
+        TableColumn<ObservableRequirement, String> minMSColumn = new TableColumn<>("Min MS");
+        minMSColumn.setCellValueFactory(c -> c.getValue().minMSNameProperty() );
+        minMSColumn.setCellFactory(TextFieldTableCell.forTableColumn() );
+
+        TableColumn<ObservableRequirement, String> maxMSColumn = new TableColumn<>("Max MS");
+        maxMSColumn.setCellValueFactory(c -> c.getValue().maxMSNameProperty() );
+        maxMSColumn.setCellFactory(TextFieldTableCell.forTableColumn() );
+
+
         TableColumn<ObservableRequirement, Boolean> binaryColumn = new TableColumn<>("Binary");
         binaryColumn.setCellValueFactory(c -> c.getValue().binaryProperty());
 
@@ -217,7 +230,7 @@ public class RequirementTableView extends BorderPane {
         malusColumn.setCellValueFactory(c -> c.getValue().malusProperty());
         malusColumn.setCellFactory(CheckBoxTableCell.forTableColumn(malusColumn));
 
-        table.getColumns().addAll(nameColumn, pointsColumn, binaryColumn, mandatoryColumn, malusColumn);
+        table.getColumns().addAll(nameColumn, pointsColumn, minMSColumn, maxMSColumn, binaryColumn, mandatoryColumn, malusColumn);
 
         table.setItems(tableData);
 
@@ -229,6 +242,10 @@ public class RequirementTableView extends BorderPane {
         return table;
     }
 
+    /**
+     * An observable representation of a {@link Requirement}, used to display
+     * a requirement in a JavaFX {@link TableView}
+     */
     static class ObservableRequirement {
         private final SimpleStringProperty name;
         private final SimpleDoubleProperty points;
@@ -236,20 +253,30 @@ public class RequirementTableView extends BorderPane {
         private final SimpleBooleanProperty mandatory;
         private final SimpleBooleanProperty malus;
 
-        ObservableRequirement(String name, double points, boolean binary, boolean mandatory, boolean malus) {
+        private final SimpleStringProperty minMSName;
+        private final SimpleStringProperty maxMSName;
+
+        ObservableRequirement(String name, double points, String minMSName, String maxMSName, boolean binary, boolean mandatory, boolean malus) {
             this.name = new SimpleStringProperty(name);
             this.points = new SimpleDoubleProperty(points);
             this.binary = new SimpleBooleanProperty(binary);
             this.mandatory = new SimpleBooleanProperty(mandatory);
             this.malus = new SimpleBooleanProperty(malus);
+            this.minMSName = new SimpleStringProperty(minMSName);
+            this.maxMSName = new SimpleStringProperty(maxMSName);
         }
 
-        static ObservableRequirement fromRequirement(Requirement r) {
+        static ObservableRequirement fromRequirement(Requirement r, Catalogue catalogue) {
             LOGGER.trace(":fromRequirement");
             if (r == null) {
                 throw new IllegalArgumentException("Cannot create ObservableRequirement from null-Requirement");
             }
-            ObservableRequirement rep = new ObservableRequirement(r.getName(), r.getMaxPoints(), r.isBinary(), r.isMandatory(), r.isMalus());
+            Milestone miMS = catalogue.getMilestoneByOrdinal(r.getMinMilestoneOrdinal());
+            Milestone maMS = catalogue.getMilestoneByOrdinal(r.getMaxMilestoneOrdinal());
+            if (miMS == null || maMS == null) {
+                throw new IllegalArgumentException("Passed Requirement is illegal formed (has null entries): " + r.toString());
+            }
+            ObservableRequirement rep = new ObservableRequirement(r.getName(), r.getMaxPoints(), miMS.getName(), maMS.getName(), r.isBinary(), r.isMandatory(), r.isMalus());
             LOGGER.trace(":fromRequirement - Created " + String.format("the representation: %s", rep));
             return rep;
         }
@@ -326,6 +353,22 @@ public class RequirementTableView extends BorderPane {
             this.malus.set(malus);
         }
 
+        String getMinMSName() {
+            return minMSName.getValue();
+        }
+
+        void setMinMSName(String minMSName) {
+            this.minMSName.set(minMSName);
+        }
+
+        String getMaxMSName() {
+            return maxMSName.get();
+        }
+
+        void setMaxMSName(String maxMSName) {
+            this.maxMSName.set(maxMSName);
+        }
+
         DoubleProperty pointsProperty() {
             return points;
         }
@@ -344,6 +387,14 @@ public class RequirementTableView extends BorderPane {
 
         BooleanProperty malusProperty() {
             return malus;
+        }
+
+        StringProperty minMSNameProperty() {
+            return minMSName;
+        }
+
+        StringProperty maxMSNameProperty() {
+            return maxMSName;
         }
     }
 }

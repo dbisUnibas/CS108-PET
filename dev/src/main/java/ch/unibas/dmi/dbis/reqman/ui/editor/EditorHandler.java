@@ -9,7 +9,6 @@ import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
@@ -152,7 +151,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     public void setupEditor() {
         LOGGER.traceEntry();
         if (manager.isCatalogueLoaded()) {
-            editor.getRequirementsView().setRequirements(manager.getObservableRequirements());
+            editor.getRequirementsView().setRequirements(manager.getObservableRequirements(), manager.getCatalogue());
             editor.getMilestoneView().setItems(manager.getObservableMilestones());
 
             setupCatalogueInfo();
