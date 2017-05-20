@@ -10,25 +10,48 @@
           "pattern": "[%d{MM-dd-yyyy HH:mm:ss.SSS}][%t] %-5level %logger{36} - %msg%n"
         },
         "filters": [
-
+          {
+            "ThresholdFilter": {
+              "level": "info",
+              "onMatch": "ACCEPT",
+              "onMismatch": "DENY"
+            }
+          }
         ]
       },
-      "RollingFile": {
-        "name": "rollingFile",
-        "fileName": "logs/reqman.log",
-        "filePattern": "logs/$${date:yyyy-MM}reqman-%d{MM-dd-yyyy}-%i.log.gz",
-        "PatternLayout": {
-          "pattern": "[%d{MM-dd-yyyy HH:mm:ss.SSS}][%t] %-5level %logger{36}: %msg%n"
-        },
-        "Policies": {
-          "SizeBasedTriggeringPolicy": {
-            "size": "10 MB"
+      "RollingFile":[
+        {
+          "name": "rollingFile",
+          "fileName": "logs/reqman.log",
+          "filePattern": "logs/$${date:yyyy-MM}/reqman-%d{MM-dd-yyyy}-%i.log.gz",
+          "PatternLayout": {
+            "pattern": "[%d{MM-dd-yyyy HH:mm:ss.SSS}][%t] %-5level %logger{36}: %msg%n"
+          },
+          "Policies": {
+            "SizeBasedTriggeringPolicy": {
+              "size": "10 MB"
+            }
+          },
+          "DefaultRolloverStrategy": {
+            "max": "5"
           }
-        },
-        "DefaultRolloverStrategy": {
-          "max": "5"
+        },{
+          "name": "traceFile",
+          "fileName": "logs/reqman-trace.log",
+          "filePattern": "logs/$${date:yyyy-MM}/reqman-trace-%d{MM-dd-yyyy}-%i.log.gz",
+          "PatternLayout": {
+            "pattern": "[%d{MM-dd-yyyy HH:mm:ss.SSS}][%t] %-5level %logger{36}: %msg%n"
+          },
+          "Policies": {
+            "OnStartupTriggeringPolicy": {
+              "minSize":1
+            }
+          },
+          "DefaultRolloverStrategy": {
+            "max": "10"
+          }
         }
-      }
+      ]
     },
     "loggers": {
       "root": {
@@ -39,6 +62,10 @@
           },
           {
             "ref": "rollingFile"
+          },
+          {
+            "ref":"traceFile",
+            "level":"trace"
           }
         ]
       },
@@ -49,12 +76,15 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "trace"
+              "ref": "console"
             },
             {
               "ref": "rollingFile",
               "level": "info"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -64,8 +94,11 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "info"
+              "ref": "console"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -75,8 +108,11 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "info"
+              "ref": "console"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -86,8 +122,11 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "info"
+              "ref": "console"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -97,12 +136,14 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "trace"
+              "ref": "console"
             },
             {
-              "ref": "rollingFile",
-              "level": "info"
+              "ref": "rollingFile"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -112,12 +153,14 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "info"
+              "ref": "console"
             },
             {
-              "ref": "rollingFile",
-              "level": "info"
+              "ref": "rollingFile"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },{
@@ -126,12 +169,14 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "trace"
+              "ref": "console"
             },
             {
-              "ref": "rollingFile",
-              "level": "info"
+              "ref": "rollingFile"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -141,12 +186,14 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "trace"
+              "ref": "console"
             },
             {
-              "ref": "rollingFile",
-              "level": "info"
+              "ref": "rollingFile"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -161,6 +208,10 @@
             {
               "ref": "rollingFile",
               "level": "info"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -171,6 +222,10 @@
           "AppenderRef": [
             {
               "ref": "console"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -180,8 +235,11 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "debug"
+              "ref": "console"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -192,6 +250,10 @@
           "AppenderRef": [
             {
               "ref": "console"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -202,6 +264,10 @@
           "AppenderRef": [
             {
               "ref": "console"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -212,6 +278,10 @@
           "AppenderRef": [
             {
               "ref": "console"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -226,6 +296,10 @@
             {
               "ref": "rollingFile",
               "level": "info"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -235,12 +309,15 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "trace"
+              "ref": "console"
             },
             {
               "ref": "rollingFile",
               "level": "info"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         },
@@ -250,8 +327,11 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console",
-              "level": "debug"
+              "ref": "console"
+            },
+            {
+              "ref":"traceFile",
+              "level":"trace"
             }
           ]
         }

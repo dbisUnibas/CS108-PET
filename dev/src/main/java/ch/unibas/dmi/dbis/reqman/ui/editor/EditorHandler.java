@@ -164,7 +164,12 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     public void saveCatalogue() {
         LOGGER.traceEntry();
         if (manager.isCatalogueLoaded()) {
-            manager.saveCatalogue();
+            if(!manager.isCatalogueFilePresent() ){
+                saveAsCatalogue();
+            }else{
+                manager.saveCatalogue();
+            }
+
         }
 
     }
