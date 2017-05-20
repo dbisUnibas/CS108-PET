@@ -9,17 +9,17 @@
 ## 
 
 # Prefixed entries with dev/ since gralde is located not in root folder
-dev/.gradle
-dev/build/
+.gradle
+build/
 
 # Ignore Gradle GUI config
-dev/gradle-app.setting
+gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
 
 # Cache of project
-dev/.gradletasknamecache
+.gradletasknamecache
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
@@ -32,6 +32,9 @@ dev/.gradletasknamecache
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# Complete .idea/**/dataSources
+.idea/
 
 # User-specific stuff:
 .idea/**/workspace.xml

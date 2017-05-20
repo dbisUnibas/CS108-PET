@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="css/achievements.css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>${group.name}</title>
+</head>
+<body>
+
+<br><br><br>
+
+
+<div class="container">
+    <h1>${group.name}</h1>
+    ${group.milestones}
+    <table class="bordered responsive-table">
+        <thead>
+        <tr>
+            <th>${catalogue.milestoneName[1]}</th>
+            <th>${catalogue.milestoneName[2]}</th>
+            <th>${catalogue.milestoneName[3]}</th>
+            <th>${catalogue.milestoneName[4]}</th>
+            <th>${catalogue.milestoneName[5]}</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>${group.sumMS[1]}</td>
+            <td>${group.sumMS[2]}</td>
+            <td>${group.sumMS[3]}</td>
+            <td>${group.sumMS[4]}</td>
+            <td>${group.sumMS[5]}</td>
+            <td>${group.sumTotal}</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!--Import jQuery before materialize.js-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="js/materialize.min.js"></script>
+</body>
+</html>

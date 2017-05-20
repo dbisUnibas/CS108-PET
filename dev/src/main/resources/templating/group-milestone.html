@@ -1,0 +1,17 @@
+<div class="milestone-content-container">
+    <div class="milestone-achievements-list">
+        ${groupMilestone.progressList}
+    </div><!-- .milestone-achievements-list -->
+    <div class="milestone-summary z-depth-3 hoverable">
+        <div class="milestone-summary-header">${groupMilestone.name}: Summary</div>
+        <div class="milestone-summary-text">${groupMilestone.comment}</div>
+        <div class="milestone-summary-progress">
+            <div class="milestone-summary-bar">
+                <div class="progress">
+                    <div class="determinate" style="width: ${groupMilestone.percentage}%"></div>
+                </div>
+            </div><!-- .milestone-summary-bar -->
+            <div class="milestone-summary-points">${groupMilestone.sum} / ${milestone.sumMax}</div>
+        </div>
+    </div><!-- .milestone-summary -->
+</div><!-- .milestone-content-container -->

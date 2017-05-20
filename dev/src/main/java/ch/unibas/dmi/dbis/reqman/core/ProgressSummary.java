@@ -7,9 +7,20 @@ package ch.unibas.dmi.dbis.reqman.core;
  */
 public class ProgressSummary {
 
-    private String milestoneName;
+    private int milestoneOrdinal;
     private String internalComment;
     private String externalComment;
+
+    public ProgressSummary(int milestoneOrdinal, String internalComment, String externalComment) {
+
+        this.milestoneOrdinal = milestoneOrdinal;
+        this.internalComment = internalComment;
+        this.externalComment = externalComment;
+    }
+
+    public ProgressSummary() {
+
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -22,7 +33,7 @@ public class ProgressSummary {
 
         ProgressSummary that = (ProgressSummary) o;
 
-        if (getMilestoneName() != null ? !getMilestoneName().equals(that.getMilestoneName()) : that.getMilestoneName() != null) {
+        if (getMilestoneOrdinal() != that.getMilestoneOrdinal()) {
             return false;
         }
         if (getInternalComment() != null ? !getInternalComment().equals(that.getInternalComment()) : that.getInternalComment() != null) {
@@ -33,19 +44,19 @@ public class ProgressSummary {
 
     @Override
     public int hashCode() {
-        int result = getMilestoneName() != null ? getMilestoneName().hashCode() : 0;
+        int result = getMilestoneOrdinal();
         result = 31 * result + (getInternalComment() != null ? getInternalComment().hashCode() : 0);
         result = 31 * result + (getExternalComment() != null ? getExternalComment().hashCode() : 0);
         return result;
     }
 
-    public String getMilestoneName() {
+    public int getMilestoneOrdinal() {
 
-        return milestoneName;
+        return milestoneOrdinal;
     }
 
-    public void setMilestoneName(String milestoneName) {
-        this.milestoneName = milestoneName;
+    public void setMilestoneOrdinal(int milestoneOrdinal) {
+        this.milestoneOrdinal = milestoneOrdinal;
     }
 
     public String getInternalComment() {
@@ -62,16 +73,5 @@ public class ProgressSummary {
 
     public void setExternalComment(String externalComment) {
         this.externalComment = externalComment;
-    }
-
-    public ProgressSummary(String milestoneName, String internalComment, String externalComment) {
-
-        this.milestoneName = milestoneName;
-        this.internalComment = internalComment;
-        this.externalComment = externalComment;
-    }
-
-    public ProgressSummary() {
-
     }
 }
