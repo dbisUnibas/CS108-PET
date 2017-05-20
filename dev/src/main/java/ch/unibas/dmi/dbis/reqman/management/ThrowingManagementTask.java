@@ -12,31 +12,29 @@ import javafx.event.EventHandler;
 public abstract class ThrowingManagementTask<R> extends ManagementTask<R> {
 
     private CatchingHandler handler;
+    private ThrowingCallback throwBack = null;
 
     public Exception getLastException() {
-        if(handler != null){
+        if (handler != null) {
             return handler.getLast();
-        }else{
+        } else {
             return null;
         }
     }
 
-    public void setThrowingOnSucceeded(ThrowingEventHandler handler){
+    public void setThrowingOnSucceeded(ThrowingEventHandler handler) {
         this.handler = new CatchingHandler(handler);
         setOnSucceeded(this.handler);
     }
-
-    private ThrowingCallback throwBack = null;
 
     public void setOnCaught(ThrowingCallback callback) throws Exception {
         throwBack = callback;
     }
 
-    private class CatchingHandler implements EventHandler<WorkerStateEvent>{
-
-        private Exception last = null;
+    private class CatchingHandler implements EventHandler<WorkerStateEvent> {
 
         private final ThrowingEventHandler handler;
+        private Exception last = null;
 
         public CatchingHandler(ThrowingEventHandler handler) {
             this.handler = handler;
@@ -46,15 +44,15 @@ public abstract class ThrowingManagementTask<R> extends ManagementTask<R> {
             return last;
         }
 
-        public boolean hasException(){
+        public boolean hasException() {
             return last != null;
         }
 
         @Override
         public void handle(WorkerStateEvent event) {
-            try{
+            try {
                 handler.handleThrowing(event);
-            }catch(Exception e){
+            } catch (Exception e) {
                 last = e;
             }
         }

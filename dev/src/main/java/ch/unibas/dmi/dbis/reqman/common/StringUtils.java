@@ -20,10 +20,11 @@ public class StringUtils {
 
     /**
      * Rounds the provided value to 2 digits.
+     *
      * @param value The value to round
      * @return A string representing the new value
      */
-    public static String roundTo2Digits(double value){
+    public static String roundTo2Digits(double value) {
         DecimalFormat df = new DecimalFormat("#.##");
         return df.format(value);
     }

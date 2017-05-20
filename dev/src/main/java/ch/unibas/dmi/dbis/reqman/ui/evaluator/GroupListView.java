@@ -6,7 +6,6 @@ import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tooltip;
@@ -17,7 +16,7 @@ import javafx.scene.input.MouseEvent;
  *
  * @author loris.sauter
  */
-public class GroupListView  extends ModifiableListView<Group> implements ModifiableListHandler<Group> {
+public class GroupListView extends ModifiableListView<Group> implements ModifiableListHandler<Group> {
     private final EvaluatorHandler handler;
 
     public GroupListView(EvaluatorHandler handler) {
@@ -42,6 +41,10 @@ public class GroupListView  extends ModifiableListView<Group> implements Modifia
         handler.handleCreation(evt);
     }
 
+    void setMilestones(ObservableList<Group> observableList) {
+        setItems(observableList);
+    }
+
     private void handleOpenRequest(MouseEvent mouseEvent) {
         if (mouseEvent.getClickCount() == 2) {
             Group group = listView.getSelectionModel().getSelectedItem();
@@ -49,10 +52,6 @@ public class GroupListView  extends ModifiableListView<Group> implements Modifia
                 handler.openGroupTab(group);
             }
         }
-    }
-
-    void setMilestones(ObservableList<Group> observableList) {
-        setItems(observableList);
     }
 
     public static class GroupCell extends ListCell<Group> {

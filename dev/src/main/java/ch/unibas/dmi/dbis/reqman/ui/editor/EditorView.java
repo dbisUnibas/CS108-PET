@@ -15,90 +15,26 @@ import org.apache.logging.log4j.Logger;
  *
  * @author loris.sauter
  */
-public class EditorView extends BorderPane implements TitleProvider{
+public class EditorView extends BorderPane implements TitleProvider {
 
     static final Logger LOGGER_UI = LogManager.getLogger(EditorView.class);
-
-
+    private final EditorHandler handler;
     private SplitPane splitter;
-
-
     private RequirementTableView reqTableView;
     private MilestonesListView msView;
     private CatalogueInfoPane catInfo;
-
-
-    private final EditorHandler handler;
-
     private String title = "Editor";
 
-    public EditorView(EditorHandler handler){
+    public EditorView(EditorHandler handler) {
         super();
         LOGGER_UI.trace("<init>");
         this.handler = handler;
         this.handler.setEditorView(this);
         initComponents();
         layoutComponents();
-        if(handler.isCatalogueLoaded() ){
+        if (handler.isCatalogueLoaded()) {
             handler.setupEditor();
         }
-    }
-
-    private void initComponents(){
-        LOGGER_UI.trace(":initComps");
-        reqTableView = new RequirementTableView();
-        reqTableView.setOnAdd(handler::handleCreation);
-        reqTableView.setOnRemove(handler::handleDeletion);
-        reqTableView.setOnModify(handler::handleModification);
-
-        msView = new MilestonesListView(handler);
-
-        catInfo = new CatalogueInfoPane();
-
-
-        splitter = new SplitPane();
-
-        splitter.prefWidthProperty().bind(widthProperty() );
-        splitter.prefHeightProperty().bind(heightProperty() );
-    }
-
-    private void layoutComponents(){
-        LOGGER_UI.trace(":layoutComps");
-        splitter.getItems().addAll(msView, reqTableView);
-        splitter.setDividerPositions(0.33);
-        setTop(catInfo);
-        setCenter(splitter);
-        disableAll();
-
-        // TEMP
-        catInfo.setOnMouseClicked(evt -> {
-            if(evt.getClickCount() == 2){
-                CUDEvent event = CUDEvent.generateModificationEvent(new ActionEvent(evt.getSource(), evt.getTarget()), TargetEntity.CATALOGUE, null);
-                handler.handleModification(event);
-            }
-        });
-    }
-
-    void enableAll(){
-        reqTableView.setDisable(false);
-        msView.setDisable(false);
-    }
-
-    void disableAll(){
-        reqTableView.setDisable(true);
-        msView.setDisable(true);
-    }
-
-    RequirementTableView getRequirementsView() {
-        return reqTableView;
-    }
-
-    MilestonesListView getMilestoneView(){
-        return msView;
-    }
-
-    CatalogueInfoPane getCatalogueView(){
-        return catInfo;
     }
 
     @Override
@@ -112,5 +48,62 @@ public class EditorView extends BorderPane implements TitleProvider{
 
     public void refresh() {
         handler.setupEditor();
+    }
+
+    void enableAll() {
+        reqTableView.setDisable(false);
+        msView.setDisable(false);
+    }
+
+    void disableAll() {
+        reqTableView.setDisable(true);
+        msView.setDisable(true);
+    }
+
+    RequirementTableView getRequirementsView() {
+        return reqTableView;
+    }
+
+    MilestonesListView getMilestoneView() {
+        return msView;
+    }
+
+    CatalogueInfoPane getCatalogueView() {
+        return catInfo;
+    }
+
+    private void initComponents() {
+        LOGGER_UI.trace(":initComps");
+        reqTableView = new RequirementTableView();
+        reqTableView.setOnAdd(handler::handleCreation);
+        reqTableView.setOnRemove(handler::handleDeletion);
+        reqTableView.setOnModify(handler::handleModification);
+
+        msView = new MilestonesListView(handler);
+
+        catInfo = new CatalogueInfoPane();
+
+
+        splitter = new SplitPane();
+
+        splitter.prefWidthProperty().bind(widthProperty());
+        splitter.prefHeightProperty().bind(heightProperty());
+    }
+
+    private void layoutComponents() {
+        LOGGER_UI.trace(":layoutComps");
+        splitter.getItems().addAll(msView, reqTableView);
+        splitter.setDividerPositions(0.33);
+        setTop(catInfo);
+        setCenter(splitter);
+        disableAll();
+
+        // TEMP
+        catInfo.setOnMouseClicked(evt -> {
+            if (evt.getClickCount() == 2) {
+                CUDEvent event = CUDEvent.generateModificationEvent(new ActionEvent(evt.getSource(), evt.getTarget()), TargetEntity.CATALOGUE, null);
+                handler.handleModification(event);
+            }
+        });
     }
 }

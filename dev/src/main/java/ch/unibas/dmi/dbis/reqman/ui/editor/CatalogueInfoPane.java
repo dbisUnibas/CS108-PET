@@ -40,7 +40,7 @@ public class CatalogueInfoPane extends VBox {
     private Label dispPoints;
 
 
-    public CatalogueInfoPane(){
+    public CatalogueInfoPane() {
         super();
         catName = new SimpleStringProperty();
         catLecture = new SimpleStringProperty();
@@ -53,7 +53,7 @@ public class CatalogueInfoPane extends VBox {
         layoutComponents();
     }
 
-    public CatalogueInfoPane(String name, String lecture, String semester, double points){
+    public CatalogueInfoPane(String name, String lecture, String semester, double points) {
         this();
         setCatName(name);
         setCatLecture(lecture);
@@ -62,12 +62,63 @@ public class CatalogueInfoPane extends VBox {
 
     }
 
-    private void initComponents(){
+    public String getCatName() {
+        return catName.get();
+    }
+
+    public void setCatName(String name) {
+        catName.set(name);
+    }
+
+    public String getCatLecture() {
+        return catLecture.get();
+    }
+
+    public void setCatLecture(String lecture) {
+        catLecture.set(lecture);
+    }
+
+    public String getCatSemester() {
+        return catSemester.get();
+    }
+
+    public void setCatSemester(String semester) {
+        catSemester.set(semester);
+    }
+
+    public double getMaxPoints() {
+        return maxPoints.get();
+    }
+
+    public void setMaxPoints(double points) {
+        maxPoints.set(points);
+    }
+
+    public StringProperty catNameProperty() {
+        return catName;
+    }
+
+    public StringProperty catLectureProperty() {
+        return catLecture;
+    }
+
+    public StringProperty catSemesterProperty() {
+        return catSemester;
+    }
+
+    public DoubleProperty maxPointsProperty() {
+        return maxPoints;
+    }
+
+    String debugStyle() {
+        return dispName.getStyleClass().toString();
+    }
+
+    private void initComponents() {
         container = new TilePane();
         //container.setVgap(5);
         //container.setHgap(5);
         container.setPrefColumns(8);
-
 
 
         lblTitle = new Label(title);
@@ -94,9 +145,9 @@ public class CatalogueInfoPane extends VBox {
 
             @Override
             public Number fromString(String string) {
-                try{
+                try {
                     return Double.valueOf(string);
-                }catch(NumberFormatException ex){
+                } catch (NumberFormatException ex) {
                     EditorView.LOGGER_UI.warn("Caught NumberFormatException and setting value to 0.", ex);
                     return 0;
                 }
@@ -115,63 +166,9 @@ public class CatalogueInfoPane extends VBox {
         setPadding(new Insets(10));
     }
 
-
-    String debugStyle(){
-        return dispName.getStyleClass().toString();
-    }
-
-    private void layoutComponents(){
+    private void layoutComponents() {
         container.getChildren().addAll(lblName, dispName, lblLecture, dispLecture, lblSemester, dispSemester, lblPoints, dispPoints);
-        container.getChildren().forEach( n -> TilePane.setAlignment(n, Pos.CENTER_LEFT));
+        container.getChildren().forEach(n -> TilePane.setAlignment(n, Pos.CENTER_LEFT));
         getChildren().addAll(lblTitle, container);
-    }
-
-
-    public String getCatName(){
-        return catName.get();
-    }
-
-    public String getCatLecture(){
-        return catLecture.get();
-    }
-
-    public String getCatSemester(){
-        return catSemester.get();
-    }
-
-    public double getMaxPoints(){
-        return maxPoints.get();
-    }
-
-    public void setCatName(String name){
-        catName.set(name);
-    }
-
-    public void setCatLecture(String lecture){
-        catLecture.set(lecture);
-    }
-
-    public void setCatSemester(String semester){
-        catSemester.set(semester);
-    }
-
-    public void setMaxPoints(double points){
-        maxPoints.set(points);
-    }
-
-    public StringProperty catNameProperty(){
-        return catName;
-    }
-
-    public StringProperty catLectureProperty(){
-        return catLecture;
-    }
-
-    public StringProperty catSemesterProperty(){
-        return catSemester;
-    }
-
-    public DoubleProperty maxPointsProperty(){
-        return maxPoints;
     }
 }

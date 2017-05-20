@@ -6,10 +6,10 @@ import java.util.*;
 
 /**
  * A catalogue is a collection of {@link Milestone}s and {@link Requirement}s.
- *
+ * <p>
  * It represents the logical superset of associated milestones and requirements, forming a namespace.
  * A catalogue must have a name and may is associated with a lecture and date.
- *
+ * <p>
  * The catalogue class will be written serialized as a json object with jackson library.
  *
  * @author loris.sauter
@@ -42,10 +42,11 @@ public class Catalogue {
 
     /**
      * A constructor for creating a new catalogue with specified name, lecture and semester as well as a description provided.
-     * @param lecture The name of the lecture
-     * @param name The  name of the catalogue
+     *
+     * @param lecture     The name of the lecture
+     * @param name        The  name of the catalogue
      * @param description A description of a catalogue
-     * @param semester The semester for which this catalogue was designed
+     * @param semester    The semester for which this catalogue was designed
      */
     public Catalogue(String lecture, String name, String description, String semester) {
         this.lecture = lecture;
@@ -56,6 +57,7 @@ public class Catalogue {
 
     /**
      * Returns the lecture name this catalogue is associated with
+     *
      * @return The lecture name this catalogue is associated with
      */
     public String getLecture() {
@@ -64,6 +66,7 @@ public class Catalogue {
 
     /**
      * Sets the lecture name for which this catalogue is made
+     *
      * @param lecture The lecture name
      */
     public void setLecture(String lecture) {
@@ -73,6 +76,7 @@ public class Catalogue {
     /**
      * Returns this catalogue's name.
      * It will be referenced in {@link Group}s with this name.
+     *
      * @return The  name of this catalogue
      */
     public String getName() {
@@ -81,6 +85,7 @@ public class Catalogue {
 
     /**
      * Sets the name of this catalogue
+     *
      * @param name The (new) name of the catalogue
      */
     public void setName(String name) {
@@ -89,6 +94,7 @@ public class Catalogue {
 
     /**
      * Returns the description of this catalogue
+     *
      * @return The description of this catalogue
      */
     public String getDescription() {
@@ -97,6 +103,7 @@ public class Catalogue {
 
     /**
      * Sets (new) the description of this catalogue
+     *
      * @param description The (new) description of the catalogue
      */
     public void setDescription(String description) {
@@ -105,6 +112,7 @@ public class Catalogue {
 
     /**
      * Returns the semester of this catalogue
+     *
      * @return The semester of this catalogue
      */
     public String getSemester() {
@@ -113,6 +121,7 @@ public class Catalogue {
 
     /**
      * Sets the semester of this catalogue
+     *
      * @param semester The semester represented as a string
      */
     public void setSemester(String semester) {
@@ -122,6 +131,7 @@ public class Catalogue {
     /**
      * Checks if the given object and this object are equal.
      * In case the specified object is a catalogue, then the catalogue name's are checked if they are equal
+     *
      * @param o The object to test
      * @return TRUE if the specified catalogue's name is similar to this catalogue's name
      * @see Object#equals(Object)
@@ -137,12 +147,13 @@ public class Catalogue {
 
         Catalogue catalogue = (Catalogue) o;
 
-        return getName().equals(catalogue.getName() );
+        return getName().equals(catalogue.getName());
     }
 
     /**
      * Returns the hashcode of this object
      * IntelliJ default implementation,
+     *
      * @return the haschode of this object
      * @see Object#hashCode()
      */
@@ -159,36 +170,66 @@ public class Catalogue {
 
     /**
      * Adds the given milestone to the list of milestones.
+     *
      * @param milestone The milestone to add
      * @return the result: TRUE if the addition successfully has been performed
+     * @see List#add(Object)
      */
     public boolean addMilestone(Milestone milestone) {
         return milestones.add(milestone);
     }
 
+    /**
+     * Removes the given milestone from the list of of milestones.
+     *
+     * @param milestone The milestone to remove
+     * @return The result: TURE if the operation was successful
+     * @see List#remove(Object)
+     */
     public boolean removeMilestone(Milestone milestone) {
         return milestones.remove(milestone);
     }
 
+    /**
+     * Returns a copy of the milestone list
+     *
+     * @return List of milestones
+     */
     public List<Milestone> getMilestones() {
         return new ArrayList<>(milestones);
     }
 
-    public void setMilestones(List<Milestone> milestones) {
-        this.milestones = milestones;
+    /**
+     * Adds a requirement to the list of requirements.
+     *
+     * @param requirement The requirement to add
+     * @return The result of the {@link List#add(Object)} operation
+     */
+    public boolean addRequirement(Requirement requirement) {
+        addReqToInternalMap(requirement);
+        return requirements.add(requirement);
     }
 
-    public boolean addRequirement(Requirement requirement) {
-
+    /**
+     * Adds the given requirement to the internal storage.
+     * Internal storage references the map of minimal milestone <-> requirements
+     * @param requirement The requirement to add
+     */
+    private void addReqToInternalMap(Requirement requirement){
         if (reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()) != null) {
             reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).add(requirement);
         } else {
             List<Requirement> list = new ArrayList<>(Arrays.asList(requirement));
             reqsPerMinMS.put(requirement.getMinMilestoneOrdinal(), list);
         }
-        return requirements.add(requirement);
     }
 
+    /**
+     * Removes the specified requirements
+     *
+     * @param requirement The requirement to remove
+     * @return The result of the {@link List#remove(Object)} operation
+     */
     public boolean removeRequirement(Requirement requirement) {
         if (reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()) != null) {
             reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).remove(requirement);
@@ -197,34 +238,40 @@ public class Catalogue {
 
     }
 
+    /**
+     * Returns a copy of the requirements list
+     *
+     * @return The list of requirements
+     */
     public List<Requirement> getRequirements() {
         return new ArrayList<>(requirements);
     }
 
+    /**
+     * Returns the requirements list itself
+     *
+     * @return The list of requirements
+     */
     @JsonIgnore
-    public List<Requirement> requirementList(){
+    public List<Requirement> requirementList() {
         return requirements;
     }
 
-    public void setRequirements(List<Requirement> requirements) {
-        this.requirements = requirements;
-        this.reqsPerMinMS = new TreeMap<>();
-        requirements.forEach(this::addRequirementToMSMap);
-    }
-
-    public void addAllRequirements(Requirement... requirements) {
-        List<Requirement> list = new ArrayList<>(Arrays.asList(requirements));
-
-        this.requirements.addAll(list);
-
-        list.forEach(this::addRequirementToMSMap);
-
-    }
-
+    /**
+     * Adds all milestones passed to this method to the list of milestones.
+     *
+     * @param milestones The milestones to add to the list of milestones
+     */
     public void addAllMilestones(Milestone... milestones) {
         this.milestones.addAll(Arrays.asList(milestones));
     }
 
+    /**
+     * Returns the milestone which is identified by the given ordinal.
+     *
+     * @param ordinal The oridnal of the milestone
+     * @return The milestone with the ordinal specified or NULL if no such milestone exists
+     */
     public Milestone getMilestoneByOrdinal(int ordinal) {
         Milestone result = null;
         for (Milestone ms : milestones) {
@@ -235,6 +282,17 @@ public class Catalogue {
         return result;
     }
 
+    /**
+     * Returns a list of requirements which are associated with the specified milestone ordinal.
+     * A requirement is associated to a milestone ordinal iff:
+     * <ul>
+     * <li>{@link Requirement#getMinMilestoneOrdinal()} is less or equals the specified ordinal <b>and</b></li>
+     * <li>{@link Requirement#getMaxMilestoneOrdinal()} is greater or equals the specified ordinal</li>
+     * </ul>
+     *
+     * @param ordinal The ordinal of a milestone to get the requirements for
+     * @return The list of requirements associated with this ordinal or an empty list if no such associated requirements exist
+     */
     public List<Requirement> getRequirementsByMilestone(int ordinal) {
         ArrayList<Requirement> reqs = new ArrayList<>();
         for (Requirement r : requirements) {
@@ -245,14 +303,27 @@ public class Catalogue {
         return reqs;
     }
 
+    /**
+     * Returns a list of requirements which are available from the specified milestone ordinal on
+     *
+     * @param ordinal The oridnal of a milestone to get the requirements for
+     * @return The resulting list or NULL if no such milestone with the specified oridnal exists
+     */
     public List<Requirement> getRequirementsWithMinMS(int ordinal) {
         if (reqsPerMinMS.containsKey(ordinal)) {
-            return new ArrayList<Requirement>(reqsPerMinMS.get(ordinal));
+            return new ArrayList<>(reqsPerMinMS.get(ordinal));
         } else {
             return null;
         }
     }
 
+    /**
+     * Returns the sum of maximal available points of the specified milestone.
+     * Requirements which are malus or are not mandatory are ignored
+     *
+     * @param msOrdinal The milestone ordinal to get the sum of
+     * @return The sum of maximal available points of the specified milestone or 0 if no such milestone exists
+     */
     @JsonIgnore
     public double getSum(int msOrdinal) {
         List<Requirement> reqs = reqsPerMinMS.get(msOrdinal);
@@ -265,6 +336,13 @@ public class Catalogue {
         }
     }
 
+    /**
+     * Returns the sum of total maximal available points.
+     * Internally this method sums over all known milestones and their sums.
+     *
+     * @return The sum of total maximal available points or 0 if no requirements are present
+     * @see Catalogue#getSum(int)
+     */
     @JsonIgnore
     public double getSum() {
         List<Double> points = new ArrayList<>();
@@ -274,6 +352,12 @@ public class Catalogue {
         return points.stream().mapToDouble(Double::doubleValue).sum();
     }
 
+    /**
+     * Returns the requirement with the specified name
+     *
+     * @param name The name of the requirement to get
+     * @return The requirement with the specified name or NULL if no such requirement exists
+     */
     @JsonIgnore
     public Requirement getRequirementByName(String name) {
         for (Requirement r : requirements) {
@@ -284,6 +368,12 @@ public class Catalogue {
         return null;
     }
 
+    /**
+     * Checks if a requirement with that name already exists
+     *
+     * @param name The name to test
+     * @return TRUE if a requirement with the specified name already exists - FALSE otherwise
+     */
     @JsonIgnore
     public boolean containsRequirement(String name) {
         for (Requirement r : requirements) {
@@ -294,37 +384,60 @@ public class Catalogue {
         return false;
     }
 
+    /**
+     * Returns the requirement for the specified progress
+     *
+     * @param progress The progress for which the requirement is
+     * @return The requirement or NULL if no such requirement exists
+     */
     @JsonIgnore
     public Requirement getRequirementForProgress(Progress progress) {
         return getRequirementByName(progress.getRequirementName());
     }
 
+    /**
+     * Returns the milestone the progress was made on
+     *
+     * @param progress The progress to get the milestone for
+     * @return The milestone the progress was made on or NULL if no such milestone exists
+     */
     @JsonIgnore
     public Milestone getMilestoneForProgress(Progress progress) {
         return getMilestoneByOrdinal(progress.getMilestoneOrdinal());
     }
 
-    private void addRequirementToMSMap(Requirement requirement) {
-        int ordinal = requirement.getMinMilestoneOrdinal();
-        if (reqsPerMinMS.get(ordinal) != null) {
-            reqsPerMinMS.get(ordinal).add(requirement);
 
-        } else {
-            reqsPerMinMS.put(ordinal, new ArrayList<>(Arrays.asList(requirement)));
-        }
-    }
-
+    /**
+     * Returns the lastly used ordinal
+     *
+     * @return the lastyl used ordinal
+     */
     @JsonIgnore
     public int getLastOrdinal() {
-        if(milestones.isEmpty() ){
+        if (milestones.isEmpty()) {
             return 0;
         }
         ArrayList<Milestone> list = new ArrayList<>(getMilestones());
         list.sort(Comparator.comparingInt(Milestone::getOrdinal));
-        return list.get(list.size()-1).getOrdinal();
+        return list.get(list.size() - 1).getOrdinal();
     }
 
+    /**
+     * Returns the list of milestones
+     *
+     * @return The list of milestones
+     */
     public List<Milestone> milestoneList() {
         return milestones;
+    }
+
+    /**
+     * Re-syncs the requirements and ensures that all internal references of and to requirements are set correctly.
+     *
+     * When loading a catalogue from a JSON file the internal structure is not completely set up. Invoking
+     * this method after reading from a JSON file it is ensured that those internal structure is correct.
+     */
+    public void resyncRequirements(){
+        requirements.forEach(this::addReqToInternalMap);
     }
 }

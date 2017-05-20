@@ -7,28 +7,71 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 
 /**
- * TODO: write JavaDoc
+ * A {@link Group} tracks progress made in a catalogue.
+ * Technically may has any arbitrary size.
+ * <p>
+ * Group objects are directly serialized using jackson serialization and written as a json file to disk
  *
  * @author loris.sauter
  */
 public class Group implements Comparable<Group> {
 
+    /**
+     * The logger instance
+     */
     private static final Logger LOG = LogManager.getLogger(Group.class);
+
+    /**
+     * The name of the group, which must be unique
+     */
     private String name;
+
+    /**
+     * The name of the group's project.
+     * This is designed so groups may have artifical names such as group1, group2 etc and can have customized names on the same time.
+     */
     private String projectName;
+
+    /**
+     * The group members as a list of strings.
+     * A member is a string in a format as follows:
+     * <ul>
+     * <li>Variant 1: <code>name</code></li>
+     * <li>Variant 2: <code>name,surname</code></li>
+     * <li>Variant 3: <code>name,surname,email</code></li>
+     * </ul>
+     */
     private List<String> members;
+    /**
+     * The reference name of the catalogue this group tracks the progress of
+     */
     private String catalogueName;
+    /**
+     * The list of {@link Progress} of this group.
+     */
     private List<Progress> progressList = new ArrayList<>();
+    /**
+     * The list of {@link ProgressSummary} of this group
+     */
     private List<ProgressSummary> progressSummaries = new ArrayList<>();
+    /**
+     * The name of the file the default export goes to.
+     * Contains only the name of the file, location will be set by user upon export
+     */
     private String exportFileName;
+    /**
+     * The ReqMan version with which this group was last saved
+     */
     private String version;
 
-
-    public List<Progress> progressList(){
-        return progressList;
-    }
-
-
+    /**
+     * Creates a new group with the specified arguments
+     *
+     * @param name          The unique name of the group
+     * @param projectName   The optional project name
+     * @param members       The optional list of members
+     * @param catalogueName The name of the catalogue this group tracks progress of
+     */
     public Group(String name, String projectName, List<String> members, String catalogueName) {
 
         this.name = name;
@@ -37,8 +80,21 @@ public class Group implements Comparable<Group> {
         this.catalogueName = catalogueName;
     }
 
+    /**
+     * Creates a group without any property set.
+     * Default constructor
+     */
     public Group() {
 
+    }
+
+    /**
+     * Returns the list of {@link Progress}
+     *
+     * @return The list of {@link Progress}
+     */
+    public List<Progress> progressList() {
+        return progressList;
     }
 
     public String getVersion() {

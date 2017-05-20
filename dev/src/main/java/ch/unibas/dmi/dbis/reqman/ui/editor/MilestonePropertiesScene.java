@@ -63,18 +63,6 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
         return "Milestone Properties";
     }
 
-    private void loadMilestone() {
-        if (milestone != null) {
-            if (milestone.getName() != null && !milestone.getName().isEmpty()) {
-                tfName.setText(milestone.getName());
-            }
-            if (milestone.getDate() != null) {
-                inputDate.setValue(milestone.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-            }
-            lblOrdinal.setText(String.valueOf(milestone.getOrdinal()));
-        }
-    }
-
     @Override
     protected void populateScene() {
         Label lblName = new Label("Name");
@@ -101,5 +89,17 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
         grid.add(inputDate, 1, rowIndex++);
 
         grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
+    }
+
+    private void loadMilestone() {
+        if (milestone != null) {
+            if (milestone.getName() != null && !milestone.getName().isEmpty()) {
+                tfName.setText(milestone.getName());
+            }
+            if (milestone.getDate() != null) {
+                inputDate.setValue(milestone.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+            lblOrdinal.setText(String.valueOf(milestone.getOrdinal()));
+        }
     }
 }

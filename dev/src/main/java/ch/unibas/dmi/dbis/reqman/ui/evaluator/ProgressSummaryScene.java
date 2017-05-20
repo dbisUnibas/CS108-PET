@@ -67,13 +67,6 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
         return summary != null;
     }
 
-    private void loadSummary() {
-        if (summary != null) {
-            taInternal.setText(summary.getInternalComment());
-            taExternal.setText(summary.getExternalComment());
-        }
-    }
-
     @Override
     protected void populateScene() {
         Label lblGroup = new Label("Group");
@@ -103,5 +96,12 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
         rowIndex += 2;
 
         grid.add(buttons, 0, ++rowIndex, 2, 1);
+    }
+
+    private void loadSummary() {
+        if (summary != null) {
+            taInternal.setText(summary.getInternalComment());
+            taExternal.setText(summary.getExternalComment());
+        }
     }
 }

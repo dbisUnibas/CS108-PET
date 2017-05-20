@@ -55,13 +55,14 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     private ObservableList<MetaKeyValuePair> metaData;
 
     private EditorHandler handler;
-    public RequirementPropertiesScene(EditorHandler handler){
+
+    public RequirementPropertiesScene(EditorHandler handler) {
         super();
         this.handler = handler;
         populateScene();
     }
 
-    public RequirementPropertiesScene(EditorHandler handler, Requirement requirement){
+    public RequirementPropertiesScene(EditorHandler handler, Requirement requirement) {
         this(handler);
         this.requirement = requirement;
         loadRequirement();
@@ -70,7 +71,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
                 "\t1) Open all groups before changing the name - then the progress is automatically updated.[recommended]\n" +
                 "\t2) Open the group files and rename the progress manually [not recommended]");
     }
-
 
 
     public void handleSaving(ActionEvent event) {
@@ -122,6 +122,162 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     @Override
     public String getPromptTitle() {
         return "Requirement Properties";
+    }
+
+    @Override
+    protected void populateScene() {
+        ScrollPane scrollPane = new ScrollPane();
+        Label lblName = new Label("Name*");
+        Label lblDesc = new Label("Description");
+        Label lblMinMS = new Label("Minimal Milestone*");
+        Label lblMaxMS = new Label("Maximal Milestone");
+        Label lblMaxPoints = new Label("Maximal Points");
+        Label lblBinary = new Label("Binary");
+        Label lblMandatory = new Label("Mandatory");
+        Label lblMalus = new Label("Malus");
+        Label lblPredecessors = new Label("Predecessors");
+        Label lblProps = new Label("Meta Data");
+
+        loadRequirement();
+        loadProperties();
+        loadMilestoneNames();
+
+        HBox minMSBox = new HBox();
+        minMSBox.setStyle("-fx-spacing: 10px;");
+        Button newMinMS = new Button("New ...");
+        newMinMS.setOnAction(this::handleNewMinMS);
+        minMSBox.getChildren().addAll(cbMinMS, newMinMS);
+
+        HBox maxMSBox = new HBox();
+        maxMSBox.setStyle("-fx-spacing: 10px;");
+        Button newMaxMS = new Button("New ...");
+        newMaxMS.setOnAction(this::handleNewMaxMS);
+        maxMSBox.getChildren().addAll(cbMaxMS, newMaxMS);
+        cbMinMS.setCellFactory((ListView<Milestone> l) -> new MilestoneCell());
+        cbMinMS.setOnAction(event -> {
+            // Make so that the maxMS is set to the same value as this one. (initially as soon as this one is set)
+            Milestone selected = cbMinMS.getSelectionModel().getSelectedItem();
+            Milestone target = cbMaxMS.getSelectionModel().getSelectedItem();
+            if (selected != null && target == null) {
+                cbMaxMS.getSelectionModel().select(selected);
+            }
+        });
+        cbMinMS.setButtonCell(new MilestoneCell());
+        cbMaxMS.setCellFactory((ListView<Milestone> lv) -> new MilestoneCell());
+        cbMaxMS.setButtonCell(new MilestoneCell());
+
+        cbMinMS.setItems(milestoneList);
+        cbMaxMS.setItems(milestoneList); // NOTE: This is intentionally the same list
+
+
+        spinnerPoints.setEditable(true);
+        // Solution by: http://stackoverflow.com/a/39380146
+        spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue) {
+                spinnerPoints.increment(0);
+            }
+        });
+
+        BorderPane inputPredecessors = createPredecessorChoice();
+        inputPredecessors.setPrefSize(300, 300);
+
+        SaveCancelPane buttonWrapper = new SaveCancelPane();
+
+        buttonWrapper.setOnSave(this::handleSaving);
+
+        buttonWrapper.setOnCancel(event -> getWindow().hide());
+
+        HBox binaryGroup = new HBox();
+        binaryGroup.setStyle("-fx-spacing: 10px");
+        ToggleGroup binaryButtons = new ToggleGroup();
+        binaryYes.setToggleGroup(binaryButtons);
+        binaryNo.setToggleGroup(binaryButtons);
+        binaryNo.setSelected(true);
+        binaryGroup.getChildren().addAll(lblBinary, binaryYes, binaryNo);
+
+
+        HBox mandatoryGroup = new HBox();
+        mandatoryGroup.setStyle("-fx-spacing: 10px");
+        ToggleGroup mandatoryButtons = new ToggleGroup();
+        mandatoryYes.setToggleGroup(mandatoryButtons);
+        mandatoryNo.setToggleGroup(mandatoryButtons);
+        mandatoryYes.setSelected(true);
+        mandatoryGroup.getChildren().addAll(lblMandatory, mandatoryYes, mandatoryNo);
+
+
+        HBox malusGroup = new HBox();
+        malusGroup.setStyle("-fx-spacing: 10px");
+        ToggleGroup malusButtons = new ToggleGroup();
+        malusYes.setToggleGroup(malusButtons);
+        malusNo.setToggleGroup(malusButtons);
+        malusNo.setSelected(true);
+        malusGroup.getChildren().addAll(lblMalus, malusYes, malusNo);
+
+        GridPane groupWrapper = new GridPane();
+        groupWrapper.setPadding(new Insets(0, 10, 0, 10));
+        groupWrapper.add(binaryGroup, 0, 0);
+        GridPane.setHgrow(binaryGroup, Priority.ALWAYS);
+        groupWrapper.add(mandatoryGroup, 1, 0);
+        GridPane.setHgrow(mandatoryGroup, Priority.ALWAYS);
+        groupWrapper.add(malusGroup, 2, 0);
+        GridPane.setHgrow(malusGroup, Priority.ALWAYS);
+
+        int leftColsRow = 0;
+        int rightColsRow = 0;
+        // First pair of columns
+
+        grid.add(lblName, 0, leftColsRow);
+        grid.add(tfName, 1, leftColsRow++);
+
+        grid.add(lblDesc, 0, leftColsRow);
+        grid.add(taDesc, 1, leftColsRow, 1, 2);
+        taDesc.setPrefSize(300, 200); // in relation to other pref size settings
+        leftColsRow += 2; // Skip two rows
+
+        grid.add(lblMaxPoints, 0, leftColsRow);
+        grid.add(spinnerPoints, 1, leftColsRow++);
+
+        grid.add(lblMinMS, 0, leftColsRow);
+        grid.add(minMSBox, 1, leftColsRow++);
+
+        grid.add(lblMaxMS, 0, leftColsRow);
+        grid.add(maxMSBox, 1, leftColsRow++);
+
+        GridPane.setValignment(lblMaxMS, VPos.TOP);
+        lblMaxMS.setPadding(new Insets(5, 0, 0, 0));// makes it appear like the others
+
+        // second pair of columns: one column gap
+        // Predecessor list
+        grid.add(lblPredecessors, 3, rightColsRow);
+        grid.add(inputPredecessors, 4, rightColsRow, 1, 3);
+        rightColsRow += 3;
+
+        grid.add(lblProps, 3, rightColsRow);
+        grid.add(table, 4, rightColsRow, 1, 3);
+        rightColsRow += 3;
+
+
+        // Sets the pref size of the table - this is rather an experimental value, but it smallers the size of the grid.
+        table.setPrefSize(300, 300);
+
+        // separator
+        grid.add(new Separator(), 0, leftColsRow++, 5, 1);
+        // RadioButton groups
+        grid.add(groupWrapper, 0, leftColsRow++, 5, 1);
+        GridPane.setHgrow(groupWrapper, Priority.ALWAYS);
+        // Separator
+        grid.add(new Separator(), 0, leftColsRow++, 5, 1);
+
+
+        // Buttons, last row
+        grid.add(buttonWrapper, 1, leftColsRow, 5, 1);
+
+
+        scrollPane.setContent(grid);
+        setRoot(scrollPane);
+
+        grid.setPrefHeight(700); // Hacky solution, due to strangely incresed height.
+        grid.setAlignment(Pos.CENTER);
     }
 
     private void loadRequirement() {
@@ -332,162 +488,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         if (tableData.isEmpty()) {
             setMetaListOnlyEmpty();
         }
-    }
-
-    @Override
-    protected void populateScene() {
-        ScrollPane scrollPane = new ScrollPane();
-        Label lblName = new Label("Name*");
-        Label lblDesc = new Label("Description");
-        Label lblMinMS = new Label("Minimal Milestone*");
-        Label lblMaxMS = new Label("Maximal Milestone");
-        Label lblMaxPoints = new Label("Maximal Points");
-        Label lblBinary = new Label("Binary");
-        Label lblMandatory = new Label("Mandatory");
-        Label lblMalus = new Label("Malus");
-        Label lblPredecessors = new Label("Predecessors");
-        Label lblProps = new Label("Meta Data");
-
-        loadRequirement();
-        loadProperties();
-        loadMilestoneNames();
-
-        HBox minMSBox = new HBox();
-        minMSBox.setStyle("-fx-spacing: 10px;");
-        Button newMinMS = new Button("New ...");
-        newMinMS.setOnAction(this::handleNewMinMS);
-        minMSBox.getChildren().addAll(cbMinMS, newMinMS);
-
-        HBox maxMSBox = new HBox();
-        maxMSBox.setStyle("-fx-spacing: 10px;");
-        Button newMaxMS = new Button("New ...");
-        newMaxMS.setOnAction(this::handleNewMaxMS);
-        maxMSBox.getChildren().addAll(cbMaxMS, newMaxMS);
-        cbMinMS.setCellFactory((ListView<Milestone> l) -> new MilestoneCell());
-        cbMinMS.setOnAction(event -> {
-            // Make so that the maxMS is set to the same value as this one. (initially as soon as this one is set)
-            Milestone selected = cbMinMS.getSelectionModel().getSelectedItem();
-            Milestone target = cbMaxMS.getSelectionModel().getSelectedItem();
-            if (selected != null && target == null) {
-                cbMaxMS.getSelectionModel().select(selected);
-            }
-        });
-        cbMinMS.setButtonCell(new MilestoneCell());
-        cbMaxMS.setCellFactory((ListView<Milestone> lv) -> new MilestoneCell());
-        cbMaxMS.setButtonCell(new MilestoneCell());
-
-        cbMinMS.setItems(milestoneList);
-        cbMaxMS.setItems(milestoneList); // NOTE: This is intentionally the same list
-
-
-        spinnerPoints.setEditable(true);
-        // Solution by: http://stackoverflow.com/a/39380146
-        spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-                spinnerPoints.increment(0);
-            }
-        });
-
-        BorderPane inputPredecessors = createPredecessorChoice();
-        inputPredecessors.setPrefSize(300, 300);
-
-        SaveCancelPane buttonWrapper = new SaveCancelPane();
-
-        buttonWrapper.setOnSave(this::handleSaving);
-
-        buttonWrapper.setOnCancel(event -> getWindow().hide());
-
-        HBox binaryGroup = new HBox();
-        binaryGroup.setStyle("-fx-spacing: 10px");
-        ToggleGroup binaryButtons = new ToggleGroup();
-        binaryYes.setToggleGroup(binaryButtons);
-        binaryNo.setToggleGroup(binaryButtons);
-        binaryNo.setSelected(true);
-        binaryGroup.getChildren().addAll(lblBinary, binaryYes, binaryNo);
-
-
-        HBox mandatoryGroup = new HBox();
-        mandatoryGroup.setStyle("-fx-spacing: 10px");
-        ToggleGroup mandatoryButtons = new ToggleGroup();
-        mandatoryYes.setToggleGroup(mandatoryButtons);
-        mandatoryNo.setToggleGroup(mandatoryButtons);
-        mandatoryYes.setSelected(true);
-        mandatoryGroup.getChildren().addAll(lblMandatory, mandatoryYes, mandatoryNo);
-
-
-        HBox malusGroup = new HBox();
-        malusGroup.setStyle("-fx-spacing: 10px");
-        ToggleGroup malusButtons = new ToggleGroup();
-        malusYes.setToggleGroup(malusButtons);
-        malusNo.setToggleGroup(malusButtons);
-        malusNo.setSelected(true);
-        malusGroup.getChildren().addAll(lblMalus, malusYes, malusNo);
-
-        GridPane groupWrapper = new GridPane();
-        groupWrapper.setPadding(new Insets(0, 10, 0, 10));
-        groupWrapper.add(binaryGroup, 0, 0);
-        GridPane.setHgrow(binaryGroup, Priority.ALWAYS);
-        groupWrapper.add(mandatoryGroup, 1, 0);
-        GridPane.setHgrow(mandatoryGroup, Priority.ALWAYS);
-        groupWrapper.add(malusGroup, 2, 0);
-        GridPane.setHgrow(malusGroup, Priority.ALWAYS);
-
-        int leftColsRow = 0;
-        int rightColsRow = 0;
-        // First pair of columns
-
-        grid.add(lblName, 0, leftColsRow);
-        grid.add(tfName, 1, leftColsRow++);
-
-        grid.add(lblDesc, 0, leftColsRow);
-        grid.add(taDesc, 1, leftColsRow, 1, 2);
-        taDesc.setPrefSize(300, 200); // in relation to other pref size settings
-        leftColsRow += 2; // Skip two rows
-
-        grid.add(lblMaxPoints, 0, leftColsRow);
-        grid.add(spinnerPoints, 1, leftColsRow++);
-
-        grid.add(lblMinMS, 0, leftColsRow);
-        grid.add(minMSBox, 1, leftColsRow++);
-
-        grid.add(lblMaxMS, 0, leftColsRow);
-        grid.add(maxMSBox, 1, leftColsRow++);
-
-        GridPane.setValignment(lblMaxMS, VPos.TOP);
-        lblMaxMS.setPadding(new Insets(5, 0, 0, 0));// makes it appear like the others
-
-        // second pair of columns: one column gap
-        // Predecessor list
-        grid.add(lblPredecessors, 3, rightColsRow);
-        grid.add(inputPredecessors, 4, rightColsRow, 1, 3);
-        rightColsRow += 3;
-
-        grid.add(lblProps, 3, rightColsRow);
-        grid.add(table, 4, rightColsRow, 1, 3);
-        rightColsRow += 3;
-
-
-        // Sets the pref size of the table - this is rather an experimental value, but it smallers the size of the grid.
-        table.setPrefSize(300, 300);
-
-        // separator
-        grid.add(new Separator(), 0, leftColsRow++, 5, 1);
-        // RadioButton groups
-        grid.add(groupWrapper, 0, leftColsRow++, 5, 1);
-        GridPane.setHgrow(groupWrapper, Priority.ALWAYS);
-        // Separator
-        grid.add(new Separator(), 0, leftColsRow++, 5, 1);
-
-
-        // Buttons, last row
-        grid.add(buttonWrapper, 1, leftColsRow, 5, 1);
-
-
-        scrollPane.setContent(grid);
-        setRoot(scrollPane);
-
-        grid.setPrefHeight(700); // Hacky solution, due to strangely incresed height.
-        grid.setAlignment(Pos.CENTER);
     }
 
     public static class MetaKeyValuePair {

@@ -74,11 +74,59 @@ public class ProgressView extends VBox {
         loadProgress();
     }
 
-    private boolean hasPercentageChanged(){
+    public Milestone getActiveMilestone() {
+        return active;
+    }
+
+    public void setActiveMilestone(Milestone active) {
+        this.active = active;
+    }
+
+    public Requirement getRequirement() {
+        return requirement;
+    }
+
+    public Progress getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Progress progress) {
+        this.progress = progress;
+    }
+
+    public void addPointsChangeListener(PointsChangeListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removePointsChangeListener(PointsChangeListener listener) {
+        listeners.remove(listener);
+    }
+
+    void addDirtyListener(DirtyListener listener) {
+        dirtyListeners.add(listener);
+    }
+
+    void removeDirtyList(DirtyListener listener) {
+        dirtyListeners.remove(listener);
+    }
+
+    void markSaved() {
+        // TODO: Implement for spinner
+        LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: selected: %b/%b -> last: %b/%b", progress.getRequirementName(), yesBtn.isSelected(), noBtn.isSelected(), previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
+        if (yesBtn != null && noBtn != null) {
+            previousSavedYesNoConfig[0] = yesBtn.isSelected();
+            previousSavedYesNoConfig[1] = noBtn.isSelected();
+            LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: -> last: %b/%b", progress.getRequirementName(), previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
+        } else if (spinnerPoints != null) {
+            previousSavedFraction = progress.getPercentage();
+        }
+    }
+
+    private boolean hasPercentageChanged() {
         return Double.compare(previousSavedFraction, progress.getPercentage()) != 0;
     }
 
-    private boolean hasYesNoConfigChaned(boolean yesSelected, boolean noSelected){
+    private boolean hasYesNoConfigChaned(boolean yesSelected, boolean noSelected) {
         LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: selected: %b/%b (%b) - last: %b/%b", progress.getRequirementName(), yesSelected, noSelected, first, previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
         /*if(first){
             first = false;
@@ -136,34 +184,6 @@ public class ProgressView extends VBox {
             notifyDirtyListeners(false);
         }
 
-    }
-
-    public Milestone getActiveMilestone() {
-        return active;
-    }
-
-    public void setActiveMilestone(Milestone active) {
-        this.active = active;
-    }
-
-    public Requirement getRequirement() {
-        return requirement;
-    }
-
-    public Progress getProgress() {
-        return progress;
-    }
-
-    public void setProgress(Progress progress) {
-        this.progress = progress;
-    }
-
-    public void addPointsChangeListener(PointsChangeListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removePointsChangeListener(PointsChangeListener listener) {
-        listeners.remove(listener);
     }
 
     private void loadProgress() {
@@ -312,27 +332,7 @@ public class ProgressView extends VBox {
         listeners.forEach(l -> l.pointsChanged(progress.getPoints()));
     }
 
-    void addDirtyListener(DirtyListener listener) {
-        dirtyListeners.add(listener);
-    }
-
-    void removeDirtyList(DirtyListener listener) {
-        dirtyListeners.remove(listener);
-    }
-
     private void notifyDirtyListeners(boolean dirty) {
         dirtyListeners.forEach(listener -> listener.mark(dirty));
-    }
-
-    void markSaved() {
-        // TODO: Implement for spinner
-        LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: selected: %b/%b -> last: %b/%b", progress.getRequirementName(), yesBtn.isSelected(), noBtn.isSelected(), previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
-        if (yesBtn != null && noBtn != null) {
-            previousSavedYesNoConfig[0] = yesBtn.isSelected();
-            previousSavedYesNoConfig[1] = noBtn.isSelected();
-            LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: -> last: %b/%b", progress.getRequirementName(), previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
-        }else if(spinnerPoints != null){
-            previousSavedFraction = progress.getPercentage();
-        }
     }
 }

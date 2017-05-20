@@ -71,16 +71,6 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
 
     }
 
-    private void loadCatalogue() {
-        if (catalogue != null) {
-            tfLecture.setText(catalogue.getLecture());
-            tfName.setText(catalogue.getName());
-            taDesc.setText(catalogue.getDescription());
-            tfSemester.setText(catalogue.getSemester());
-        }
-
-    }
-
     @Override
     protected void populateScene() {
         Label lblLecture = new Label("Lecture");
@@ -110,6 +100,16 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
         grid.add(taDesc, 1, rowIndex, 1, 3);
         rowIndex += 3;
         grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
+    }
+
+    private void loadCatalogue() {
+        if (catalogue != null) {
+            tfLecture.setText(catalogue.getLecture());
+            tfName.setText(catalogue.getName());
+            taDesc.setText(catalogue.getDescription());
+            tfSemester.setText(catalogue.getSemester());
+        }
+
     }
 
 }

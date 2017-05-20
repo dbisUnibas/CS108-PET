@@ -47,23 +47,33 @@ public class OperationFactory {
         return createOperationForTask(task, true);
     }
 
-    public static CheckedAsynchronousOperation<Boolean> createSaveGroupOperation(File file, Group group){
-        SaveGroupTask task = new SaveGroupTask(file,group);
+    public static CheckedAsynchronousOperation<Boolean> createSaveGroupOperation(File file, Group group) {
+        SaveGroupTask task = new SaveGroupTask(file, group);
         return createOperationForTask(task, true);
     }
 
-    public static CheckedAsynchronousOperation<Boolean> createExportMultipleGroupsOperation(File dir, List<Group> groups, Catalogue catalogue){
+    public static CheckedAsynchronousOperation<Boolean> createExportMultipleGroupsOperation(File dir, List<Group> groups, Catalogue catalogue) {
         ExportMultipleGroupTask task = new ExportMultipleGroupTask(dir, groups, catalogue);
         return createOperationForTask(task, true);
     }
 
-    public static CheckedAsynchronousOperation<Boolean> createSaveAsBackupOperation(Group group, File catFile){
-        SaveGroupBackupTask task = new SaveGroupBackupTask(group,catFile);
+    public static CheckedAsynchronousOperation<Boolean> createSaveAsBackupOperation(Group group, File catFile) {
+        SaveGroupBackupTask task = new SaveGroupBackupTask(group, catFile);
         return createOperationForTask(task, false); // deamon=false ensures finish execution before closing application
     }
 
-    public static CheckedAsynchronousOperation<List<OpenBackupsTask.BackupObject>> createOpenBackupsOperation(){
+    public static CheckedAsynchronousOperation<List<OpenBackupsTask.BackupObject>> createOpenBackupsOperation() {
         OpenBackupsTask task = new OpenBackupsTask();
+        return createOperationForTask(task, true);
+    }
+
+    public static CheckedAsynchronousOperation<List<Group>> createOpenMultipleGroupOperation(List<File> files) {
+        OpenMultipleGroupsTask task = new OpenMultipleGroupsTask(files);
+        return createOperationForTask(task, true);
+    }
+
+    public static CheckedAsynchronousOperation<Boolean> createExportOverviewOperation(OverviewSnapshot snapshot, File exportFile) {
+        ExportOverviewTask task = new ExportOverviewTask(snapshot, exportFile);
         return createOperationForTask(task, true);
     }
 
@@ -71,17 +81,6 @@ public class OperationFactory {
         CheckedAsynchronousOperation<T> op = new CheckedAsynchronousOperation<T>(task, deamon);
         bindStatusBar(op);
         return op;
-    }
-
-
-    public static CheckedAsynchronousOperation<List<Group>> createOpenMultipleGroupOperation(List<File> files) {
-        OpenMultipleGroupsTask task = new OpenMultipleGroupsTask(files);
-        return createOperationForTask(task, true);
-    }
-
-    public static CheckedAsynchronousOperation<Boolean> createExportOverviewOperation(OverviewSnapshot snapshot, File exportFile){
-        ExportOverviewTask task = new ExportOverviewTask(snapshot, exportFile);
-        return createOperationForTask(task, true);
     }
 
     private static <T> void bindStatusBar(CheckedAsynchronousOperation<T> operation) {

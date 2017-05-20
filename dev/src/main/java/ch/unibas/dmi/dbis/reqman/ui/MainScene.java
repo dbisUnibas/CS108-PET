@@ -34,66 +34,37 @@ public class MainScene extends TitledScene {
 
     private Mode active;
 
-    boolean isEditorActive() {
-        return active == Mode.EDITOR;
-    }
-
-    boolean isEvaluatorActive(){
-        return active == Mode.EVALUATOR;
-    }
-
-    enum Mode{
-        EDITOR,
-        EVALUATOR
-    }
-
-    MainScene(){
-        super(new Region(), 800,600);
+    MainScene() {
+        super(new Region(), 800, 600);
         initComponents();
         layoutComponents();
         getRoot().getStylesheets().add("style.css");
     }
 
-    void stop(){
+    @Override
+    public String getTitle() {
+        String mode = active.equals(Mode.EDITOR) ? "Editor" : "Evaluator";
+        return String.format("ReqMan %s (%s)", mode, Version.getInstance().getVersion());
+    }
+
+    boolean isEditorActive() {
+        return active == Mode.EDITOR;
+    }
+
+    boolean isEvaluatorActive() {
+        return active == Mode.EVALUATOR;
+    }
+
+    void stop() {
         mainHandler.stop();
     }
 
-    Mode getActiveMode(){
+    Mode getActiveMode() {
         return active;
     }
 
-    private void initComponents(){
-        root = new BorderPane();
-        topContainer = new VBox();
-
-        editorHandler = new EditorHandler();
-        editor = new EditorView(editorHandler);
-        evaluatorHandler = new EvaluatorHandler();
-        evaluator = new EvaluatorView(evaluatorHandler);
-
-        statusBar = new StatusBar();
-
-        mainHandler = new MainHandler(evaluatorHandler,editorHandler);
-        mainHandler.setMainScene(this);
-        mainHandler.setStatusBar(statusBar);
-
-        menuManager.setMenuHandler(mainHandler);
-
-
-        setActive(Mode.EVALUATOR);
-        menuManager.disableGroupNeeded();
-    }
-
-    private void layoutComponents(){
-        setRoot(root);
-        root.setTop(topContainer);
-        topContainer.getChildren().add(menuManager.getMenuBar() );
-        root.setBottom(statusBar);
-        mainHandler.checkGroupsPresent();
-    }
-
-    void setActive(Mode mode){
-        switch (mode){
+    void setActive(Mode mode) {
+        switch (mode) {
             case EDITOR:
                 root.setCenter(editor);
                 editor.refresh();
@@ -110,14 +81,42 @@ public class MainScene extends TitledScene {
         active = mode;
     }
 
-
-    @Override
-    public String getTitle() {
-        String mode = active.equals(Mode.EDITOR) ? "Editor" : "Evaluator";
-        return String.format("ReqMan %s (%s)", mode, Version.getInstance().getVersion());
-    }
-
     void indicateWaiting(boolean waiting) {
         getRoot().setCursor(waiting ? Cursor.WAIT : Cursor.DEFAULT);
+    }
+
+    private void initComponents() {
+        root = new BorderPane();
+        topContainer = new VBox();
+
+        editorHandler = new EditorHandler();
+        editor = new EditorView(editorHandler);
+        evaluatorHandler = new EvaluatorHandler();
+        evaluator = new EvaluatorView(evaluatorHandler);
+
+        statusBar = new StatusBar();
+
+        mainHandler = new MainHandler(evaluatorHandler, editorHandler);
+        mainHandler.setMainScene(this);
+        mainHandler.setStatusBar(statusBar);
+
+        menuManager.setMenuHandler(mainHandler);
+
+
+        setActive(Mode.EVALUATOR);
+        menuManager.disableGroupNeeded();
+    }
+
+    private void layoutComponents() {
+        setRoot(root);
+        root.setTop(topContainer);
+        topContainer.getChildren().add(menuManager.getMenuBar());
+        root.setBottom(statusBar);
+        mainHandler.checkGroupsPresent();
+    }
+
+    enum Mode {
+        EDITOR,
+        EVALUATOR
     }
 }

@@ -1,10 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
-import ch.unibas.dmi.dbis.reqman.common.Callback;
-import ch.unibas.dmi.dbis.reqman.common.ThrowingCallback;
 import ch.unibas.dmi.dbis.reqman.core.*;
-import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -21,16 +17,33 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * TODO: Write JavaDoc
+ * The {@link EntityManager} manages the (core) entities of ReqMan.
+ *
+ * The manager is responsible to sync the UI-accessible elements with the underlying data structure.
+ * All I/O operations are started via this class.
+ *
+ * This class is a singleton.
  *
  * @author loris.sauter
  */
 public class EntityManager {
 
+    /**
+     * The backup file extension
+     */
     public static final String BACKUP_EXTENSION = "backup";
+    /**
+     * The key for the group property of the backup file
+     */
     public static final String GROUP_KEY = "group";
+    /**
+     * The key for the catalogue property of the backup file
+     */
     public static final String CATALOGUE_KEY = "catalogue";
     private static final Logger LOGGER = LogManager.getLogger(EntityManager.class);
+    /**
+     * The file filter which filters everything but <code>.backup</code> files
+     */
     public static final FileFilter BACKUP_FILTER = (file) -> {
         if (file.isDirectory()) {
             return false;
@@ -50,30 +63,77 @@ public class EntityManager {
             return false;
         }
     };
+    /**
+     * The instance
+     */
     private static EntityManager instance = null;
+    /**
+     * The property to display the max sum of the points
+     */
     private final SimpleDoubleProperty maxSumProperty = new SimpleDoubleProperty();
     /* === COMMON === */
+    /**
+     * The currently loaded catalogue
+     */
     private Catalogue catalogue = null;
+    /**
+     * The catalogue file
+     */
     private File catalogueFile = null;
+    /**
+     * The last opened location
+     */
     private File lastOpenLocation = null;
+    /**
+     * The last saved location
+     */
     private File lastSaveLocation = null;
+    /**
+     * The last exported location
+     */
     private File lastExportLocation = null;
     /* === CATALOGUE / EDITOR  RELATED === */
+    /**
+     * The observable list of requirements
+     */
     private ObservableList<Requirement> observableRequirements;
+    /**
+     * The observable list of milestones
+     */
     private ObservableList<Milestone> observableMilestones;
     /* === EVALUATOR RELATED === */
+    /**
+     * The observable list of groups
+     */
     private ObservableList<Group> groups = FXCollections.observableArrayList();
+    /**
+     * The map groupname : savefile
+     */
     private HashMap<String, File> groupFileMap = new HashMap<>();
+    /**
+     * The last opened group
+     */
     private Group lastOpenedGroup = null;
+    /**
+     * The last used ordinal
+     */
     private int lastOrdinal = -1;
+    /**
+     * The last occured exception while opening
+     */
     private Exception lastOpenException = null;
-    @Deprecated
-    private StatusBar statusBar;
 
+    /**
+     * Since a singleton: private constructor
+     */
     private EntityManager() {
 
     }
 
+    /**
+     * Returns the instance of the {@link EntityManager}
+     * @return
+     */
     public static EntityManager getInstance() {
         LOGGER.traceEntry();
         if (instance == null) {
@@ -83,44 +143,37 @@ public class EntityManager {
         return instance;
     }
 
-    private static Thread createDeamon(ManagementTask task) {
-        Thread thread = new Thread(task);
-        thread.setDaemon(true); // silently shutsdown upon exiting
-
-        task.setOnFailed(event -> {
-            throw new RuntimeException("Opening failed: ", task.getException());
-        });
-        return thread;
-    }
-
-    private static void runTaskThrowing(ThrowingManagementTask task, ThrowingCallback internalCallback, Callback doneCallback) {
-        Thread deamon = createDeamon(task);
-        if (internalCallback != null) {
-            task.setThrowingOnSucceeded(event -> {
-                internalCallback.callThrowing();
-
-                if (doneCallback != null) {
-                    doneCallback.apply(null);
-                }
-
-            });
-        }
-        deamon.start();
-    }
-
+    /**
+     * Returns the observable group list as an object reference
+     * @return The observable group list.
+     */
     public ObservableList<Group> groupList() {
         return groups;
     }
 
+    /**
+     * Returns the observable requirement list as an object reference
+     * @return The observable requirement list
+     */
     public ObservableList<Requirement> getObservableRequirements() {
         return observableRequirements;
     }
 
+    /**
+     * Returns the observable milestone list as an object reference
+     * @return The observable milestone list.
+     */
     public ObservableList<Milestone> getObservableMilestones() {
         return observableMilestones;
     }
 
     /**
+     * Loads the catalogue from the specified catalogue file.
+     *
+     * Once the loading has completed, the given doneProcessor processes the catalogue
+     *
+     * <p>Asynchronous I/O operation:<br />
+     * Starts a {@link CheckedAsynchronousOperation} with an {@link OpenCatalogueTask}.</p>
      * @param file nontnull
      */
     public void openCatalogue(File file, Consumer<Catalogue> doneProcessor) throws IllegalStateException {
@@ -144,26 +197,49 @@ public class EntityManager {
 
     }
 
+    /**
+     * Checks whether a catalogue file is present.
+     * A newly created, unsaved catalogue has no file associated. Otherwise it has a savefile associated
+     * and this method returns true.
+     * @return TRUE if the currently active catalogue has a save file associated or FALSE if not.
+     */
     public boolean isCatalogueFilePresent() {
         return catalogueFile != null;
     }
 
     /**
-     * caller must ensure via isCatalogueFilePresent if catalogue can be saved
+     * Saves the currently active catalogue to its savefile, in case there is one provided.
+     * Otherwise it will fail, therefore before invoking this method, calling {@link EntityManager#isCatalogueFilePresent()}
+     * is mandatory.
+     * @see EntityManager#saveCatalogue(File)
      */
     public void saveCatalogue() {
         saveCatalogue(catalogueFile);
     }
 
-    @Deprecated // Remove when fully async implemented
-    public void setStatusBar(StatusBar statusBar) {
-        this.statusBar = statusBar;
-    }
-
+    /**
+     * Saves the currently active catalogue at the specified location.
+     * @param file The location to save the catalogue to.
+     */
     public void saveAsCatalogue(File file) {
         saveCatalogue(file);
     }
 
+    /**
+     * Exports the currently active catalogue to the specified location.
+     *
+     * The export workflow is as follows:
+     * <ol>
+     *     <li>Find template configuration</li>
+     *     <li>Parse template configuration</li>
+     *     <li>Render catalogue based on provided templates</li>
+     *     <li>Write export to disk</li>
+     * </ol>
+     *
+     * <p>Asynchronous I/O operation:<br />
+     * Starts a {@link CheckedAsynchronousOperation} with an {@link ExportCatalogueTask}</p>
+     * @param file The file to write the catalogue export into. If null, the export fails
+     */
     public void exportCatalogue(File file) {
         LOGGER.traceEntry();
         CheckedAsynchronousOperation<Boolean> op = OperationFactory.createExportCatalogueOperation(catalogue, file);
@@ -279,15 +355,6 @@ public class EntityManager {
         }
     }
 
-    private void updateProgress(Requirement oldReq, Requirement newReq) {
-        groups.forEach(g -> {
-            Progress p = getProgressForRequirement(g, oldReq);
-            if(p != null){
-                p.setRequirementName(newReq.getName() );
-            }
-        });
-    }
-
     public void modifyCatalogue(Catalogue mod) {
         LOGGER.traceEntry();
         catalogue.setName(mod.getName());
@@ -303,6 +370,7 @@ public class EntityManager {
     public void setCatalogue(Catalogue catalogue) {
         LOGGER.debug("Setting catalogue %s", catalogue);
         this.catalogue = catalogue;
+        this.catalogue.resyncRequirements();
         observableRequirements = FXCollections.observableList(catalogue.requirementList());
         observableMilestones = FXCollections.observableList(catalogue.milestoneList());
         lastOrdinal = catalogue.getLastOrdinal();
@@ -412,7 +480,7 @@ public class EntityManager {
     }
 
     public void openGroups(List<File> files, Consumer<List<Group>> callback, Consumer<Exception> exHandler) {
-        LOGGER.traceEntry("Param: {}",files);
+        LOGGER.traceEntry("Param: {}", files);
 
         CheckedAsynchronousOperation<List<Group>> op = OperationFactory.createOpenMultipleGroupOperation(files);
 
@@ -429,7 +497,7 @@ public class EntityManager {
         op.start();
     }
 
-    public void exportOverview(File exportFile){
+    public void exportOverview(File exportFile) {
         LOGGER.traceEntry("Params: {}", exportFile);
         CheckedAsynchronousOperation<Boolean> op = OperationFactory.createExportOverviewOperation(new OverviewSnapshot(catalogue, groups.toArray(new Group[0])), exportFile);
         op.setExceptionHandler(ex -> LOGGER.catching(Level.ERROR, ex));
@@ -508,6 +576,15 @@ public class EntityManager {
             }
         }
         return out;
+    }
+
+    private void updateProgress(Requirement oldReq, Requirement newReq) {
+        groups.forEach(g -> {
+            Progress p = getProgressForRequirement(g, oldReq);
+            if (p != null) {
+                p.setRequirementName(newReq.getName());
+            }
+        });
     }
 
     private void saveCatalogue(File file) {

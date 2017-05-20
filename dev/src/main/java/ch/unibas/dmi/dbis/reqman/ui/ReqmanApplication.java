@@ -24,9 +24,9 @@ public class ReqmanApplication extends Application {
     public static final int EVALUATOR_VIEW = 2000;
     private static Logger LOGGER;
     private static Version version;
-    private int currentView = -1;
-
     private static volatile boolean exp = false;
+    private int currentView = -1;
+    private MainScene scene;
 
     public ReqmanApplication() {
     }
@@ -43,15 +43,13 @@ public class ReqmanApplication extends Application {
     public void start(Stage primaryStage) {
         scene = new MainScene();
         primaryStage.setScene(scene);
-        primaryStage.setTitle(scene.getTitle() );
+        primaryStage.setTitle(scene.getTitle());
         primaryStage.show();
     }
-    private MainScene scene;
-
 
     @Override
     public void stop() {
-        if(scene != null){
+        if (scene != null) {
             scene.stop();
         }
 

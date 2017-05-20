@@ -15,36 +15,81 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 class TemplatingConfiguration {
 
+    /**
+     * The requirement entity key
+     */
     @JsonIgnore
     public static final String REQUIREMENT = "requirement";
+    /**
+     * The milestone entity key
+     */
     @JsonIgnore
     public static final String MILESTONE = "milestone";
+    /**
+     * The catalogue entity key
+     */
     @JsonIgnore
     public static final String CATALOGUE = "catalogue";
+    /**
+     * The progress entity key
+     */
     @JsonIgnore
     public static final String PROGRESS = "progress";
+    /**
+     * The group-milestone (progress-summary) entity key
+     */
     @JsonIgnore
     public static final String GROUP_MILESTONE = "group-milestone";
+    /**
+     * The group entity key
+     */
     @JsonIgnore
     public static final String GROUP = "group";
+    /**
+     * The template property key
+     */
     @JsonIgnore
     public static final String TEMPLATE = "template";
+    /**
+     * The overview entity key
+     */
     @JsonIgnore
     public static final String OVERVIEW = "overview";
+    /**
+     * The default templating config
+     */
     @JsonIgnore
     public static final Map<String, String> DEFAULT_TEMPLATING_CONFIGURATION = generateDefaultTemplatesMap();
+    /**
+     * The extension of the export files
+     */
     private String extension;
+    /**
+     * The template locations
+     */
     private Map<String, String> templates;
 
+    /**
+     * Default constructor for new {@link TemplatingConfiguration}
+     */
     public TemplatingConfiguration() {
         templates = new HashMap<>();
     }
 
+    /**
+     * Constructs a new {@link TemplatingConfiguration} with specified export extension
+     * @param extension
+     */
     public TemplatingConfiguration(String extension) {
         this();
         this.extension = extension;
     }
 
+    /**
+     * Constructs a new {@link TemplatingConfiguration} with specified export extension and template file locations
+     * @param extension
+     * @param templates
+     */
     private TemplatingConfiguration(String extension, Map<String, String> templates) {
         this();
         this.extension = extension;
@@ -52,6 +97,12 @@ class TemplatingConfiguration {
         this.templates.putAll(templates);
     }
 
+    /**
+     * Creates the default template configuration.
+     * The default template configuration assumes that the template files are named like '<entity>.template' and
+     * are located as siblings of the templating configuration file
+     * @return
+     */
     private static final Map<String, String> generateDefaultTemplatesMap() {
         HashMap<String, String> map = new HashMap<>();
 
@@ -103,10 +154,12 @@ class TemplatingConfiguration {
     public String getGroupMilestoneEntry() {
         return getTemplatesEntry(GROUP_MILESTONE);
     }
+
     @JsonIgnore
     public String getOverviewEntry() {
         return getTemplatesEntry(OVERVIEW);
     }
+
     @JsonIgnore
     public String getGroupEntry() {
         return getTemplatesEntry(GROUP);
@@ -148,7 +201,6 @@ class TemplatingConfiguration {
         sb.append('}');
         return sb.toString();
     }
-
 
 
     /**

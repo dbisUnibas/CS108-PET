@@ -102,6 +102,50 @@ public class TemplateParser {
         return map;
     }
 
+    <E> List<Replacement<E>> parseReplacements(String template) {
+        LOGGER.trace("parseReplacements");
+        ArrayList<Replacement<E>> list = new ArrayList<>();
+        Pattern patternField = Pattern.compile(regexEntity + FIELD_DELIMETER_REGEX + NAME_REGEX);
+        LOGGER.debug(String.format("[parseRep] Field regex: %s", patternField.pattern()));
+        Matcher matcherField = patternField.matcher(template);
+        while (matcherField.find()) {
+            String expression = template.substring(matcherField.start(), matcherField.end());
+            String successor = template.substring(matcherField.end(), matcherField.end() + 1);
+            LOGGER.debug("[parseRep] Expression: " + expression);
+            LOGGER.debug("[parseRep] Expression region: " + matcherField.start() + ", " + matcherField.end());
+            LOGGER.debug("[parseRep] Sucessor: " + successor);
+            int end = template.indexOf(CLOSING, matcherField.end());
+            String subExpression = template.substring(matcherField.start(), end + 1);
+            switch (successor) {
+                case CLOSING:
+                    // normal field
+                    Field<E, ?> field = parseNormalField(expression + CLOSING);
+                    Replacement<E> repl = new Replacement<E>(field, matcherField.start(), matcherField.end() + 1, regexEntity + FIELD_DELIMETER_REGEX + field.getName() + CLOSING_REGEX, expression + CLOSING);
+                    list.add(repl);
+                    break;
+                case FIELD_DELIMETER:
+                    // subentity field
+                    SubEntityField<E, ?> subField = parseSubField(patternField.pattern(), subExpression);
+                    Replacement<E> subRepl = new Replacement<E>(subField, matcherField.start(), end + 1, regexEntity + FIELD_DELIMETER_REGEX + subField.getName() + FIELD_DELIMETER_REGEX + subField.getSubFieldName() + CLOSING_REGEX, subExpression);
+                    list.add(subRepl);
+                    break;
+                case OPTION_OPENING:
+                    // CONDITIONAL or PARAMETRIZED
+                    Field<E, ?> paramField = parseParametrizedField(patternField.pattern(), subExpression);
+                    Replacement<E> paramRepl = new Replacement<E>(paramField, matcherField.start(), end + 1, "", subExpression);
+                    list.add(paramRepl);
+                    break;
+                default:
+                    // something went wrong
+                    LOGGER.error("FOUND something that is not handled: " + successor);
+                    break;
+            }
+            LOGGER.debug(String.format("[parseRep] Added replacement: %s", list.get(list.size() - 1).toString()));
+        }
+
+        return list;
+    }
+
     private <E> SubEntityField<E, ?> parseSubField(String regexField, String expression) {
         LOGGER.debug("[parseSubEntity] Expression: " + expression);
         Pattern patternSub = Pattern.compile(regexField + FIELD_DELIMETER_REGEX + NAME_REGEX);
@@ -228,50 +272,6 @@ public class TemplateParser {
 
     private void throwNoSuchField(String name) throws ParseException {
         throw new ParseException("Entity (" + entity.getEntityName() + ") has no field with name " + name + " registered");
-    }
-
-    <E> List<Replacement<E>> parseReplacements(String template) {
-        LOGGER.trace("parseReplacements");
-        ArrayList<Replacement<E>> list = new ArrayList<>();
-        Pattern patternField = Pattern.compile(regexEntity + FIELD_DELIMETER_REGEX + NAME_REGEX);
-        LOGGER.debug(String.format("[parseRep] Field regex: %s", patternField.pattern()));
-        Matcher matcherField = patternField.matcher(template);
-        while (matcherField.find()) {
-            String expression = template.substring(matcherField.start(), matcherField.end());
-            String successor = template.substring(matcherField.end(), matcherField.end() + 1);
-            LOGGER.debug("[parseRep] Expression: " + expression);
-            LOGGER.debug("[parseRep] Expression region: " + matcherField.start() + ", " + matcherField.end());
-            LOGGER.debug("[parseRep] Sucessor: " + successor);
-            int end = template.indexOf(CLOSING, matcherField.end());
-            String subExpression = template.substring(matcherField.start(), end + 1);
-            switch (successor) {
-                case CLOSING:
-                    // normal field
-                    Field<E, ?> field = parseNormalField(expression + CLOSING);
-                    Replacement<E> repl = new Replacement<E>(field, matcherField.start(), matcherField.end() + 1, regexEntity + FIELD_DELIMETER_REGEX + field.getName() + CLOSING_REGEX, expression + CLOSING);
-                    list.add(repl);
-                    break;
-                case FIELD_DELIMETER:
-                    // subentity field
-                    SubEntityField<E, ?> subField = parseSubField(patternField.pattern(), subExpression);
-                    Replacement<E> subRepl = new Replacement<E>(subField, matcherField.start(), end + 1, regexEntity + FIELD_DELIMETER_REGEX + subField.getName() + FIELD_DELIMETER_REGEX + subField.getSubFieldName() + CLOSING_REGEX, subExpression);
-                    list.add(subRepl);
-                    break;
-                case OPTION_OPENING:
-                    // CONDITIONAL or PARAMETRIZED
-                    Field<E, ?> paramField = parseParametrizedField(patternField.pattern(), subExpression);
-                    Replacement<E> paramRepl = new Replacement<E>(paramField, matcherField.start(), end + 1, "", subExpression);
-                    list.add(paramRepl);
-                    break;
-                default:
-                    // something went wrong
-                    LOGGER.error("FOUND something that is not handled: " + successor);
-                    break;
-            }
-            LOGGER.debug(String.format("[parseRep] Added replacement: %s", list.get(list.size() - 1).toString()));
-        }
-
-        return list;
     }
 
     public static class ParseException extends RuntimeException {

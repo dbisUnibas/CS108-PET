@@ -21,8 +21,6 @@ import java.util.List;
  */
 public class MenuManager {
 
-    private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
-
     public static final String ITEM_NEW_CAT = "itemNewCat";
     public static final String ITEM_NEW_GROUP = "itemNewGroup";
     public static final String ITEM_OPEN_CAT = "itemOpenCat";
@@ -46,12 +44,10 @@ public class MenuManager {
     public static final String ITEM_EDITOR = "itemEditor";
     public static final String ITEM_EVALUATOR = "itemEvaluator";
     public static final String ITEM_PRESENTATION_MODE = "itemPresentation";
-
-
     public static final String CLEAR_GLOBAL_MS_KEY = "clear";
-
-
+    private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
     private static MenuManager instance = null;
+    private final ToggleGroup toggleMilestone = new ToggleGroup();
     private HashMap<String, MenuItem> menuItems = new HashMap<>();
     private HashMap<String, Menu> menus = new HashMap<>();
     private Menu menuFile;
@@ -59,8 +55,6 @@ public class MenuManager {
     private Menu menuEvaluate;
     private Menu menuView;
     private Menu menuHelp;
-
-    private final ToggleGroup toggleMilestone = new ToggleGroup();
     private Menu menuGlobalMilestone;
 
     private MenuItem itemNewCat;
@@ -119,7 +113,7 @@ public class MenuManager {
 
         registerEditorItem(ITEM_EXPORT_CAT, itemExportCat = new MenuItem("Export Catalogue..."), true);
         registerEvaluatorItem(ITEM_EXPORT_GROUPS, itemExportGroups = new MenuItem("Export Groups..."), true);
-        registerEvaluatorItem(ITEM_EXPORT_GROUP, itemExportGroup = new MenuItem("Export Group..."), true);
+        //registerEvaluatorItem(ITEM_EXPORT_GROUP, itemExportGroup = new MenuItem("Export Group..."), true); // TODO implement
 
         registerMenuItem(ITEM_QUIT, itemQuit = new MenuItem("Quit"));
 
@@ -153,25 +147,22 @@ public class MenuManager {
         disableAllButInitial();
     }
 
-    private void loadDefaultKeyBindings() {
-        activeKeyBindings.put(ITEM_OPEN_CAT, "Ctrl+L");
-        activeKeyBindings.put(ITEM_SAVE_CAT, "Alt+S");
-        activeKeyBindings.put(ITEM_SAVE_CAT_AS,"Alt+Shift+S");
-        activeKeyBindings.put(ITEM_OPEN_GROUPS, "Ctrl+O");
-        activeKeyBindings.put(ITEM_SAVE_GROUP, "Ctrl+S");
-        activeKeyBindings.put(ITEM_SAVE_GROUP_AS, "Ctrl+Shift+S");
-        activeKeyBindings.put(ITEM_EXPORT_CAT, "Alt+E");
-        activeKeyBindings.put(ITEM_EXPORT_GROUPS, "Ctrl+E");
+    public static MenuManager getInstance() {
+        if (instance == null) {
+            instance = new MenuManager();
+        }
+        return instance;
     }
 
     /**
      * Resets the menu each time.
+     *
      * @param milestones Only a snapshot in time
      */
-    public void setupGlobalMilestoneMenu(List<Milestone> milestones){
+    public void setupGlobalMilestoneMenu(List<Milestone> milestones) {
         menuGlobalMilestone.getItems().clear();
-        for(Milestone ms : milestones){
-            RadioMenuItem itemMilestone = new RadioMenuItem(ms.getName() );
+        for (Milestone ms : milestones) {
+            RadioMenuItem itemMilestone = new RadioMenuItem(ms.getName());
             itemMilestone.setUserData(ms);
             itemMilestone.setToggleGroup(toggleMilestone);
             menuGlobalMilestone.getItems().add(itemMilestone);
@@ -182,39 +173,94 @@ public class MenuManager {
         menuGlobalMilestone.getItems().add(0, itemClearMilestone);
     }
 
-    private void setOnActionAll() {
-        menuItems.values().forEach(mi -> mi.setOnAction(this::handle));
-    }
-
-    private void setKeyBindings(){
-        activeKeyBindings.forEach((miKey, combination) -> {
-            MenuItem mi = menuItems.get(miKey);
-            if(mi != null){
-                mi.setAccelerator(KeyCombination.keyCombination(combination));
-            }
-        });
-    }
-
-    public MenuHandler setMenuHandler(MenuHandler handler){
+    public MenuHandler setMenuHandler(MenuHandler handler) {
         MenuHandler old = null;
-        if(this.handler != null){
+        if (this.handler != null) {
             old = this.handler;
         }
         this.handler = handler;
         return old;
     }
 
-    public MenuHandler getMenuHandler(){
+    public MenuHandler getMenuHandler() {
         return handler;
     }
 
-    private void handle(ActionEvent event){
-        if(event.getSource() != null){
-            if(event.getSource() instanceof  MenuItem){
+    public MenuBar getMenuBar() {
+        return menuBar;
+    }
+
+    public void disableEditorItems() {
+        setDisableForItems(editorItems, true);
+    }
+
+    public void enableEditorItems() {
+        setDisableForItems(editorItems, false);
+    }
+
+    public void disableEvaluatorItems() {
+        setDisableForItems(evaluatorItems, true);
+    }
+
+    public void enableEvaluaotrItems() {
+        setDisableForItems(evaluatorItems, false);
+    }
+
+    public void disableCatalogueNeeded() {
+        setDisableForItems(catNeeded, true);
+    }
+
+    public void enableCatalogueNeeded() {
+        setDisableForItems(catNeeded, false);
+    }
+
+    public void disableGroupNeeded() {
+        setDisableForItems(groupNeeded, true);
+    }
+
+    public void enableGroupNeeded() {
+        LOGGER.traceEntry();
+        setDisableForItems(groupNeeded, false);
+    }
+
+    public void disableAllButInitial() {
+        disableCatalogueNeeded();
+        disableEditorItems();
+        disableGroupNeeded();
+        disableEvaluatorItems();
+    }
+
+    private void loadDefaultKeyBindings() {
+        activeKeyBindings.put(ITEM_OPEN_CAT, "Ctrl+L");
+        activeKeyBindings.put(ITEM_SAVE_CAT, "Alt+S");
+        activeKeyBindings.put(ITEM_SAVE_CAT_AS, "Alt+Shift+S");
+        activeKeyBindings.put(ITEM_OPEN_GROUPS, "Ctrl+O");
+        activeKeyBindings.put(ITEM_SAVE_GROUP, "Ctrl+S");
+        activeKeyBindings.put(ITEM_SAVE_GROUP_AS, "Ctrl+Shift+S");
+        activeKeyBindings.put(ITEM_EXPORT_CAT, "Alt+E");
+        activeKeyBindings.put(ITEM_EXPORT_GROUPS, "Ctrl+E");
+    }
+
+    private void setOnActionAll() {
+        menuItems.values().forEach(mi -> mi.setOnAction(this::handle));
+    }
+
+    private void setKeyBindings() {
+        activeKeyBindings.forEach((miKey, combination) -> {
+            MenuItem mi = menuItems.get(miKey);
+            if (mi != null) {
+                mi.setAccelerator(KeyCombination.keyCombination(combination));
+            }
+        });
+    }
+
+    private void handle(ActionEvent event) {
+        if (event.getSource() != null) {
+            if (event.getSource() instanceof MenuItem) {
                 MenuItem mi = (MenuItem) event.getSource();
-                if(mi.getUserData() != null && mi.getUserData() instanceof  String){
-                    String key = (String)mi.getUserData();
-                    switch(key){
+                if (mi.getUserData() != null && mi.getUserData() instanceof String) {
+                    String key = (String) mi.getUserData();
+                    switch (key) {
                         case ITEM_NEW_CAT:
                             handler.handleNewCatalogue(event);
                             break;
@@ -292,17 +338,6 @@ public class MenuManager {
         }
     }
 
-    public static MenuManager getInstance() {
-        if (instance == null) {
-            instance = new MenuManager();
-        }
-        return instance;
-    }
-
-    public MenuBar getMenuBar() {
-        return menuBar;
-    }
-
     private void assembleMenus() {
         menuFile.getItems().addAll(itemNewCat,
                 itemNewGroup,
@@ -311,7 +346,7 @@ public class MenuManager {
                 new SeparatorMenuItem(),
                 itemSaveCat, itemSaveCatAs, itemSaveGroup, itemSaveGroupAs,
                 new SeparatorMenuItem(),
-                itemExportCat, itemExportGroups, itemExportGroup,
+                itemExportCat, itemExportGroups/*,itemExportGroup /*TODO implement*/,
                 new SeparatorMenuItem(),
                 itemQuit
         );
@@ -324,40 +359,40 @@ public class MenuManager {
         );
 
         // The set-milestone-forall-groups menu related handling
-        toggleMilestone.selectedToggleProperty().addListener( (ObservableValue<? extends Toggle> ov, Toggle oldToggle, Toggle newToggle ) -> {
+        toggleMilestone.selectedToggleProperty().addListener((ObservableValue<? extends Toggle> ov, Toggle oldToggle, Toggle newToggle) -> {
             /*
             Lots of trace logging to understand what is going on
              */
 
-            if(ov != null){
-                LOGGER.trace("Obesrvable Value: "+ov.toString() );
-                if(ov.getValue() instanceof RadioMenuItem){
+            if (ov != null) {
+                LOGGER.trace("Obesrvable Value: " + ov.toString());
+                if (ov.getValue() instanceof RadioMenuItem) {
                     RadioMenuItem item = (RadioMenuItem) ov.getValue();
-                    if(item != null && item.getUserData() != null){
-                        if(item.getUserData() instanceof String && ((String)item.getUserData()).equals("clear")){
+                    if (item != null && item.getUserData() != null) {
+                        if (item.getUserData() instanceof String && ((String) item.getUserData()).equals("clear")) {
                             handler.resetGlobalMilestoneChoice();
                             return;
                         }
                     }
                 }
             }
-            if(LOGGER.getLevel().equals(Level.TRACE)){
+            if (LOGGER.getLevel().equals(Level.TRACE)) {
                 // Print stuff only if on trace:
-                if(newToggle != null){
-                    if(newToggle.getUserData() instanceof Milestone){
+                if (newToggle != null) {
+                    if (newToggle.getUserData() instanceof Milestone) {
                         Milestone newMS = (Milestone) newToggle.getUserData();
-                        LOGGER.trace("newMS: "+newMS.getName());
-                    }else{
-                        LOGGER.trace("newToggle: "+newToggle.toString() );
+                        LOGGER.trace("newMS: " + newMS.getName());
+                    } else {
+                        LOGGER.trace("newToggle: " + newToggle.toString());
                     }
 
                 }
-                if(oldToggle != null){
-                    if(oldToggle.getUserData() instanceof  Milestone){
+                if (oldToggle != null) {
+                    if (oldToggle.getUserData() instanceof Milestone) {
                         Milestone oldMS = (Milestone) oldToggle.getUserData();
-                        LOGGER.trace("oldMS: "+oldMS.getName() );
-                    }else{
-                        LOGGER.trace("oldToggle: "+oldToggle.toString());
+                        LOGGER.trace("oldMS: " + oldMS.getName());
+                    } else {
+                        LOGGER.trace("oldToggle: " + oldToggle.toString());
                     }
 
                 }
@@ -367,14 +402,14 @@ public class MenuManager {
             /*
             Conclusion: Only if *newly* selected the event is fired and thus handled in here.
              */
-            if(toggleMilestone.getSelectedToggle() != null && toggleMilestone.getSelectedToggle().getUserData() instanceof Milestone){
+            if (toggleMilestone.getSelectedToggle() != null && toggleMilestone.getSelectedToggle().getUserData() instanceof Milestone) {
                 Milestone ms = (Milestone) toggleMilestone.getSelectedToggle().getUserData();
-                LOGGER.debug("Selected: "+ms.getName());
+                LOGGER.debug("Selected: " + ms.getName());
                 handler.setGlobalMilestoneChoice(ms);
             }
-        } );
+        });
 
-        menuEvaluate.getItems().addAll(itemShowOverview,itemExportOverview, new SeparatorMenuItem(), menuGlobalMilestone);
+        menuEvaluate.getItems().addAll(itemShowOverview, itemExportOverview, new SeparatorMenuItem(), menuGlobalMilestone);
 
         menuView.getItems().addAll(itemEditor, itemEvaluator, new SeparatorMenuItem(), itemPresentation);
     }
@@ -415,50 +450,9 @@ public class MenuManager {
 
     private void setDisableForItems(List<String> keyProvider, boolean disable) {
         keyProvider.forEach(key -> {
-            LOGGER.trace(":setDisableForItems - "+String.format("Setting %b for %s", disable, key));
+            LOGGER.trace(":setDisableForItems - " + String.format("Setting %b for %s", disable, key));
             menuItems.get(key).setDisable(disable);
         });
-    }
-
-    public void disableEditorItems() {
-        setDisableForItems(editorItems, true);
-    }
-
-    public void enableEditorItems() {
-        setDisableForItems(editorItems, false);
-    }
-
-
-    public void disableEvaluatorItems() {
-        setDisableForItems(evaluatorItems, true);
-    }
-
-    public void enableEvaluaotrItems() {
-        setDisableForItems(evaluatorItems, false);
-    }
-
-    public void disableCatalogueNeeded() {
-        setDisableForItems(catNeeded, true);
-    }
-
-    public void enableCatalogueNeeded() {
-        setDisableForItems(catNeeded, false);
-    }
-
-    public void disableGroupNeeded() {
-        setDisableForItems(groupNeeded, true);
-    }
-
-    public void enableGroupNeeded() {
-        LOGGER.traceEntry();
-        setDisableForItems(groupNeeded, false);
-    }
-
-    public void disableAllButInitial() {
-        disableCatalogueNeeded();
-        disableEditorItems();
-        disableGroupNeeded();
-        disableEvaluatorItems();
     }
 
 }

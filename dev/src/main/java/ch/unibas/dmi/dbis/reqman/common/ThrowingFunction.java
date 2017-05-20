@@ -8,15 +8,16 @@ import java.util.function.Function;
  * @author loris.sauter
  */
 @FunctionalInterface
-public interface ThrowingFunction<T, R> extends Function<T,R> {
+@Deprecated
+public interface ThrowingFunction<T, R> extends Function<T, R> {
 
     R applyThrowing(T input) throws Exception;
 
     @Override
-    default R apply(T input){
-        try{
+    default R apply(T input) {
+        try {
             return applyThrowing(input);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

@@ -11,15 +11,15 @@ import javafx.event.EventHandler;
 @FunctionalInterface
 public interface ThrowingEventHandler extends EventHandler<WorkerStateEvent> {
 
+    String MARKER = "Marks that this RuntimeException was thrown on purpose.";
+
     void handleThrowing(WorkerStateEvent event) throws Exception;
 
-    default void handle(WorkerStateEvent event){
-        try{
+    default void handle(WorkerStateEvent event) {
+        try {
             handleThrowing(event);
-        }catch(Exception e){
-            throw new RuntimeException(MARKER,e);
+        } catch (Exception e) {
+            throw new RuntimeException(MARKER, e);
         }
     }
-
-    String MARKER = "Marks that this RuntimeException was thrown on purpose.";
 }

@@ -18,6 +18,7 @@ public class GroupUpdater {
     public static final String SEPARATOR = "=";
     public static final String OUT_KEY = "-o";
     private final GroupUpdatingStrategy strategy;
+
     GroupUpdater(GroupUpdatingStrategy strategy) {
         this.strategy = strategy;
     }
@@ -44,6 +45,17 @@ public class GroupUpdater {
             // -o out in specified
             throw new UnsupportedOperationException("Not implemented");
         }
+    }
+
+    public String getUsage() {
+        return "Updates a reqman group json file from reqman-version " + strategy.fromVersion() +
+                " to reqman-version " + strategy.toVersion() + "\n\n" +
+                "Usage:\n" +
+                "group " + IN_DIR_KEY + SEPARATOR + "<INDIR> " + OUT_DIR_KEY + SEPARATOR + "<OUTDIR> " + CATALOGUE_KEY + SEPARATOR + "<path>" + "\n" +
+                "\tupdates all group files in directory <INDIR> and stores the results in the directory <OUTDIR>, keeping the file names.\n\n" +
+                "or\n" + "group " + CATALOGUE_KEY + SEPARATOR + "<path>" + "[" + OUT_KEY + " <out>] <file>\n" +
+                "\tupdates the <file> group and saves it at the same location with the prefix updtated- or, when option " + OUT_KEY + " is specified, at the location <out>." +
+                "\n\nAll paths are assumed to be relative to the current working directory";
     }
 
     private String findArgument(String key, String[] args) {
@@ -84,16 +96,5 @@ public class GroupUpdater {
             System.exit(-2);
         }
 
-    }
-
-    public String getUsage() {
-        return "Updates a reqman group json file from reqman-version " + strategy.fromVersion() +
-                " to reqman-version " + strategy.toVersion() + "\n\n" +
-                "Usage:\n" +
-                "group " + IN_DIR_KEY + SEPARATOR + "<INDIR> " + OUT_DIR_KEY + SEPARATOR + "<OUTDIR> " + CATALOGUE_KEY + SEPARATOR + "<path>" + "\n" +
-                "\tupdates all group files in directory <INDIR> and stores the results in the directory <OUTDIR>, keeping the file names.\n\n" +
-                "or\n" + "group " + CATALOGUE_KEY + SEPARATOR + "<path>" + "[" + OUT_KEY + " <out>] <file>\n" +
-                "\tupdates the <file> group and saves it at the same location with the prefix updtated- or, when option " + OUT_KEY + " is specified, at the location <out>." +
-                "\n\nAll paths are assumed to be relative to the current working directory";
     }
 }

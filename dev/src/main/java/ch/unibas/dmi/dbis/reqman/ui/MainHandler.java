@@ -9,13 +9,13 @@ import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.RadioMenuItem;
 import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.text.html.parser.Entity;
 import java.io.File;
 
 /**
@@ -104,7 +104,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleOpenGroups(ActionEvent event) {
-        if(mainScene.isEditorActive() ){
+        if (mainScene.isEditorActive()) {
             handleShowEvaluator(event);
         }
         evaluatorHandler.handleOpenGroups(event);
@@ -149,8 +149,8 @@ public class MainHandler implements MenuHandler {
         }
         FileChooser fc = new FileChooser();
         fc.setTitle("Export Catalogue");
-        if(EntityManager.getInstance().hasLastExportLocation() ){
-            fc.setInitialDirectory(EntityManager.getInstance().getLastExportLocation() );
+        if (EntityManager.getInstance().hasLastExportLocation()) {
+            fc.setInitialDirectory(EntityManager.getInstance().getLastExportLocation());
         }
         File f = fc.showSaveDialog(mainScene.getWindow());
         if (f != null) {
@@ -179,8 +179,7 @@ public class MainHandler implements MenuHandler {
 
     @Override
     public void handleQuit(ActionEvent event) {
-        // TODO ensure correct mode
-        throw new UnsupportedOperationException("NYI");
+        Platform.exit();
     }
 
     @Override
@@ -267,12 +266,12 @@ public class MainHandler implements MenuHandler {
     @Override
     public void handleExportOverview(ActionEvent event) {
         LOGGER.traceEntry();
-        if(mainScene.isEvaluatorActive()){
-            if(evaluatorHandler.isGroupLoaded() ){
+        if (mainScene.isEvaluatorActive()) {
+            if (evaluatorHandler.isGroupLoaded()) {
                 FileChooser fc = new FileChooser();
                 fc.setTitle("Export Overview");
-                if(EntityManager.getInstance().hasLastExportLocation() ){
-                    fc.setInitialDirectory(EntityManager.getInstance().getLastExportLocation() );
+                if (EntityManager.getInstance().hasLastExportLocation()) {
+                    fc.setInitialDirectory(EntityManager.getInstance().getLastExportLocation());
                 }
                 File f = fc.showSaveDialog(mainScene.getWindow());
                 if (f != null) {
@@ -280,7 +279,7 @@ public class MainHandler implements MenuHandler {
                     EntityManager.getInstance().exportOverview(f);
                     mainScene.indicateWaiting(false);
                 }
-            }else{
+            } else {
                 Utils.showErrorDialog("Export Failed", "Cannot export an overview if no groups are loaded");
             }
         }
@@ -327,8 +326,6 @@ public class MainHandler implements MenuHandler {
         evaluatorHandler.setStatusBar(statusBar);
         editorHandler.setStatusBar(statusBar);
         OperationFactory.registerStatusBar(statusBar);
-        // TODO Change to async
-        EntityManager.getInstance().setStatusBar(statusBar);
     }
 
     void stop() {

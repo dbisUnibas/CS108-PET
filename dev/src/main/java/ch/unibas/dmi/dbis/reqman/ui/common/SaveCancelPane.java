@@ -92,26 +92,6 @@ public class SaveCancelPane extends AnchorPane {
         return cancelButton;
     }
 
-    private void handleSave(ActionEvent event) {
-        if (saveHandler != null) {
-            saveHandler.handle(event);
-        } else {
-            handlers.forEach(handler -> {
-                handler.save(event);
-            });
-        }
-    }
-
-    private void handleCancel(ActionEvent event) {
-        if (cancelHandler != null) {
-            cancelHandler.handle(event);
-        } else {
-            handlers.forEach(handler -> {
-                handler.cancel(event);
-            });
-        }
-    }
-
     /**
      * Initializes the components.
      */
@@ -137,6 +117,26 @@ public class SaveCancelPane extends AnchorPane {
         setRightAnchor(btnBox, 0d);
 
         btnBox.setStyle("-fx-spacing: inherit;-fx-padding: inherit");
+    }
+
+    private void handleSave(ActionEvent event) {
+        if (saveHandler != null) {
+            saveHandler.handle(event);
+        } else {
+            handlers.forEach(handler -> {
+                handler.save(event);
+            });
+        }
+    }
+
+    private void handleCancel(ActionEvent event) {
+        if (cancelHandler != null) {
+            cancelHandler.handle(event);
+        } else {
+            handlers.forEach(handler -> {
+                handler.cancel(event);
+            });
+        }
     }
 
 

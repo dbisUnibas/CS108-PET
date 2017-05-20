@@ -3,6 +3,8 @@ package ch.unibas.dmi.dbis.reqman.configuration;
 /**
  * Container class to hold the template(-string)s.
  *
+ * All the returning templates / templates to set are considered to be formatted in RMTL.
+ *
  * @author loris.sauter
  */
 public class Templates {
@@ -67,11 +69,11 @@ public class Templates {
         this.groupTemplate = groupTemplate;
     }
 
-    public void setOverviewTemplate(String template){
-        this.overviewTemplate = template;
+    public String getOverviewTemplate() {
+        return overviewTemplate;
     }
 
-    public String getOverviewTemplate(){
-        return overviewTemplate;
+    public void setOverviewTemplate(String template) {
+        this.overviewTemplate = template;
     }
 }

@@ -30,11 +30,11 @@ public class ExportMultipleGroupTask extends ManagementTask<Boolean> {
 
     @Override
     protected Boolean call() throws Exception {
-        updateAll("Started groups export...",0.01);
+        updateAll("Started groups export...", 0.01);
         RenderManager manager = new RenderManager(catalogue);
         TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
         configManager.loadConfig();
-        String extension = configManager.getTemplatesExtension();
+        String extension = configManager.getExportExtension();
         Templates templates = configManager.getTemplates();
 
         updateAll("Loaded templating config...", 0.05);
@@ -45,8 +45,8 @@ public class ExportMultipleGroupTask extends ManagementTask<Boolean> {
 
         updateAll("Parsed templates...", 0.1);
 
-        for(int i=1; i<= groups.size(); i++){
-            Group g = groups.get(i-1);
+        for (int i = 1; i <= groups.size(); i++) {
+            Group g = groups.get(i - 1);
             manager.setGroup(g);
             String export = manager.renderGroup(g);
 
@@ -56,7 +56,7 @@ public class ExportMultipleGroupTask extends ManagementTask<Boolean> {
             String exportFile = exportDir.getPath() + ConfigUtils.getFileSeparator() + exportName;
             // If the file has no extension // TODO: REMOVE extension in exportfilename of group
             if (!exportFile.substring(exportFile.lastIndexOf(ConfigUtils.getFileSeparator())).contains(".")) {
-                exportFile += "."+extension;
+                exportFile += "." + extension;
             }
             File eFile = new File(exportFile);
             PrintWriter pw = new PrintWriter(eFile);
@@ -64,7 +64,7 @@ public class ExportMultipleGroupTask extends ManagementTask<Boolean> {
             pw.flush();
             pw.close();
 
-            updateAll("Wrote export to disk ("+eFile.getPath()+")", calcAfterWrite(i));
+            updateAll("Wrote export to disk (" + eFile.getPath() + ")", calcAfterWrite(i));
 
             LOGGER.info("============================");
             LOGGER.info(" FINISHED : " + g.getName() + " @ " + ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrintTimestamp(System.currentTimeMillis()));
@@ -77,14 +77,15 @@ public class ExportMultipleGroupTask extends ManagementTask<Boolean> {
 
     /**
      * Stage must be so first stage == 1
+     *
      * @param stage
      * @return
      */
-    private double calcAfterRender(int stage){
-        return 0.1 + stage * (0.2/(double)groups.size()) + (stage-1) * (0.7/(double)groups.size());
+    private double calcAfterRender(int stage) {
+        return 0.1 + stage * (0.2 / (double) groups.size()) + (stage - 1) * (0.7 / (double) groups.size());
     }
 
-    private double calcAfterWrite(int stage){
-        return 0.1 + stage * (0.2/(double)groups.size()) + (stage) * (0.7/(double)groups.size());
+    private double calcAfterWrite(int stage) {
+        return 0.1 + stage * (0.2 / (double) groups.size()) + (stage) * (0.7 / (double) groups.size());
     }
 }

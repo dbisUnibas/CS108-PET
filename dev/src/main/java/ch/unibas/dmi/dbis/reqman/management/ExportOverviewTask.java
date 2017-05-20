@@ -2,7 +2,6 @@ package ch.unibas.dmi.dbis.reqman.management;
 
 import ch.unibas.dmi.dbis.reqman.configuration.Templates;
 import ch.unibas.dmi.dbis.reqman.configuration.TemplatingConfigurationManager;
-import ch.unibas.dmi.dbis.reqman.core.Group;
 import ch.unibas.dmi.dbis.reqman.templating.RenderManager;
 
 import java.io.File;
@@ -18,19 +17,19 @@ class ExportOverviewTask extends ManagementTask<Boolean> {
     private final OverviewSnapshot snapshot;
     private final File file;
 
-    ExportOverviewTask(OverviewSnapshot snapshot, File file){
+    ExportOverviewTask(OverviewSnapshot snapshot, File file) {
         this.snapshot = snapshot;
         this.file = file;
     }
 
     @Override
     protected Boolean call() throws Exception {
-        updateAll("Started overview export...",0.1);
+        updateAll("Started overview export...", 0.1);
         RenderManager manager = new RenderManager(snapshot);
 
         TemplatingConfigurationManager configManager = new TemplatingConfigurationManager();
         configManager.loadConfig();
-        String extension = configManager.getTemplatesExtension();
+        String extension = configManager.getExportExtension();
         Templates templates = configManager.getTemplates();
 
         updateAll("Loaded templating config...", 0.2);
@@ -41,7 +40,7 @@ class ExportOverviewTask extends ManagementTask<Boolean> {
 
         String export = manager.renderOverview(snapshot);
 
-        updateAll("Rendered overview...",0.8);
+        updateAll("Rendered overview...", 0.8);
 
         // Appends the configured extension if none is present
         String exportFile = file.getPath();
@@ -54,7 +53,7 @@ class ExportOverviewTask extends ManagementTask<Boolean> {
         pw.close();
         pw.flush();
 
-        updateAll("Wrote export to disk ("+eFile.getPath()+")", 1.0);
+        updateAll("Wrote export to disk (" + eFile.getPath() + ")", 1.0);
 
         return true;
     }
