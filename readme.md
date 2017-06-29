@@ -9,7 +9,7 @@ created using `ReqMan`'s built in `editor`.
 Using `ReqMan`'s built in `evaluator` one can register several **group**s and
 assess their voyage on achieving the **requirement**s with so called **progress**.
 
-*Catalogue**s and **group**s may be exported with templates provided.
+**Catalogue**s and **group**s may be exported with templates provided.
 
 
 ## Table of Contents
