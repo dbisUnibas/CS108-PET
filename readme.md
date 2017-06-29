@@ -11,19 +11,6 @@ assess their voyage on achieving the **requirement**s with so called **progress*
 
 **Catalogue**s and **group**s may be exported with templates provided.
 
-
-## Table of Contents
-
- - Build
- - Usage
- - Dependencies
- - Issues
- - Contributors
- - License
- - Versioning
- - Branching
- - Repository structure
-
 ## Build
 
 `ReqMan` uses gradle. The source of `ReqMan` is located under `dev/src/`.
