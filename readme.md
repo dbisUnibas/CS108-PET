@@ -59,8 +59,7 @@ Beside using JavaFX 8 (from java 1.8.0_121) all dependencies are handled by the 
 
 ## Issues
 
-Please use Maniphest to report issues. Create a task and set the tag to 
-the ReqMan project as well as setting the visibility to *Members of Project...* ReqMan.
+To report bugs or add feature requests, use the [GitHub issues page](https://github.com/dbisUnibas/ReqMan/issues)
 
 ## Contributors
 
