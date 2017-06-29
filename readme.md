@@ -73,31 +73,3 @@ See LICENSE.txt for the complete license text.
 ## Versioning
 
 `ReqMan` uses semantic versioning as defined by http://semver.org/
-
-## Branching
-
-There are several branches active:
-
- - `master` which is up-to-date with the documentation and core classes
- - `reqman` which is up-to-date with the latest **recommended** version of
-  `ReqMan`
- - `editor-exp` which is the branch for developing features related
-   to `editor`
- - `assessment-exp` which is the branch for developing features related
-   to `evaluator`
- - `reqman-exp` which is the branch for developing features related to both: 
-   `editor` and `evaluator` and points to the **latest** version of `ReqMan`
- - `experimental` a branch dedicated to highly experimental development.
-   The application as in the state of this branch may not be fully compatible
-   with the ones of other states.
-   
-## Repository structure
-
-The repository contains the following files & folders:
-
- - .gitignore   The gitignore for this repository.
- - CS108.json   A catalogue used by FS17, cs108
- - dev/         The development folder
- - LICENSE.txt  The full license file
- - process/     A folder containing additional documentation and process related files
- - readme.md    This readme
