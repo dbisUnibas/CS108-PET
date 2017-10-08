@@ -11,50 +11,81 @@ import java.util.*;
  */
 public class Requirement {
   
-  private final UUID uuid;
-  
   /**
-   * The name of the requirement. Shall be unique.
+   * The unique identifier of the requirement
+   */
+  private final UUID uuid;
+  /**
+   * The name of the requirement.
    */
   private String name;
+  /**
+   * The short excerpt of the requirement.
+   */
+  private String excerpt;
   /**
    * The desciption of the requirement. May be a long-ish string.
    */
   private String description;
   /**
-   * The minimal milestone ordinal this requirement firstly occurs
+   * The ID of the milestone this requirement is firstly available
    */
-  private int minMilestoneOrdinal;
+  private UUID minimalMilestoneUUID;
   /**
-   * The maximal milestone ordinal this requirement must be met
+   * The ID of the milestone this requirement is lastly available
    */
-  private int maxMilestoneOrdinal;
+  private UUID maximalMilestoneUUID;
   /**
    * The maximal amount of points received upon meeting this requirement
    */
   private double maxPoints;
   /**
    * Whether this requirement is binary or not:
-   * If this requirement can be met or not, or if it
-   * could potentially be partially met
+   * A binary requirement is either completely fulfilled - or not.
+   * A non-binary requirement may be partially fulfilled.
    */
   private boolean binary;
   /**
-   * Whether this requirement is mandatory or not.
+   * The type of the requriement
    */
-  private boolean mandatory;
+  private Type type;
   /**
    * A list of predecessor requirement names this requirement depends on.
    */
-  private List<String> predecessorNames = new Vector<String>();
+  private List<String> predecessorNames = new Vector<>();
   /**
    * A map of key-value-pairs related to export this requirement
    */
-  private Map<String, String> propertiesMap = new HashMap<String, String>();
+  private Map<String, String> propertiesMap = new HashMap<>();
+  /**
+   * The optional category this requirement belongs to.
+   */
+  private String category;
+  
+  /**
+   * The minimal milestone ordinal this requirement firstly occurs
+   * @deprecated Since SNAPSHOT-2.0.0: UUIDs were introduced for cross-references
+   */
+  @Deprecated
+  private int minMilestoneOrdinal;
+  /**
+   * The maximal milestone ordinal this requirement must be met
+   * @deprecated Since SNAPSHOT-2.0.0: UUIDs were introduced for cross-references
+   */
+  @Deprecated
+  private int maxMilestoneOrdinal;
+  /**
+   * Whether this requirement is mandatory or not.
+   * @deprecated Since SNAPSHOT-2.0.0: The requirement type was introduced
+   */
+  @Deprecated
+  private boolean mandatory;
   /**
    * Whether this requirement has a malus role or not.
    * So to speak if maxPoints is negative or not.
+   * @deprecated Since SNAPSHOT-2.0.0: The requirement type was introduced
    */
+  @Deprecated
   private boolean malus;
   
   /**
@@ -91,11 +122,11 @@ public class Requirement {
   }
   
   public void clearPredecessorNames() {
-    predecessorNames = new ArrayList<>();
+    predecessorNames.clear();
   }
   
   public void clearPropertiesMap() {
-    propertiesMap = new HashMap<>();
+    propertiesMap.clear();
   }
   
   /**
@@ -206,18 +237,19 @@ public class Requirement {
     this.description = description;
   }
   
+  @Deprecated
   public int getMinMilestoneOrdinal() {
     return minMilestoneOrdinal;
   }
-  
+  @Deprecated
   public void setMinMilestoneOrdinal(int minMilestoneOrdinal) {
     this.minMilestoneOrdinal = minMilestoneOrdinal;
   }
-  
+  @Deprecated
   public int getMaxMilestoneOrdinal() {
     return maxMilestoneOrdinal;
   }
-  
+  @Deprecated
   public void setMaxMilestoneOrdinal(int maxMilestoneOrdinal) {
     this.maxMilestoneOrdinal = maxMilestoneOrdinal;
   }
@@ -238,18 +270,19 @@ public class Requirement {
     this.binary = binary;
   }
   
+  @Deprecated
   public boolean isMandatory() {
     return mandatory;
   }
-  
+  @Deprecated
   public void setMandatory(boolean mandatory) {
     this.mandatory = mandatory;
   }
-  
+  @Deprecated
   public boolean isMalus() {
     return malus;
   }
-  
+  @Deprecated
   public void setMalus(boolean malus) {
     this.malus = malus;
   }
@@ -267,11 +300,52 @@ public class Requirement {
     this.propertiesMap = propertiesMap;
   }
   
+  public String getExcerpt() {
+    return excerpt;
+  }
+  
+  public void setExcerpt(String excerpt) {
+    this.excerpt = excerpt;
+  }
+  
+  public UUID getMinimalMilestoneUUID() {
+    return minimalMilestoneUUID;
+  }
+  
+  public void setMinimalMilestoneUUID(UUID minimalMilestoneUUID) {
+    this.minimalMilestoneUUID = minimalMilestoneUUID;
+  }
+  
+  public UUID getMaximalMilestoneUUID() {
+    return maximalMilestoneUUID;
+  }
+  
+  public void setMaximalMilestoneUUID(UUID maximalMilestoneUUID) {
+    this.maximalMilestoneUUID = maximalMilestoneUUID;
+  }
+  
+  public Type getType() {
+    return type;
+  }
+  
+  public void setType(Type type) {
+    this.type = type;
+  }
+  
+  public String getCategory() {
+    return category;
+  }
+  
+  public void setCategory(String category) {
+    this.category = category;
+  }
+  
   @JsonIgnore
   public double getMaxPointsSensitive() {
     double factor = isMalus() ? -1.0 : 1.0;
     return getMaxPoints() * factor;
   }
+  
   
   
   /**
@@ -281,5 +355,13 @@ public class Requirement {
    */
   public UUID getUuid() {
     return uuid;
+  }
+  
+  public enum Type{
+    
+    REGULAR,
+    BONUS,
+    MALUS;
+    
   }
 }
