@@ -12,7 +12,7 @@ public class Milestone {
   
   private final UUID uuid;
   private String name;
-  private String timeUUID;
+  private UUID timeUUID;
   
   /**
    * @deprecated Since SNAPSHOT-2.0.0: Replaced by Time's natural ordering
@@ -36,11 +36,11 @@ public class Milestone {
     this.date = date;
   }
   
-  public String getTimeUUID() {
+  public UUID getTimeUUID() {
     return timeUUID;
   }
   
-  public void setTimeUUID(String timeUUID) {
+  public void setTimeUUID(UUID timeUUID) {
     this.timeUUID = timeUUID;
   }
   
