@@ -12,7 +12,7 @@
         "filters": [
           {
             "ThresholdFilter": {
-              "level": "info",
+              "level": "debug",
               "onMatch": "ACCEPT",
               "onMismatch": "DENY"
             }
@@ -216,7 +216,7 @@
           ]
         },
         {
-          "name": "ch.unibas.dmi.dbis.reqman.core",
+          "name": "ch.unibas.dmi.dbis.reqman.data",
           "level": "info",
           "additivity": false,
           "AppenderRef": [
@@ -327,11 +327,22 @@
           "additivity": false,
           "AppenderRef": [
             {
-              "ref": "console"
+              "ref": "console",
+              "level":"debug"
             },
             {
               "ref":"traceFile",
               "level":"trace"
+            }
+          ]
+        },
+        {
+          "name": "ch.unibas.dmi.dbis.reqman",
+          "level": "debug",
+          "additivity": false,
+          "AppenderRef": [
+            {
+              "ref": "console"
             }
           ]
         }
