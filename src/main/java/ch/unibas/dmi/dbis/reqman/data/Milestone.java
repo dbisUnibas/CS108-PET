@@ -11,11 +11,18 @@ import java.util.UUID;
 public class Milestone {
   
   private final UUID uuid;
-  
-  private int ordinal = 0;
-  
   private String name;
+  private String timeUUID;
   
+  /**
+   * @deprecated Since SNAPSHOT-2.0.0: Replaced by Time's natural ordering
+   */
+  @Deprecated
+  private int ordinal = 0;
+  /**
+   * @deprecated Since SNAPSHOT-2.0.0: Repalced by reference to time
+   */
+  @Deprecated
   private Date date;
   
   public Milestone() {
@@ -29,12 +36,20 @@ public class Milestone {
     this.date = date;
   }
   
+  public String getTimeUUID() {
+    return timeUUID;
+  }
   
+  public void setTimeUUID(String timeUUID) {
+    this.timeUUID = timeUUID;
+  }
+  
+  @Deprecated
   public int getOrdinal() {
     return ordinal;
   }
   
-  // TODO reduce visibility
+  @Deprecated
   public void setOrdinal(int ordinal) {
     this.ordinal = ordinal;
   }
@@ -46,11 +61,11 @@ public class Milestone {
   public void setName(String name) {
     this.name = name;
   }
-  
+  @Deprecated
   public Date getDate() {
     return date;
   }
-  
+  @Deprecated
   public void setDate(Date date) {
     this.date = date;
   }
@@ -71,20 +86,18 @@ public class Milestone {
   
   @Override
   public int hashCode() {
-    int result = getUuid() != null ? getUuid().hashCode() : 0;
-    result = 31 * result + getOrdinal();
+    int result = getUuid().hashCode();
     result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-    result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
+    result = 31 * result + (getTimeUUID() != null ? getTimeUUID().hashCode() : 0);
     return result;
   }
   
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("Milestone{");
+    final StringBuffer sb = new StringBuffer("Milestone{");
     sb.append("uuid=").append(uuid);
-    sb.append(", ordinal=").append(ordinal);
     sb.append(", name='").append(name).append('\'');
-    sb.append(", date=").append(date);
+    sb.append(", timeUUID='").append(timeUUID).append('\'');
     sb.append('}');
     return sb.toString();
   }
