@@ -174,21 +174,23 @@ public class Requirement {
   }
   
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("Requirement{");
-    sb.append("uuid=").append(uuid);
-    sb.append(", name='").append(name).append('\'');
-    sb.append(", description='").append(description).append('\'');
-    sb.append(", minMilestoneOrdinal=").append(minMilestoneOrdinal);
-    sb.append(", maxMilestoneOrdinal=").append(maxMilestoneOrdinal);
-    sb.append(", maxPoints=").append(maxPoints);
-    sb.append(", binary=").append(binary);
-    sb.append(", mandatory=").append(mandatory);
-    sb.append(", predecessorNames=").append(predecessorNames);
-    sb.append(", propertiesMap=").append(propertiesMap);
-    sb.append(", malus=").append(malus);
-    sb.append('}');
-    return sb.toString();
+  public int hashCode() {
+    int result;
+    long temp;
+    result = getUuid().hashCode();
+    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+    result = 31 * result + (getExcerpt() != null ? getExcerpt().hashCode() : 0);
+    result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
+    result = 31 * result + (getMinimalMilestoneUUID() != null ? getMinimalMilestoneUUID().hashCode() : 0);
+    result = 31 * result + (getMaximalMilestoneUUID() != null ? getMaximalMilestoneUUID().hashCode() : 0);
+    temp = Double.doubleToLongBits(getMaxPoints());
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    result = 31 * result + (isBinary() ? 1 : 0);
+    result = 31 * result + (getType() != null ? getType().hashCode() : 0);
+    result = 31 * result + (getPredecessorNames() != null ? getPredecessorNames().hashCode() : 0);
+    result = 31 * result + (getPropertiesMap() != null ? getPropertiesMap().hashCode() : 0);
+    result = 31 * result + (getCategory() != null ? getCategory().hashCode() : 0);
+    return result;
   }
   
   @Override
@@ -202,22 +204,22 @@ public class Requirement {
   }
   
   @Override
-  public int hashCode() {
-    int result;
-    long temp;
-    result = getUuid().hashCode();
-    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-    result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
-    result = 31 * result + getMinMilestoneOrdinal();
-    result = 31 * result + getMaxMilestoneOrdinal();
-    temp = Double.doubleToLongBits(getMaxPoints());
-    result = 31 * result + (int) (temp ^ (temp >>> 32));
-    result = 31 * result + (isBinary() ? 1 : 0);
-    result = 31 * result + (isMandatory() ? 1 : 0);
-    result = 31 * result + (getPredecessorNames() != null ? getPredecessorNames().hashCode() : 0);
-    result = 31 * result + (getPropertiesMap() != null ? getPropertiesMap().hashCode() : 0);
-    result = 31 * result + (isMalus() ? 1 : 0);
-    return result;
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("Requirement{");
+    sb.append("uuid=").append(uuid);
+    sb.append(", name='").append(name).append('\'');
+    sb.append(", excerpt='").append(excerpt).append('\'');
+    sb.append(", description='").append(description).append('\'');
+    sb.append(", minimalMilestoneUUID=").append(minimalMilestoneUUID);
+    sb.append(", maximalMilestoneUUID=").append(maximalMilestoneUUID);
+    sb.append(", maxPoints=").append(maxPoints);
+    sb.append(", binary=").append(binary);
+    sb.append(", type=").append(type);
+    sb.append(", predecessorNames=").append(predecessorNames);
+    sb.append(", propertiesMap=").append(propertiesMap);
+    sb.append(", category='").append(category).append('\'');
+    sb.append('}');
+    return sb.toString();
   }
   
   public String getName() {
