@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Group;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
 
 import java.io.File;

@@ -1,8 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.templating;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
 
 import java.util.Date;
 import java.util.Map;

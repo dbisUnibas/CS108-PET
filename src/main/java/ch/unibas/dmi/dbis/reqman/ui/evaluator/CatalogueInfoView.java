@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;

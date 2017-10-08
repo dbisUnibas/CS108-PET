@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListCell;

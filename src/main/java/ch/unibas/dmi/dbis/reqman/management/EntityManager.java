@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
-import ch.unibas.dmi.dbis.reqman.core.*;
+import ch.unibas.dmi.dbis.reqman.data.*;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;

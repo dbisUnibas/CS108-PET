@@ -1,8 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Progress;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Progress;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
 
 import java.util.Comparator;
 

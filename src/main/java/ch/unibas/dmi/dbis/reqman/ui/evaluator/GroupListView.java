@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.core.Group;
+import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListHandler;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;

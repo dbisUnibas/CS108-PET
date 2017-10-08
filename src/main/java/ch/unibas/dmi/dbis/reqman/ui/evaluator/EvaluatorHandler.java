@@ -2,7 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.Callback;
 import ch.unibas.dmi.dbis.reqman.common.Version;
-import ch.unibas.dmi.dbis.reqman.core.*;
+import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.management.CatalogueNameMismatchException;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.management.NonUniqueGroupNameException;

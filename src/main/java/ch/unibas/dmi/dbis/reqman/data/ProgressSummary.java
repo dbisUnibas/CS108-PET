@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.reqman.core;
+package ch.unibas.dmi.dbis.reqman.data;
 
 /**
  * TODO: write JavaDoc

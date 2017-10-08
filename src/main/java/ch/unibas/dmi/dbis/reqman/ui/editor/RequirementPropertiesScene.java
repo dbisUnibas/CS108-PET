@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;

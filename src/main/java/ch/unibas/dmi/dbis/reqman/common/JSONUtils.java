@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Group;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Group;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;

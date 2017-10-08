@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import javafx.scene.control.ListCell;
 
 /**

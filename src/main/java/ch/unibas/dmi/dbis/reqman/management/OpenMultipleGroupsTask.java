@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
-import ch.unibas.dmi.dbis.reqman.core.Group;
+import ch.unibas.dmi.dbis.reqman.data.Group;
 
 import java.io.File;
 import java.util.ArrayList;

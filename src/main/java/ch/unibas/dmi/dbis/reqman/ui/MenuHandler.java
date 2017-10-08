@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import javafx.event.ActionEvent;
 
 /**

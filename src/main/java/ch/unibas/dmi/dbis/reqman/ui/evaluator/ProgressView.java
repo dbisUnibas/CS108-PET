@@ -1,10 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Progress;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Progress;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;

@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.core.Group;
+import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.beans.property.SimpleStringProperty;
@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author loris.sauter
  */
-public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.core.Group> {
+public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.data.Group> {
 
     private static final Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger(GroupPropertiesScene.class);
     private final String catalogueName;
@@ -32,7 +32,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     private TextField tfProjectName;
     private TextField tfExportFileName;
     private TableView<Member> table;
-    private ch.unibas.dmi.dbis.reqman.core.Group group = null;
+    private ch.unibas.dmi.dbis.reqman.data.Group group = null;
     private ObservableList<Member> tableData;
 
     GroupPropertiesScene(EvaluatorHandler handler) {
@@ -80,7 +80,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     }
 
     @Override
-    public ch.unibas.dmi.dbis.reqman.core.Group create() throws IllegalStateException {
+    public ch.unibas.dmi.dbis.reqman.data.Group create() throws IllegalStateException {
         if (!isCreatorReady()) {
             throw new IllegalStateException("Cannot create Group, creator not ready");
         }

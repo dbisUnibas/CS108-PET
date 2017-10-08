@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.event.ActionEvent;

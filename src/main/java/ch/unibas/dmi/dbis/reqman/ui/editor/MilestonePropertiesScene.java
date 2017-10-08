@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.event.ActionEvent;

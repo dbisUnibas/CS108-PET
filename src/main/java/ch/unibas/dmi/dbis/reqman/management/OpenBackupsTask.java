@@ -2,8 +2,8 @@ package ch.unibas.dmi.dbis.reqman.management;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.configuration.ConfigUtils;
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Group;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Group;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;

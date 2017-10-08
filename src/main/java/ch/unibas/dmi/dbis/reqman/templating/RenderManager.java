@@ -2,7 +2,7 @@ package ch.unibas.dmi.dbis.reqman.templating;
 
 import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
-import ch.unibas.dmi.dbis.reqman.core.*;
+import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.management.OverviewSnapshot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

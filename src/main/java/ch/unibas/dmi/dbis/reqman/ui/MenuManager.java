@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
 
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;

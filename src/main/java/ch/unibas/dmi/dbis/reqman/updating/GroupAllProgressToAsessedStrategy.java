@@ -1,10 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.updating;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Group;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Progress;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Group;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Progress;
 
 import java.io.File;
 import java.io.IOException;

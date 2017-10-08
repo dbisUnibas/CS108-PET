@@ -2,7 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
-import ch.unibas.dmi.dbis.reqman.core.*;
+import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;

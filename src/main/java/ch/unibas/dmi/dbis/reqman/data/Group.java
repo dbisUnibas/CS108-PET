@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.reqman.core;
+package ch.unibas.dmi.dbis.reqman.data;
 
 import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import org.apache.logging.log4j.LogManager;

@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.common.Version;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;

@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListHandler;
 import ch.unibas.dmi.dbis.reqman.ui.common.ModifiableListView;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;

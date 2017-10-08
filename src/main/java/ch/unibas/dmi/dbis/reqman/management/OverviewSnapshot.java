@@ -1,8 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Group;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Group;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
 
 import java.util.ArrayList;
 import java.util.HashMap;
