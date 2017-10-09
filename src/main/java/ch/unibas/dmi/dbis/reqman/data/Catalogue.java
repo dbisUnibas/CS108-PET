@@ -11,15 +11,26 @@ import java.util.*;
  * A catalogue must have a name and may is associated with a lecture and date.
  * <p>
  * The catalogue class will be written serialized as a json object with jackson library.
+ * <p>
+ * <b>Note:</b> Since SNAPSHOT-2.0.0, all of the 'analysis' methods, i.e. {@link #getSum()} are deprecated.
+ * There will be dedicated classes for the analysis of ReqMan entities.
  *
  * @author loris.sauter
  */
 public class Catalogue {
   
   private final UUID uuid;
+  /**
+   * @deprecated Since SNAPSHOT-2.0.0: Got moved to entity Course
+   */
+  @Deprecated
   private String lecture;
   private String name;
   private String description;
+  /**
+   * @deprecated Since SNAPSHOT-2.0.0: Got moved t entity Course
+   */
+  @Deprecated
   private String semester;
   
   /**
@@ -31,6 +42,7 @@ public class Catalogue {
    */
   private List<Requirement> requirements = new Vector<Requirement>();
   
+  @Deprecated
   @JsonIgnore
   private Map<Integer, List<Requirement>> reqsPerMinMS = new TreeMap<>();
   
@@ -62,6 +74,7 @@ public class Catalogue {
    *
    * @return The lecture name this catalogue is associated with
    */
+  @Deprecated
   public String getLecture() {
     return lecture;
   }
@@ -71,6 +84,7 @@ public class Catalogue {
    *
    * @param lecture The lecture name
    */
+  @Deprecated
   public void setLecture(String lecture) {
     this.lecture = lecture;
   }
@@ -117,6 +131,7 @@ public class Catalogue {
    *
    * @return The semester of this catalogue
    */
+  @Deprecated
   public String getSemester() {
     return semester;
   }
@@ -126,6 +141,7 @@ public class Catalogue {
    *
    * @param semester The semester represented as a string
    */
+  @Deprecated
   public void setSemester(String semester) {
     this.semester = semester;
   }
@@ -236,6 +252,7 @@ public class Catalogue {
    * @param ordinal The oridnal of the milestone
    * @return The milestone with the ordinal specified or NULL if no such milestone exists
    */
+  @Deprecated
   public Milestone getMilestoneByOrdinal(int ordinal) {
     Milestone result = null;
     for (Milestone ms : milestones) {
@@ -257,6 +274,7 @@ public class Catalogue {
    * @param ordinal The ordinal of a milestone to get the requirements for
    * @return The list of requirements associated with this ordinal or an empty list if no such associated requirements exist
    */
+  @Deprecated
   public List<Requirement> getRequirementsByMilestone(int ordinal) {
     ArrayList<Requirement> reqs = new ArrayList<>();
     for (Requirement r : requirements) {
@@ -273,6 +291,7 @@ public class Catalogue {
    * @param ordinal The oridnal of a milestone to get the requirements for
    * @return The resulting list or NULL if no such milestone with the specified oridnal exists
    */
+  @Deprecated
   public List<Requirement> getRequirementsWithMinMS(int ordinal) {
     if (reqsPerMinMS.containsKey(ordinal)) {
       return new ArrayList<>(reqsPerMinMS.get(ordinal));
@@ -289,6 +308,7 @@ public class Catalogue {
    * @return The sum of maximal available points of the specified milestone or 0 if no such milestone exists
    */
   @JsonIgnore
+  @Deprecated
   public double getSum(int msOrdinal) {
     List<Requirement> reqs = reqsPerMinMS.get(msOrdinal);
     if (reqs == null) {
@@ -308,6 +328,7 @@ public class Catalogue {
    * @see Catalogue#getSum(int)
    */
   @JsonIgnore
+  @Deprecated
   public double getSum() {
     List<Double> points = new ArrayList<>();
     reqsPerMinMS.keySet().forEach(ordinal -> {
@@ -323,6 +344,7 @@ public class Catalogue {
    * @return The requirement with the specified name or NULL if no such requirement exists
    */
   @JsonIgnore
+  @Deprecated
   public Requirement getRequirementByName(String name) {
     for (Requirement r : requirements) {
       if (r.getName().equals(name)) {
@@ -339,6 +361,7 @@ public class Catalogue {
    * @return TRUE if a requirement with the specified name already exists - FALSE otherwise
    */
   @JsonIgnore
+  @Deprecated
   public boolean containsRequirement(String name) {
     for (Requirement r : requirements) {
       if (r.getName().equals(name)) {
@@ -355,6 +378,7 @@ public class Catalogue {
    * @return The requirement or NULL if no such requirement exists
    */
   @JsonIgnore
+  @Deprecated
   public Requirement getRequirementForProgress(Progress progress) {
     return getRequirementByName(progress.getRequirementName());
   }
@@ -366,6 +390,7 @@ public class Catalogue {
    * @return The milestone the progress was made on or NULL if no such milestone exists
    */
   @JsonIgnore
+  @Deprecated
   public Milestone getMilestoneForProgress(Progress progress) {
     return getMilestoneByOrdinal(progress.getMilestoneOrdinal());
   }
@@ -377,6 +402,7 @@ public class Catalogue {
    * @return the lastyl used ordinal
    */
   @JsonIgnore
+  @Deprecated
   public int getLastOrdinal() {
     if (milestones.isEmpty()) {
       return 0;
@@ -411,18 +437,13 @@ public class Catalogue {
   }
   
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("Catalogue{");
-    sb.append("uuid=").append(uuid);
-    sb.append(", lecture='").append(lecture).append('\'');
-    sb.append(", name='").append(name).append('\'');
-    sb.append(", description='").append(description).append('\'');
-    sb.append(", semester='").append(semester).append('\'');
-    sb.append(", milestones=").append(milestones);
-    sb.append(", requirements=").append(requirements);
-    sb.append(", reqsPerMinMS=").append(reqsPerMinMS);
-    sb.append('}');
-    return sb.toString();
+  public int hashCode() {
+    int result = getUuid().hashCode();
+    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+    result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
+    result = 31 * result + (getMilestones() != null ? getMilestones().hashCode() : 0);
+    result = 31 * result + (getRequirements() != null ? getRequirements().hashCode() : 0);
+    return result;
   }
   
   @Override
@@ -435,15 +456,14 @@ public class Catalogue {
   }
   
   @Override
-  public int hashCode() {
-    int result = getUuid().hashCode();
-    result = 31 * result + (getLecture() != null ? getLecture().hashCode() : 0);
-    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-    result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
-    result = 31 * result + (getSemester() != null ? getSemester().hashCode() : 0);
-    result = 31 * result + (getMilestones() != null ? getMilestones().hashCode() : 0);
-    result = 31 * result + (getRequirements() != null ? getRequirements().hashCode() : 0);
-    result = 31 * result + (reqsPerMinMS != null ? reqsPerMinMS.hashCode() : 0);
-    return result;
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("Catalogue{");
+    sb.append("uuid=").append(uuid);
+    sb.append(", name='").append(name).append('\'');
+    sb.append(", description='").append(description).append('\'');
+    sb.append(", milestones=").append(milestones);
+    sb.append(", requirements=").append(requirements);
+    sb.append('}');
+    return sb.toString();
   }
 }
