@@ -10,11 +10,15 @@ import java.util.UUID;
 public class ProgressSummary {
   
   private final UUID uuid;
+  private UUID milestoneUUID;
   
+  @Deprecated
   private int milestoneOrdinal;
+  
   private String internalComment;
   private String externalComment;
   
+  @Deprecated
   public ProgressSummary(int milestoneOrdinal, String internalComment, String externalComment) {
     this();
     this.milestoneOrdinal = milestoneOrdinal;
@@ -27,9 +31,18 @@ public class ProgressSummary {
   }
   
   
+  @Deprecated
   public int getMilestoneOrdinal() {
     
     return milestoneOrdinal;
+  }
+  
+  public UUID getMilestoneUUID() {
+    return milestoneUUID;
+  }
+  
+  public void setMilestoneUUID(UUID milestoneUUID) {
+    this.milestoneUUID = milestoneUUID;
   }
   
   public void setMilestoneOrdinal(int milestoneOrdinal) {
@@ -69,7 +82,7 @@ public class ProgressSummary {
   @Override
   public int hashCode() {
     int result = getUuid().hashCode();
-    result = 31 * result + getMilestoneOrdinal();
+    result = 31 * result + (milestoneUUID != null ? milestoneUUID.hashCode() : 0);
     result = 31 * result + (getInternalComment() != null ? getInternalComment().hashCode() : 0);
     result = 31 * result + (getExternalComment() != null ? getExternalComment().hashCode() : 0);
     return result;
@@ -79,7 +92,7 @@ public class ProgressSummary {
   public String toString() {
     final StringBuilder sb = new StringBuilder("ProgressSummary{");
     sb.append("uuid=").append(uuid);
-    sb.append(", milestoneOrdinal=").append(milestoneOrdinal);
+    sb.append(", milestoneUUID=").append(milestoneUUID);
     sb.append(", internalComment='").append(internalComment).append('\'');
     sb.append(", externalComment='").append(externalComment).append('\'');
     sb.append('}');
