@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -91,4 +93,7 @@ public class Course {
     groupUUIDs.clear();
   }
   
+  List<Time> getTimes() {
+    return new ArrayList<>(timeEntities);
+  }
 }
