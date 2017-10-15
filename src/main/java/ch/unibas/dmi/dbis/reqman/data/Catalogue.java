@@ -36,11 +36,11 @@ public class Catalogue {
   /**
    * The very list of milestones
    */
-  private List<Milestone> milestones = new Vector<Milestone>();
+  private List<Milestone> milestones = new ArrayList<>();
   /**
    * The very list of requirements
    */
-  private List<Requirement> requirements = new Vector<Requirement>();
+  private List<Requirement> requirements = new ArrayList<>();
   
   @Deprecated
   @JsonIgnore
@@ -465,5 +465,9 @@ public class Catalogue {
     sb.append(", requirements=").append(requirements);
     sb.append('}');
     return sb.toString();
+  }
+  
+  public void addAllRequirements(Requirement... requirements) {
+    this.requirements.addAll(Arrays.asList(requirements));
   }
 }

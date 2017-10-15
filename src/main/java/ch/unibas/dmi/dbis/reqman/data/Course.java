@@ -1,9 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * TODO: Write JavaDoc
@@ -22,6 +19,8 @@ public class Course {
   
   public Course(){
     uuid = UUID.randomUUID();
+    groupUUIDs = new HashSet<>();
+    timeEntities = new HashSet<>();
   }
   
   public UUID getUuid() {
@@ -95,5 +94,9 @@ public class Course {
   
   List<Time> getTimes() {
     return new ArrayList<>(timeEntities);
+  }
+  
+  public void addAllTimes(Time... times) {
+    timeEntities.addAll(Arrays.asList(times));
   }
 }

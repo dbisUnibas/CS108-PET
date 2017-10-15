@@ -1,10 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
-import ch.unibas.dmi.dbis.reqman.data.Catalogue;
-import ch.unibas.dmi.dbis.reqman.data.Course;
-import ch.unibas.dmi.dbis.reqman.data.Milestone;
-import ch.unibas.dmi.dbis.reqman.data.Time;
-
 import java.util.Date;
 
 /**
@@ -52,4 +47,6 @@ public class CourseManager {
     }
     return null;
   }
+  
+  
 }
