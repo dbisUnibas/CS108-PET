@@ -23,6 +23,12 @@ public class Course {
     timeEntities = new HashSet<>();
   }
   
+  Course(String name, String semester){
+    this();
+    this.name = name;
+    this.semester = semester;
+  }
+  
   public UUID getUuid() {
     return uuid;
   }
