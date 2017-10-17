@@ -15,6 +15,9 @@ public class CourseManagerTest {
   
   private Catalogue catalogue;
   private Course course;
+  
+  private EntityFactory factory;
+  
   private Time t1;
   private Time t2;
   private Time t3;
@@ -35,54 +38,41 @@ public class CourseManagerTest {
   
   @Before
   public void setupClasses(){
+    factory = EntityFactory.createFactoryAndCourse("Test Course", "HS17");
+    course = factory.getCourse();
+    catalogue = factory.createCatalogue("Test Catalogue");
+    catalogue.setDescription("Catalogue created during CourseManagerTest, thus used in unit test environment");
+    factory.setCatalogue(catalogue);
     setupTimeEntities();
     setupMilestones();
     setupRequirements();
-    setupCatalogue();
-    catalogue.addAllMilestones(ms1,ms2,ms3);
-    catalogue.addAllRequirements(r1,r2,r3,r4,r5);
-    setupCourse();
   }
   
   private void setupMilestones(){
-    ms1 = EntityFactory.createMilestone("MS1", t1);
-    ms2 = EntityFactory.createMilestone("MS2", t2);
-    ms3 = EntityFactory.createMilestone("MS3", t3);
+    ms1 = factory.createMilestone("MS1", t1);
+    ms2 = factory.createMilestone("MS2", t2);
+    ms3 = factory.createMilestone("MS3", t3);
   }
   
   private void setupRequirements(){
-    r1 = EntityFactory.createRequirement("R1", "ToDos for R1",5,ms1,ms1);
-    r2 = EntityFactory.createBinaryRequirement("R2", "ToDos for R2, binary", 1, ms1, ms3);
-    r3 = EntityFactory.createRequirement("R3", "ToDos for R3", 4, ms1, ms2);
-    r4 = EntityFactory.createBonusRequirement("R4", "ToDos for BONUS R4", 2, ms1, ms3);
-    r5 = EntityFactory.createMalusRequirement("R5", "Donts for MALUS R5", 5, ms1, ms3);
+    r1 = factory.createRequirement("R1", "ToDos for R1",5,ms1,ms1);
+    r2 = factory.createBinaryRequirement("R2", "ToDos for R2, binary", 1, ms1, ms3);
+    r3 = factory.createRequirement("R3", "ToDos for R3", 4, ms1, ms2);
+    r4 = factory.createBonusRequirement("R4", "ToDos for BONUS R4", 2, ms1, ms3);
+    r5 = factory.createMalusRequirement("R5", "Donts for MALUS R5", 5, ms1, ms3);
   }
   
-  private void setupCatalogue(){
-    catalogue = new Catalogue();
-    catalogue.setName("Test Catalogue");
-    catalogue.setDescription("Catalogue created during CourseManagerTest, thus used in unit test environment");
-  }
   
   private void setupTimeEntities(){
-    t1 = new Time();
     d1 = new Date(1508025600L);
-    t1.setDate(d1);
-    t2 = new Time();
     d2 = new Date(1508457600L);
-    t2.setDate(d2);
-    t3 = new Time();
     d3 = new Date(1508889600L);
-    t3.setDate(d3);
+    t1 = factory.createTime(d1);
+    t2 = factory.createTime(d2);
+    t3 = factory.createTime(d3);
   }
   
-  private void setupCourse(){
-    course = new Course();
-    course.setName("Test Course");
-    course.setSemester("HS17");
-    course.setCatalogueUUID(catalogue.getUuid());
-    course.addAllTimes(t1,t2,t3);
-  }
+  // TODO properly test manager
   
   @Test
   public void testGetMSDate(){

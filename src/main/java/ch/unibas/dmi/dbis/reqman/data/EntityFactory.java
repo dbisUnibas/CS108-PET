@@ -15,6 +15,9 @@ import java.util.Date;
  * @author loris.sauter
  */
 public class EntityFactory {
+  // TODO Unit test
+  
+  // TODO Decide whether singleton or not (currently: Not)
   
   /**
    * The internal manager instance for link resolving
@@ -43,7 +46,6 @@ public class EntityFactory {
    *
    * @param course The course, must not be null
    */
-  @NotNull
   private EntityFactory(Course course) {
     ensureNonNullArgument(course);
     this.course = course;
@@ -55,7 +57,6 @@ public class EntityFactory {
    * @param course    the course, must not be null
    * @param catalogue the catalogue, must not be null
    */
-  @NotNull
   private EntityFactory(Course course, Catalogue catalogue) {
     this(course);
     ensureNonNullArgument(catalogue);
@@ -124,6 +125,7 @@ public class EntityFactory {
    * @param minMS
    * @param maxMS
    * @return
+   * @throws IllegalStateException Iff no course / catalogue is set
    */
   public Requirement createBinaryRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, true, Requirement.Type.REGULAR);
@@ -141,6 +143,7 @@ public class EntityFactory {
    * @param minMS
    * @param maxMS
    * @return
+   * @throws IllegalStateException Iff no course / catalogue is set
    */
   public Requirement createRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, false, Requirement.Type.REGULAR);
@@ -157,6 +160,7 @@ public class EntityFactory {
    * @param minMS
    * @param maxMS
    * @return
+   * @throws IllegalStateException Iff no course / catalogue is set
    */
   public Requirement createMalusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, true, Requirement.Type.MALUS);
@@ -173,6 +177,7 @@ public class EntityFactory {
    * @param minMS
    * @param maxMS
    * @return
+   * @throws IllegalStateException Iff no course / catalogue is set
    */
   public Requirement createBonusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, true, Requirement.Type.BONUS);
@@ -191,7 +196,9 @@ public class EntityFactory {
    * @param time The {@link Time} object of the milestone's date. Must not be null
    * @return A new milestone, linked with the given Time entity and added to this factory's catalogue.
    * @throws IllegalArgumentException If the name or time argument is null (or both)
+   * @throws IllegalStateException Iff no course / catalogue is set
    */
+  @NotNull
   public Milestone createMilestone(String name, Time time) {
     ensureCourseAndCatalogueSet("Create Milestone");
     if (name == null || time == null) {
@@ -207,21 +214,58 @@ public class EntityFactory {
     return ms;
   }
   
-  public Milestone createMilestone(String name, Date date){
+  /**
+   * Creates a new {@link Milestone} with given name and {@link Date}.
+   * <p>
+   * Note that a {@link Time} entity for the given date will be created, if none exists in the namespace of the course.
+   *
+   * @param name The name of the milestone. Must not be null
+   * @param date The date on which the milestone is set to. Must not be null and will cause the creation of a {@link Time} entity for this date, if none exists
+   * @return A new milestone, linked with a newly created {@link Time} entity
+   * @throws IllegalArgumentException Iff either the name or date is null (or both).
+   * @throws IllegalStateException    Iff no course / catalogue is set
+   */
+  @NotNull
+  public Milestone createMilestone(String name, Date date) {
     ensureCourseAndCatalogueSet("Create Milestone");
-    if(name == null || date == null){
-    
+    if (name == null || date == null) {
+      throw new IllegalArgumentException("Cannot create milestone if name or date is null");
     }
-    return null;
+    Time t = createTime(date);
+    return createMilestone(name, t);
   }
   
-  public Time createTime(Date date){
-    return null;
+  /**
+   *
+   * @param date
+   * @return
+   * @throws IllegalStateException Iff no course / catalogue is set
+   */
+  public Time createTime(Date date) {
+    ensureCourseSet("Create Time");
+    if(date == null){
+      throw new IllegalArgumentException("Cannot create a time with date null");
+    }
+    Time t = new Time(date);
+    if(course.containsTime(t) ){
+      return course.getTimeFor(date);
+    }else{
+      course.addTime(t);
+      return t;
+    }
   }
   
+  /**
+   *
+   * @param name
+   * @return
+   * @throws  IllegalStateException Iff no course set
+   */
   public Catalogue createCatalogue(String name) {
+    ensureCourseSet("Create Catalogue");
     Catalogue cat = new Catalogue();
     cat.setName(name);
+    course.setCatalogueUUID(cat.getUuid());
     return cat;
   }
   
@@ -239,6 +283,10 @@ public class EntityFactory {
   }
   
   private Requirement createRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS, boolean binary, Requirement.Type type) {
+    if(manager.compare(minMS, maxMS) > 0){ // General compare contract
+      throw new IllegalArgumentException("MinMS cannot have a date greater than maxMS ("+manager.getMilestoneDate(minMS)+" > "+manager.getMilestoneDate(maxMS)+")");
+    }
+    
     Requirement r = new Requirement();
     r.setName(name);
     r.setExcerpt(excerpt);
@@ -247,6 +295,11 @@ public class EntityFactory {
     r.setMaximalMilestoneUUID(maxMS.getUuid());
     r.setBinary(binary);
     r.setType(type);
+    
+    catalogue.addRequirement(r);
+    
+    // TODO add contains check: reqs, ms' are now all set (based on equals, thus based on UUID)
+    
     return r;
   }
   

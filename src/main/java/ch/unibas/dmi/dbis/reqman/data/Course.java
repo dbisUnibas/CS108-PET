@@ -25,7 +25,6 @@ public class Course {
     timeEntities = new HashSet<>();
   }
   
-  @NotNull
   Course(String name, String semester) {
     this();
     this.name = name;
@@ -145,6 +144,7 @@ public class Course {
   public void clearGroupSet() {
     groupUUIDs.clear();
   }
+  
   @NotNull
   public void addAllTimes(Time... times) {
     timeEntities.addAll(Arrays.asList(times));
@@ -154,4 +154,13 @@ public class Course {
     return new ArrayList<>(timeEntities);
   }
   
+  @NotNull
+  public Time getTimeFor(Date date) {
+    for (Time t : timeEntities) {
+      if (t.getDate().equals(date)) {
+        return t;
+      }
+    }
+    return null;
+  }
 }

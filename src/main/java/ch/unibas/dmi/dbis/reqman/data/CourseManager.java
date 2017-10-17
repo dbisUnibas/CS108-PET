@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Date;
  *
  * @author loris.sauter
  */
-public class CourseManager {
+public class CourseManager implements Comparator<Milestone> {
   
   private final Course course;
   private final Catalogue catalogue;
@@ -55,4 +56,8 @@ public class CourseManager {
   }
   
   
+  @Override
+  public int compare(Milestone o1, Milestone o2) {
+    return getMilestoneDate(o1).compareTo(getMilestoneDate(o2));
+  }
 }
