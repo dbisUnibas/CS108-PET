@@ -3,9 +3,9 @@ package ch.unibas.dmi.dbis.reqman.data;
 /**
  * Creates entities that are linked with each other.
  * <p>
- * Since the {@link Catalogue} entity and the {@link Course} entity are linked,
+ * Since the {@link Catalogue} entity and the {@link Course} entity are heavily dependent on each other,
  * the factory needs both of them in order to work properly.
- * <p>
+ * </p>
  * Basically, the factory creates the entities and links them in a structured and safe way.
  *
  * @author loris.sauter
@@ -28,6 +28,7 @@ public class EntityFactory {
   
   /**
    * Legacy
+   *
    * @deprecated Replaced by parametrized constructors
    */
   private EntityFactory() {
@@ -35,6 +36,7 @@ public class EntityFactory {
   
   /**
    * Creates an EntityFactory for the given course
+   *
    * @param course The course, must not be null
    */
   private EntityFactory(Course course) {
@@ -44,7 +46,8 @@ public class EntityFactory {
   
   /**
    * Creates an EntityFactory for the given course and catalogue
-   * @param course the course, must not be null
+   *
+   * @param course    the course, must not be null
    * @param catalogue the catalogue, must not be null
    */
   private EntityFactory(Course course, Catalogue catalogue) {
@@ -56,10 +59,11 @@ public class EntityFactory {
   
   /**
    * Creates a new EntityFactory for the given course.
-   *
+   * <p>
    * The factory also needs to have its catalogue set, in order to function properly
-   *
+   * <p>
    * The given course is used to resolve dates via the course's Time entities.
+   *
    * @param course The course to use when creating new entities with this factory. Must not be null
    * @return A new EntityFactory which will create entities in the namespace of the specified course.
    * @throws IllegalArgumentException If the specified course object is null
@@ -70,12 +74,13 @@ public class EntityFactory {
   
   /**
    * Creates a new EntityFactory for the given course and given catalogue.
-   *
+   * <p>
    * The given course is used to resolve dates via the course's Time entities.
-   *
+   * <p>
    * The given catalogue is used to link milestones and requirements on the fly.
    * Besides this, requirements and milestones are automatically added to the catalogue on the fly.
-   * @param course The course to use when creating new entities with this factory. Must not be null
+   *
+   * @param course    The course to use when creating new entities with this factory. Must not be null
    * @param catalogue The catalogue to use when creating new entities with this factory. Must not be null
    * @return A new EntityFactory which will create entities in the namespace of the specified course/catalogue.
    * @throws IllegalArgumentException If either the course or catalogue are null
@@ -107,7 +112,8 @@ public class EntityFactory {
   /**
    * Creates a new requirement with the specified properties.
    * <p>
-   * The resulting requirement is of type {@link ch.unibas.dmi.dbis.reqman.data.Requirement.Type#REGULAR} and is non-binary.
+   * The resulting requirement is of type {@link ch.unibas.dmi.dbis.reqman.data.Requirement.Type#REGULAR} and is
+   * non-binary.
    *
    * @param name
    * @param excerpt
