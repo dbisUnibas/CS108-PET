@@ -13,6 +13,12 @@ public class CourseManager {
   private final Catalogue catalogue;
   
   public CourseManager(Course course, Catalogue catalogue) {
+    if(course == null || catalogue == null){
+      throw new IllegalArgumentException("Cannot create CourseManager if course or catalogue is null");
+    }
+    if(! course.getCatalogueUUID().equals(catalogue.getUuid()) ){
+      throw new IllegalArgumentException("Nonmatching course/catalogue pair. Expected catalogue "+course.getCatalogueUUID()+", but "+catalogue.getUuid()+" given");
+    }
     this.course = course;
     this.catalogue = catalogue;
   }

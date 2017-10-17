@@ -89,6 +89,16 @@ public class EntityFactory {
     return new EntityFactory(course, catalogue);
   }
   
+  /**
+   * Creates a new EntityFactory and a new course, for which this factory will create entities.
+   * <p>
+   * The factory also needs to have its catalogue set, in order to function properly
+   * <p>
+   * The given course is used to resolve dates via the course's Time entities.
+   * @param courseName The name for the course
+   * @param semester The semester abbreviation
+   * @return A new EntityFactory with the newly created course, based on the given arguments
+   */
   public static EntityFactory createFactoryAndCourse(String courseName, String semester) {
     return new EntityFactory(new Course(courseName, semester));
   }
