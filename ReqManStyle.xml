@@ -1,5 +1,7 @@
 <code_scheme name="ReqManStyle">
+  <option name="JD_PRESERVE_LINE_FEEDS" value="true" />
   <option name="HTML_ATTRIBUTE_WRAP" value="0" />
+  <option name="WRAP_COMMENTS" value="true" />
   <codeStyleSettings language="HTML">
     <indentOptions>
       <option name="INDENT_SIZE" value="2" />
@@ -219,7 +221,30 @@
         <section>
           <rule>
             <match>
-              <CONSTRUCTOR>true</CONSTRUCTOR>
+              <AND>
+                <CONSTRUCTOR>true</CONSTRUCTOR>
+                <PUBLIC>true</PUBLIC>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <CONSTRUCTOR>true</CONSTRUCTOR>
+                <PACKAGE_PRIVATE>true</PACKAGE_PRIVATE>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <CONSTRUCTOR>true</CONSTRUCTOR>
+                <PROTECTED>true</PROTECTED>
+              </AND>
             </match>
           </rule>
         </section>
@@ -236,9 +261,100 @@
         <section>
           <rule>
             <match>
+              <CONSTRUCTOR>true</CONSTRUCTOR>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <METHOD>true</METHOD>
+                <PUBLIC>true</PUBLIC>
+                <STATIC>true</STATIC>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <METHOD>true</METHOD>
+                <PACKAGE_PRIVATE>true</PACKAGE_PRIVATE>
+                <STATIC>true</STATIC>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
               <AND>
                 <METHOD>true</METHOD>
                 <STATIC>true</STATIC>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <METHOD>true</METHOD>
+                <PROTECTED>true</PROTECTED>
+                <STATIC>true</STATIC>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <METHOD>true</METHOD>
+                <PRIVATE>true</PRIVATE>
+                <STATIC>true</STATIC>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <METHOD>true</METHOD>
+                <PUBLIC>true</PUBLIC>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <METHOD>true</METHOD>
+                <PACKAGE_PRIVATE>true</PACKAGE_PRIVATE>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <METHOD>true</METHOD>
+                <PROTECTED>true</PROTECTED>
+              </AND>
+            </match>
+          </rule>
+        </section>
+        <section>
+          <rule>
+            <match>
+              <AND>
+                <METHOD>true</METHOD>
+                <PRIVATE>true</PRIVATE>
               </AND>
             </match>
           </rule>
