@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 /**
@@ -17,13 +19,14 @@ public class Course {
   private Set<UUID> groupUUIDs;
   private Set<Time> timeEntities;
   
-  public Course(){
+  public Course() {
     uuid = UUID.randomUUID();
     groupUUIDs = new HashSet<>();
     timeEntities = new HashSet<>();
   }
   
-  Course(String name, String semester){
+  @NotNull
+  Course(String name, String semester) {
     this();
     this.name = name;
     this.semester = semester;
@@ -37,6 +40,7 @@ public class Course {
     return name;
   }
   
+  @NotNull
   public void setName(String name) {
     this.name = name;
   }
@@ -45,6 +49,7 @@ public class Course {
     return semester;
   }
   
+  @NotNull
   public void setSemester(String semester) {
     this.semester = semester;
   }
@@ -53,6 +58,7 @@ public class Course {
     return catalogueUUID;
   }
   
+  @NotNull
   public void setCatalogueUUID(UUID catalogueUUID) {
     this.catalogueUUID = catalogueUUID;
   }
@@ -62,14 +68,53 @@ public class Course {
     return timeEntities.isEmpty();
   }
   
+  /**
+   * Returns {@code true} if this course contains the given {@link Time}.
+   * <p>
+   * The time entity is identified by its {@link UUID}, but also by its {@link Date}.
+   * So if either the time's UUID ({@link Time#getUuid()}) or the time's date ({@link Time#getDate()}), represented by
+   * another time entity,
+   * already is in the course's time entity set, this method will return {@code true} - otherwise {@code false}
+   *
+   * @param time
+   * @return
+   */
+  @NotNull
   public boolean containsTime(Time time) {
-    return timeEntities.contains(time);
+    if (timeEntities.contains(time)) {
+      return true;
+    } else {
+      for (Time t : timeEntities) {
+        if (t.getDate().equals(time.getDate())) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
   
+  /**
+   * Adds the given {@link Time} entity to the set of time entities.
+   * <p>
+   * If the given time entity is already part of the set, this method returns {@code false},
+   * otherwise -on success- it returns {@code true}.
+   * More formally, the return value of this method is either {@code false}, iff Course{@link #containsTime(Time)}
+   * returns {@code true}. Otherwise the return value is the one of the operation {@link Set#add(Object)}, where the
+   * set is the internal set of time entities, and the object the given time entity.
+   *
+   * @param time The time to add. Must not be null
+   * @return {@code true} on success, so the given time entity was added to the set of time entities, or {@code false}
+   * if this time entity (or the entity's date) were already in the set.
+   */
+  @NotNull
   public boolean addTime(Time time) {
+    if (containsTime(time)) {
+      return false;
+    }
     return timeEntities.add(time);
   }
   
+  @NotNull
   public boolean removeTime(Time time) {
     return timeEntities.remove(time);
   }
@@ -82,14 +127,17 @@ public class Course {
     return groupUUIDs.isEmpty();
   }
   
+  @NotNull
   public boolean containsGroup(Group group) {
     return groupUUIDs.contains(group.getUuid());
   }
   
+  @NotNull
   public boolean addGroup(Group group) {
     return groupUUIDs.add(group.getUuid());
   }
   
+  @NotNull
   public boolean removeGroup(Group group) {
     return groupUUIDs.remove(group.getUuid());
   }
@@ -97,12 +145,13 @@ public class Course {
   public void clearGroupSet() {
     groupUUIDs.clear();
   }
+  @NotNull
+  public void addAllTimes(Time... times) {
+    timeEntities.addAll(Arrays.asList(times));
+  }
   
   List<Time> getTimes() {
     return new ArrayList<>(timeEntities);
   }
   
-  public void addAllTimes(Time... times) {
-    timeEntities.addAll(Arrays.asList(times));
-  }
 }

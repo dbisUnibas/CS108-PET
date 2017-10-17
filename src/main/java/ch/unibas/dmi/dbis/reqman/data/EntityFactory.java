@@ -1,5 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Date;
+
 /**
  * Creates entities that are linked with each other.
  * <p>
@@ -39,6 +43,7 @@ public class EntityFactory {
    *
    * @param course The course, must not be null
    */
+  @NotNull
   private EntityFactory(Course course) {
     ensureNonNullArgument(course);
     this.course = course;
@@ -50,6 +55,7 @@ public class EntityFactory {
    * @param course    the course, must not be null
    * @param catalogue the catalogue, must not be null
    */
+  @NotNull
   private EntityFactory(Course course, Catalogue catalogue) {
     this(course);
     ensureNonNullArgument(catalogue);
@@ -68,6 +74,7 @@ public class EntityFactory {
    * @return A new EntityFactory which will create entities in the namespace of the specified course.
    * @throws IllegalArgumentException If the specified course object is null
    */
+  @NotNull
   public static EntityFactory createFactoryFor(Course course) {
     return new EntityFactory(course);
   }
@@ -85,6 +92,7 @@ public class EntityFactory {
    * @return A new EntityFactory which will create entities in the namespace of the specified course/catalogue.
    * @throws IllegalArgumentException If either the course or catalogue are null
    */
+  @NotNull
   public static EntityFactory createFactoryFor(Course course, Catalogue catalogue) {
     return new EntityFactory(course, catalogue);
   }
@@ -95,10 +103,12 @@ public class EntityFactory {
    * The factory also needs to have its catalogue set, in order to function properly
    * <p>
    * The given course is used to resolve dates via the course's Time entities.
+   *
    * @param courseName The name for the course
-   * @param semester The semester abbreviation
+   * @param semester   The semester abbreviation
    * @return A new EntityFactory with the newly created course, based on the given arguments
    */
+  @NotNull
   public static EntityFactory createFactoryAndCourse(String courseName, String semester) {
     return new EntityFactory(new Course(courseName, semester));
   }
@@ -115,7 +125,7 @@ public class EntityFactory {
    * @param maxMS
    * @return
    */
-  public static Requirement createBinaryRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
+  public Requirement createBinaryRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, true, Requirement.Type.REGULAR);
   }
   
@@ -132,7 +142,7 @@ public class EntityFactory {
    * @param maxMS
    * @return
    */
-  public static Requirement createRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
+  public Requirement createRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, false, Requirement.Type.REGULAR);
   }
   
@@ -148,7 +158,7 @@ public class EntityFactory {
    * @param maxMS
    * @return
    */
-  public static Requirement createMalusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
+  public Requirement createMalusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, true, Requirement.Type.MALUS);
   }
   
@@ -164,33 +174,55 @@ public class EntityFactory {
    * @param maxMS
    * @return
    */
-  public static Requirement createBonusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
+  public Requirement createBonusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, true, Requirement.Type.BONUS);
   }
   
-  public static Milestone createMilestone(String name, Time time) {
+  /**
+   * Creates a new {@link Milestone} with given name and {@link Time}.
+   * <p>
+   * This operation requires the course and catalogue of this factory set.
+   * <p>
+   * If the given time is not already part of the {@link Course}, it will be added to it.
+   * <p>
+   * The resulting milestone will be automatically added to the catalogue.
+   *
+   * @param name The name of the milestone. Must not be null
+   * @param time The {@link Time} object of the milestone's date. Must not be null
+   * @return A new milestone, linked with the given Time entity and added to this factory's catalogue.
+   * @throws IllegalArgumentException If the name or time argument is null (or both)
+   */
+  public Milestone createMilestone(String name, Time time) {
+    ensureCourseAndCatalogueSet("Create Milestone");
+    if (name == null || time == null) {
+      throw new IllegalArgumentException("Cannot create milestone if name or time is null");
+    }
+    if (!course.containsTime(time)) {
+      course.addTime(time);
+    }
     Milestone ms = new Milestone();
     ms.setName(name);
     ms.setTimeUUID(time.getUuid());
+    catalogue.addMilestone(ms);
     return ms;
   }
   
-  public static Catalogue createCatalogue(String name) {
+  public Milestone createMilestone(String name, Date date){
+    ensureCourseAndCatalogueSet("Create Milestone");
+    if(name == null || date == null){
+    
+    }
+    return null;
+  }
+  
+  public Time createTime(Date date){
+    return null;
+  }
+  
+  public Catalogue createCatalogue(String name) {
     Catalogue cat = new Catalogue();
     cat.setName(name);
     return cat;
-  }
-  
-  private static Requirement createRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS, boolean binary, Requirement.Type type) {
-    Requirement r = new Requirement();
-    r.setName(name);
-    r.setExcerpt(excerpt);
-    r.setMaxPoints(maxPoints);
-    r.setMinimalMilestoneUUID(minMS.getUuid());
-    r.setMaximalMilestoneUUID(maxMS.getUuid());
-    r.setBinary(binary);
-    r.setType(type);
-    return r;
   }
   
   public Catalogue getCatalogue() {
@@ -204,6 +236,18 @@ public class EntityFactory {
   
   public Course getCourse() {
     return course;
+  }
+  
+  private Requirement createRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS, boolean binary, Requirement.Type type) {
+    Requirement r = new Requirement();
+    r.setName(name);
+    r.setExcerpt(excerpt);
+    r.setMaxPoints(maxPoints);
+    r.setMinimalMilestoneUUID(minMS.getUuid());
+    r.setMaximalMilestoneUUID(maxMS.getUuid());
+    r.setBinary(binary);
+    r.setType(type);
+    return r;
   }
   
   private void ensureCourseSet(String operation) {
@@ -224,6 +268,16 @@ public class EntityFactory {
   
   private void ensureCatalogueSet() {
     ensureCatalogueSet("");
+  }
+  
+  private void ensureCourseAndCatalogueSet(String operation) {
+    ensureCourseSet(operation);
+    ensureCatalogueSet(operation);
+  }
+  
+  private void ensureCourseAndAcatalogueSet() {
+    ensureCourseSet();
+    ensureCatalogueSet();
   }
   
   private void ensureNonNullArgument(Object o) {
