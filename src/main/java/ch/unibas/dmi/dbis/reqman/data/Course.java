@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -155,6 +156,7 @@ public class Course {
   }
   
   @NotNull
+  @JsonIgnore
   public Time getTimeFor(Date date) {
     for (Time t : timeEntities) {
       if (t.getDate().equals(date)) {

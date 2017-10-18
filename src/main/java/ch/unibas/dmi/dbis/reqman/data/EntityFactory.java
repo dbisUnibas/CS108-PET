@@ -15,7 +15,6 @@ import java.util.Date;
  * @author loris.sauter
  */
 public class EntityFactory {
-  // TODO Unit test
   
   // TODO Decide whether singleton or not (currently: Not)
   
