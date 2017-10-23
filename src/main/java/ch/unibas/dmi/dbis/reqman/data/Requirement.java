@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import java.util.*;
 
@@ -272,17 +273,15 @@ public class Requirement {
     this.binary = binary;
   }
   
-  @Deprecated
   public boolean isMandatory() {
-    return mandatory;
+    return type.equals(Type.REGULAR);
   }
   @Deprecated
   public void setMandatory(boolean mandatory) {
     this.mandatory = mandatory;
   }
-  @Deprecated
   public boolean isMalus() {
-    return malus;
+    return type.equals(Type.MALUS);
   }
   @Deprecated
   public void setMalus(boolean malus) {
@@ -343,12 +342,27 @@ public class Requirement {
   }
   
   @JsonIgnore
+  @Deprecated
   public double getMaxPointsSensitive() {
     double factor = isMalus() ? -1.0 : 1.0;
     return getMaxPoints() * factor;
   }
   
+  /**
+   * Denotes whether this requirement is a regular requirement.
+   * Non-regular requirements are either bonus or malus requirements and are not considered for the
+   * maximal available points of a catalogue.
+   * @return TRUE iff and only if this requirement is of type REGULAR.
+   */
+  @JsonIgnore
+  public boolean isRegular(){
+    return this.type.equals(Type.REGULAR);
+  }
   
+  @JsonIgnore
+  public boolean isBonus(){
+    return type.equals(Type.BONUS);
+  }
   
   /**
    * Returns the UUID of this requirement.

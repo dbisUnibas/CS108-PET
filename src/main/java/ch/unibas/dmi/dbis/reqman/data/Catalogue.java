@@ -162,7 +162,7 @@ public class Catalogue {
    * Removes the given milestone from the list of of milestones.
    *
    * @param milestone The milestone to remove
-   * @return The result: TURE if the operation was successful
+   * @return The result: TRUE if the operation was successful
    * @see List#remove(Object)
    */
   public boolean removeMilestone(Milestone milestone) {
@@ -185,24 +185,9 @@ public class Catalogue {
    * @return The result of the {@link List#add(Object)} operation
    */
   public boolean addRequirement(Requirement requirement) {
-    addReqToInternalMap(requirement);
     return requirements.add(requirement);
   }
   
-  /**
-   * Adds the given requirement to the internal storage.
-   * Internal storage references the map of minimal milestone <-> requirements
-   *
-   * @param requirement The requirement to add
-   */
-  private void addReqToInternalMap(Requirement requirement) {
-    if (reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()) != null) {
-      reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).add(requirement);
-    } else {
-      List<Requirement> list = new ArrayList<>(Arrays.asList(requirement));
-      reqsPerMinMS.put(requirement.getMinMilestoneOrdinal(), list);
-    }
-  }
   
   /**
    * Removes the specified requirements
@@ -211,9 +196,6 @@ public class Catalogue {
    * @return The result of the {@link List#remove(Object)} operation
    */
   public boolean removeRequirement(Requirement requirement) {
-    if (reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()) != null) {
-      reqsPerMinMS.get(requirement.getMinMilestoneOrdinal()).remove(requirement);
-    }
     return requirements.remove(requirement);
     
   }
@@ -276,13 +258,7 @@ public class Catalogue {
    */
   @Deprecated
   public List<Requirement> getRequirementsByMilestone(int ordinal) {
-    ArrayList<Requirement> reqs = new ArrayList<>();
-    for (Requirement r : requirements) {
-      if (r.getMinMilestoneOrdinal() <= ordinal && ordinal <= r.getMaxMilestoneOrdinal()) {
-        reqs.add(r);
-      }
-    }
-    return reqs;
+    return null;
   }
   
   /**
@@ -293,11 +269,7 @@ public class Catalogue {
    */
   @Deprecated
   public List<Requirement> getRequirementsWithMinMS(int ordinal) {
-    if (reqsPerMinMS.containsKey(ordinal)) {
-      return new ArrayList<>(reqsPerMinMS.get(ordinal));
-    } else {
-      return null;
-    }
+    return null;
   }
   
   /**
@@ -428,7 +400,7 @@ public class Catalogue {
    * this method after reading from a JSON file it is ensured that those internal structure is correct.
    */
   public void resyncRequirements() {
-    requirements.forEach(this::addReqToInternalMap);
+    // nothing
   }
   
   
