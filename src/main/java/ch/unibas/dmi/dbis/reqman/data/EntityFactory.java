@@ -268,6 +268,26 @@ public class EntityFactory {
     return cat;
   }
   
+  /**
+   * Creates a new progress
+   * @param requirement
+   * @param ps
+   * @param points the amount of points achieved
+   * @return
+   */
+  public Progress createProgressFor(Requirement requirement, ProgressSummary ps, double points){
+    Progress p = new Progress();
+    p.setAssessmentDate(new Date() );
+    double fraction = points / requirement.getMaxPoints();
+    if(Double.isNaN(fraction) && requirement.getMaxPoints()==0){
+      fraction = 1;
+    }
+    p.setFraction(fraction);
+    p.setRequirementUUID(requirement.getUuid());
+    p.setProgressSummaryUUID(ps.getUuid());
+    return p;
+  }
+  
   public Catalogue getCatalogue() {
     return catalogue;
   }
