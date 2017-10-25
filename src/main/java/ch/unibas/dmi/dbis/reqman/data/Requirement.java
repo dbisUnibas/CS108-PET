@@ -109,6 +109,7 @@ public class Requirement {
    * @param mandatory           Whether this requirement is mandatory
    * @param malus               Whether this requirement has to be considered as a malus.
    */
+  @Deprecated
   public Requirement(String name, String description, int minMilestoneOrdinal, int maxMilestoneOrdinal, double maxPoints, boolean binary, boolean mandatory, boolean malus) {
     this();
     

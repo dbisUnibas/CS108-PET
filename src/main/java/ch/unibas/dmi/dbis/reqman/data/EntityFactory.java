@@ -282,6 +282,7 @@ public class EntityFactory {
   }
   
   private Requirement createRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS, boolean binary, Requirement.Type type) {
+    ensureCourseAndCatalogueSet("CreateRequirement");
     if(manager.compare(minMS, maxMS) > 0){ // General compare contract
       throw new IllegalArgumentException("MinMS cannot have a date greater than maxMS ("+manager.getMilestoneDate(minMS)+" > "+manager.getMilestoneDate(maxMS)+")");
     }
