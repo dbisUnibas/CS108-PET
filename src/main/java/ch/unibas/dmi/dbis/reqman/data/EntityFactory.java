@@ -195,7 +195,7 @@ public class EntityFactory {
    * @param time The {@link Time} object of the milestone's date. Must not be null
    * @return A new milestone, linked with the given Time entity and added to this factory's catalogue.
    * @throws IllegalArgumentException If the name or time argument is null (or both)
-   * @throws IllegalStateException Iff no course / catalogue is set
+   * @throws IllegalStateException    Iff no course / catalogue is set
    */
   @NotNull
   public Milestone createMilestone(String name, Time time) {
@@ -219,7 +219,8 @@ public class EntityFactory {
    * Note that a {@link Time} entity for the given date will be created, if none exists in the namespace of the course.
    *
    * @param name The name of the milestone. Must not be null
-   * @param date The date on which the milestone is set to. Must not be null and will cause the creation of a {@link Time} entity for this date, if none exists
+   * @param date The date on which the milestone is set to. Must not be null and will cause the creation of a {@link
+   *             Time} entity for this date, if none exists
    * @return A new milestone, linked with a newly created {@link Time} entity
    * @throws IllegalArgumentException Iff either the name or date is null (or both).
    * @throws IllegalStateException    Iff no course / catalogue is set
@@ -235,30 +236,28 @@ public class EntityFactory {
   }
   
   /**
-   *
    * @param date
    * @return
    * @throws IllegalStateException Iff no course / catalogue is set
    */
   public Time createTime(Date date) {
     ensureCourseSet("Create Time");
-    if(date == null){
+    if (date == null) {
       throw new IllegalArgumentException("Cannot create a time with date null");
     }
     Time t = new Time(date);
-    if(course.containsTime(t) ){
+    if (course.containsTime(t)) {
       return course.getTimeFor(date);
-    }else{
+    } else {
       course.addTime(t);
       return t;
     }
   }
   
   /**
-   *
    * @param name
    * @return
-   * @throws  IllegalStateException Iff no course set
+   * @throws IllegalStateException Iff no course set
    */
   public Catalogue createCatalogue(String name) {
     ensureCourseSet("Create Catalogue");
@@ -266,35 +265,6 @@ public class EntityFactory {
     cat.setName(name);
     course.setCatalogueUUID(cat.getUuid());
     return cat;
-  }
-  
-  ProgressSummary createProgressSummary(Milestone ms){
-    ProgressSummary ps = new ProgressSummary();
-    ps.setMilestoneUUID(ms.getUuid());
-    return ps;
-  }
-  
-  /**
-   * Creates a new progress
-   * @param requirement
-   * @param ps
-   * @param points the amount of points achieved
-   * @return
-   */
-  Progress createProgressFor(Requirement requirement, ProgressSummary ps, double points){
-    Progress p = new Progress();
-    p.setAssessmentDate(new Date() );
-    double fraction = points / requirement.getMaxPoints();
-    if(Double.isNaN(fraction) && requirement.getMaxPoints()==0){
-      fraction = 1;
-    }
-    p.setFraction(fraction);
-    p.setRequirementUUID(requirement.getUuid());
-    p.setProgressSummaryUUID(ps.getUuid());
-    
-    // TODO Linking to group?
-    
-    return p;
   }
   
   public Catalogue getCatalogue() {
@@ -310,10 +280,40 @@ public class EntityFactory {
     return course;
   }
   
+  ProgressSummary createProgressSummary(Milestone ms) {
+    ProgressSummary ps = new ProgressSummary();
+    ps.setMilestoneUUID(ms.getUuid());
+    return ps;
+  }
+  
+  /**
+   * Creates a new progress
+   *
+   * @param requirement
+   * @param ps
+   * @param points      the amount of points achieved
+   * @return
+   */
+  Progress createProgressFor(Requirement requirement, ProgressSummary ps, double points) {
+    Progress p = new Progress();
+    p.setAssessmentDate(new Date());
+    double fraction = points / requirement.getMaxPoints();
+    if (Double.isNaN(fraction) && requirement.getMaxPoints() == 0) {
+      fraction = 1;
+    }
+    p.setFraction(fraction);
+    p.setRequirementUUID(requirement.getUuid());
+    p.setProgressSummaryUUID(ps.getUuid());
+    
+    // TODO Linking to group?
+    
+    return p;
+  }
+  
   private Requirement createRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS, boolean binary, Requirement.Type type) {
     ensureCourseAndCatalogueSet("CreateRequirement");
-    if(manager.compare(minMS, maxMS) > 0){ // General compare contract
-      throw new IllegalArgumentException("MinMS cannot have a date greater than maxMS ("+manager.getMilestoneDate(minMS)+" > "+manager.getMilestoneDate(maxMS)+")");
+    if (manager.compare(minMS, maxMS) > 0) { // General compare contract
+      throw new IllegalArgumentException("MinMS cannot have a date greater than maxMS (" + manager.getMilestoneDate(minMS) + " > " + manager.getMilestoneDate(maxMS) + ")");
     }
     
     Requirement r = new Requirement();
