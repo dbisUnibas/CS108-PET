@@ -45,6 +45,7 @@ public class ProgressSummary {
     this.milestoneUUID = milestoneUUID;
   }
   
+  @Deprecated
   public void setMilestoneOrdinal(int milestoneOrdinal) {
     this.milestoneOrdinal = milestoneOrdinal;
   }

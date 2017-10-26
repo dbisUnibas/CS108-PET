@@ -268,6 +268,12 @@ public class EntityFactory {
     return cat;
   }
   
+  ProgressSummary createProgressSummary(Milestone ms){
+    ProgressSummary ps = new ProgressSummary();
+    ps.setMilestoneUUID(ms.getUuid());
+    return ps;
+  }
+  
   /**
    * Creates a new progress
    * @param requirement
@@ -275,7 +281,7 @@ public class EntityFactory {
    * @param points the amount of points achieved
    * @return
    */
-  public Progress createProgressFor(Requirement requirement, ProgressSummary ps, double points){
+  Progress createProgressFor(Requirement requirement, ProgressSummary ps, double points){
     Progress p = new Progress();
     p.setAssessmentDate(new Date() );
     double fraction = points / requirement.getMaxPoints();
@@ -285,6 +291,9 @@ public class EntityFactory {
     p.setFraction(fraction);
     p.setRequirementUUID(requirement.getUuid());
     p.setProgressSummaryUUID(ps.getUuid());
+    
+    // TODO Linking to group?
+    
     return p;
   }
   
