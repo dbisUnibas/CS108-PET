@@ -1,9 +1,12 @@
 package ch.unibas.dmi.dbis.reqman.analysis;
 
 import ch.unibas.dmi.dbis.reqman.data.*;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +36,30 @@ public class CatalogueAnalyser {
   
   public boolean hasMilestones() {
     return !catalogue.getMilestones().isEmpty();
+  }
+  
+  public Requirement getRequirementById(UUID requirementUuid){
+    if(requirementUuid == null){
+      throw new IllegalArgumentException("Cannot find requirement by id, if the id is null");
+    }
+    for(Requirement r : catalogue.getRequirements()){
+      if(requirementUuid.equals(r.getUuid())){
+        return r;
+      }
+    }
+    return null;
+  }
+  
+  public Milestone getMilestoneById(UUID milestoneUuid){
+    if(milestoneUuid == null){
+      throw new IllegalArgumentException("Cannot find milestone by id, if the id is null");
+    }
+    for(Milestone ms : catalogue.getMilestones()){
+      if(milestoneUuid.equals(ms.getUuid())){
+        return ms;
+      }
+    }
+    return null;
   }
   
   /**
@@ -81,6 +108,14 @@ public class CatalogueAnalyser {
   
   public double getMaximalMalusSum() {
     return catalogue.getRequirements().stream().filter(Requirement::isMalus).mapToDouble(Requirement::getMaxPoints).sum();
+  }
+  
+  public List<Requirement> getPredecessors(Requirement requirement){
+    List<Requirement> predecessors = new ArrayList<>();
+    for(UUID id : requirement.getPredecessors()){
+      predecessors.add(getRequirementById(id));
+    }
+    return predecessors;
   }
   
   boolean matchesMinimalMilestone(Requirement requirement, Milestone milestone) {

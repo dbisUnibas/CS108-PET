@@ -51,8 +51,13 @@ public class Requirement {
    */
   private Type type;
   /**
+   * A list of predecessor requirement UUIDs.
+   */
+  private List<UUID> predecessors = new ArrayList<>();
+  /**
    * A list of predecessor requirement names this requirement depends on.
    */
+  @Deprecated
   private List<String> predecessorNames = new Vector<>();
   /**
    * A map of key-value-pairs related to export this requirement
@@ -324,6 +329,18 @@ public class Requirement {
   
   public void setMaximalMilestoneUUID(UUID maximalMilestoneUUID) {
     this.maximalMilestoneUUID = maximalMilestoneUUID;
+  }
+  
+  public boolean addPredecessor(Requirement requirement){
+    return predecessors.add(requirement.getUuid());
+  }
+  
+  public boolean removePRedecessor(Requirement requirement){
+    return predecessors.remove(requirement.getUuid());
+  }
+  
+  public UUID[] getPredecessors(){
+    return predecessors.toArray(new UUID[0]);
   }
   
   public Type getType() {

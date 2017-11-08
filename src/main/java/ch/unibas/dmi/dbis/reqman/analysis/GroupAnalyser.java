@@ -46,8 +46,6 @@ public class GroupAnalyser {
     return Double.NaN; // unreachable?
   }
   
-  
-  
   public Requirement getRequirementOf(Progress progress) {
     for (Requirement r : catalogue.getRequirements()) {
       if (r.getUuid().equals(progress.getUuid())) {
@@ -55,6 +53,10 @@ public class GroupAnalyser {
       }
     }
     return null;
+  }
+  
+  public boolean isProgressUnlocked(Progress progress){
+    return false;
   }
   
   boolean matchesProgressSummary(Progress p, ProgressSummary ps) {
