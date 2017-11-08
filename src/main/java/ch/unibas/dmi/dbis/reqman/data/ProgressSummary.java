@@ -37,17 +37,17 @@ public class ProgressSummary {
     return milestoneOrdinal;
   }
   
+  @Deprecated
+  public void setMilestoneOrdinal(int milestoneOrdinal) {
+    this.milestoneOrdinal = milestoneOrdinal;
+  }
+  
   public UUID getMilestoneUUID() {
     return milestoneUUID;
   }
   
   public void setMilestoneUUID(UUID milestoneUUID) {
     this.milestoneUUID = milestoneUUID;
-  }
-  
-  @Deprecated
-  public void setMilestoneOrdinal(int milestoneOrdinal) {
-    this.milestoneOrdinal = milestoneOrdinal;
   }
   
   public String getInternalComment() {

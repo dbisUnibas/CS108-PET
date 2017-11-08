@@ -2,7 +2,7 @@ package ch.unibas.dmi.dbis.reqman.data;
 
 /**
  * A {@link Member} is an abstraction of a person, represented by the triple <code>< name, firstName, email ></code>
- *
+ * <p>
  * Objects of this type may be added to {@link Group} objects, to
  * link the person with the group.
  *
@@ -26,6 +26,7 @@ public class Member {
   
   /**
    * Creates a new {@link Member} by the given name
+   *
    * @param name The name of the person. May only be the firstname or a username.
    *             Preferably this name is unique, but is not ensured by the framework.
    */
@@ -36,9 +37,9 @@ public class Member {
   /**
    * Creates a new, {@link Member} with specified name, firstname and email.
    *
-   * @param name The name of the person
+   * @param name      The name of the person
    * @param firstName The firstname of the person
-   * @param email The email address of the person
+   * @param email     The email address of the person
    */
   public Member(String name, String firstName, String email) {
     this.name = name;
@@ -49,6 +50,7 @@ public class Member {
   /**
    * Returns the name of the person.
    * The returned value is be unique by convention.
+   *
    * @return The name of the person
    */
   public String getName() {
@@ -66,6 +68,7 @@ public class Member {
   
   /**
    * Returns the email address of the person
+   *
    * @return The email address of the person
    */
   public String getEmail() {

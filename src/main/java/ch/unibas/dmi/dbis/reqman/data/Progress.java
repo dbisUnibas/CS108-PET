@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 import java.util.UUID;
@@ -13,14 +12,13 @@ import java.util.UUID;
  */
 public class Progress {
   
+  public static final double NO_POINTS = -999;
   private final UUID uuid;
   private double fraction = -1d;
   private UUID requirementUUID;
   private Date assessmentDate = null;
   private UUID progressSummaryUUID;
   private String comment;
-  
-  public static final double NO_POINTS = -999;
   @Deprecated
   private String requirementName;
   @Deprecated
@@ -34,6 +32,19 @@ public class Progress {
   
   public Progress() {
     uuid = UUID.randomUUID();
+  }
+  
+  @Deprecated
+  public Progress(String requirementName, int milestoneOrdinal, double points) {
+    this();
+    this.requirementName = requirementName;
+    this.milestoneOrdinal = milestoneOrdinal;
+    this.points = points;
+  }
+  
+  @Deprecated
+  public Progress(Requirement req) {
+    this(req.getName(), req.getMinMilestoneOrdinal(), 0);
   }
   
   public double getFraction() {
@@ -77,19 +88,6 @@ public class Progress {
   }
   
   @Deprecated
-  public Progress(String requirementName, int milestoneOrdinal, double points) {
-    this();
-    this.requirementName = requirementName;
-    this.milestoneOrdinal = milestoneOrdinal;
-    this.points = points;
-  }
-  
-  @Deprecated
-  public Progress(Requirement req) {
-    this(req.getName(), req.getMinMilestoneOrdinal(), 0);
-  }
-  
-  @Deprecated
   public Date getDate() {
     return date;
   }
@@ -117,18 +115,22 @@ public class Progress {
   public String getRequirementName() {
     return requirementName;
   }
+  
   @Deprecated
   public void setRequirementName(String requirementName) {
     this.requirementName = requirementName;
   }
+  
   @Deprecated
   public int getMilestoneOrdinal() {
     return milestoneOrdinal;
   }
+  
   @Deprecated
   public void setMilestoneOrdinal(int milestoneOrdinal) {
     this.milestoneOrdinal = milestoneOrdinal;
   }
+  
   @Deprecated
   public double getPoints() {
     return points;
@@ -138,6 +140,7 @@ public class Progress {
   public void setPoints(double points) {
     this.points = points;
   }
+  
   @Deprecated
   public void setPoints(double points, double max) {
     if (points == NO_POINTS) {
@@ -154,6 +157,7 @@ public class Progress {
       percentage = points / max;
     }
   }
+  
   @Deprecated
   @JsonIgnore
   public double getPointsSensitive(Catalogue catalogue) {
@@ -161,17 +165,18 @@ public class Progress {
     double factor = (r.isMalus() ? -1d : 1d) * percentage;
     return factor * r.getMaxPoints();
   }
+  
   @Deprecated
   @JsonIgnore
   public boolean hasProgress() {
     return percentage > 0;
   }
+  
   @Deprecated
   @JsonIgnore
   public boolean hasDefaultPercentage() {
     return Double.compare(-1d, percentage) == 0;
   }
-  
   
   
   public UUID getUuid() {
@@ -198,7 +203,7 @@ public class Progress {
     
     Progress progress = (Progress) o;
     
-    return getUuid().equals(progress.getUuid() );
+    return getUuid().equals(progress.getUuid());
   }
   
   @Override

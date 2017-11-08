@@ -61,10 +61,12 @@ public class Milestone {
   public void setName(String name) {
     this.name = name;
   }
+  
   @Deprecated
   public Date getDate() {
     return date;
   }
+  
   @Deprecated
   public void setDate(Date date) {
     this.date = date;

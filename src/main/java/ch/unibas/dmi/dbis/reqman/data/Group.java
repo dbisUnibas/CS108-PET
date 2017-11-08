@@ -92,7 +92,6 @@ public class Group implements Comparable<Group> {
    * @param projectName   The optional project name
    * @param legacyMembers The optional list of legacyMembers
    * @param catalogueName The name of the catalogue this group tracks progress of
-   *
    * @deprecated Got replaced by {@link EntityFactory#createGroup(String, Member...)}
    */
   @Deprecated
@@ -131,11 +130,9 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @param ms
    * @param catalogue
    * @return
-   *
    * @deprecated Got replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser#getSumFor(ProgressSummary)}
    */
   @Deprecated
@@ -168,7 +165,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @return
    * @deprecated Will be handled externally
    */
@@ -178,7 +174,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @param exportFileName
    * @deprecated Will be handled externally
    */
@@ -221,7 +216,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @param name
    * @return
    * @deprecated Replaced by {@link #addMember(Member)}
@@ -232,7 +226,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @return
    * @deprecated Replaced by {@link #getMembers()}
    */
@@ -241,12 +234,11 @@ public class Group implements Comparable<Group> {
     return new Vector<String>(legacyMembers);
   }
   
-  public Member[] getMembers(){
+  public Member[] getMembers() {
     return members.toArray(new Member[0]);
   }
   
   /**
-   *
    * @param name
    * @return
    * @deprecated Replaced by {@link #removeMember(Member)}
@@ -265,7 +257,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @param progressList
    * @deprecated Removed due to different architecture
    */
@@ -302,7 +293,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @param ms
    * @return
    * @deprecated Replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser#getProgressSummaryFor(Milestone)}
@@ -318,7 +308,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @param ordinal
    * @return
    * @deprecated Replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser#getProgressFor(ProgressSummary)}
@@ -337,7 +326,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @param catalogue
    * @return
    * @deprecated Replaced by  {@link GroupAnalyser#getSum()}
@@ -352,7 +340,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @param requirement
    * @return
    * @deprecated Replaced by {@link GroupAnalyser#getProgressFor(Requirement)}
@@ -371,7 +358,6 @@ public class Group implements Comparable<Group> {
   }
   
   /**
-   *
    * @param catalogue
    * @param progress
    * @return

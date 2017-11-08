@@ -152,10 +152,6 @@ public class Course {
     timeEntities.addAll(Arrays.asList(times));
   }
   
-  List<Time> getTimes() {
-    return new ArrayList<>(timeEntities);
-  }
-  
   @NotNull
   @JsonIgnore
   public Time getTimeFor(Date date) {
@@ -173,5 +169,9 @@ public class Course {
   
   public void setVersion(String version) {
     this.version = version;
+  }
+  
+  List<Time> getTimes() {
+    return new ArrayList<>(timeEntities);
   }
 }

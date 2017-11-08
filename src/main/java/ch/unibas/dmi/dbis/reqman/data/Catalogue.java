@@ -54,7 +54,8 @@ public class Catalogue {
   }
   
   /**
-   * A constructor for creating a new catalogue with specified name, lecture and semester as well as a description provided.
+   * A constructor for creating a new catalogue with specified name, lecture and semester as well as a description
+   * provided.
    *
    * @param lecture     The name of the lecture
    * @param name        The  name of the catalogue

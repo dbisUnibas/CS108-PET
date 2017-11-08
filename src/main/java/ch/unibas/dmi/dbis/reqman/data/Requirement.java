@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonSetter;
 
 import java.util.*;
 
@@ -70,18 +69,21 @@ public class Requirement {
   
   /**
    * The minimal milestone ordinal this requirement firstly occurs
+   *
    * @deprecated Since SNAPSHOT-2.0.0: UUIDs were introduced for cross-references
    */
   @Deprecated
   private int minMilestoneOrdinal;
   /**
    * The maximal milestone ordinal this requirement must be met
+   *
    * @deprecated Since SNAPSHOT-2.0.0: UUIDs were introduced for cross-references
    */
   @Deprecated
   private int maxMilestoneOrdinal;
   /**
    * Whether this requirement is mandatory or not.
+   *
    * @deprecated Since SNAPSHOT-2.0.0: The requirement type was introduced
    */
   @Deprecated
@@ -89,6 +91,7 @@ public class Requirement {
   /**
    * Whether this requirement has a malus role or not.
    * So to speak if maxPoints is negative or not.
+   *
    * @deprecated Since SNAPSHOT-2.0.0: The requirement type was introduced
    */
   @Deprecated
@@ -250,14 +253,17 @@ public class Requirement {
   public int getMinMilestoneOrdinal() {
     return minMilestoneOrdinal;
   }
+  
   @Deprecated
   public void setMinMilestoneOrdinal(int minMilestoneOrdinal) {
     this.minMilestoneOrdinal = minMilestoneOrdinal;
   }
+  
   @Deprecated
   public int getMaxMilestoneOrdinal() {
     return maxMilestoneOrdinal;
   }
+  
   @Deprecated
   public void setMaxMilestoneOrdinal(int maxMilestoneOrdinal) {
     this.maxMilestoneOrdinal = maxMilestoneOrdinal;
@@ -282,13 +288,16 @@ public class Requirement {
   public boolean isMandatory() {
     return type.equals(Type.REGULAR);
   }
+  
   @Deprecated
   public void setMandatory(boolean mandatory) {
     this.mandatory = mandatory;
   }
+  
   public boolean isMalus() {
     return type.equals(Type.MALUS);
   }
+  
   @Deprecated
   public void setMalus(boolean malus) {
     this.malus = malus;
@@ -331,15 +340,15 @@ public class Requirement {
     this.maximalMilestoneUUID = maximalMilestoneUUID;
   }
   
-  public boolean addPredecessor(Requirement requirement){
+  public boolean addPredecessor(Requirement requirement) {
     return predecessors.add(requirement.getUuid());
   }
   
-  public boolean removePRedecessor(Requirement requirement){
+  public boolean removePRedecessor(Requirement requirement) {
     return predecessors.remove(requirement.getUuid());
   }
   
-  public UUID[] getPredecessors(){
+  public UUID[] getPredecessors() {
     return predecessors.toArray(new UUID[0]);
   }
   
@@ -370,15 +379,16 @@ public class Requirement {
    * Denotes whether this requirement is a regular requirement.
    * Non-regular requirements are either bonus or malus requirements and are not considered for the
    * maximal available points of a catalogue.
+   *
    * @return TRUE iff and only if this requirement is of type REGULAR.
    */
   @JsonIgnore
-  public boolean isRegular(){
+  public boolean isRegular() {
     return this.type.equals(Type.REGULAR);
   }
   
   @JsonIgnore
-  public boolean isBonus(){
+  public boolean isBonus() {
     return type.equals(Type.BONUS);
   }
   
@@ -391,7 +401,7 @@ public class Requirement {
     return uuid;
   }
   
-  public enum Type{
+  public enum Type {
     
     REGULAR,
     BONUS,
