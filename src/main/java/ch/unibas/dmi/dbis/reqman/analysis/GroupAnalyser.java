@@ -102,6 +102,20 @@ public class GroupAnalyser {
     return null;
   }
   
+  public Milestone getMilestoneOf(Progress p){
+    if(p == null){
+      throw new IllegalArgumentException("Cannot find a progress' milestone, if the milestone is null");
+    }
+    return catalogueAnalyser.getMilestoneById(getProgressSummaryOf(p).getMilestoneUUID());
+  }
+  
+  public ProgressSummary getProgressSummaryOf(Progress p){
+    if(p == null){
+      throw new IllegalArgumentException("Cannot find a progress' progress summary, if the milestone is null");
+    }
+    return getProgressSummaryById(p.getProgressSummaryUUID());
+  }
+  
   
   public boolean isProgressUnlocked(Progress progress){
     int predecessorsFulfilled = 0;

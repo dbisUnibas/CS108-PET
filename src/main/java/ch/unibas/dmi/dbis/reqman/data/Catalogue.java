@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.*;
@@ -21,14 +22,14 @@ public class Catalogue {
   
   private final UUID uuid;
   /**
-   * @deprecated Since SNAPSHOT-2.0.0: Got moved to entity Course
+   * @deprecated Replaced by {@link Course#getName()}
    */
   @Deprecated
   private String lecture;
   private String name;
   private String description;
   /**
-   * @deprecated Since SNAPSHOT-2.0.0: Got moved t entity Course
+   * @deprecated Replaced by {@link Course#getSemester()}
    */
   @Deprecated
   private String semester;
@@ -42,6 +43,9 @@ public class Catalogue {
    */
   private List<Requirement> requirements = new ArrayList<>();
   
+  /**
+   * @deprecated Removed and not needed anymore
+   */
   @Deprecated
   @JsonIgnore
   private Map<Integer, List<Requirement>> reqsPerMinMS = new TreeMap<>();
@@ -61,7 +65,9 @@ public class Catalogue {
    * @param name        The  name of the catalogue
    * @param description A description of a catalogue
    * @param semester    The semester for which this catalogue was designed
+   * @deprecated Replaced by {@link EntityFactory#createCatalogue(String)}
    */
+  @Deprecated
   public Catalogue(String lecture, String name, String description, String semester) {
     this();
     this.lecture = lecture;
@@ -74,6 +80,7 @@ public class Catalogue {
    * Returns the lecture name this catalogue is associated with
    *
    * @return The lecture name this catalogue is associated with
+   * @deprecated Replaced by {@link Course#getName()}
    */
   @Deprecated
   public String getLecture() {
@@ -84,6 +91,7 @@ public class Catalogue {
    * Sets the lecture name for which this catalogue is made
    *
    * @param lecture The lecture name
+   * @deprecated Replaced by {@link Course#setName(String)}
    */
   @Deprecated
   public void setLecture(String lecture) {
@@ -131,6 +139,7 @@ public class Catalogue {
    * Returns the semester of this catalogue
    *
    * @return The semester of this catalogue
+   * @deprecated Replaced by {@link Course#getSemester()}
    */
   @Deprecated
   public String getSemester() {
@@ -141,6 +150,7 @@ public class Catalogue {
    * Sets the semester of this catalogue
    *
    * @param semester The semester represented as a string
+   * @deprecated Replaced by {@link Course#setSemester(String)}
    */
   @Deprecated
   public void setSemester(String semester) {
@@ -234,6 +244,7 @@ public class Catalogue {
    *
    * @param ordinal The oridnal of the milestone
    * @return The milestone with the ordinal specified or NULL if no such milestone exists
+   * @deprecated Removed. The order of milestones is now implicitly given by their date
    */
   @Deprecated
   public Milestone getMilestoneByOrdinal(int ordinal) {
@@ -256,6 +267,7 @@ public class Catalogue {
    *
    * @param ordinal The ordinal of a milestone to get the requirements for
    * @return The list of requirements associated with this ordinal or an empty list if no such associated requirements exist
+   * @deprecated Replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser#getRequirementsFor(Milestone)}
    */
   @Deprecated
   public List<Requirement> getRequirementsByMilestone(int ordinal) {
@@ -267,6 +279,7 @@ public class Catalogue {
    *
    * @param ordinal The oridnal of a milestone to get the requirements for
    * @return The resulting list or NULL if no such milestone with the specified oridnal exists
+   * @deprecated Removed due currently not used
    */
   @Deprecated
   public List<Requirement> getRequirementsWithMinMS(int ordinal) {
@@ -279,6 +292,7 @@ public class Catalogue {
    *
    * @param msOrdinal The milestone ordinal to get the sum of
    * @return The sum of maximal available points of the specified milestone or 0 if no such milestone exists
+   * @deprecated Replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser#getMaximalRegularSumFor(Milestone)}
    */
   @JsonIgnore
   @Deprecated
@@ -299,6 +313,7 @@ public class Catalogue {
    *
    * @return The sum of total maximal available points or 0 if no requirements are present
    * @see Catalogue#getSum(int)
+   * @deprecated Replaced by {@link CatalogueAnalyser#getMaximalRegularSum()}
    */
   @JsonIgnore
   @Deprecated
@@ -315,6 +330,7 @@ public class Catalogue {
    *
    * @param name The name of the requirement to get
    * @return The requirement with the specified name or NULL if no such requirement exists
+   * @deprecated Replaced by {@link CatalogueAnalyser#getRequirementById(UUID)}
    */
   @JsonIgnore
   @Deprecated
@@ -332,6 +348,7 @@ public class Catalogue {
    *
    * @param name The name to test
    * @return TRUE if a requirement with the specified name already exists - FALSE otherwise
+   * @deprecated Removed due currently not used
    */
   @JsonIgnore
   @Deprecated
@@ -349,6 +366,7 @@ public class Catalogue {
    *
    * @param progress The progress for which the requirement is
    * @return The requirement or NULL if no such requirement exists
+   * @deprecated Replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser#getRequirementOf(Progress)}
    */
   @JsonIgnore
   @Deprecated
@@ -361,6 +379,7 @@ public class Catalogue {
    *
    * @param progress The progress to get the milestone for
    * @return The milestone the progress was made on or NULL if no such milestone exists
+   * @deprecated Replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser#getMilestoneOf(Progress)}
    */
   @JsonIgnore
   @Deprecated
@@ -373,6 +392,7 @@ public class Catalogue {
    * Returns the lastly used ordinal
    *
    * @return the lastyl used ordinal
+   * @deprecated Removed due to currently not used
    */
   @JsonIgnore
   @Deprecated
