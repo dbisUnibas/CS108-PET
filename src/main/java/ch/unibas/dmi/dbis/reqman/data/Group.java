@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,7 +21,11 @@ public class Group implements Comparable<Group> {
   /**
    * The logger instance
    */
+  @Deprecated
   private static final Logger LOG = LogManager.getLogger(Group.class);
+  /**
+   * The unique identifier of this group
+   */
   private final UUID uuid;
   private UUID courseUuid;
   /**
@@ -30,7 +35,8 @@ public class Group implements Comparable<Group> {
   
   /**
    * The name of the group's project.
-   * This is designed so groups may have artifical names such as group1, group2 etc and can have customized names on the same time.
+   * This is designed so groups may have artifical names such as group1, group2 etc and can have customized names on the
+   * same time.
    */
   private String projectName;
   
@@ -49,11 +55,15 @@ public class Group implements Comparable<Group> {
    * <li>Variant 2: <code>name,surname</code></li>
    * <li>Variant 3: <code>name,surname,email</code></li>
    * </ul>
+   *
+   * @deprecated Got replaced by {@link Group#members}
    */
   @Deprecated
   private List<String> legacyMembers;
   /**
    * The reference name of the catalogue this group tracks the progress of
+   *
+   * @deprecated Got replaced by Group{@link #courseUuid}
    */
   @Deprecated
   private String catalogueName;
@@ -80,9 +90,12 @@ public class Group implements Comparable<Group> {
    *
    * @param name          The unique name of the group
    * @param projectName   The optional project name
-   * @param legacyMembers       The optional list of legacyMembers
+   * @param legacyMembers The optional list of legacyMembers
    * @param catalogueName The name of the catalogue this group tracks progress of
+   *
+   * @deprecated Got replaced by {@link EntityFactory#createGroup(String, Member...)}
    */
+  @Deprecated
   public Group(String name, String projectName, List<String> legacyMembers, String catalogueName) {
     this();
     this.name = name;
@@ -117,6 +130,14 @@ public class Group implements Comparable<Group> {
     this.version = version;
   }
   
+  /**
+   *
+   * @param ms
+   * @param catalogue
+   * @return
+   *
+   * @deprecated Got replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser#getSumFor(ProgressSummary)}
+   */
   @Deprecated
   public double getSumForMilestone(Milestone ms, Catalogue catalogue) {
     ArrayList<Double> points = new ArrayList<>();
@@ -146,12 +167,21 @@ public class Group implements Comparable<Group> {
     return list;
   }
   
-  
+  /**
+   *
+   * @return
+   * @deprecated Will be handled externally
+   */
   @Deprecated
   public String getExportFileName() {
     return exportFileName;
   }
   
+  /**
+   *
+   * @param exportFileName
+   * @deprecated Will be handled externally
+   */
   @Deprecated
   public void setExportFileName(String exportFileName) {
     this.exportFileName = exportFileName;
@@ -182,23 +212,45 @@ public class Group implements Comparable<Group> {
     this.catalogueName = catalogueName;
   }
   
-  public boolean addMember(Member member){
+  public boolean addMember(Member member) {
     return members.add(member);
   }
   
-  public boolean removeMember(Member member){
+  public boolean removeMember(Member member) {
     return members.remove(member);
   }
   
+  /**
+   *
+   * @param name
+   * @return
+   * @deprecated Replaced by {@link #addMember(Member)}
+   */
   @Deprecated
   public boolean addMember(String name) {
     return legacyMembers.add(name);
   }
   
+  /**
+   *
+   * @return
+   * @deprecated Replaced by {@link #getMembers()}
+   */
   @Deprecated
   public List<String> getLegacyMembers() {
     return new Vector<String>(legacyMembers);
   }
+  
+  public Member[] getMembers(){
+    return members.toArray(new Member[0]);
+  }
+  
+  /**
+   *
+   * @param name
+   * @return
+   * @deprecated Replaced by {@link #removeMember(Member)}
+   */
   @Deprecated
   public boolean removeMember(String name) {
     return legacyMembers.remove(name);
@@ -212,6 +264,11 @@ public class Group implements Comparable<Group> {
     return new ArrayList<>(progressList);
   }
   
+  /**
+   *
+   * @param progressList
+   * @deprecated Removed due to different architecture
+   */
   @Deprecated
   public void setProgressList(List<Progress> progressList) {
     this.progressList.clear();
@@ -244,6 +301,12 @@ public class Group implements Comparable<Group> {
     return name.compareTo(o.getName());
   }
   
+  /**
+   *
+   * @param ms
+   * @return
+   * @deprecated Replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser#getProgressSummaryFor(Milestone)}
+   */
   @Deprecated
   public ProgressSummary getProgressSummaryForMilestone(Milestone ms) {
     for (ProgressSummary ps : progressSummaries) {
@@ -254,6 +317,12 @@ public class Group implements Comparable<Group> {
     return null;
   }
   
+  /**
+   *
+   * @param ordinal
+   * @return
+   * @deprecated Replaced by {@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser#getProgressFor(ProgressSummary)}
+   */
   @Deprecated
   public List<Progress> getProgressByMilestoneOrdinal(int ordinal) {
     HashSet<Progress> set = new HashSet<>();
@@ -267,6 +336,12 @@ public class Group implements Comparable<Group> {
     return new ArrayList<>(set);
   }
   
+  /**
+   *
+   * @param catalogue
+   * @return
+   * @deprecated Replaced by  {@link GroupAnalyser#getSum()}
+   */
   @Deprecated
   public double getTotalSum(Catalogue catalogue) {
     ArrayList<Double> points = new ArrayList<>();
@@ -276,6 +351,12 @@ public class Group implements Comparable<Group> {
     return points.stream().mapToDouble(Double::doubleValue).sum();
   }
   
+  /**
+   *
+   * @param requirement
+   * @return
+   * @deprecated Replaced by {@link GroupAnalyser#getProgressFor(Requirement)}
+   */
   @Deprecated
   public Progress getProgressForRequirement(Requirement requirement) {
     if (requirement == null) {
@@ -289,6 +370,13 @@ public class Group implements Comparable<Group> {
     return null;
   }
   
+  /**
+   *
+   * @param catalogue
+   * @param progress
+   * @return
+   * @deprecated Replaced by {@link GroupAnalyser#isProgressUnlocked(Progress)}
+   */
   @Deprecated
   public boolean isProgressUnlocked(Catalogue catalogue, Progress progress) {
     int predecessorsAchieved = 0;
@@ -319,12 +407,18 @@ public class Group implements Comparable<Group> {
     int result = getUuid() != null ? getUuid().hashCode() : 0;
     result = 31 * result + (getName() != null ? getName().hashCode() : 0);
     result = 31 * result + (getProjectName() != null ? getProjectName().hashCode() : 0);
-    result = 31 * result + (getLegacyMembers() != null ? getLegacyMembers().hashCode() : 0);
     result = 31 * result + (getCatalogueName() != null ? getCatalogueName().hashCode() : 0);
     result = 31 * result + (getProgressList() != null ? getProgressList().hashCode() : 0);
     result = 31 * result + (getProgressSummaries() != null ? getProgressSummaries().hashCode() : 0);
-    result = 31 * result + (getExportFileName() != null ? getExportFileName().hashCode() : 0);
     result = 31 * result + (getVersion() != null ? getVersion().hashCode() : 0);
     return result;
+  }
+  
+  public boolean addAllMembers(Collection<Member> members) {
+    return this.members.addAll(members);
+  }
+  
+  void setCourse(Course course) {
+    courseUuid = course.getUuid();
   }
 }

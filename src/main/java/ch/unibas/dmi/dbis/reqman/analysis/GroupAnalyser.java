@@ -90,6 +90,17 @@ public class GroupAnalyser {
     return null;
   }
   
+  public ProgressSummary getProgressSummaryFor(@NotNull  Milestone ms){
+    if(ms == null){
+      throw new IllegalArgumentException("Cannot find a progress summary for a milestone, if the milestone is null");
+    }
+    for(ProgressSummary ps : group.getProgressSummaries()){
+      if(ms.getUuid().equals(ps.getMilestoneUUID())){
+        return ps;
+      }
+    }
+    return null;
+  }
   
   
   public boolean isProgressUnlocked(Progress progress){

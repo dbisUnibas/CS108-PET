@@ -2,7 +2,9 @@ package ch.unibas.dmi.dbis.reqman.data;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Creates entities that are linked with each other.
@@ -163,6 +165,19 @@ public class EntityFactory {
    */
   public Requirement createMalusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, true, Requirement.Type.MALUS);
+  }
+  
+  /**
+   * Creates a group of given members and links it with the current course.
+   * @param groupName
+   * @param members
+   * @return
+   */
+  public Group createGroup(String groupName, Member...members){
+    Group g = new Group();
+    g.setCourse(course);
+    g.addAllMembers(Arrays.asList(members));
+    return g;
   }
   
   /**
