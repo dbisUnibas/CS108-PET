@@ -2,6 +2,8 @@ package ch.unibas.dmi.dbis.reqman.data;
 
 import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
+import ch.unibas.dmi.dbis.reqman.common.NamedEntity;
+import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,7 +17,7 @@ import java.util.*;
  *
  * @author loris.sauter
  */
-public class Group implements Comparable<Group> {
+public class Group extends VersionedEntity implements Comparable<Group> {
   
   
   /**
@@ -80,10 +82,6 @@ public class Group implements Comparable<Group> {
    * Contains only the name of the file, location will be set by user upon export
    */
   private String exportFileName;
-  /**
-   * The ReqMan version with which this group was last saved
-   */
-  private String version;
   
   /**
    * Creates a new group with the specified arguments
@@ -121,12 +119,8 @@ public class Group implements Comparable<Group> {
     return progressList;
   }
   
-  public String getVersion() {
-    return version;
-  }
-  
   public void setVersion(String version) {
-    this.version = version;
+    this.setVersionInternally(version);
   }
   
   /**

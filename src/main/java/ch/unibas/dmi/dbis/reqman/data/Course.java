@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import ch.unibas.dmi.dbis.reqman.common.NamedEntity;
+import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +12,7 @@ import java.util.*;
  *
  * @author loris.sauter
  */
-public class Course {
+public class Course extends VersionedEntity{
   
   private final UUID uuid;
   
@@ -19,7 +21,6 @@ public class Course {
   private UUID catalogueUUID;
   private Set<UUID> groupUUIDs;
   private Set<Time> timeEntities;
-  private String version;
   
   public Course() {
     uuid = UUID.randomUUID();
@@ -161,14 +162,6 @@ public class Course {
       }
     }
     return null;
-  }
-  
-  public String getVersion() {
-    return version;
-  }
-  
-  public void setVersion(String version) {
-    this.version = version;
   }
   
   List<Time> getTimes() {
