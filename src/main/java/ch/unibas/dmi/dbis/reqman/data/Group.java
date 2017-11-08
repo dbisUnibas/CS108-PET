@@ -22,6 +22,7 @@ public class Group implements Comparable<Group> {
    */
   private static final Logger LOG = LogManager.getLogger(Group.class);
   private final UUID uuid;
+  private UUID courseUuid;
   /**
    * The name of the group, which must be unique
    */
@@ -33,8 +34,15 @@ public class Group implements Comparable<Group> {
    */
   private String projectName;
   
+  
   /**
-   * The group members as a list of strings.
+   * The list of members.
+   * This list may be of any size, since groups may vary in size.
+   */
+  private List<Member> members;
+  
+  /**
+   * The group legacyMembers as a list of strings.
    * A member is a string in a format as follows:
    * <ul>
    * <li>Variant 1: <code>name</code></li>
@@ -42,10 +50,12 @@ public class Group implements Comparable<Group> {
    * <li>Variant 3: <code>name,surname,email</code></li>
    * </ul>
    */
-  private List<String> members;
+  @Deprecated
+  private List<String> legacyMembers;
   /**
    * The reference name of the catalogue this group tracks the progress of
    */
+  @Deprecated
   private String catalogueName;
   /**
    * The list of {@link Progress} of this group.
@@ -70,14 +80,14 @@ public class Group implements Comparable<Group> {
    *
    * @param name          The unique name of the group
    * @param projectName   The optional project name
-   * @param members       The optional list of members
+   * @param legacyMembers       The optional list of legacyMembers
    * @param catalogueName The name of the catalogue this group tracks progress of
    */
-  public Group(String name, String projectName, List<String> members, String catalogueName) {
+  public Group(String name, String projectName, List<String> legacyMembers, String catalogueName) {
     this();
     this.name = name;
     this.projectName = projectName;
-    this.members = members;
+    this.legacyMembers = legacyMembers;
     this.catalogueName = catalogueName;
   }
   
@@ -87,6 +97,7 @@ public class Group implements Comparable<Group> {
    */
   public Group() {
     uuid = UUID.randomUUID();
+    members = new ArrayList<>();
   }
   
   /**
@@ -106,6 +117,7 @@ public class Group implements Comparable<Group> {
     this.version = version;
   }
   
+  @Deprecated
   public double getSumForMilestone(Milestone ms, Catalogue catalogue) {
     ArrayList<Double> points = new ArrayList<>();
     
@@ -118,6 +130,7 @@ public class Group implements Comparable<Group> {
     return points.stream().mapToDouble(Double::doubleValue).sum();
   }
   
+  @Deprecated
   public List<Milestone> getMilestonesForGroup(Catalogue catalogue) {
     ArrayList<Milestone> list = new ArrayList<>();
     
@@ -134,10 +147,12 @@ public class Group implements Comparable<Group> {
   }
   
   
+  @Deprecated
   public String getExportFileName() {
     return exportFileName;
   }
   
+  @Deprecated
   public void setExportFileName(String exportFileName) {
     this.exportFileName = exportFileName;
   }
@@ -167,16 +182,26 @@ public class Group implements Comparable<Group> {
     this.catalogueName = catalogueName;
   }
   
+  public boolean addMember(Member member){
+    return members.add(member);
+  }
+  
+  public boolean removeMember(Member member){
+    return members.remove(member);
+  }
+  
+  @Deprecated
   public boolean addMember(String name) {
-    return members.add(name);
+    return legacyMembers.add(name);
   }
   
-  public List<String> getMembers() {
-    return new Vector<String>(members);
+  @Deprecated
+  public List<String> getLegacyMembers() {
+    return new Vector<String>(legacyMembers);
   }
-  
+  @Deprecated
   public boolean removeMember(String name) {
-    return members.remove(name);
+    return legacyMembers.remove(name);
   }
   
   public boolean addProgress(Progress progress) {
@@ -187,6 +212,7 @@ public class Group implements Comparable<Group> {
     return new ArrayList<>(progressList);
   }
   
+  @Deprecated
   public void setProgressList(List<Progress> progressList) {
     this.progressList.clear();
     this.progressList.addAll(progressList);
@@ -218,6 +244,7 @@ public class Group implements Comparable<Group> {
     return name.compareTo(o.getName());
   }
   
+  @Deprecated
   public ProgressSummary getProgressSummaryForMilestone(Milestone ms) {
     for (ProgressSummary ps : progressSummaries) {
       if (ps.getMilestoneOrdinal() == ms.getOrdinal()) {
@@ -227,6 +254,7 @@ public class Group implements Comparable<Group> {
     return null;
   }
   
+  @Deprecated
   public List<Progress> getProgressByMilestoneOrdinal(int ordinal) {
     HashSet<Progress> set = new HashSet<>();
     for (Progress p : getProgressList()) {
@@ -239,6 +267,7 @@ public class Group implements Comparable<Group> {
     return new ArrayList<>(set);
   }
   
+  @Deprecated
   public double getTotalSum(Catalogue catalogue) {
     ArrayList<Double> points = new ArrayList<>();
     getMilestonesForGroup(catalogue).forEach(ms -> {
@@ -247,6 +276,7 @@ public class Group implements Comparable<Group> {
     return points.stream().mapToDouble(Double::doubleValue).sum();
   }
   
+  @Deprecated
   public Progress getProgressForRequirement(Requirement requirement) {
     if (requirement == null) {
       throw new IllegalArgumentException("Requirement cannot be null, if progress for it should be provided");
@@ -259,6 +289,7 @@ public class Group implements Comparable<Group> {
     return null;
   }
   
+  @Deprecated
   public boolean isProgressUnlocked(Catalogue catalogue, Progress progress) {
     int predecessorsAchieved = 0;
     for (String name : catalogue.getRequirementForProgress(progress).getPredecessorNames()) {
@@ -288,28 +319,12 @@ public class Group implements Comparable<Group> {
     int result = getUuid() != null ? getUuid().hashCode() : 0;
     result = 31 * result + (getName() != null ? getName().hashCode() : 0);
     result = 31 * result + (getProjectName() != null ? getProjectName().hashCode() : 0);
-    result = 31 * result + (getMembers() != null ? getMembers().hashCode() : 0);
+    result = 31 * result + (getLegacyMembers() != null ? getLegacyMembers().hashCode() : 0);
     result = 31 * result + (getCatalogueName() != null ? getCatalogueName().hashCode() : 0);
     result = 31 * result + (getProgressList() != null ? getProgressList().hashCode() : 0);
     result = 31 * result + (getProgressSummaries() != null ? getProgressSummaries().hashCode() : 0);
     result = 31 * result + (getExportFileName() != null ? getExportFileName().hashCode() : 0);
     result = 31 * result + (getVersion() != null ? getVersion().hashCode() : 0);
     return result;
-  }
-  
-  @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder("Group{");
-    sb.append("uuid=").append(uuid);
-    sb.append(", name='").append(name).append('\'');
-    sb.append(", projectName='").append(projectName).append('\'');
-    sb.append(", members=").append(members);
-    sb.append(", catalogueName='").append(catalogueName).append('\'');
-    sb.append(", progressList=").append(progressList);
-    sb.append(", progressSummaries=").append(progressSummaries);
-    sb.append(", exportFileName='").append(exportFileName).append('\'');
-    sb.append(", version='").append(version).append('\'');
-    sb.append('}');
-    return sb.toString();
   }
 }

@@ -224,7 +224,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
 
     private void loadMembers() {
         if (group != null) {
-            group.getMembers().forEach(str -> {
+            group.getLegacyMembers().forEach(str -> {
                 Member member = Member.convertFromString(str);
                 if (member != null) {
                     tableData.add(member);

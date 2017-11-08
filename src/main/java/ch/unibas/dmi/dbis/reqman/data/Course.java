@@ -19,6 +19,7 @@ public class Course {
   private UUID catalogueUUID;
   private Set<UUID> groupUUIDs;
   private Set<Time> timeEntities;
+  private String version;
   
   public Course() {
     uuid = UUID.randomUUID();
@@ -164,5 +165,13 @@ public class Course {
       }
     }
     return null;
+  }
+  
+  public String getVersion() {
+    return version;
+  }
+  
+  public void setVersion(String version) {
+    this.version = version;
   }
 }
