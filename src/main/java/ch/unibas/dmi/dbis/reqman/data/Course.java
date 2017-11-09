@@ -65,7 +65,7 @@ public class Course extends VersionedEntity{
     this.catalogueUUID = catalogueUUID;
   }
   
-  
+  @JsonIgnore
   public boolean isTimeListEmpty() {
     return timeEntities.isEmpty();
   }
@@ -125,6 +125,7 @@ public class Course extends VersionedEntity{
     timeEntities.clear();
   }
   
+  @JsonIgnore
   public boolean isGroupSetEmpty() {
     return groupUUIDs.isEmpty();
   }
@@ -166,5 +167,34 @@ public class Course extends VersionedEntity{
   
   List<Time> getTimes() {
     return new ArrayList<>(timeEntities);
+  }
+  
+  public Time[] getTimeEntities(){
+    return timeEntities.toArray(new Time[0]);
+  }
+  
+  void setTimeEntities(Time[] entities){
+    timeEntities.addAll(Arrays.asList(entities));
+  }
+  
+  public UUID[] getGroupUUIDs(){
+    return groupUUIDs.toArray(new UUID[0]);
+  }
+  
+  void setGroupUUIDs(UUID[] uuids){
+    groupUUIDs.addAll(Arrays.asList(uuids));
+  }
+  
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder("Course{");
+    sb.append("uuid=").append(uuid);
+    sb.append(", name='").append(name).append('\'');
+    sb.append(", semester='").append(semester).append('\'');
+    sb.append(", catalogueUUID=").append(catalogueUUID);
+    sb.append(", groupUUIDs=").append(groupUUIDs);
+    sb.append(", timeEntities=").append(timeEntities);
+    sb.append('}');
+    return sb.toString();
   }
 }

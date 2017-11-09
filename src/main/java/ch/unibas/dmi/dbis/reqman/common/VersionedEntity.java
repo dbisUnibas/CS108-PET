@@ -16,8 +16,8 @@ public abstract class VersionedEntity implements NamedEntity {
     return version;
   }
   
-  public void setVersion(Version version){
-    this.version = version.getVersion();
+  public void setVersion(String version){
+    this.version = version;
   }
   
   protected void setVersionInternally(String version){

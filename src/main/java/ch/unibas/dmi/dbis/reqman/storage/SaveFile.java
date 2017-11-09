@@ -3,11 +3,10 @@ package ch.unibas.dmi.dbis.reqman.storage;
 import ch.unibas.dmi.dbis.reqman.common.IOUtils;
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
-import org.apache.logging.log4j.core.util.FileUtils;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * The {@link SaveFile} class represents a save file of an entity.
@@ -22,43 +21,46 @@ import java.util.Arrays;
 public class SaveFile<T extends VersionedEntity> {
   
   private T entity;
-  private Class<T> typeClass;
+  private Class<T> typeClass = null;
   
   private File file = null;
   
   private File dir = null;
   
-  public SaveFile(File file, Class<T> typeClass) {
-    this.typeClass = typeClass;
-    if (file.isDirectory()) {
-      this.dir = file;
-    } else if (file.isFile() && hasCorrectExtension(file)) {
-      this.file = file;
-    } else {
-      this.file = new File(file.getPath() + IOUtils.EXTENSION_SEPARATOR + getDesignatedExtension());
-    }
-    if (dir == null) {
-      dir = file.getParentFile();
-    }
-    
-  }
-  
-  public SaveFile(T entity) {
+  private SaveFile(T entity) {
     this.entity = entity;
   }
   
-  public void setStorageFile(File file) {
-    // TODO Check extension
-    this.file = file;
-    this.dir = file.getParentFile();
+  private SaveFile(Class<T> typeClass) {
+    this.typeClass = typeClass;
   }
   
-  public void setSaveDirectory(File dir){
+  public static <T extends VersionedEntity> SaveFile createForEntity(@NotNull T entity) {
+    if (entity == null) {
+      throw new IllegalArgumentException("Cannot create SaveFile for null entity");
+    }
+    return new SaveFile<>(entity);
+  }
+  
+  public static <T extends VersionedEntity> SaveFile createForSaveDir(@NotNull File dir, @NotNull Class<T> typeClass) {
+    // TODO no way to check if directory, if not existent
+    SaveFile<T> save = new SaveFile<>(typeClass);
+    save.setSaveDirectory(dir);
+    return save;
+  }
+  
+  public static <T extends VersionedEntity> SaveFile createForSaveFile(@NotNull File file, @NotNull Class<T> typeClass) {
+    SaveFile<T> save = new SaveFile<>(typeClass);
+    save.setSaveFile(file);
+    return save;
+  }
+  
+  public void setSaveDirectory(File dir) {
     // TODO Check dir
     this.dir = dir;
   }
   
-  public void setEntity(T entity){
+  public void setEntity(T entity) {
     this.entity = entity;
   }
   
@@ -69,13 +71,35 @@ public class SaveFile<T extends VersionedEntity> {
     }
     
     if (file == null) {
-      file = new File(dir.getPath() + File.separator + getSaveFileName());
+      file = new File(getSaveFilePath());
     }
     JSONUtils.writeToJSONFile(entity, file);
   }
   
+  public void read() throws IOException{
+    if(file == null){
+      throw new IllegalArgumentException("Cannot read if no file is set");
+    }
+    entity = JSONUtils.readFromJSONFile(file, typeClass);
+  }
+  
+  public T getEntity(){
+    return  entity;
+  }
+  
   public File getSaveFile() {
     return file;
+  }
+  
+  public void setSaveFile(File file) {
+    // TODO Check extension
+    if (IOUtils.hasExpectedExtension(file, getDesignatedExtension())) {
+      this.file = file;
+      this.dir = this.file.getParentFile();
+    } else {
+      this.file = new File(file.getPath() + IOUtils.EXTENSION_SEPARATOR + getDesignatedExtension());
+      dir = this.file.getParentFile();
+    }
   }
   
   public File getSaveDir() {
@@ -87,14 +111,15 @@ public class SaveFile<T extends VersionedEntity> {
     return entity.getName() + IOUtils.EXTENSION_SEPARATOR + getDesignatedExtension();
   }
   
-  protected boolean hasCorrectExtension(File file) {
-    return FileUtils.getFileExtension(file).equals(getDesignatedExtension());
+  // TODO reduce visiblity
+  public String getSaveFilePath() {
+    return dir.getPath() + IOUtils.FILE_SEPARATOR + getSaveFileName();
   }
   
-  protected String getDesignatedExtension() {
-    if(entity == null){
-      return typeClass.getTypeName().substring(typeClass.getTypeName().lastIndexOf(IOUtils.EXTENSION_SEPARATOR)+1).toLowerCase();
-    }else{
+  private String getDesignatedExtension() {
+    if (entity == null) {
+      return typeClass.getTypeName().substring(typeClass.getTypeName().lastIndexOf(IOUtils.EXTENSION_SEPARATOR) + 1).toLowerCase();
+    } else {
       return entity.getClass().getSimpleName().toLowerCase();
     }
   }
