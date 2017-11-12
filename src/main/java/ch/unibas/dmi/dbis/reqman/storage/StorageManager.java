@@ -63,14 +63,17 @@ public class StorageManager {
   }
   
   public Course openCourse(){
+    // TODO simply open .course file in dir
     return null;
   }
   
   public Catalogue openCatalogue(){
+    // TODO open .catalogue file in dir, then open .course file and check matching id
     return null;
   }
   
   public Group openGroup(){
+    // TODO open .group file in dir, then open .course file in dir and check matching id, then open .catalogue file and check matching id
     return null;
   }
   

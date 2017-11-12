@@ -110,7 +110,7 @@ public class SaveFile<T extends VersionedEntity> {
   
   // TODO reduce visibility
   public String getSaveFileName() {
-    return entity.getName() + IOUtils.EXTENSION_SEPARATOR + getDesignatedExtension();
+    return entity.getName().replace(' ', '_') + IOUtils.EXTENSION_SEPARATOR + getDesignatedExtension();
   }
   
   // TODO reduce visiblity
