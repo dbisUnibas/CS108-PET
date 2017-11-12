@@ -3,8 +3,13 @@ package ch.unibas.dmi.dbis.reqman.storage;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Course;
 import ch.unibas.dmi.dbis.reqman.data.Group;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.util.FileUtils;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +26,7 @@ import java.util.List;
  */
 public class StorageManager {
   // TODO Decide: Singleton or not
+  private final Logger LOGGER = LogManager.getLogger();
   
   private SaveFile<Course> courseSaveFile;
   private SaveFile<Catalogue> catalogueSaveFile;
@@ -41,7 +47,19 @@ public class StorageManager {
    * @return
    */
   public List<ReqmanFile> listFiles(){
-    return null;
+    ArrayList<ReqmanFile> files = new ArrayList<>();
+    for(File f : dir.listFiles(REQMAN_FILE_FILTER)){
+      LOGGER.debug("Processing file {}", f);
+      try{
+        ReqmanFile.Type t = ReqmanFile.Type.valueOf(FileUtils.getFileExtension(f).toUpperCase() );
+        ReqmanFile rf = new ReqmanFile(f, t);
+        files.add(rf);
+        LOGGER.debug("Added {}", rf);
+      }catch(IllegalArgumentException ex){
+        LOGGER.error("Could not find the type of {}. Ignoring this file", ex);
+      }
+    }
+    return files;
   }
   
   public Course openCourse(){
@@ -69,5 +87,13 @@ public class StorageManager {
   }
   
   
+  public static List<String> getKnownExtensions(){
+    ArrayList<String> list = new ArrayList<>();
+    for(ReqmanFile.Type type : ReqmanFile.Type.values()){
+      list.add(type.getExtension() );
+    }
+    return list;
+  }
   
+  public static final FileFilter REQMAN_FILE_FILTER = pathname -> getKnownExtensions().contains(FileUtils.getFileExtension(pathname));
 }
