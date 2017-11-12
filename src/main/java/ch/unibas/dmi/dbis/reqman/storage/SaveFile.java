@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.storage;
 
 import ch.unibas.dmi.dbis.reqman.common.IOUtils;
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
+import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +12,7 @@ import java.io.IOException;
 /**
  * The {@link SaveFile} class represents a save file of an entity.
  * <p>
- * The save file is used to read and write the entity it is typed for, using {@link
+ * The save file is used to open and write the entity it is typed for, using {@link
  * ch.unibas.dmi.dbis.reqman.common.JSONUtils}.
  * Furthermore, it keeps track of the on disk storage location, so that it could be written to disk without the need
  * of getting a location for it.
@@ -73,12 +74,13 @@ public class SaveFile<T extends VersionedEntity> {
     if (file == null) {
       file = new File(getSaveFilePath());
     }
+    entity.setVersion(Version.getInstance().getVersion());
     JSONUtils.writeToJSONFile(entity, file);
   }
   
-  public void read() throws IOException{
+  public void open() throws IOException{
     if(file == null){
-      throw new IllegalArgumentException("Cannot read if no file is set");
+      throw new IllegalArgumentException("Cannot open if no file is set");
     }
     entity = JSONUtils.readFromJSONFile(file, typeClass);
   }
