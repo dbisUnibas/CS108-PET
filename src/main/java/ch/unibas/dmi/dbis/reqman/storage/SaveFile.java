@@ -4,9 +4,11 @@ import ch.unibas.dmi.dbis.reqman.common.IOUtils;
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
+import org.apache.logging.log4j.core.util.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -61,10 +63,6 @@ public class SaveFile<T extends VersionedEntity> {
     this.dir = dir;
   }
   
-  public void setEntity(T entity) {
-    this.entity = entity;
-  }
-  
   public void save() throws IOException {
     // No file set:
     if (dir == null) {
@@ -78,15 +76,31 @@ public class SaveFile<T extends VersionedEntity> {
     JSONUtils.writeToJSONFile(entity, file);
   }
   
-  public void open() throws IOException{
-    if(file == null){
-      throw new IllegalArgumentException("Cannot open if no file is set");
+  public void open() throws IOException {
+    if (file != null) {
+      // Case 1: File directly specified (e.g. per user dialog)
+      // do nothing
+    } else if (dir != null) {
+      // Case 2: Directory specified
+      // search file with matching extension in that dir
+      File[] files = dir.listFiles(f -> FileUtils.getFileExtension(f).equals(getDesignatedExtension()));
+      if (file.length() >= 1) {
+        file = files[0];
+      } else {
+        throw new FileNotFoundException(String.format("Could not find a %s file in %s", getDesignatedExtension(), dir.getAbsolutePath()));
+      }
+    } else {
+      throw new IllegalStateException("Cannot open a savefile, if neither savedir nor savefile is set");
     }
     entity = JSONUtils.readFromJSONFile(file, typeClass);
   }
   
-  public T getEntity(){
-    return  entity;
+  public T getEntity() {
+    return entity;
+  }
+  
+  public void setEntity(T entity) {
+    this.entity = entity;
   }
   
   public File getSaveFile() {

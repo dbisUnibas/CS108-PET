@@ -9,8 +9,10 @@ import org.apache.logging.log4j.core.util.FileUtils;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * The {@link StorageManager} manages {@link SaveFile} for a ReqMan session.
@@ -28,9 +30,9 @@ public class StorageManager {
   // TODO Decide: Singleton or not
   private final Logger LOGGER = LogManager.getLogger();
   
-  private SaveFile<Course> courseSaveFile;
-  private SaveFile<Catalogue> catalogueSaveFile;
-  private List<SaveFile<Group>> groupSaveFileList;
+  private SaveFile courseSaveFile;
+  private SaveFile catalogueSaveFile;
+  private List<SaveFile> groupSaveFileList;
   
   private final File dir;
   
@@ -62,13 +64,37 @@ public class StorageManager {
     return files;
   }
   
-  public Course openCourse(){
-    // TODO simply open .course file in dir
+  public Course openCourse() throws IOException {
+    courseSaveFile = SaveFile.createForSaveDir(dir, Course.class);
+    courseSaveFile.open();
+    return (Course)courseSaveFile.getEntity();
+  }
+  
+  public Catalogue openCatalogue() throws IOException, UuidMismatchException {
+    catalogueSaveFile = SaveFile.createForSaveDir(dir, Catalogue.class);
+    catalogueSaveFile.open();
+    
+    Catalogue cat = (Catalogue) catalogueSaveFile.getEntity();
+    Course course = openCourse();
+    
+    if(!matchingUuid(course.getCatalogueUUID(), cat.getUuid())){
+      throw new UuidMismatchException(course.getCatalogueUUID(), cat.getUuid());
+    }
+    
+    return cat;
+  }
+  
+  public Course getCourse(){
+    if(courseSaveFile != null){
+      return (Course) courseSaveFile.getEntity();
+    }
     return null;
   }
   
-  public Catalogue openCatalogue(){
-    // TODO open .catalogue file in dir, then open .course file and check matching id
+  public Catalogue getCatalogue(){
+    if(catalogueSaveFile != null){
+      return (Catalogue) catalogueSaveFile.getEntity();
+    }
     return null;
   }
   
@@ -90,12 +116,16 @@ public class StorageManager {
   }
   
   
-  public static List<String> getKnownExtensions(){
+  private static List<String> getKnownExtensions(){
     ArrayList<String> list = new ArrayList<>();
     for(ReqmanFile.Type type : ReqmanFile.Type.values()){
       list.add(type.getExtension() );
     }
     return list;
+  }
+  
+  private static boolean matchingUuid(UUID expected, UUID actual){
+    return expected.equals(actual);
   }
   
   public static final FileFilter REQMAN_FILE_FILTER = pathname -> getKnownExtensions().contains(FileUtils.getFileExtension(pathname));
