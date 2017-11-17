@@ -78,6 +78,9 @@ public class StorageManager {
     Course course = openCourse();
     
     if(!matchingUuid(course.getCatalogueUUID(), cat.getUuid())){
+      // 'Clean savefiles'
+      catalogueSaveFile = null;
+      courseSaveFile = null;
       throw new UuidMismatchException(course.getCatalogueUUID(), cat.getUuid());
     }
     
