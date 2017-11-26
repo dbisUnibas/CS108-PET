@@ -2,7 +2,6 @@ package ch.unibas.dmi.dbis.reqman.data;
 
 import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
-import ch.unibas.dmi.dbis.reqman.common.NamedEntity;
 import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -396,6 +395,10 @@ public class Group extends VersionedEntity implements Comparable<Group> {
   
   public boolean addAllMembers(Collection<Member> members) {
     return this.members.addAll(members);
+  }
+  
+  public UUID getCourseUuid() {
+    return courseUuid;
   }
   
   void setCourse(Course course) {

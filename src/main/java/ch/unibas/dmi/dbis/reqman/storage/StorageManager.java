@@ -101,9 +101,25 @@ public class StorageManager {
     return null;
   }
   
-  public Group openGroup(){
+  public Group openGroup(File file) throws IOException, UuidMismatchException {
     // TODO open .group file in dir, then open .course file in dir and check matching id, then open .catalogue file and check matching id
-    return null;
+    SaveFile groupFile = SaveFile.createForSaveFile(file, Group.class);
+    groupFile.open();
+    
+    Group group = (Group) groupFile.getEntity();
+    
+    Catalogue cat = openCatalogue(); // Checks if catalogue is matchin on its own.
+    Course course = getCourse(); // Loaded / opened due call of openCatalogue()
+    
+    if(!matchingUuid(group.getCourseUuid(), course.getUuid())){
+      // Resetting the other opened files
+      catalogueSaveFile = null;
+      courseSaveFile=null;
+      throw new UuidMismatchException(group.getCourseUuid(), course.getUuid());
+    }
+    
+    groupSaveFileList.add(groupFile);
+    return group;
   }
   
   public void saveCourse(Course course){
