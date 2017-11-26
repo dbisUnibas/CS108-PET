@@ -122,16 +122,23 @@ public class StorageManager {
     return group;
   }
   
-  public void saveCourse(Course course){
-  
+  public void saveCourse(Course course) throws IOException {
+    courseSaveFile = SaveFile.createForEntity(course);
+    courseSaveFile.setSaveDirectory(dir);
+    courseSaveFile.save();
   }
   
-  public void saveCatalogue(Catalogue catalogue){
-  
+  public void saveCatalogue(Catalogue catalogue) throws IOException {
+    catalogueSaveFile = SaveFile.createForEntity(catalogue);
+    catalogueSaveFile.setSaveDirectory(dir);
+    catalogueSaveFile.save();
   }
   
-  public void saveGroup(Group group){
-  
+  public void saveGroup(Group group) throws IOException {
+    SaveFile groupFile = SaveFile.createForEntity(group);
+    groupFile.setSaveDirectory(dir);
+    groupFile.save();
+    groupSaveFileList.add(groupFile);
   }
   
   
