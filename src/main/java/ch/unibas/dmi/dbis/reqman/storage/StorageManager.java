@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,6 +43,7 @@ public class StorageManager {
    */
   public StorageManager(File dir) {
     this.dir = dir;
+    groupSaveFileList = new ArrayList<>();
   }
   
   /**
@@ -50,17 +52,17 @@ public class StorageManager {
    */
   public List<ReqmanFile> listFiles(){
     ArrayList<ReqmanFile> files = new ArrayList<>();
-    for(File f : dir.listFiles(REQMAN_FILE_FILTER)){
+    Arrays.stream(dir.listFiles(REQMAN_FILE_FILTER)).forEach(f -> {
       LOGGER.debug("Processing file {}", f);
-      try{
-        ReqmanFile.Type t = ReqmanFile.Type.valueOf(FileUtils.getFileExtension(f).toUpperCase() );
+      try {
+        ReqmanFile.Type t = ReqmanFile.Type.valueOf(FileUtils.getFileExtension(f).toUpperCase());
         ReqmanFile rf = new ReqmanFile(f, t);
         files.add(rf);
         LOGGER.debug("Added {}", rf);
-      }catch(IllegalArgumentException ex){
+      } catch (IllegalArgumentException ex) {
         LOGGER.error("Could not find the type of {}. Ignoring this file", ex);
       }
-    }
+    });
     return files;
   }
   
@@ -123,22 +125,42 @@ public class StorageManager {
   }
   
   public void saveCourse(Course course) throws IOException {
+    checkIfDirSet();
     courseSaveFile = SaveFile.createForEntity(course);
     courseSaveFile.setSaveDirectory(dir);
     courseSaveFile.save();
   }
   
+  public void saveCourse() throws IOException{
+    courseSaveFile.save();
+  }
+  
   public void saveCatalogue(Catalogue catalogue) throws IOException {
+    checkIfDirSet();
     catalogueSaveFile = SaveFile.createForEntity(catalogue);
     catalogueSaveFile.setSaveDirectory(dir);
     catalogueSaveFile.save();
   }
   
+  public void saveCatalogue() throws IOException {
+    catalogueSaveFile.save();
+  }
+  
   public void saveGroup(Group group) throws IOException {
+    // TODO handle existing group
+    checkIfDirSet();
     SaveFile groupFile = SaveFile.createForEntity(group);
     groupFile.setSaveDirectory(dir);
     groupFile.save();
     groupSaveFileList.add(groupFile);
+  }
+  
+  public void saveGroup(UUID groupUuid) throws IOException {
+    for (SaveFile sf : groupSaveFileList) {
+      if (groupUuid.equals(((Group) sf.getEntity()).getUuid())){
+        sf.save();
+      }
+    }
   }
   
   
@@ -152,6 +174,12 @@ public class StorageManager {
   
   private static boolean matchingUuid(UUID expected, UUID actual){
     return expected.equals(actual);
+  }
+  
+  private void checkIfDirSet() throws RuntimeException{
+    if(dir == null){
+      throw new RuntimeException("Save Directory not set");
+    }
   }
   
   public static final FileFilter REQMAN_FILE_FILTER = pathname -> getKnownExtensions().contains(FileUtils.getFileExtension(pathname));
