@@ -4,6 +4,8 @@ import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
 import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -14,24 +16,25 @@ import java.util.UUID;
 
 /**
  * The {@link EntityController} controls all entities during a session.
- *
+ * <p>
  * In fact, it has several delegates for such a purpose, these are:
  * <ul>
- *   <li>{@link ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser} for analyses of the {@link ch.unibas.dmi.dbis.reqman.data.Catalogue}</li>
- *   <li>{@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser} for analyses of a {@link ch.unibas.dmi.dbis.reqman.data.Group}</li>
- *   <li>{@link ch.unibas.dmi.dbis.reqman.data.CourseManager} for managing the {@link ch.unibas.dmi.dbis.reqman.data.Course}</li>
- *   <li>{@link ch.unibas.dmi.dbis.reqman.data.EntityFactory} for the creation of new entities</li>
- *   <li>{@link ch.unibas.dmi.dbis.reqman.storage.StorageManager} for IO operations</li>
+ * <li>{@link ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser} for analyses of the {@link
+ * ch.unibas.dmi.dbis.reqman.data.Catalogue}</li>
+ * <li>{@link ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser} for analyses of a {@link
+ * ch.unibas.dmi.dbis.reqman.data.Group}</li>
+ * <li>{@link ch.unibas.dmi.dbis.reqman.data.CourseManager} for managing the {@link
+ * ch.unibas.dmi.dbis.reqman.data.Course}</li>
+ * <li>{@link ch.unibas.dmi.dbis.reqman.data.EntityFactory} for the creation of new entities</li>
+ * <li>{@link ch.unibas.dmi.dbis.reqman.storage.StorageManager} for IO operations</li>
  * </ul>
  *
  * @author loris.sauter
  */
 public class EntityController {
   
-  private static EntityController instance = null;
-  
   private static final Logger LOGGER = LogManager.getLogger();
-  
+  private static EntityController instance = null;
   private CatalogueAnalyser catalogueAnalyser;
   
   private CourseManager courseManager;
@@ -41,18 +44,21 @@ public class EntityController {
   private StorageManager storageManager;
   
   private HashMap<UUID, GroupAnalyser> groupAnalyserMap = new HashMap<>();
+  private ObservableList<Requirement> observableRequirements;
+  private ObservableList<Milestone> observableMilestones;
+  
   
   private EntityController() {
   }
   
-  public static EntityController getInstance(){
-    if(instance == null){
+  public static EntityController getInstance() {
+    if (instance == null) {
       instance = new EntityController();
     }
     return instance;
   }
   
-  public Course createCourse(String courseName, String semester){
+  public Course createCourse(String courseName, String semester) {
     entityFactory = EntityFactory.createFactoryAndCourse(courseName, semester);
     return entityFactory.getCourse();
   }
@@ -79,9 +85,20 @@ public class EntityController {
   }
   
   public Catalogue createCatalogue(String name) {
-    return entityFactory.createCatalogue(name);
+    Catalogue cat = entityFactory.createCatalogue(name);
+    /*
+     Since the EntityFactory handles the linking and adding of reqs/ ms backing the observable lists, reflects each change.
+      */
+    observableRequirements = FXCollections.observableList(cat.getRequirements());
+    observableMilestones = FXCollections.observableList(cat.getMilestones());
+    catalogueAnalyser = new CatalogueAnalyser(getCourse(), cat);
+    courseManager = new CourseManager(getCourse(), cat);
+    return cat;
   }
   
+  public Course getCourse(){
+    return entityFactory.getCourse();
+  }
   
   
   public CatalogueAnalyser getCatalogueAnalyser() {
@@ -122,5 +139,29 @@ public class EntityController {
   
   public GroupAnalyser removeGroupAnalyser(Object key) {
     return groupAnalyserMap.remove(key);
+  }
+  
+  public ObservableList<Requirement> getObservableRequirements() {
+    return observableRequirements;
+  }
+  
+  public ObservableList<Milestone> getObservableMilestones() {
+    return observableMilestones;
+  }
+  
+  public boolean removeRequirement(Requirement requirement) {
+    return entityFactory.getCatalogue().removeRequirement(requirement);
+  }
+  
+  public boolean removeMilestone(Milestone milestone) {
+    return entityFactory.getCatalogue().removeMilestone(milestone);
+  }
+  
+  public boolean hasCatalogue() {
+    return entityFactory.getCatalogue() != null;
+  }
+  
+  public Catalogue getCatalogue() {
+    return entityFactory.getCatalogue();
   }
 }

@@ -359,12 +359,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   
   
   private void loadPredecessors() {
-    requirement.getPredecessorNames().forEach(name -> {
-      Requirement r = handler.getRequirementByName(name);
-      if (r != null) {
-        predecessors.add(r);
-      }
-    });
+    predecessors.addAll(EntityController.getInstance().getCatalogueAnalyser().getPredecessors(requirement));
   }
   
   private BorderPane createPredecessorChoice() {
@@ -379,7 +374,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     ComboBox<Requirement> reqBox = new ComboBox<>();
     reqBox.setButtonCell(new RequirementCell());
     reqBox.setCellFactory((ListView<Requirement> l) -> new RequirementCell());
-    reqBox.setItems(handler.getObservableRequirements());
+    reqBox.setItems(EntityController.getInstance().getObservableRequirements());
     
     upper.getChildren().addAll(reqBox, addPred, rmPred);
     
@@ -422,7 +417,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   }
   
   private void loadMilestoneNames() {
-    milestoneList = handler.getObservableMilestones();
+    milestoneList = EntityController.getInstance().getObservableMilestones();
   }
   
   private TableView<MetaKeyValuePair> createPropertiesTable() {
