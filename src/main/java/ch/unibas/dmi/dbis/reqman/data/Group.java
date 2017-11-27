@@ -28,7 +28,18 @@ public class Group extends VersionedEntity implements Comparable<Group> {
    * The unique identifier of this group
    */
   private final UUID uuid;
+  
+  /**
+   * The unique identifier of the {@link Course} this group belongs to.
+   */
   private UUID courseUuid;
+  
+  /**
+   * The unique identifier of the {@link Catalogue}, this group tracks the progress of.
+   */
+  private UUID catalogueUuid;
+  
+  
   /**
    * The name of the group, which must be unique
    */
@@ -76,11 +87,13 @@ public class Group extends VersionedEntity implements Comparable<Group> {
    * The list of {@link ProgressSummary} of this group
    */
   private List<ProgressSummary> progressSummaries = new ArrayList<>();
+  
   /**
    * The name of the file the default export goes to.
    * Contains only the name of the file, location will be set by user upon export
    */
   private String exportFileName;
+  // TODO Revisit
   
   /**
    * Creates a new group with the specified arguments
@@ -399,6 +412,14 @@ public class Group extends VersionedEntity implements Comparable<Group> {
   
   public UUID getCourseUuid() {
     return courseUuid;
+  }
+  
+  public UUID getCatalogueUuid() {
+    return catalogueUuid;
+  }
+  
+  public void setCatalogue(Catalogue catalogue) {
+    this.catalogueUuid = catalogue.getUuid();
   }
   
   void setCourse(Course course) {

@@ -113,11 +113,20 @@ public class StorageManager {
     Catalogue cat = openCatalogue(); // Checks if catalogue is matchin on its own.
     Course course = getCourse(); // Loaded / opened due call of openCatalogue()
     
-    if(!matchingUuid(group.getCourseUuid(), course.getUuid())){
+    boolean matchingCourse = matchingUuid(group.getCourseUuid(), course.getUuid());
+    boolean matchingCatalogue = matchingUuid(group.getCatalogueUuid(), cat.getUuid());
+    
+    if(!(matchingCatalogue && matchingCourse)){
+      UuidMismatchException ex;
+      if(!matchingCatalogue){
+        ex = new UuidMismatchException(group.getCourseUuid(), cat.getUuid());
+      }else{
+        ex = new UuidMismatchException(group.getCourseUuid(), course.getUuid());
+      }
       // Resetting the other opened files
       catalogueSaveFile = null;
       courseSaveFile=null;
-      throw new UuidMismatchException(group.getCourseUuid(), course.getUuid());
+      throw ex;
     }
     
     groupSaveFileList.add(groupFile);

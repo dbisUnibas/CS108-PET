@@ -176,6 +176,7 @@ public class EntityFactory {
   public Group createGroup(String groupName, Member... members) {
     Group g = new Group();
     g.setCourse(course);
+    g.setCatalogue(catalogue);
     g.addAllMembers(Arrays.asList(members));
     return g;
   }
