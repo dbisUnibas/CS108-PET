@@ -70,6 +70,9 @@ public class EditorHandler implements EventHandler<CUDEvent> {
       case MILESTONE:
         Milestone ms = EditorPromptFactory.promptNewMilestone();
         break;
+      case COURSE:
+        EditorPromptFactory.promptNewCourse();
+        break;
       default:
         throwInappropriateTargetEntity(evt.getTargetEntity());
     }

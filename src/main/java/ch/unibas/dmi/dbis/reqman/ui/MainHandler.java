@@ -316,7 +316,32 @@ public class MainHandler implements MenuHandler {
             }
         }
     }
-
+    
+    @Override
+    public void handleNewCourse(ActionEvent event) {
+        editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.COURSE));
+        if (!editorHandler.isCatalogueLoaded()) {
+            return;
+        }
+        mainScene.setActive(MainScene.Mode.EDITOR);
+        manager.enableCatalogueNeeded();
+    }
+    
+    @Override
+    public void handleOpenCourse(ActionEvent event) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+    
+    @Override
+    public void handleSaveCourse(ActionEvent event) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+    
+    @Override
+    public void handleSaveCourseAs(ActionEvent event) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+    
     public void setMainScene(MainScene mainScene) {
         this.mainScene = mainScene;
     }
