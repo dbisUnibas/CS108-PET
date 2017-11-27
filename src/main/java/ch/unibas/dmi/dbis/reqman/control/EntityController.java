@@ -69,6 +69,10 @@ public class EntityController {
     return entityFactory.createMalusRequirement(name, excerpt, maxPoints, minMS, maxMS);
   }
   
+  public Requirement createBonusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS) {
+    return entityFactory.createBonusRequirement(name, excerpt, maxPoints, minMS, maxMS);
+  }
+  
   @NotNull
   public Milestone createMilestone(String name, Date date) {
     return entityFactory.createMilestone(name, date);
