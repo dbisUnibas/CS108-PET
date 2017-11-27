@@ -37,6 +37,8 @@ public class StorageManager {
   
   private final File dir;
   
+  // TODO: openX - check if already opened and check if dependencies were already opened
+  
   /**
    * Creates a new StorageManager for the current session, by specifying the savefolder.
    * @param dir The folder in which ReqMan should store all files
@@ -104,7 +106,6 @@ public class StorageManager {
   }
   
   public Group openGroup(File file) throws IOException, UuidMismatchException {
-    // TODO open .group file in dir, then open .course file in dir and check matching id, then open .catalogue file and check matching id
     SaveFile groupFile = SaveFile.createForSaveFile(file, Group.class);
     groupFile.open();
     
