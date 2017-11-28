@@ -97,6 +97,9 @@ public class RequirementTableView extends BorderPane {
             }
             for (Requirement addItem : c.getAddedSubList()) {
               LOGGER.trace("Added  {}", c.getAddedSubList());
+              if(addItem == null){
+                continue;
+              }
               ObservableRequirement obsReq = ObservableRequirement.fromRequirement(addItem);
               LOGGER.debug("Table contains to add: {}", tableData.contains(obsReq));
               if (!tableData.contains(obsReq)) {

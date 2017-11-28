@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Course;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
@@ -79,8 +80,10 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         LOGGER.debug("All ObsMS={}", EntityController.getInstance().getObservableMilestones());
         break;
       case COURSE:
-        EditorPromptFactory.promptNewCourse();
-        setupEditor();
+        Course  course = EditorPromptFactory.promptNewCourse();
+        if(course != null){
+          setupEditor();
+        }
         break;
       default:
         throwInappropriateTargetEntity(evt.getTargetEntity());

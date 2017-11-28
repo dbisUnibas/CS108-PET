@@ -131,9 +131,11 @@ public class Requirement {
     this.malus = malus;
   }
   
+  @Deprecated
   public void clearPredecessorNames() {
     predecessorNames.clear();
   }
+  
   
   public void clearPropertiesMap() {
     propertiesMap.clear();
@@ -148,6 +150,7 @@ public class Requirement {
    * @return {@code true} As specified in {@link List#add(Object)}
    * @see List#add(Object)
    */
+  @Deprecated
   public boolean addPredecessorName(String name) {
     return predecessorNames.add(name);
   }
@@ -158,6 +161,7 @@ public class Requirement {
    * @param name The name of the requirement this requirement no longer depends on. Must be a valid requirement name.
    * @return {@code true} If the specified name was in the list of predecessors (and is now not anymore).
    */
+  @Deprecated
   public boolean removePredecessorName(String name) {
     return predecessorNames.remove(name);
   }
@@ -171,17 +175,21 @@ public class Requirement {
    *
    * @return A copy of the list of predecessor names.
    */
+  @Deprecated
   public List<String> getPredecessorNames() {
     return new ArrayList<>(predecessorNames);
   }
   
+  @Deprecated
   public void setPredecessorNames(List<String> predecessorNames) {
     this.predecessorNames = predecessorNames;
   }
   
+  
   public String addProperty(String key, String value) {
     return propertiesMap.put(key, value);
   }
+  
   
   @Override
   public int hashCode() {
@@ -197,8 +205,6 @@ public class Requirement {
     result = 31 * result + (int) (temp ^ (temp >>> 32));
     result = 31 * result + (isBinary() ? 1 : 0);
     result = 31 * result + (getType() != null ? getType().hashCode() : 0);
-    result = 31 * result + (getPredecessorNames() != null ? getPredecessorNames().hashCode() : 0);
-    result = 31 * result + (getPropertiesMap() != null ? getPropertiesMap().hashCode() : 0);
     result = 31 * result + (getCategory() != null ? getCategory().hashCode() : 0);
     return result;
   }
@@ -225,7 +231,6 @@ public class Requirement {
     sb.append(", maxPoints=").append(maxPoints);
     sb.append(", binary=").append(binary);
     sb.append(", type=").append(type);
-    sb.append(", predecessorNames=").append(predecessorNames);
     sb.append(", propertiesMap=").append(propertiesMap);
     sb.append(", category='").append(category).append('\'');
     sb.append('}');

@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
@@ -24,7 +25,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,16 +38,22 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   
   private final static MetaKeyValuePair PLACEHOLDER = new MetaKeyValuePair("key", "value");
   private TextField tfName = new TextField();
+  private TextField tfShort = new TextField();
   private TextArea taDesc = new TextArea();
+  private TextField tfCategory = new TextField();
   private ComboBox<Milestone> cbMinMS = new ComboBox<>();
   private ComboBox<Milestone> cbMaxMS = new ComboBox<>();
   private Spinner spinnerPoints = new Spinner(0d, Double.MAX_VALUE, 0.0);
-  private RadioButton binaryYes = new RadioButton("Yes");
-  private RadioButton binaryNo = new RadioButton("No");
-  private RadioButton mandatoryYes = new RadioButton("Yes");
-  private RadioButton mandatoryNo = new RadioButton("No");
-  private RadioButton malusYes = new RadioButton("Yes");
-  private RadioButton malusNo = new RadioButton("No");
+  private RadioButton rbRegular = new RadioButton("Regular");
+  private RadioButton rbBinary = new RadioButton("Binary");
+  private RadioButton rbBonus = new RadioButton("Bonus");
+  private RadioButton rbMalus = new RadioButton("Malus");
+  @Deprecated  private RadioButton binaryYes = new RadioButton("Yes");
+  @Deprecated private RadioButton binaryNo = new RadioButton("No");
+  @Deprecated private RadioButton mandatoryYes = new RadioButton("Yes");
+  @Deprecated private RadioButton mandatoryNo = new RadioButton("No");
+  @Deprecated private RadioButton malusYes = new RadioButton("Yes");
+  @Deprecated private RadioButton malusNo = new RadioButton("No");
   private Requirement requirement = null;
   private ObservableList<MetaKeyValuePair> tableData;
   private TableView<MetaKeyValuePair> table = createPropertiesTable();
@@ -76,9 +82,11 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   
   public void handleSaving(ActionEvent event) {
     String name = tfName.getText();
-    String excerpt = taDesc.getText();
+    String excerpt = tfShort.getText();
+    String desc = taDesc.getText();
     Milestone min = cbMinMS.getValue();
     double maxPoints = (double) spinnerPoints.getValue();
+    String cat = tfCategory.getText();
     
     if ((name == null || name.isEmpty()) || min == null) {
       throw new IllegalArgumentException("[Requirement] Name and Minimal Milestone are mandatory fields");
@@ -87,13 +95,13 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
     
     
-    if (malusYes.isSelected()) {
+    if (rbMalus.isSelected()) {
       // Malus
       requirement = EntityController.getInstance().createMalusRequirement(name, excerpt, maxPoints, min, max);
-    } else if (mandatoryNo.isSelected()) {
+    } else if (rbBonus.isSelected()) {
       // Bonus
       requirement = EntityController.getInstance().createBonusRequirement(name, excerpt, maxPoints, min, max);
-    } else if (binaryYes.isSelected()) {
+    } else if (rbBinary.isSelected()) {
       // binary
       requirement = EntityController.getInstance().createBinaryRequirement(name, excerpt, maxPoints, min, max);
     } else {
@@ -101,10 +109,15 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       requirement = EntityController.getInstance().createRequirement(name, excerpt, maxPoints, min, max);
     }
     
+    if(!StringUtils.isNullOrEmpty(desc)){
+      requirement.setDescription(desc);
+    }
+    if(!StringUtils.isNullOrEmpty(cat)){
+      requirement.setCategory(cat);
+    }
+    
     if (!predecessors.isEmpty()) {
-      ArrayList<String> names = new ArrayList<>();
-      predecessors.forEach(pred -> names.add(pred.getName()));
-      requirement.setPredecessorNames(names);
+      predecessors.stream().forEach(requirement::addPredecessor);
     }
     
     saveProperties();
@@ -134,13 +147,13 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   protected void populateScene() {
     ScrollPane scrollPane = new ScrollPane();
     Label lblName = new Label("Name*");
-    Label lblDesc = new Label("Excerpt");
+    Label lblDesc = new Label("Description");
+    Label lblShort = new Label("Excerpt*");
     Label lblMinMS = new Label("Minimal Milestone*");
     Label lblMaxMS = new Label("Maximal Milestone");
     Label lblMaxPoints = new Label("Maximal Points");
-    Label lblBinary = new Label("Binary");
-    Label lblMandatory = new Label("Mandatory");
-    Label lblMalus = new Label("Malus");
+    Label lblType = new Label("Type");
+    Label lblCategory = new Label("Category");
     Label lblPredecessors = new Label("Predecessors");
     Label lblProps = new Label("Meta Data");
     
@@ -195,40 +208,19 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     // TODO create new button groups
     
-    HBox binaryGroup = new HBox();
-    binaryGroup.setStyle("-fx-spacing: 10px");
-    ToggleGroup binaryButtons = new ToggleGroup();
-    binaryYes.setToggleGroup(binaryButtons);
-    binaryNo.setToggleGroup(binaryButtons);
-    binaryNo.setSelected(true);
-    binaryGroup.getChildren().addAll(lblBinary, binaryYes, binaryNo);
+    HBox typeGroup = new HBox();
+    typeGroup.setStyle("-fx-spacing: 10px");
+    ToggleGroup typeButtons = new ToggleGroup();
+    rbRegular.setToggleGroup(typeButtons);
+    rbBinary.setToggleGroup(typeButtons);
+    rbBonus.setToggleGroup(typeButtons);
+    rbMalus.setToggleGroup(typeButtons);
     
+    rbRegular.setSelected(true);
     
-    HBox mandatoryGroup = new HBox();
-    mandatoryGroup.setStyle("-fx-spacing: 10px");
-    ToggleGroup mandatoryButtons = new ToggleGroup();
-    mandatoryYes.setToggleGroup(mandatoryButtons);
-    mandatoryNo.setToggleGroup(mandatoryButtons);
-    mandatoryYes.setSelected(true);
-    mandatoryGroup.getChildren().addAll(lblMandatory, mandatoryYes, mandatoryNo);
+    typeGroup.getChildren().addAll(lblType, rbRegular, rbBinary, rbBonus, rbMalus);
+    GridPane.setHgrow(typeGroup, Priority.ALWAYS);
     
-    
-    HBox malusGroup = new HBox();
-    malusGroup.setStyle("-fx-spacing: 10px");
-    ToggleGroup malusButtons = new ToggleGroup();
-    malusYes.setToggleGroup(malusButtons);
-    malusNo.setToggleGroup(malusButtons);
-    malusNo.setSelected(true);
-    malusGroup.getChildren().addAll(lblMalus, malusYes, malusNo);
-    
-    GridPane groupWrapper = new GridPane();
-    groupWrapper.setPadding(new Insets(0, 10, 0, 10));
-    groupWrapper.add(binaryGroup, 0, 0);
-    GridPane.setHgrow(binaryGroup, Priority.ALWAYS);
-    groupWrapper.add(mandatoryGroup, 1, 0);
-    GridPane.setHgrow(mandatoryGroup, Priority.ALWAYS);
-    groupWrapper.add(malusGroup, 2, 0);
-    GridPane.setHgrow(malusGroup, Priority.ALWAYS);
     
     int leftColsRow = 0;
     int rightColsRow = 0;
@@ -236,6 +228,9 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     grid.add(lblName, 0, leftColsRow);
     grid.add(tfName, 1, leftColsRow++);
+    
+    grid.add(lblShort, 0, leftColsRow);
+    grid.add(tfShort, 1, leftColsRow++);
     
     grid.add(lblDesc, 0, leftColsRow);
     grid.add(taDesc, 1, leftColsRow, 1, 2);
@@ -250,6 +245,9 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     grid.add(lblMaxMS, 0, leftColsRow);
     grid.add(maxMSBox, 1, leftColsRow++);
+    
+    grid.add(lblCategory, 0, leftColsRow);
+    grid.add(tfCategory, 1, leftColsRow++);
     
     GridPane.setValignment(lblMaxMS, VPos.TOP);
     lblMaxMS.setPadding(new Insets(5, 0, 0, 0));// makes it appear like the others
@@ -271,8 +269,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     // separator
     grid.add(new Separator(), 0, leftColsRow++, 5, 1);
     // RadioButton groups
-    grid.add(groupWrapper, 0, leftColsRow++, 5, 1);
-    GridPane.setHgrow(groupWrapper, Priority.ALWAYS);
+    grid.add(typeGroup, 0, leftColsRow++, 5, 1);
     // Separator
     grid.add(new Separator(), 0, leftColsRow++, 5, 1);
     
@@ -291,6 +288,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   private void loadRequirement() {
     if (requirement != null) {
       tfName.setText(requirement.getName());
+      tfShort.setText(requirement.getExcerpt());
+      tfCategory.setText(requirement.getCategory());
       taDesc.setText(requirement.getDescription());
       Milestone min = EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(requirement.getMinimalMilestoneUUID());
       cbMinMS.getSelectionModel().select(min);
@@ -298,14 +297,21 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       cbMaxMS.getSelectionModel().select(max);
       spinnerPoints.getValueFactory().setValue(requirement.getMaxPoints());
       
-      binaryYes.setSelected(requirement.isBinary());
-      binaryNo.setSelected(!requirement.isBinary());
-      
-      mandatoryYes.setSelected(requirement.isMandatory());
-      mandatoryNo.setSelected(!requirement.isMandatory());
-      
-      malusYes.setSelected(requirement.isMalus());
-      malusNo.setSelected(!requirement.isMalus());
+      switch(requirement.getType()){
+        case REGULAR:
+          if(requirement.isBinary()){
+            rbBinary.setSelected(true);
+          }else{
+            rbRegular.setSelected(true);
+          }
+          break;
+        case BONUS:
+          rbBonus.setSelected(true);
+          break;
+        case MALUS:
+          rbMalus.setSelected(true);
+          break;
+      }
       
       loadPredecessors();
       loadProperties();
