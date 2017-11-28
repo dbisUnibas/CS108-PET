@@ -83,17 +83,23 @@ public class EntityController {
   
   @NotNull
   public Milestone createMilestone(String name, Date date) {
-    return entityFactory.createMilestone(name, date);
+    Milestone ms = entityFactory.createMilestone(name, date);
+    LOGGER.debug("Created the ms={}",ms);
+    return ms;
   }
   
   public Catalogue createCatalogue(String name) {
     LOGGER.debug("Creating catalogue");
     Catalogue cat = entityFactory.createCatalogue(name);
     /*
-     Since the EntityFactory handles the linking and adding of reqs/ ms backing the observable lists, reflects each change.
+     Since the EntityFactory handles the linking and adding of reqs/ ms in catalogue.requirements /catalogue.milestones,
+     this redundancy is not very beautiful, but the first way I thought about to still get the UI notified.
+     This leads to the contract, that the EditorHandler needs to add the req/ms on its own, to the obs.list
+     
+     TODO Another way would be to add the entity while creating it. So that this keeps track of the redundant lists
       */
-    observableRequirements = FXCollections.observableList(cat.getRequirements());
-    observableMilestones = FXCollections.observableList(cat.getMilestones());
+    observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
+    observableMilestones = FXCollections.observableArrayList();
     catalogueAnalyser = new CatalogueAnalyser(getCourse(), cat);
     courseManager = new CourseManager(getCourse(), cat);
     LOGGER.debug("Setup catalogueAnalyser and courseManager");

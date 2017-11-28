@@ -14,7 +14,7 @@ public class MilestoneCell extends ListCell<Milestone> {
     public void updateItem(Milestone item, boolean empty) {
         super.updateItem(item, empty);
         if (!empty) {
-            setText(item.getName() + " (" + item.getOrdinal() + ")");
+            setText(item.getName());
         } else {
             setText("");
         }

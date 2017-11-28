@@ -100,6 +100,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       // regular
       requirement = EntityController.getInstance().createRequirement(name, excerpt, maxPoints, min, max);
     }
+    
     if (!predecessors.isEmpty()) {
       ArrayList<String> names = new ArrayList<>();
       predecessors.forEach(pred -> names.add(pred.getName()));

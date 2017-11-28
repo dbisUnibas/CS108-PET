@@ -281,6 +281,7 @@ public class EntityFactory {
     cat.setName(name);
     course.setCatalogueUUID(cat.getUuid());
     this.catalogue = cat;
+    manager = new CourseManager(course,catalogue);
     return cat;
   }
   

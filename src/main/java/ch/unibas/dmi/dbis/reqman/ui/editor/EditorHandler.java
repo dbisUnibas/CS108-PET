@@ -66,9 +66,17 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         break;
       case REQUIREMENT:
         Requirement req = EditorPromptFactory.promptNewRequirement(this);
+        EntityController.getInstance().getObservableRequirements().add(req);
+        LOGGER.debug("Created Req={}", req);
+        LOGGER.debug("All Cat.Reqs={}", EntityController.getInstance().getCatalogue().getRequirements());
+        LOGGER.debug("All ObsReqs={}", EntityController.getInstance().getObservableRequirements());
         break;
       case MILESTONE:
         Milestone ms = EditorPromptFactory.promptNewMilestone();
+        EntityController.getInstance().getObservableMilestones().add(ms);
+        LOGGER.debug("Created MS={}", ms);
+        LOGGER.debug("All Cat.MS={}", EntityController.getInstance().getCatalogue().getMilestones());
+        LOGGER.debug("All ObsMS={}", EntityController.getInstance().getObservableMilestones());
         break;
       case COURSE:
         EditorPromptFactory.promptNewCourse();
