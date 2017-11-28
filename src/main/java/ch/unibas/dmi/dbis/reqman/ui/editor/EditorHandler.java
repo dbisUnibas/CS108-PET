@@ -104,11 +104,11 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         } else {
           throw new RuntimeException("Something went really bad.");
         }
-        
         break;
       case MILESTONE:
         if (evt.getDelivery() instanceof Milestone) {
           Milestone milestone = (Milestone) evt.getDelivery();
+          LOGGER.debug("Going to remove MS={}", milestone);
           EntityController.getInstance().removeMilestone(milestone);
         }
         break;

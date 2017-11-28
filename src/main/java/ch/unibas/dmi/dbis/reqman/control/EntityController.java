@@ -163,11 +163,19 @@ public class EntityController {
   }
   
   public boolean removeRequirement(Requirement requirement) {
-    return entityFactory.getCatalogue().removeRequirement(requirement);
+    boolean result = entityFactory.getCatalogue().removeRequirement(requirement);
+    LOGGER.debug("Removing req={}", requirement);
+    LOGGER.debug("After deletion: {}", entityFactory.getCatalogue().getRequirements());
+    observableRequirements.remove(requirement);
+    return  result;
   }
   
   public boolean removeMilestone(Milestone milestone) {
-    return entityFactory.getCatalogue().removeMilestone(milestone);
+    boolean result = entityFactory.getCatalogue().removeMilestone(milestone);
+    LOGGER.debug("Removing ms={}", milestone);
+    LOGGER.debug("After deletion: {}", entityFactory.getCatalogue().getMilestones());
+    observableMilestones.remove(milestone);
+    return result;
   }
   
   public boolean hasCatalogue() {

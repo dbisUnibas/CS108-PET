@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import ch.unibas.dmi.dbis.reqman.ui.common.MandatoryFieldsMissingException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -245,7 +246,7 @@ public class EntityFactory {
   public Milestone createMilestone(String name, Date date) {
     ensureCourseAndCatalogueSet("Create Milestone");
     if (name == null || date == null) {
-      throw new IllegalArgumentException("Cannot create milestone if name or date is null");
+      throw MandatoryFieldsMissingException.createWithFormattedMessage("Mandatory fields for entity Milestone:\n\t1. Name\n\t2. Date");
     }
     Time t = createTime(date);
     return createMilestone(name, t);

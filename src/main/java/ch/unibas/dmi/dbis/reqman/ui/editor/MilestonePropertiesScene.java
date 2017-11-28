@@ -73,8 +73,8 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
   
   @Override
   protected void populateScene() {
-    Label lblName = new Label("Name");
-    Label lblDate = new Label("Date");
+    Label lblName = new Label("Name*");
+    Label lblDate = new Label("Date*");
     
     loadMilestone();
     
