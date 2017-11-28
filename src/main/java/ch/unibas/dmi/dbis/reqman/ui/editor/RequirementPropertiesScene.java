@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
+import ch.unibas.dmi.dbis.reqman.ui.common.MandatoryFieldsMissingException;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
@@ -89,7 +90,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     String cat = tfCategory.getText();
     
     if ((name == null || name.isEmpty()) || min == null) {
-      throw new IllegalArgumentException("[Requirement] Name and Minimal Milestone are mandatory fields");
+      throw MandatoryFieldsMissingException.createWithFormattedMessage("Mandatory fields for entity Requirement:\n\t1) Name\n\t2) Minimal Milestone");
     }
     
     Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
@@ -218,7 +219,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     rbRegular.setSelected(true);
     
-    typeGroup.getChildren().addAll(lblType, rbRegular, rbBinary, rbBonus, rbMalus);
+    typeGroup.getChildren().addAll(rbRegular, rbBinary, rbBonus, rbMalus);
     GridPane.setHgrow(typeGroup, Priority.ALWAYS);
     
     
@@ -248,6 +249,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     grid.add(lblCategory, 0, leftColsRow);
     grid.add(tfCategory, 1, leftColsRow++);
+    leftColsRow++;
     
     GridPane.setValignment(lblMaxMS, VPos.TOP);
     lblMaxMS.setPadding(new Insets(5, 0, 0, 0));// makes it appear like the others
@@ -255,12 +257,12 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     // second pair of columns: one column gap
     // Predecessor list
     grid.add(lblPredecessors, 3, rightColsRow);
-    grid.add(inputPredecessors, 4, rightColsRow, 1, 3);
-    rightColsRow += 3;
+    grid.add(inputPredecessors, 4, rightColsRow, 1, 4);
+    rightColsRow += 4;
     
     grid.add(lblProps, 3, rightColsRow);
-    grid.add(table, 4, rightColsRow, 1, 3);
-    rightColsRow += 3;
+    grid.add(table, 4, rightColsRow, 1, 5);
+    rightColsRow += 5;
     
     
     // Sets the pref size of the table - this is rather an experimental value, but it smallers the size of the grid.
@@ -268,8 +270,12 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     // separator
     grid.add(new Separator(), 0, leftColsRow++, 5, 1);
-    // RadioButton groups
-    grid.add(typeGroup, 0, leftColsRow++, 5, 1);
+    // RadioButton group
+    GridPane.setHgrow(typeGroup, Priority.ALWAYS);
+    GridPane.setFillWidth(typeGroup, true);
+    grid.add(lblType, 0, leftColsRow);
+    grid.add(typeGroup, 1, leftColsRow++, 5, 1);
+    
     // Separator
     grid.add(new Separator(), 0, leftColsRow++, 5, 1);
     
