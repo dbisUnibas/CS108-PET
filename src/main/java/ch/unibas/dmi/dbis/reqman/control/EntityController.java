@@ -107,6 +107,9 @@ public class EntityController {
   }
   
   public Course getCourse() {
+    if(entityFactory==null){
+      return null;
+    }
     return entityFactory.getCourse();
   }
   
@@ -176,6 +179,9 @@ public class EntityController {
   }
   
   public Catalogue getCatalogue() {
+    if(entityFactory == null){
+      return null;
+    }
     return entityFactory.getCatalogue();
   }
   

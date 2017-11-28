@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
@@ -49,18 +48,11 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   private RadioButton rbBinary = new RadioButton("Binary");
   private RadioButton rbBonus = new RadioButton("Bonus");
   private RadioButton rbMalus = new RadioButton("Malus");
-  @Deprecated  private RadioButton binaryYes = new RadioButton("Yes");
-  @Deprecated private RadioButton binaryNo = new RadioButton("No");
-  @Deprecated private RadioButton mandatoryYes = new RadioButton("Yes");
-  @Deprecated private RadioButton mandatoryNo = new RadioButton("No");
-  @Deprecated private RadioButton malusYes = new RadioButton("Yes");
-  @Deprecated private RadioButton malusNo = new RadioButton("No");
   private Requirement requirement = null;
   private ObservableList<MetaKeyValuePair> tableData;
   private TableView<MetaKeyValuePair> table = createPropertiesTable();
   private ObservableList<Requirement> predecessors = FXCollections.observableArrayList();
   private ObservableList<Milestone> milestoneList;
-  private ObservableList<MetaKeyValuePair> metaData;
   
   private EditorHandler handler;
   
@@ -74,10 +66,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     this(handler);
     this.requirement = requirement;
     loadRequirement();
-    Utils.showWarningDialog("Tracked progress potentloss", "In the instance, that there are no groups open and a requirement's name is changed. Any progress a group has made so far is lost.\n\n" +
-        "There are two ways to save that progress:\n\n" +
-        "\t1) Open all groups before changing the name - then the progress is automatically updated.[recommended]\n" +
-        "\t2) Open the group files and rename the progress manually [not recommended]");
   }
   
   
@@ -95,28 +83,42 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
     
-    
-    if (rbMalus.isSelected()) {
-      // Malus
-      requirement = EntityController.getInstance().createMalusRequirement(name, excerpt, maxPoints, min, max);
-    } else if (rbBonus.isSelected()) {
-      // Bonus
-      requirement = EntityController.getInstance().createBonusRequirement(name, excerpt, maxPoints, min, max);
-    } else if (rbBinary.isSelected()) {
-      // binary
-      requirement = EntityController.getInstance().createBinaryRequirement(name, excerpt, maxPoints, min, max);
-    } else {
-      // regular
-      requirement = EntityController.getInstance().createRequirement(name, excerpt, maxPoints, min, max);
+    if(requirement== null){
+      if (rbMalus.isSelected()) {
+        // Malus
+        requirement = EntityController.getInstance().createMalusRequirement(name, excerpt, maxPoints, min, max);
+      } else if (rbBonus.isSelected()) {
+        // Bonus
+        requirement = EntityController.getInstance().createBonusRequirement(name, excerpt, maxPoints, min, max);
+      } else if (rbBinary.isSelected()) {
+        // binary
+        requirement = EntityController.getInstance().createBinaryRequirement(name, excerpt, maxPoints, min, max);
+      } else {
+        // regular
+        requirement = EntityController.getInstance().createRequirement(name, excerpt, maxPoints, min, max);
+      }
+    }else{
+      requirement.setName(name);
+      requirement.setExcerpt(excerpt);
+      requirement.setMaxPoints(maxPoints);
+      requirement.setMinimalMilestoneUUID(min.getUuid());
+      requirement.setMaximalMilestoneUUID(max.getUuid());
+      
+      if(rbMalus.isSelected()){
+        requirement.setType(Requirement.Type.MALUS);
+      }else if(rbBonus.isSelected()){
+        requirement.setType(Requirement.Type.BONUS);
+      }else{
+        requirement.setType(Requirement.Type.REGULAR);
+        requirement.setBinary(rbBinary.isSelected());
+      }
     }
     
-    if(!StringUtils.isNullOrEmpty(desc)){
+    
       requirement.setDescription(desc);
-    }
-    if(!StringUtils.isNullOrEmpty(cat)){
       requirement.setCategory(cat);
-    }
     
+      
     if (!predecessors.isEmpty()) {
       predecessors.stream().forEach(requirement::addPredecessor);
     }

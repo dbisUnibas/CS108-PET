@@ -118,39 +118,29 @@ public class EditorHandler implements EventHandler<CUDEvent> {
   }
   
   public void handleModification(CUDEvent evt) {
-    throw new UnsupportedOperationException("Not implemented yet");
-    /*
+    
     switch (evt.getTargetEntity()) {
       case CATALOGUE:
-        Catalogue cat = manager.getCatalogue();
-        Catalogue modCat = EditorPromptFactory.promptCatalogue(cat);
-        manager.modifyCatalogue(modCat);
-        setupCatalogueInfo();
-        
-        break;
+        throw new UnsupportedOperationException("Not implemented yet");
       case REQUIREMENT:
         if (evt.getDelivery() instanceof RequirementTableView.ObservableRequirement) {
           RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement) evt.getDelivery();
-          Requirement r = manager.getRequirementByName(obsReq.getName());
+          Requirement r = obsReq.getRequirement();
           Requirement mod = EditorPromptFactory.promptRequirement(this, r);
-          LOGGER.debug("Origin: " + r + ", mod: " + mod);
-          if (r == mod) {
-            LOGGER.debug("Modification aborted");
-            return;
-          } else if (mod != null) {
-            manager.replaceRequirement(r, mod);
-          }
+          
+          // modification should happen in the same object, since java objects are always call by reference
+          LOGGER.debug("hash(origin)={}, hash(modified)={} (O={}, M={})", r.hashCode(), mod.hashCode(), r, mod);
         }
         break;
       case MILESTONE:
         if (evt.getDelivery() instanceof Milestone) {
           Milestone mod = EditorPromptFactory.promptMilestone((Milestone) evt.getDelivery());
-          manager.replaceMilestone((Milestone) evt.getDelivery(), mod);
+          LOGGER.debug("Milestone got modified: {}", mod);
         }
         break;
       default:
         throwInappropriateTargetEntity(evt.getTargetEntity());
-    }*/
+    }
   }
   
   public void setupEditor() {
@@ -158,8 +148,6 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     if (EntityController.getInstance().hasCatalogue() ) {
       editor.getRequirementsView().setRequirements(EntityController.getInstance().getObservableRequirements(), EntityController.getInstance().getCatalogue());
       editor.getMilestoneView().setItems(EntityController.getInstance().getObservableMilestones());
-      
-      
     }
   
     // TODO Cleanup

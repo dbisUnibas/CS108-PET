@@ -41,8 +41,14 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
       d = Date.from(inputDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
     
-    milestone = EntityController.getInstance().createMilestone(name, d);
-    // TODO Handle date already existent ?
+    if(milestone == null){
+      milestone = EntityController.getInstance().createMilestone(name, d);
+    }else{
+      milestone.setName(name);
+      milestone.setTimeUUID(EntityController.getInstance().getEntityFactory().createTime(d).getUuid());
+    }
+    
+    
     
     getWindow().hide();
   }
@@ -69,7 +75,6 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
   protected void populateScene() {
     Label lblName = new Label("Name");
     Label lblDate = new Label("Date");
-    Label lblOrdinalLabel = new Label("Ordinal");
     
     loadMilestone();
     
