@@ -281,11 +281,17 @@ public class MenuManager {
             case ITEM_NEW_GROUP:
               handler.handleNewGroup(event);
               break;
+            case ITEM_OPEN_COURSE:
+              handler.handleOpenCourse(event);
+              break;
             case ITEM_OPEN_CAT:
               handler.handleOpenCat(event);
               break;
             case ITEM_OPEN_GROUPS:
               handler.handleOpenGroups(event);
+              break;
+            case ITEM_SAVE_COURSE:
+              handler.handleSaveCourse(event);
               break;
             case ITEM_SAVE_CAT:
               handler.handleSaveCat(event);
@@ -293,6 +299,8 @@ public class MenuManager {
             case ITEM_SAVE_GROUP:
               handler.handleSaveGroup(event);
               break;
+            case ITEM_SAVE_COURSE_AS:
+              handler.handleSaveCourseAs(event);
             case ITEM_SAVE_CAT_AS:
               handler.handleSaveCatAs(event);
               break;
@@ -353,12 +361,14 @@ public class MenuManager {
   }
   
   private void assembleMenus() {
-    menuFile.getItems().addAll(itemNewCat,
+    menuFile.getItems().addAll(
+        itemNewCourse,
+        itemNewCat,
         itemNewGroup,
         new SeparatorMenuItem(),
-        itemOpenCat, itemOpenGroup,
+        itemOpenCourse, itemOpenCat, itemOpenGroup,
         new SeparatorMenuItem(),
-        itemSaveCat, itemSaveCatAs, itemSaveGroup, itemSaveGroupAs,
+        itemSaveCourse, itemSaveCourseAs, itemSaveCat, itemSaveCatAs, itemSaveGroup, itemSaveGroupAs,
         new SeparatorMenuItem(),
         itemExportCat, itemExportGroups/*,itemExportGroup /*TODO implement*/,
         new SeparatorMenuItem(),

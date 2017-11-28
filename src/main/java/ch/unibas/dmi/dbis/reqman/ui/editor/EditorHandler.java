@@ -147,10 +147,13 @@ public class EditorHandler implements EventHandler<CUDEvent> {
       editor.getRequirementsView().setRequirements(EntityController.getInstance().getObservableRequirements(), EntityController.getInstance().getCatalogue());
       editor.getMilestoneView().setItems(EntityController.getInstance().getObservableMilestones());
       
-      setupCatalogueInfo();
       
-      editor.enableAll();
     }
+  
+    // TODO Cleanup
+    setupCatalogueInfo();
+  
+    editor.enableAll();
     
   }
   
@@ -201,6 +204,6 @@ public class EditorHandler implements EventHandler<CUDEvent> {
   
   private void setupCatalogueInfo() {
     LOGGER.debug("setupCatalogueInfo called");
-    
+    editor.getCourseInfoView().refresh();
   }
 }

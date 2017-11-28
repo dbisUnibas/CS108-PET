@@ -96,7 +96,7 @@ public class EntityController {
     return cat;
   }
   
-  public Course getCourse(){
+  public Course getCourse() {
     return entityFactory.getCourse();
   }
   
@@ -158,10 +158,22 @@ public class EntityController {
   }
   
   public boolean hasCatalogue() {
-    return entityFactory.getCatalogue() != null;
+    if (entityFactory == null) {
+      return false;
+    } else {
+      return entityFactory.getCatalogue() != null;
+    }
   }
   
   public Catalogue getCatalogue() {
     return entityFactory.getCatalogue();
+  }
+  
+  public boolean hasCourse() {
+    if(entityFactory == null){
+      return false;
+    }else{
+      return entityFactory.getCourse() != null;
+    }
   }
 }
