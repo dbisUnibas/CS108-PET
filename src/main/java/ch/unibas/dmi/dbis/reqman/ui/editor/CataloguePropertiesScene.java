@@ -56,14 +56,16 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
     String name = tfName.getText();
     String desc = taDesc.getText();
     
+    log.debug("CatName={}, CatDesc={}", name, desc);
+    
     if (name == null) {
       throw new IllegalArgumentException("[Catalogue] Name MUST not be null");
     }
     
-    
     catalogue = EntityController.getInstance().createCatalogue(name);
     if (desc != null && !desc.isEmpty()) {
       catalogue.setDescription(desc);
+      log.debug("CatDesc set, after creation");
     }
     
     getWindow().hide();
@@ -72,12 +74,10 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
   
   @Override
   protected void populateScene() {
-    Label lblLecture = new Label("Lecture");
     Label lblName = new Label("Name*");
     Label lblDescription = new Label("Description");
     
     // Milestones and Labels added via different scene
-    Label lblSemester = new Label("Semester");
     
     SaveCancelPane buttonWrapper = new SaveCancelPane();
     

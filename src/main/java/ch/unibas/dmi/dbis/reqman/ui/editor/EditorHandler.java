@@ -72,6 +72,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         break;
       case COURSE:
         EditorPromptFactory.promptNewCourse();
+        setupEditor();
         break;
       default:
         throwInappropriateTargetEntity(evt.getTargetEntity());

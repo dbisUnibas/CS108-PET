@@ -3,12 +3,16 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Course;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Displays information about the {@link ch.unibas.dmi.dbis.reqman.data.Course} and {@link ch.unibas.dmi.dbis.reqman.data.Catalogue}
@@ -16,6 +20,8 @@ import javafx.scene.layout.Priority;
  * @author loris.sauter
  */
 public class CourseInfoView extends HBox{
+  
+  private static final Logger LOGGER = LogManager.getLogger();
   
   private Course course;
   private Catalogue catalogue;
@@ -52,6 +58,7 @@ public class CourseInfoView extends HBox{
   public void refresh() {
     course = EntityController.getInstance().getCourse();
     catalogue = EntityController.getInstance().getCatalogue();
+    LOGGER.debug("Refreshing, Course={}, Cat={}", course, catalogue);
     populateInfo();
   }
   
@@ -78,7 +85,7 @@ public class CourseInfoView extends HBox{
   }
   
   private void layoutComponents(){
-    leftWrapper.getChildren().addAll(courseKeyLbl, courseLbl, semesterKeyLbl, semesterLbl);
+    leftWrapper.getChildren().addAll(courseKeyLbl, courseLbl, Utils.createHFill(), semesterKeyLbl, semesterLbl);
     rightWrapper.getChildren().addAll(catalogueKeyLbl, catalogueLbl);
     
     splitPane.setDividerPositions(0.5);
@@ -91,6 +98,8 @@ public class CourseInfoView extends HBox{
     getChildren().add(splitPane);
     
     HBox.setHgrow(this, Priority.ALWAYS);
+    
+    setOpaqueInsets(new Insets(5,5,5,5));
   }
   
   private void populateInfo(){
@@ -100,6 +109,7 @@ public class CourseInfoView extends HBox{
       courseNameProperty.set(name != null ? name : "");
       semesterProperty.set(semester != null ? semester : "");
     }
+    
     if(catalogue != null){
       String name = catalogue.getName();
       String desc = catalogue.getDescription();

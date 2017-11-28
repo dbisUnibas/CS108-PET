@@ -59,7 +59,9 @@ public class EntityController {
   }
   
   public Course createCourse(String courseName, String semester) {
+    LOGGER.debug("Creating course");
     entityFactory = EntityFactory.createFactoryAndCourse(courseName, semester);
+    LOGGER.debug("Course created");
     return entityFactory.getCourse();
   }
   
@@ -85,6 +87,7 @@ public class EntityController {
   }
   
   public Catalogue createCatalogue(String name) {
+    LOGGER.debug("Creating catalogue");
     Catalogue cat = entityFactory.createCatalogue(name);
     /*
      Since the EntityFactory handles the linking and adding of reqs/ ms backing the observable lists, reflects each change.
@@ -93,6 +96,7 @@ public class EntityController {
     observableMilestones = FXCollections.observableList(cat.getMilestones());
     catalogueAnalyser = new CatalogueAnalyser(getCourse(), cat);
     courseManager = new CourseManager(getCourse(), cat);
+    LOGGER.debug("Setup catalogueAnalyser and courseManager");
     return cat;
   }
   

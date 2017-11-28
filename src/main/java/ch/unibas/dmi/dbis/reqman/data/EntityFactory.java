@@ -280,6 +280,7 @@ public class EntityFactory {
     Catalogue cat = new Catalogue();
     cat.setName(name);
     course.setCatalogueUUID(cat.getUuid());
+    this.catalogue = cat;
     return cat;
   }
   
