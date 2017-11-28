@@ -43,9 +43,29 @@ public class StorageManager {
    * Creates a new StorageManager for the current session, by specifying the savefolder.
    * @param dir The folder in which ReqMan should store all files
    */
-  public StorageManager(File dir) {
+  private StorageManager(File dir) {
     this.dir = dir;
     groupSaveFileList = new ArrayList<>();
+  }
+  
+  private static StorageManager instance = null;
+  
+  /**
+   * Creates a new StorageManager for the current session, by specifying the savefolder.
+   * @param dir The folder in which ReqMan should store all files
+   */
+  public static StorageManager getInstance(File dir){
+    if(instance == null){
+      instance = new StorageManager(dir);
+    }
+    return instance;
+  }
+  
+  public static StorageManager getInstance(){
+    if(instance == null){
+      throw new IllegalStateException("Cannot get instance of StorageManager, due to instance not set");
+    }
+    return instance;
   }
   
   /**
@@ -186,6 +206,18 @@ public class StorageManager {
     return expected.equals(actual);
   }
   
+  public File getSaveDir() {
+    return dir;
+  }
+  
+  public String getCataloguePath() {
+    return catalogueSaveFile.getSaveFilePath();
+  }
+  
+  public String getCoursePath() {
+    return courseSaveFile.getSaveFilePath();
+  }
+  
   private void checkIfDirSet() throws RuntimeException{
     if(dir == null){
       throw new RuntimeException("Save Directory not set");
@@ -193,4 +225,5 @@ public class StorageManager {
   }
   
   public static final FileFilter REQMAN_FILE_FILTER = pathname -> getKnownExtensions().contains(FileUtils.getFileExtension(pathname));
+  
 }

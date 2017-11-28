@@ -1,8 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.storage;
 
+import org.apache.logging.log4j.core.util.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.FileFilter;
 
 /**
  * The {@link ReqmanFile} is a tuple of {@link File} and {@link ReqmanFile.Type}.
@@ -96,5 +98,7 @@ public class ReqmanFile {
     public String getExtension(){
       return name().toLowerCase();
     }
+    
+    public FileFilter getFileFilter = pathname -> FileUtils.getFileExtension(pathname).equals(getExtension());
   }
 }

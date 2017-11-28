@@ -10,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
@@ -128,11 +129,9 @@ public class EntityController {
     return entityFactory;
   }
   
-  
-  public StorageManager getStorageManager() {
-    return storageManager;
+  public void setupSaveDirectory(File dir){
+    storageManager = StorageManager.getInstance(dir);
   }
-  
   
   public boolean isEmpty() {
     return groupAnalyserMap.isEmpty();
@@ -163,6 +162,7 @@ public class EntityController {
   }
   
   public boolean removeRequirement(Requirement requirement) {
+    // TODO Check dependecies
     boolean result = entityFactory.getCatalogue().removeRequirement(requirement);
     LOGGER.debug("Removing req={}", requirement);
     LOGGER.debug("After deletion: {}", entityFactory.getCatalogue().getRequirements());
@@ -171,6 +171,7 @@ public class EntityController {
   }
   
   public boolean removeMilestone(Milestone milestone) {
+    // TODO Check dependencies
     boolean result = entityFactory.getCatalogue().removeMilestone(milestone);
     LOGGER.debug("Removing ms={}", milestone);
     LOGGER.debug("After deletion: {}", entityFactory.getCatalogue().getMilestones());
