@@ -335,12 +335,12 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleSaveCourse(ActionEvent event) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    editorHandler.saveCourse();
   }
   
   @Override
   public void handleSaveCourseAs(ActionEvent event) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    editorHandler.saveAsCourse();
   }
   
   public void setMainScene(MainScene mainScene) {

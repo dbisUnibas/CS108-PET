@@ -1,15 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
-import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
-import ch.unibas.dmi.dbis.reqman.configuration.ConfigUtils;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Group;
-import org.apache.logging.log4j.Level;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * TODO: write JavaDoc
@@ -21,6 +16,8 @@ public class OpenBackupsTask extends ManagementTask<List<OpenBackupsTask.BackupO
 
     @Override
     protected List<BackupObject> call() throws Exception {
+        throw new UnsupportedOperationException("Not implemented anymore");
+        /*
         List<BackupObject> list = new ArrayList<>();
         File dir = ConfigUtils.getCodeSourceLocation().getParentFile();
         if (dir.isDirectory()) {
@@ -37,7 +34,7 @@ public class OpenBackupsTask extends ManagementTask<List<OpenBackupsTask.BackupO
                     if (backupObj.get(EntityManager.CATALOGUE_KEY) instanceof String) {
                         File catFile = new File((String) backupObj.get(EntityManager.CATALOGUE_KEY));
 
-                        OpenCatalogueTask openCatalogueTask = new OpenCatalogueTask(catFile);
+                        OpenCatalogueTask openCatalogueTask = new OpenCatalogueTask();
                         Thread th = new Thread(openCatalogueTask);
                         th.setDaemon(true);
                         th.start();
@@ -67,7 +64,7 @@ public class OpenBackupsTask extends ManagementTask<List<OpenBackupsTask.BackupO
                 }
             }
         }
-        return list;
+        return list;*/
     }
 
     public static class BackupObject {

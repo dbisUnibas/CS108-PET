@@ -5,12 +5,17 @@ import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Course;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
+import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.event.EventHandler;
+import javafx.stage.DirectoryChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.File;
 
 /**
  * Layer between (G)UI and internal logic.
@@ -159,31 +164,51 @@ public class EditorHandler implements EventHandler<CUDEvent> {
   }
   
   public void saveCatalogue() {
-    throw new UnsupportedOperationException("Not implemented yet");
-    /*
     LOGGER.traceEntry();
-    if (manager.isCatalogueLoaded()) {
-      if (!manager.isCatalogueFilePresent()) {
+    if (EntityController.getInstance().hasCatalogue() && EntityController.getInstance().isStorageManagerReady()) {
+      if(StorageManager.getInstance().getCataloguePath() == null){
         saveAsCatalogue();
-      } else {
-        manager.saveCatalogue();
+      }else{
+        EntityController.getInstance().saveCatalogue();
       }
-      
     }
-    */
   }
   
+  
   public void saveAsCatalogue() {
-    throw new UnsupportedOperationException("Not implemented yet");
-    /*
-    if (manager.isCatalogueLoaded()) {
-      FileChooser sc = Utils.createCatalogueFileChooser("Save As");
-      File f = sc.showSaveDialog(editor.getScene().getWindow());
-      if (f != null) {
-        manager.saveAsCatalogue(f);
+    LOGGER.debug("Saving catalgoue as");
+    if (EntityController.getInstance().hasCatalogue()) {
+      DirectoryChooser dc = Utils.createDirectoryChooser("Save as");
+      File dir = dc.showDialog(editor.getScene().getWindow());
+      LOGGER.debug("Chosen dir={}",dir);
+      if (dir != null) {
+        EntityController.getInstance().setupSaveDirectory(dir);
+        EntityController.getInstance().saveCatalogue();
+      }
+    }else {
+      LOGGER.warn("Cannot save non-exist logger");
+    }
+  }
+  
+  public void saveCourse(){
+    if(EntityController.getInstance().hasCourse() && EntityController.getInstance().isStorageManagerReady()){
+      if(StorageManager.getInstance().getCoursePath() == null){
+        saveAsCourse();
+      }else{
+        EntityController.getInstance().saveCourse();
       }
     }
-    */
+  }
+  
+  public void saveAsCourse(){
+    if(EntityController.getInstance().hasCourse() ){
+      DirectoryChooser dc = Utils.createDirectoryChooser("Save as");
+      File dir = dc.showDialog(editor.getScene().getWindow() );
+      if(dir != null){
+        EntityController.getInstance().setupSaveDirectory(dir);
+        EntityController.getInstance().saveCourse();
+      }
+    }
   }
   
   public boolean isCatalogueLoaded() {

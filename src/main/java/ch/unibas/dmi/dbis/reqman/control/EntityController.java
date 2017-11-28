@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
@@ -85,7 +86,7 @@ public class EntityController {
   @NotNull
   public Milestone createMilestone(String name, Date date) {
     Milestone ms = entityFactory.createMilestone(name, date);
-    LOGGER.debug("Created the ms={}",ms);
+    LOGGER.debug("Created the ms={}", ms);
     return ms;
   }
   
@@ -108,7 +109,7 @@ public class EntityController {
   }
   
   public Course getCourse() {
-    if(entityFactory==null){
+    if (entityFactory == null) {
       return null;
     }
     return entityFactory.getCourse();
@@ -129,9 +130,16 @@ public class EntityController {
     return entityFactory;
   }
   
-  public void setupSaveDirectory(File dir){
-    storageManager = StorageManager.getInstance(dir);
+  public void setupSaveDirectory(File dir) {
+    if(storageManager == null){
+      storageManager = StorageManager.getInstance(dir);
+      LOGGER.debug("Created StorageManager, dir={}", storageManager.getSaveDir());
+    }else{
+      storageManager.setSaveDir(dir);
+      LOGGER.debug("Re-set savedir={}", storageManager.getSaveDir());
+    }
   }
+  
   
   public boolean isEmpty() {
     return groupAnalyserMap.isEmpty();
@@ -167,7 +175,7 @@ public class EntityController {
     LOGGER.debug("Removing req={}", requirement);
     LOGGER.debug("After deletion: {}", entityFactory.getCatalogue().getRequirements());
     observableRequirements.remove(requirement);
-    return  result;
+    return result;
   }
   
   public boolean removeMilestone(Milestone milestone) {
@@ -188,17 +196,59 @@ public class EntityController {
   }
   
   public Catalogue getCatalogue() {
-    if(entityFactory == null){
+    if (entityFactory == null) {
       return null;
     }
     return entityFactory.getCatalogue();
   }
   
   public boolean hasCourse() {
-    if(entityFactory == null){
+    if (entityFactory == null) {
       return false;
-    }else{
+    } else {
       return entityFactory.getCourse() != null;
     }
+  }
+  
+  public void saveCourse() {
+    if (hasCourse()) {
+      if (storageManager != null) {
+        LOGGER.debug("Saving course");
+        //OperationFactory.createSaveCourseOperation(getCourse(), null).start();
+        try {
+          storageManager.saveCourse(getCourse());
+        } catch (IOException e) {
+          LOGGER.catching(e);
+          // TODO what to do
+        }
+      } else {
+        throw LOGGER.throwing(new IllegalStateException("Cannot save the course if no StorageManager is available"));
+      }
+    }
+  }
+  
+  public void saveCatalogue() {
+    if(hasCatalogue() ){
+      if(storageManager != null){
+        LOGGER.debug("Saving catalogue");
+        //OperationFactory.createSaveCatalogueOperation(getCatalogue(), null).start();
+        try {
+          storageManager.saveCatalogue(getCatalogue());
+        } catch (IOException e) {
+          LOGGER.catching(e);
+          // TODO What to do
+        }
+      }else{
+        throw LOGGER.throwing(new IllegalStateException("Canno save catalogue if no StorageManager is available"));
+      }
+    }
+  }
+  
+  public StorageManager getStorageManager() {
+    return storageManager;
+  }
+  
+  public boolean isStorageManagerReady() {
+    return storageManager != null && storageManager.getSaveDir() != null;
   }
 }

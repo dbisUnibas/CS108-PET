@@ -183,7 +183,7 @@ public class EntityManager {
             throw new IllegalStateException("There is already a catalogue open");
         }
 
-        CheckedAsynchronousOperation<Catalogue> operation = OperationFactory.createLoadCatalogueOperation(file, doneProcessor);
+        CheckedAsynchronousOperation<Catalogue> operation = OperationFactory.createLoadCatalogueOperation( doneProcessor);
 
         operation.addProcessor(c -> {
             setCatalogue(c);

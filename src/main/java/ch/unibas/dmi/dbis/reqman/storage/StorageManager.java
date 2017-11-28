@@ -28,14 +28,13 @@ import java.util.UUID;
  * @author loris.sauter
  */
 public class StorageManager {
-  // TODO Decide: Singleton or not
-  private final Logger LOGGER = LogManager.getLogger();
+  private Logger LOGGER = LogManager.getLogger();
   
   private SaveFile courseSaveFile;
   private SaveFile catalogueSaveFile;
   private List<SaveFile> groupSaveFileList;
   
-  private final File dir;
+  private File dir;
   
   // TODO: openX - check if already opened and check if dependencies were already opened
   
@@ -45,6 +44,7 @@ public class StorageManager {
    */
   private StorageManager(File dir) {
     this.dir = dir;
+    LOGGER.debug("Created with dir={}",dir);
     groupSaveFileList = new ArrayList<>();
   }
   
@@ -158,10 +158,13 @@ public class StorageManager {
     checkIfDirSet();
     courseSaveFile = SaveFile.createForEntity(course);
     courseSaveFile.setSaveDirectory(dir);
+    LOGGER.debug("Course savePath={}",courseSaveFile.getSaveFilePath());
     courseSaveFile.save();
+    LOGGER.debug("Saved course!");
   }
   
   public void saveCourse() throws IOException{
+    LOGGER.debug("Saving to {}",courseSaveFile.getSaveFilePath());
     courseSaveFile.save();
   }
   
@@ -169,7 +172,9 @@ public class StorageManager {
     checkIfDirSet();
     catalogueSaveFile = SaveFile.createForEntity(catalogue);
     catalogueSaveFile.setSaveDirectory(dir);
+    LOGGER.debug("Catalogue savePath={}", catalogueSaveFile.getSaveFilePath());
     catalogueSaveFile.save();
+    LOGGER.debug("Saved catalogue!");
   }
   
   public void saveCatalogue() throws IOException {
@@ -211,11 +216,21 @@ public class StorageManager {
   }
   
   public String getCataloguePath() {
+    if(catalogueSaveFile == null){
+      return null;
+    }
     return catalogueSaveFile.getSaveFilePath();
   }
   
   public String getCoursePath() {
+    if(courseSaveFile == null){
+      return null;
+    }
     return courseSaveFile.getSaveFilePath();
+  }
+  
+  public void setSaveDir(File saveDir) {
+    this.dir = saveDir;
   }
   
   private void checkIfDirSet() throws RuntimeException{

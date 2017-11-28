@@ -9,6 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 /**
@@ -118,6 +119,12 @@ public class Utils {
     alert.setHeaderText(header);
     alert.setContentText(content);
     alert.showAndWait();
+  }
+  
+  public static DirectoryChooser createDirectoryChooser(String title) {
+    DirectoryChooser dc = new DirectoryChooser();
+    dc.setTitle(title);
+    return dc;
   }
   
   public static class MilestoneCell extends ListCell<Milestone> {
