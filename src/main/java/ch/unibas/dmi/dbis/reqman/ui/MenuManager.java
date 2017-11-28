@@ -301,6 +301,7 @@ public class MenuManager {
               break;
             case ITEM_SAVE_COURSE_AS:
               handler.handleSaveCourseAs(event);
+              break;
             case ITEM_SAVE_CAT_AS:
               handler.handleSaveCatAs(event);
               break;

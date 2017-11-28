@@ -191,20 +191,25 @@ public class EditorHandler implements EventHandler<CUDEvent> {
   }
   
   public void saveCourse(){
+    LOGGER.debug("SaveCourse");
     if(EntityController.getInstance().hasCourse() && EntityController.getInstance().isStorageManagerReady()){
       if(StorageManager.getInstance().getCoursePath() == null){
+        LOGGER.warn("No coursepath -> save course as");
         saveAsCourse();
       }else{
+        LOGGER.debug("Save course");
         EntityController.getInstance().saveCourse();
       }
     }
   }
   
   public void saveAsCourse(){
+    LOGGER.debug("SaveAsCourse");
     if(EntityController.getInstance().hasCourse() ){
       DirectoryChooser dc = Utils.createDirectoryChooser("Save as");
       File dir = dc.showDialog(editor.getScene().getWindow() );
       if(dir != null){
+        LOGGER.debug("SaveCourse as..");
         EntityController.getInstance().setupSaveDirectory(dir);
         EntityController.getInstance().saveCourse();
       }
