@@ -135,6 +135,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
       case MILESTONE:
         if (evt.getDelivery() instanceof Milestone) {
           Milestone mod = EditorPromptFactory.promptMilestone((Milestone) evt.getDelivery());
+          editor.getMilestoneView().updateMilestone(mod);
           LOGGER.debug("Milestone got modified: {}", mod);
         }
         break;
