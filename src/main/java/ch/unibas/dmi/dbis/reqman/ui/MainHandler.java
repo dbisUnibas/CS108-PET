@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.common.Version;
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
@@ -320,7 +321,7 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleNewCourse(ActionEvent event) {
     editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.COURSE));
-    if (!editorHandler.isCatalogueLoaded()) {
+    if (!EntityController.getInstance().hasCourse()) {
       return;
     }
     mainScene.setActive(MainScene.Mode.EDITOR);

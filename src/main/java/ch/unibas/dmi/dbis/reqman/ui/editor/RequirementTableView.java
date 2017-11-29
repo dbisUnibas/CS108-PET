@@ -124,10 +124,14 @@ public class RequirementTableView extends BorderPane {
     return req.getRequirement();
   }
   
-  public void updateRequirement(Requirement mod) {
-    tableData.remove(ObservableRequirement.fromRequirement(mod));
-    tableData.add(ObservableRequirement.fromRequirement(mod));
+  public void updateRequirement(Requirement requirement) {
+    removeFromTable(requirement);
+    tableData.add(ObservableRequirement.fromRequirement(requirement));
     table.refresh();
+  }
+  
+  private void removeFromTable(Requirement requirement){
+    tableData.removeIf(or -> or.getRequirement().equals(requirement));
   }
   
   private void layoutComponents() {
