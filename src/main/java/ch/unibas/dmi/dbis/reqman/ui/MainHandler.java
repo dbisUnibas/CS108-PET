@@ -330,7 +330,7 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleOpenCourse(ActionEvent event) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    editorHandler.openCourse();
   }
   
   @Override

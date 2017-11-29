@@ -91,6 +91,14 @@ public class StorageManager {
   public Course openCourse() throws IOException {
     courseSaveFile = SaveFile.createForSaveDir(dir, Course.class);
     courseSaveFile.open();
+    LOGGER.debug("Opened course: {}", courseSaveFile.getEntity());
+    return (Course)courseSaveFile.getEntity();
+  }
+  
+  public Course openCourse(File file) throws IOException{
+    courseSaveFile = SaveFile.createForSaveFile(file, Course.class);
+    courseSaveFile.open();
+    LOGGER.debug("Opened coruse:{}", courseSaveFile.getEntity());
     return (Course)courseSaveFile.getEntity();
   }
   

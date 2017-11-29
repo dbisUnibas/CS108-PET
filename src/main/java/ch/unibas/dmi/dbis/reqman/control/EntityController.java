@@ -131,10 +131,10 @@ public class EntityController {
   }
   
   public void setupSaveDirectory(File dir) {
-    if(storageManager == null){
+    if (storageManager == null) {
       storageManager = StorageManager.getInstance(dir);
       LOGGER.debug("Created StorageManager, dir={}", storageManager.getSaveDir());
-    }else{
+    } else {
       storageManager.setSaveDir(dir);
       LOGGER.debug("Re-set savedir={}", storageManager.getSaveDir());
     }
@@ -228,8 +228,8 @@ public class EntityController {
   }
   
   public void saveCatalogue() {
-    if(hasCatalogue() ){
-      if(storageManager != null){
+    if (hasCatalogue()) {
+      if (storageManager != null) {
         LOGGER.debug("Saving catalogue");
         //OperationFactory.createSaveCatalogueOperation(getCatalogue(), null).start();
         try {
@@ -238,7 +238,7 @@ public class EntityController {
           LOGGER.catching(e);
           // TODO What to do
         }
-      }else{
+      } else {
         throw LOGGER.throwing(new IllegalStateException("Canno save catalogue if no StorageManager is available"));
       }
     }
@@ -250,5 +250,16 @@ public class EntityController {
   
   public boolean isStorageManagerReady() {
     return storageManager != null && storageManager.getSaveDir() != null;
+  }
+  
+  public void openCourse(File courseFile) {
+    storageManager = StorageManager.getInstance(courseFile.getParentFile());
+    try {
+      Course c = storageManager.openCourse(courseFile);
+      entityFactory = EntityFactory.createFactoryFor(c);
+    } catch (IOException e) {
+      LOGGER.catching(e);
+      //TODO what to do
+    }
   }
 }

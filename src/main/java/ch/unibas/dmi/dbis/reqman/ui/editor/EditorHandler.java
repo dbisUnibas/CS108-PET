@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Course;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
+import ch.unibas.dmi.dbis.reqman.storage.ReqmanFile;
 import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
@@ -12,6 +13,8 @@ import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.event.EventHandler;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -200,6 +203,23 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         LOGGER.debug("Save course");
         EntityController.getInstance().saveCourse();
       }
+    }
+  }
+  
+  public void openCourse(){
+    LOGGER.debug("Open coruse");
+    FileChooser fc = Utils.createFileChooser("Open Course");
+    fc.getExtensionFilters().add(ReqmanFile.Type.COURSE.getExtensionFilter());
+    
+    LOGGER.debug("Filter.desc={}",fc.getExtensionFilters().get(0).getDescription());
+    LOGGER.debug("Filter.ext={}",fc.getExtensionFilters().get(0).getExtensions());
+    
+    LOGGER.debug("fc={}",fc);
+    LOGGER.debug("Editor={}",editor);
+    Window w = null;
+    File f = fc.showOpenDialog(w);
+    if(f != null){
+      EntityController.getInstance().openCourse(f);
     }
   }
   

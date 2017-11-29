@@ -127,6 +127,12 @@ public class Utils {
     return dc;
   }
   
+  public static FileChooser createFileChooser(String title) {
+    FileChooser fc = new FileChooser();
+    fc.setTitle(title);
+    return fc;
+  }
+  
   public static class MilestoneCell extends ListCell<Milestone> {
     
     @Override
