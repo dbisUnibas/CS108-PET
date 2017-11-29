@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
@@ -14,17 +15,13 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
+import javafx.scene.layout.*;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -42,9 +39,18 @@ public class RequirementTableView extends BorderPane {
   private HBox header;
   private Button addBtn;
   private Button rmBtn;
+  private GridPane footer;
   private TableView<ObservableRequirement> table;
   private ObservableList<ObservableRequirement> tableData = FXCollections.observableArrayList();
   private Catalogue cat;
+  
+  private Label lblFooterHeader;
+  private Label lblTotalPoints;
+  private Label lblTotalBonus;
+  private Label lblTotalMalus;
+  private SimpleDoubleProperty totalPoints;
+  private SimpleDoubleProperty totalBonus;
+  private SimpleDoubleProperty totalMalus;
   
   RequirementTableView() {
     initComponents();
@@ -71,6 +77,7 @@ public class RequirementTableView extends BorderPane {
     cat = catalogue;
     // Ensures that this view is really simply view - and nothing more!
     LOGGER.traceEntry();
+    LOGGER.debug("Requirements={}\ncat={}",requirements,catalogue);
     tableData.clear();
     requirements.forEach(r -> tableData.add(ObservableRequirement.fromRequirement(r)));
     LOGGER.trace(":setRequirements - Created " + tableData.size() + " observable requirements");
@@ -95,6 +102,7 @@ public class RequirementTableView extends BorderPane {
             for (Requirement removeItem : c.getRemoved()) {
               LOGGER.trace("Removed {}", c.getRemoved());
               tableData.remove(ObservableRequirement.fromRequirement(removeItem));
+              updatePoints();
             }
             for (Requirement addItem : c.getAddedSubList()) {
               LOGGER.trace("Added  {}", c.getAddedSubList());
@@ -105,6 +113,7 @@ public class RequirementTableView extends BorderPane {
               LOGGER.debug("Table contains to add: {}", tableData.contains(obsReq));
               if (!tableData.contains(obsReq)) {
                 tableData.add(obsReq);
+                updatePoints();
               }
             }
           }
@@ -113,6 +122,17 @@ public class RequirementTableView extends BorderPane {
         c.reset();
       }
     });
+    updatePoints();
+  }
+  
+  private void updatePoints(){
+    CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
+    if(analyser != null){
+      totalPoints.set(analyser.getMaximalRegularSum());
+      totalBonus.set(analyser.getMaximalBonusSum());
+      totalMalus.set(analyser.getMaximalMalusSum());
+    }
+
   }
   
   public int getRequirementsSize() {
@@ -128,6 +148,7 @@ public class RequirementTableView extends BorderPane {
     removeFromTable(requirement);
     tableData.add(ObservableRequirement.fromRequirement(requirement));
     table.refresh();
+    updatePoints();
   }
   
   private void removeFromTable(Requirement requirement){
@@ -152,6 +173,18 @@ public class RequirementTableView extends BorderPane {
     header.getChildren().addAll(title, spacer, btnWrapper);
     
     
+    footer.add(lblFooterHeader, 0,0,3,1);
+    TextField tfPoints = createAndBind(totalPoints);
+    TextField tfBonus = createAndBind(totalBonus);
+    TextField tfMalus = createAndBind(totalMalus);
+    footer.add(lblTotalPoints, 0,1);
+    footer.add(lblTotalBonus, 1, 1);
+    footer.add(lblTotalMalus, 2,1);
+    footer.add(tfPoints,0,2);
+    footer.add(tfBonus, 1,2);
+    footer.add(tfMalus,2,2);
+    
+    
     // Adding header
     setTop(header);
     
@@ -160,6 +193,17 @@ public class RequirementTableView extends BorderPane {
     // Adding table
     setCenter(table);
     
+    // Adding footer
+    setBottom(footer);
+    
+  }
+  
+  private TextField createAndBind(SimpleDoubleProperty contentProperty){
+    TextField tf = new TextField();
+    tf.setEditable(false);
+    tf.textProperty().bind(contentProperty.asString());
+    tf.setAlignment(Pos.CENTER_RIGHT);
+    return tf;
   }
   
   private void initComponents() {
@@ -174,6 +218,16 @@ public class RequirementTableView extends BorderPane {
     table = initTable();
     table.setTooltip(new Tooltip("Double-click to modify requirement"));
     table.setOnMouseClicked(this::handleModification);
+    
+    footer = Utils.generateDefaultGridPane();
+    lblFooterHeader = new Label("Catalogue Statistics");
+    lblTotalPoints = new Label("Total regular Points:");
+    lblTotalBonus = new Label("Total Bonus:");
+    lblTotalMalus = new Label("Total Malus:");
+    
+    totalPoints = new SimpleDoubleProperty();
+    totalBonus = new SimpleDoubleProperty();
+    totalMalus = new SimpleDoubleProperty();
   }
   
   private void handleModification(MouseEvent evt) {

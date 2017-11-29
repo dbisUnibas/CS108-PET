@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
 import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
+import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import org.apache.logging.log4j.LogManager;
@@ -100,12 +101,23 @@ public class EntityController {
      
      TODO Another way would be to add the entity while creating it. So that this keeps track of the redundant lists
       */
-    observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
-    observableMilestones = FXCollections.observableArrayList();
-    catalogueAnalyser = new CatalogueAnalyser(getCourse(), cat);
-    courseManager = new CourseManager(getCourse(), cat);
+    setupObservableCatalogueLists();
+    loadedCatalogue();
     LOGGER.debug("Setup catalogueAnalyser and courseManager");
     return cat;
+  }
+  
+  private void setupObservableCatalogueLists(){
+    observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
+    observableMilestones = FXCollections.observableArrayList();
+    
+    observableMilestones.addAll(getCatalogue().getMilestones());
+    observableRequirements.addAll(getCatalogue().getRequirements());
+  }
+  
+  private void loadedCatalogue(){
+    catalogueAnalyser = new CatalogueAnalyser(getCourse(), getCatalogue());
+    courseManager = new CourseManager(getCourse(), getCatalogue());
   }
   
   public Course getCourse() {
@@ -261,5 +273,18 @@ public class EntityController {
       LOGGER.catching(e);
       //TODO what to do
     }
+  }
+  
+  public void openCatalogue() throws IOException, UuidMismatchException {
+    if(storageManager.getCourse() != null){
+      Course c = getCourse();
+      entityFactory = EntityFactory.createFactoryFor(c, storageManager.openCatalogue() );
+    }else{
+      Catalogue cat = storageManager.openCatalogue();
+      Course c = storageManager.getCourse();
+      entityFactory = EntityFactory.createFactoryFor(c,cat);
+    }
+    setupObservableCatalogueLists();
+    loadedCatalogue();
   }
 }

@@ -81,12 +81,16 @@ public class MainHandler implements MenuHandler {
       return;
     }
     try {
+      
       if(EntityController.getInstance().isStorageManagerReady() ){
-        EntityController.getInstance().getStorageManager().openCatalogue();
+        LOGGER.debug("Open Catalogue - course loaded");
+        EntityController.getInstance().openCatalogue();
         mainScene.setActive(MainScene.Mode.EDITOR);
+        editorHandler.setupEditor();
       }else if(event.isConsumed()){
         LOGGER.warn("Something went very wrong");
       }else{
+        LOGGER.debug("Open catalogue and course");
         handleOpenCourse(event);
         event.consume();
         handleOpenCat(event);

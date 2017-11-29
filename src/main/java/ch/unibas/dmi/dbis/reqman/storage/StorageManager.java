@@ -116,7 +116,7 @@ public class StorageManager {
       courseSaveFile = null;
       throw new UuidMismatchException(course.getCatalogueUUID(), cat.getUuid());
     }
-    
+    LOGGER.debug("Opened catalogue {}",cat);
     return cat;
   }
   
