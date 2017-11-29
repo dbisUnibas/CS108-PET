@@ -118,4 +118,20 @@ public class StringUtils {
   public static boolean isNullOrEmpty(String str) {
     return str == null || str.isEmpty();
   }
+  
+  /**
+   * A null-safe version of {@link String#contains(CharSequence)}.
+   *
+   * @param str     The string to search in
+   * @param pattern The pattern to search for
+   * @return {@code true} iff {@code str} is not {@code null} and {@link String#contains(CharSequence)} returns {@code
+   * true}, {@code false} oderwise.
+   * @see String#contains(CharSequence)
+   */
+  public static boolean containsNullSafe(String str, CharSequence pattern) {
+    if (str == null) {
+      return false;
+    }
+    return str.contains(pattern);
+  }
 }
