@@ -103,6 +103,7 @@ public class StorageManager {
   }
   
   public Catalogue openCatalogue() throws IOException, UuidMismatchException {
+    LOGGER.debug("Opening catalogue with dir={}", dir);
     catalogueSaveFile = SaveFile.createForSaveDir(dir, Catalogue.class);
     catalogueSaveFile.open();
     

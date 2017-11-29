@@ -60,6 +60,9 @@ public class SaveFile<T extends VersionedEntity> {
   
   public void setSaveDirectory(File dir) {
     // TODO Check dir
+    if(!dir.isDirectory() ){
+      throw new IllegalArgumentException("Cannot set save directory for non-directory file "+dir.toString());
+    }
     this.dir = dir;
   }
   
@@ -87,7 +90,7 @@ public class SaveFile<T extends VersionedEntity> {
       if(files == null){
         throw new RuntimeException("For some reason, files is null");
       }
-      if (file.length() >= 1) {
+      if (files.length >= 1) {
         file = files[0];
       } else {
         throw new FileNotFoundException(String.format("Could not find a %s file in %s", getDesignatedExtension(), dir.getAbsolutePath()));

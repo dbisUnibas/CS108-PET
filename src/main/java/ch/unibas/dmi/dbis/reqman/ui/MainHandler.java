@@ -1,10 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
-import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
+import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * TODO: Write JavaDoc
@@ -74,31 +75,49 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleOpenCat(ActionEvent event) {
-    if (EntityManager.getInstance().isCatalogueLoaded()) {
-      Utils.showErrorDialog("Cannot load another catalogue", "Currently (ReqMan v" + Version.getInstance().getVersion() + ") cannot switch catalgoues during runitme.\n Please save your work and restart the application. ");
+    if (EntityController.getInstance().hasCatalogue()) {
+      LOGGER.warn("Cannot handle re-opening of catalogue. Silently ignoring");
+//      Utils.showErrorDialog("Cannot load another catalogue", "Currently (ReqMan v" + Version.getInstance().getVersion() + ") cannot switch catalgoues during runitme.\n Please save your work and restart the application. ");
       return;
     }
     try {
-      FileChooser fc = Utils.createCatalogueFileChooser("Load");
-      if (EntityManager.getInstance().hasLastOpenLocation()) {
-        fc.setInitialDirectory(EntityManager.getInstance().getLastOpenLocation());
+      if(EntityController.getInstance().isStorageManagerReady() ){
+        EntityController.getInstance().getStorageManager().openCatalogue();
+        mainScene.setActive(MainScene.Mode.EDITOR);
+      }else if(event.isConsumed()){
+        LOGGER.warn("Something went very wrong");
+      }else{
+        handleOpenCourse(event);
+        event.consume();
+        handleOpenCat(event);
       }
-      File f = fc.showOpenDialog(mainScene.getWindow());
+      
+      // Currently not needed:
+      /*
+      FileChooser fc = Utils.createFileChooser("Open Catalogue");
+      fc.getExtensionFilters().add(ReqmanFile.Type.CATALOGUE.getExtensionFilter());
+      File f = fc.showOpenDialog(null);
       if (f != null) {
         if (mainScene.isEditorActive()) {
           LOGGER.debug("Opening catalogue in editor");
           // EDITOR
-          EntityManager.getInstance().openCatalogue(f, (cat) -> editorHandler.setupEditor());
+          editorHandler.setupEditor();
         } else {
           // EVALUATOR
           LOGGER.debug("Opening catalogue in evalautor");
-          EntityManager.getInstance().openCatalogue(f, evaluatorHandler::processCatalogueOpened);
+          evaluatorHandler.processCatalogueOpened(EntityController.getInstance().getCatalogue());
         }
-        
-      }
+      }*/
       
     } catch (IllegalStateException ex) {
+      LOGGER.catching(ex);
       Utils.showErrorDialog("Error on loading catalgoue", ex.getMessage());
+    } catch (UuidMismatchException e) {
+      LOGGER.catching(e);
+      Utils.showErrorDialog("ID Mismatch", e.getMessage());
+    } catch (IOException e) {
+      LOGGER.catching(e);
+      Utils.showErrorDialog("IOException during Open Catalogue", e.getLocalizedMessage());
     }
     
   }

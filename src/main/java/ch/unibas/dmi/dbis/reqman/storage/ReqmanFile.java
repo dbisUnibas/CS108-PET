@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.storage;
 
 import javafx.stage.FileChooser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.core.util.FileUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -102,7 +103,7 @@ public class ReqmanFile {
     
     public final FileFilter getFileFilter = pathname -> FileUtils.getFileExtension(pathname).equals(getExtension());
     public final FileChooser.ExtensionFilter getExtensionFilter(){
-      return new FileChooser.ExtensionFilter("Only displays "+getExtension()+" files", "*."+getExtension());
+      return new FileChooser.ExtensionFilter(StringUtils.capitalize(getExtension() )+" files", "*."+getExtension());
     }
   }
 }
