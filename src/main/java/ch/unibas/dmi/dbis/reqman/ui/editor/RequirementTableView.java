@@ -14,6 +14,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -121,6 +122,12 @@ public class RequirementTableView extends BorderPane {
   public Requirement getSelectedRequirement() {
     ObservableRequirement req = table.getSelectionModel().getSelectedItem();
     return req.getRequirement();
+  }
+  
+  public void updateRequirement(Requirement mod) {
+    tableData.remove(ObservableRequirement.fromRequirement(mod));
+    tableData.add(ObservableRequirement.fromRequirement(mod));
+    table.refresh();
   }
   
   private void layoutComponents() {
@@ -318,7 +325,7 @@ public class RequirementTableView extends BorderPane {
       
       ObservableRequirement that = (ObservableRequirement) o;
       
-      return getName().equals(that.getName());
+      return getRequirement().equals(that.getRequirement());
     }
     
     @Override
@@ -334,7 +341,7 @@ public class RequirementTableView extends BorderPane {
     public Requirement getRequirement() {
       return requirement;
     }
-    
+  
     double getPoints() {
       return points.get();
     }

@@ -34,7 +34,13 @@ public class CoursePropertiesScene extends AbstractVisualCreator<Course> {
     String name = (tfName.getText() == null || tfName.getText().isEmpty()) ? "Course" : tfName.getText(); // Default name
     String semester = (ftSemester.getText() == null || ftSemester.getText().isEmpty()) ? "" : ftSemester.getText();
     
-    course = EntityController.getInstance().createCourse(name, semester);
+    if(course == null){
+      course = EntityController.getInstance().createCourse(name, semester);
+    }else{
+      course.setName(name);
+      course.setSemester(semester);
+    }
+    
     getWindow().hide();
   }
   

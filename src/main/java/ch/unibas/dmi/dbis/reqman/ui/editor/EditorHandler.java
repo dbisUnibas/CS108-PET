@@ -100,8 +100,6 @@ public class EditorHandler implements EventHandler<CUDEvent> {
   
   public void handleDeletion(CUDEvent evt) {
     switch (evt.getTargetEntity()) {
-      case CATALOGUE:
-        throw new IllegalArgumentException("Cannot delete the catalogue");
       case REQUIREMENT:
         if (evt.getDelivery() instanceof RequirementTableView.ObservableRequirement) {
           RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement) evt.getDelivery();
@@ -129,13 +127,23 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     
     switch (evt.getTargetEntity()) {
       case CATALOGUE:
-        throw new UnsupportedOperationException("Not implemented yet");
+        Catalogue oldCat = EntityController.getInstance().getCatalogue();
+        Catalogue newCat = EditorPromptFactory.promptCatalogue(oldCat);
+        LOGGER.debug("Modificaiton of catalaogue: old={}, new={}", oldCat, newCat);
+        setupCatalogueInfo();
+        break;
+      case COURSE:
+        Course oldCourse = EntityController.getInstance().getCourse();
+        Course newCourse = EditorPromptFactory.promptCourse(oldCourse);
+        LOGGER.debug("Modification of course: old={}, new={}",oldCourse, newCourse);
+        setupCatalogueInfo();
+        break;
       case REQUIREMENT:
         if (evt.getDelivery() instanceof RequirementTableView.ObservableRequirement) {
           RequirementTableView.ObservableRequirement obsReq = (RequirementTableView.ObservableRequirement) evt.getDelivery();
           Requirement r = obsReq.getRequirement();
           Requirement mod = EditorPromptFactory.promptRequirement(this, r);
-          
+          editor.getRequirementsView().updateRequirement(mod);
           // modification should happen in the same object, since java objects are always call by reference
           LOGGER.debug("hash(origin)={}, hash(modified)={} (O={}, M={})", r.hashCode(), mod.hashCode(), r, mod);
         }
