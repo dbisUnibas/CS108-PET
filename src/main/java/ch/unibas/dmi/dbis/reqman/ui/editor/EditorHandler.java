@@ -6,7 +6,6 @@ import ch.unibas.dmi.dbis.reqman.data.Course;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.storage.ReqmanFile;
-import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
@@ -75,6 +74,9 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         break;
       case REQUIREMENT:
         Requirement req = EditorPromptFactory.promptNewRequirement(this);
+        if (req == null) {
+          return;
+        }
         EntityController.getInstance().getObservableRequirements().add(req);
         LOGGER.debug("Created Req={}", req);
         LOGGER.debug("All Cat.Reqs={}", EntityController.getInstance().getCatalogue().getRequirements());
@@ -82,14 +84,17 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         break;
       case MILESTONE:
         Milestone ms = EditorPromptFactory.promptNewMilestone();
+        if (ms == null) {
+          return;
+        }
         EntityController.getInstance().getObservableMilestones().add(ms);
         LOGGER.debug("Created MS={}", ms);
         LOGGER.debug("All Cat.MS={}", EntityController.getInstance().getCatalogue().getMilestones());
         LOGGER.debug("All ObsMS={}", EntityController.getInstance().getObservableMilestones());
         break;
       case COURSE:
-        Course  course = EditorPromptFactory.promptNewCourse();
-        if(course != null){
+        Course course = EditorPromptFactory.promptNewCourse();
+        if (course != null) {
           setupEditor();
         }
         break;
@@ -108,7 +113,10 @@ public class EditorHandler implements EventHandler<CUDEvent> {
           EntityController.getInstance().removeRequirement(req);
           LOGGER.debug("size: " + editor.getRequirementsView().getRequirementsSize());
         } else {
-          throw new RuntimeException("Something went really bad.");
+          // Most probably the event has no delivery -> thus nothing has to happen.
+          if (evt.getDelivery() != null) {
+            throw new RuntimeException("Something went really bad. DelReq with no non-null req");
+          }
         }
         break;
       case MILESTONE:
@@ -135,7 +143,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
       case COURSE:
         Course oldCourse = EntityController.getInstance().getCourse();
         Course newCourse = EditorPromptFactory.promptCourse(oldCourse);
-        LOGGER.debug("Modification of course: old={}, new={}",oldCourse, newCourse);
+        LOGGER.debug("Modification of course: old={}, new={}", oldCourse, newCourse);
         setupCatalogueInfo();
         break;
       case REQUIREMENT:
@@ -162,14 +170,14 @@ public class EditorHandler implements EventHandler<CUDEvent> {
   
   public void setupEditor() {
     LOGGER.traceEntry();
-    if (EntityController.getInstance().hasCatalogue() ) {
+    if (EntityController.getInstance().hasCatalogue()) {
       editor.getRequirementsView().setRequirements(EntityController.getInstance().getObservableRequirements(), EntityController.getInstance().getCatalogue());
       editor.getMilestoneView().setItems(EntityController.getInstance().getObservableMilestones());
     }
-  
+    
     // TODO Cleanup
     setupCatalogueInfo();
-  
+    
     editor.enableAll();
     
   }
@@ -177,11 +185,11 @@ public class EditorHandler implements EventHandler<CUDEvent> {
   public void saveCatalogue() {
     LOGGER.traceEntry();
     if (EntityController.getInstance().hasCatalogue() && EntityController.getInstance().isStorageManagerReady()) {
-      if(StorageManager.getInstance().getCataloguePath() == null){
-        saveAsCatalogue();
-      }else{
-        EntityController.getInstance().saveCatalogue();
-      }
+      LOGGER.debug("Save catalogeu");
+      EntityController.getInstance().saveCatalogue();
+    } else {
+      LOGGER.debug("Cannot save [CATALOGUE]. Save as instead");
+      saveAsCatalogue();
     }
   }
   
@@ -191,52 +199,50 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     if (EntityController.getInstance().hasCatalogue()) {
       DirectoryChooser dc = Utils.createDirectoryChooser("Save as");
       File dir = dc.showDialog(editor.getScene().getWindow());
-      LOGGER.debug("Chosen dir={}",dir);
+      LOGGER.debug("Chosen dir={}", dir);
       if (dir != null) {
         EntityController.getInstance().setupSaveDirectory(dir);
         EntityController.getInstance().saveCatalogue();
       }
-    }else {
+    } else {
       LOGGER.warn("Cannot save non-exist logger");
     }
   }
   
-  public void saveCourse(){
+  public void saveCourse() {
     LOGGER.debug("SaveCourse");
-    if(EntityController.getInstance().hasCourse() && EntityController.getInstance().isStorageManagerReady()){
-      if(StorageManager.getInstance().getCoursePath() == null){
-        LOGGER.warn("No coursepath -> save course as");
-        saveAsCourse();
-      }else{
-        LOGGER.debug("Save course");
-        EntityController.getInstance().saveCourse();
-      }
+    if (EntityController.getInstance().hasCourse() && EntityController.getInstance().isStorageManagerReady()) {
+      LOGGER.debug("Save course");
+      EntityController.getInstance().saveCourse();
+    } else {
+      LOGGER.debug("Cannot save [COURSE]. SaveAs instead");
+      saveAsCourse();
     }
   }
   
-  public void openCourse(){
+  public void openCourse() {
     LOGGER.debug("Open coruse");
     FileChooser fc = Utils.createFileChooser("Open Course");
     fc.getExtensionFilters().add(ReqmanFile.Type.COURSE.getExtensionFilter());
     
-    LOGGER.debug("Filter.desc={}",fc.getExtensionFilters().get(0).getDescription());
-    LOGGER.debug("Filter.ext={}",fc.getExtensionFilters().get(0).getExtensions());
+    LOGGER.debug("Filter.desc={}", fc.getExtensionFilters().get(0).getDescription());
+    LOGGER.debug("Filter.ext={}", fc.getExtensionFilters().get(0).getExtensions());
     
-    LOGGER.debug("fc={}",fc);
-    LOGGER.debug("Editor={}",editor);
+    LOGGER.debug("fc={}", fc);
+    LOGGER.debug("Editor={}", editor);
     Window w = null;
     File f = fc.showOpenDialog(w);
-    if(f != null){
+    if (f != null) {
       EntityController.getInstance().openCourse(f);
     }
   }
   
-  public void saveAsCourse(){
+  public void saveAsCourse() {
     LOGGER.debug("SaveAsCourse");
-    if(EntityController.getInstance().hasCourse() ){
+    if (EntityController.getInstance().hasCourse()) {
       DirectoryChooser dc = Utils.createDirectoryChooser("Save as");
-      File dir = dc.showDialog(editor.getScene().getWindow() );
-      if(dir != null){
+      File dir = dc.showDialog(editor.getScene().getWindow());
+      if (dir != null) {
         LOGGER.debug("SaveCourse as..");
         EntityController.getInstance().setupSaveDirectory(dir);
         EntityController.getInstance().saveCourse();
