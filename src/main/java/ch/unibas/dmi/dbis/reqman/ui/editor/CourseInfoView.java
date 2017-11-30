@@ -3,15 +3,19 @@ package ch.unibas.dmi.dbis.reqman.ui.editor;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Course;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tooltip;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import javax.rmi.CORBA.Util;
 
 /**
  * Displays information about the {@link ch.unibas.dmi.dbis.reqman.data.Course} and {@link ch.unibas.dmi.dbis.reqman.data.Catalogue}
@@ -25,9 +29,7 @@ public class CourseInfoView extends HBox{
   private Course course;
   private Catalogue catalogue;
   
-  private HBox leftWrapper = new HBox();
-  private HBox rightWrapper = new HBox();
-  private SplitPane splitPane = new SplitPane();
+  private GridPane grid;
   
   private Label courseKeyLbl;
   private Label courseLbl;
@@ -62,6 +64,9 @@ public class CourseInfoView extends HBox{
   }
   
   private void initComponents(){
+    
+    grid = Utils.generateDefaultGridPane();
+    
     courseKeyLbl = new Label("Course:");
     courseNameProperty = new SimpleStringProperty();
     courseLbl = new Label();
@@ -84,27 +89,11 @@ public class CourseInfoView extends HBox{
   }
   
   private void layoutComponents(){
-    leftWrapper.getChildren().addAll(courseKeyLbl, courseLbl, semesterKeyLbl, semesterLbl);
-    leftWrapper.setStyle("-fx-spacing: 10px");
-    leftWrapper.setMinHeight(20);
-    leftWrapper.setAlignment(Pos.CENTER_LEFT);
-    rightWrapper.getChildren().addAll(catalogueKeyLbl, catalogueLbl);
-    rightWrapper.setStyle("-fx-spacing: 10px");
-    rightWrapper.setMinHeight(20);
-    rightWrapper.setAlignment(Pos.CENTER_LEFT);
-    
-    splitPane.setDividerPositions(0.5);
-    splitPane.getItems().addAll(leftWrapper, rightWrapper);
-    
-    splitPane.prefHeightProperty().bind(heightProperty());
-    splitPane.prefWidthProperty().bind(widthProperty());
-    splitPane.setStyle("-fx-spacing: 10px");
-    
+    grid.addRow(0,  courseKeyLbl, courseLbl, semesterKeyLbl, semesterLbl, catalogueKeyLbl, catalogueLbl);
     
     this.getChildren().clear();
-    getChildren().add(splitPane);
-    
-    HBox.setHgrow(this, Priority.ALWAYS);
+    getChildren().add(grid);
+    HBox.setHgrow(grid, Priority.ALWAYS);
     setStyle("-fx-spacing: 10px");
     setMinHeight(20);
   }
