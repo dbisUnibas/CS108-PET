@@ -77,7 +77,7 @@ public class Member {
   
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder("Member{");
+    final StringBuilder sb = new StringBuilder("ObservableMember{");
     sb.append("name='").append(name).append('\'');
     sb.append(", firstName='").append(firstName).append('\'');
     sb.append(", email='").append(email).append('\'');

@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.data.Group;
+import ch.unibas.dmi.dbis.reqman.data.Member;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
 import ch.unibas.dmi.dbis.reqman.ui.common.PromptPopup;
@@ -18,8 +19,8 @@ public class EvaluatorPromptFactory {
         // no objects
     }
 
-    public static GroupPropertiesScene.Member promptMember() {
-        PromptPopup<GroupPropertiesScene.Member> popup = new PromptPopup<>(new MemberScene());
+    public static Member promptMember() {
+        PromptPopup<Member> popup = new PromptPopup<>(new MemberScene());
         return popup.prompt();
     }
 

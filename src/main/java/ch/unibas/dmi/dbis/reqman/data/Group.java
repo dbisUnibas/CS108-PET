@@ -22,7 +22,6 @@ public class Group extends VersionedEntity implements Comparable<Group> {
   /**
    * The logger instance
    */
-  @Deprecated
   private static final Logger LOG = LogManager.getLogger(Group.class);
   /**
    * The unique identifier of this group
@@ -93,7 +92,6 @@ public class Group extends VersionedEntity implements Comparable<Group> {
    * Contains only the name of the file, location will be set by user upon export
    */
   private String exportFileName;
-  // TODO Revisit
   
   /**
    * Creates a new group with the specified arguments
@@ -172,18 +170,14 @@ public class Group extends VersionedEntity implements Comparable<Group> {
   
   /**
    * @return
-   * @deprecated Will be handled externally
    */
-  @Deprecated
   public String getExportFileName() {
     return exportFileName;
   }
   
   /**
    * @param exportFileName
-   * @deprecated Will be handled externally
    */
-  @Deprecated
   public void setExportFileName(String exportFileName) {
     this.exportFileName = exportFileName;
   }
@@ -420,6 +414,11 @@ public class Group extends VersionedEntity implements Comparable<Group> {
   
   public void setCatalogue(Catalogue catalogue) {
     this.catalogueUuid = catalogue.getUuid();
+  }
+  
+  public void setMembers(List<Member> members) {
+    this.members.clear();
+    this.members.addAll(members);
   }
   
   void setCourse(Course course) {
