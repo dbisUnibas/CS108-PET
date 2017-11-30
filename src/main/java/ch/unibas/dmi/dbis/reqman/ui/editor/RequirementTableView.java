@@ -77,7 +77,7 @@ public class RequirementTableView extends BorderPane {
     cat = catalogue;
     // Ensures that this view is really simply view - and nothing more!
     LOGGER.traceEntry();
-    LOGGER.debug("Requirements={}\ncat={}",requirements,catalogue);
+    LOGGER.debug("Requirements={}\ncat={}", requirements, catalogue);
     tableData.clear();
     requirements.forEach(r -> tableData.add(ObservableRequirement.fromRequirement(r)));
     LOGGER.trace(":setRequirements - Created " + tableData.size() + " observable requirements");
@@ -106,7 +106,7 @@ public class RequirementTableView extends BorderPane {
             }
             for (Requirement addItem : c.getAddedSubList()) {
               LOGGER.trace("Added  {}", c.getAddedSubList());
-              if(addItem == null){
+              if (addItem == null) {
                 continue;
               }
               ObservableRequirement obsReq = ObservableRequirement.fromRequirement(addItem);
@@ -125,16 +125,6 @@ public class RequirementTableView extends BorderPane {
     updatePoints();
   }
   
-  private void updatePoints(){
-    CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
-    if(analyser != null){
-      totalPoints.set(analyser.getMaximalRegularSum());
-      totalBonus.set(analyser.getMaximalBonusSum());
-      totalMalus.set(analyser.getMaximalMalusSum());
-    }
-
-  }
-  
   public int getRequirementsSize() {
     return tableData.size();
   }
@@ -151,7 +141,17 @@ public class RequirementTableView extends BorderPane {
     updatePoints();
   }
   
-  private void removeFromTable(Requirement requirement){
+  private void updatePoints() {
+    CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
+    if (analyser != null) {
+      totalPoints.set(analyser.getMaximalRegularSum());
+      totalBonus.set(analyser.getMaximalBonusSum());
+      totalMalus.set(analyser.getMaximalMalusSum());
+    }
+    
+  }
+  
+  private void removeFromTable(Requirement requirement) {
     tableData.removeIf(or -> or.getRequirement().equals(requirement));
   }
   
@@ -173,16 +173,16 @@ public class RequirementTableView extends BorderPane {
     header.getChildren().addAll(title, spacer, btnWrapper);
     
     
-    footer.add(lblFooterHeader, 0,0,3,1);
+    footer.add(lblFooterHeader, 0, 0, 3, 1);
     TextField tfPoints = createAndBind(totalPoints);
     TextField tfBonus = createAndBind(totalBonus);
     TextField tfMalus = createAndBind(totalMalus);
-    footer.add(lblTotalPoints, 0,1);
+    footer.add(lblTotalPoints, 0, 1);
     footer.add(lblTotalBonus, 1, 1);
-    footer.add(lblTotalMalus, 2,1);
-    footer.add(tfPoints,0,2);
-    footer.add(tfBonus, 1,2);
-    footer.add(tfMalus,2,2);
+    footer.add(lblTotalMalus, 2, 1);
+    footer.add(tfPoints, 0, 2);
+    footer.add(tfBonus, 1, 2);
+    footer.add(tfMalus, 2, 2);
     
     
     // Adding header
@@ -198,7 +198,7 @@ public class RequirementTableView extends BorderPane {
     
   }
   
-  private TextField createAndBind(SimpleDoubleProperty contentProperty){
+  private TextField createAndBind(SimpleDoubleProperty contentProperty) {
     TextField tf = new TextField();
     tf.setEditable(false);
     tf.textProperty().bind(contentProperty.asString());
@@ -264,42 +264,24 @@ public class RequirementTableView extends BorderPane {
       }
     }));
     
-    TableColumn<ObservableRequirement, String> minMSColumn = new TableColumn<>("Min MS");
+    TableColumn<ObservableRequirement, String> minMSColumn = new TableColumn<>("Available from");
     minMSColumn.setCellValueFactory(c -> c.getValue().minMSNameProperty());
     minMSColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     
-    TableColumn<ObservableRequirement, String> maxMSColumn = new TableColumn<>("Max MS");
+    TableColumn<ObservableRequirement, String> maxMSColumn = new TableColumn<>("Available until");
     maxMSColumn.setCellValueFactory(c -> c.getValue().maxMSNameProperty());
     maxMSColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     
+    TableColumn<ObservableRequirement, String> typeColumn = new TableColumn<>("Type");
+    typeColumn.setCellValueFactory(c -> c.getValue().typeProperty());
+    typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+  
+    TableColumn<ObservableRequirement, String> categoryColumn = new TableColumn<>("Category");
+    typeColumn.setCellValueFactory(c -> c.getValue().typeProperty());
+    typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     
-    TableColumn<ObservableRequirement, Boolean> binaryColumn = new TableColumn<>("Binary");
-    binaryColumn.setCellValueFactory(c -> c.getValue().binaryProperty());
-
-        /*
-        //Not Working
-        binaryColumn.setCellFactory(new Callback<TableColumn<ObservableRequirement, Boolean>, TableCell<ObservableRequirement, Boolean>>() {
-            @Override
-            public TableCell<ObservableRequirement, Boolean> call(TableColumn<ObservableRequirement, Boolean> param) {
-                Callback<TableColumn<ObservableRequirement, Boolean>, TableCell<ObservableRequirement, Boolean>> factory = CheckBoxTableCell.forTableColumn(param);
-                TableCell<ObservableRequirement, Boolean> cell = factory.call(param);
-                cell.getStyleClass().add("silent");
-                return cell;
-            }
-        });
-        */
     
-    binaryColumn.setCellFactory(CheckBoxTableCell.forTableColumn(binaryColumn));
-    
-    TableColumn<ObservableRequirement, Boolean> mandatoryColumn = new TableColumn<>("Mandatory");
-    mandatoryColumn.setCellValueFactory(c -> c.getValue().mandatoryProperty());
-    mandatoryColumn.setCellFactory(CheckBoxTableCell.forTableColumn(mandatoryColumn));
-    
-    TableColumn<ObservableRequirement, Boolean> malusColumn = new TableColumn<>("Malus");
-    malusColumn.setCellValueFactory(c -> c.getValue().malusProperty());
-    malusColumn.setCellFactory(CheckBoxTableCell.forTableColumn(malusColumn));
-    
-    table.getColumns().addAll(nameColumn, pointsColumn, minMSColumn, maxMSColumn, binaryColumn, mandatoryColumn, malusColumn);
+    table.getColumns().addAll(nameColumn, pointsColumn, minMSColumn, maxMSColumn, typeColumn, categoryColumn);
     
     table.setItems(tableData);
     
@@ -318,36 +300,29 @@ public class RequirementTableView extends BorderPane {
   static class ObservableRequirement {
     private final SimpleStringProperty name;
     private final SimpleDoubleProperty points;
-    private final SimpleBooleanProperty binary;
-    private final SimpleBooleanProperty mandatory;
-    private final SimpleBooleanProperty malus;
+    
+    private final SimpleStringProperty type;
+    private final SimpleStringProperty category;
     
     private final SimpleStringProperty minMSName;
     private final SimpleStringProperty maxMSName;
+    
+    
     private Requirement requirement;
     
     ObservableRequirement(Requirement req) {
       requirement = req;
       name = new SimpleStringProperty(req.getName());
       points = new SimpleDoubleProperty(req.getMaxPoints());
-      binary = new SimpleBooleanProperty(req.isBinary());
-      mandatory = new SimpleBooleanProperty(req.isMandatory());
-      malus = new SimpleBooleanProperty(req.isMalus());
+      
+      type = new SimpleStringProperty(req.getType().toString());
+      
+      category = new SimpleStringProperty(req.getCategory() != null ? req.getCategory() : "");
+      
       minMSName = new SimpleStringProperty(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(req.getMinimalMilestoneUUID()).getName());
       maxMSName = new SimpleStringProperty(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(req.getMaximalMilestoneUUID()).getName());
     }
     
-    
-    @Deprecated
-    ObservableRequirement(String name, double points, String minMSName, String maxMSName, boolean binary, boolean mandatory, boolean malus) {
-      this.name = new SimpleStringProperty(name);
-      this.points = new SimpleDoubleProperty(points);
-      this.binary = new SimpleBooleanProperty(binary);
-      this.mandatory = new SimpleBooleanProperty(mandatory);
-      this.malus = new SimpleBooleanProperty(malus);
-      this.minMSName = new SimpleStringProperty(minMSName);
-      this.maxMSName = new SimpleStringProperty(maxMSName);
-    }
     
     static ObservableRequirement fromRequirement(Requirement r) {
       LOGGER.trace(":fromRequirement");
@@ -366,12 +341,10 @@ public class RequirementTableView extends BorderPane {
     
     @Override
     public String toString() {
+      // TODO Rewrite
       final StringBuffer sb = new StringBuffer("ObservableRequirement{");
       sb.append("name=").append(name.get());
       sb.append(", points=").append(points.get());
-      sb.append(", binary=").append(binary.get());
-      sb.append(", mandatory=").append(mandatory.get());
-      sb.append(", malus=").append(malus.get());
       sb.append('}');
       return sb.toString();
     }
@@ -388,18 +361,16 @@ public class RequirementTableView extends BorderPane {
     
     @Override
     public int hashCode() {
+      // TODO regen
       int result = getName() != null ? getName().hashCode() : 0;
       result = 31 * result + (int) getPoints();
-      result = 31 * result + (isBinary() ? 1 : 0);
-      result = 31 * result + (isMandatory() ? 1 : 0);
-      result = 31 * result + (isMalus() ? 1 : 0);
       return result;
     }
     
     public Requirement getRequirement() {
       return requirement;
     }
-  
+    
     double getPoints() {
       return points.get();
     }
@@ -414,30 +385,6 @@ public class RequirementTableView extends BorderPane {
     
     void setName(String name) {
       this.name.set(name);
-    }
-    
-    boolean isBinary() {
-      return binary.get();
-    }
-    
-    void setBinary(boolean binary) {
-      this.binary.set(binary);
-    }
-    
-    boolean isMandatory() {
-      return mandatory.get();
-    }
-    
-    void setMandatory(boolean mandatory) {
-      this.mandatory.set(mandatory);
-    }
-    
-    boolean isMalus() {
-      return malus.get();
-    }
-    
-    void setMalus(boolean malus) {
-      this.malus.set(malus);
     }
     
     String getMinMSName() {
@@ -464,16 +411,12 @@ public class RequirementTableView extends BorderPane {
       return name;
     }
     
-    BooleanProperty binaryProperty() {
-      return binary;
+    StringProperty typeProperty() {
+      return type;
     }
     
-    BooleanProperty mandatoryProperty() {
-      return mandatory;
-    }
-    
-    BooleanProperty malusProperty() {
-      return malus;
+    StringProperty categoryProperty() {
+      return category;
     }
     
     StringProperty minMSNameProperty() {

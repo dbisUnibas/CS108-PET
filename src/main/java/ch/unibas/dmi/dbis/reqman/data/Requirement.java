@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
 
@@ -411,6 +412,10 @@ public class Requirement {
     REGULAR,
     BONUS,
     MALUS;
-    
+  
+    @Override
+    public String toString() {
+      return StringUtils.capitalize(name().toLowerCase() );
+    }
   }
 }
