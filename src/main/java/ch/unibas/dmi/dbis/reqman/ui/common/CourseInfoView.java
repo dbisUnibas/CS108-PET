@@ -1,21 +1,16 @@
-package ch.unibas.dmi.dbis.reqman.ui.editor;
+package ch.unibas.dmi.dbis.reqman.ui.common;
 
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Course;
-import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import javax.rmi.CORBA.Util;
 
 /**
  * Displays information about the {@link ch.unibas.dmi.dbis.reqman.data.Course} and {@link ch.unibas.dmi.dbis.reqman.data.Catalogue}

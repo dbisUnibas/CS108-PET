@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
+import ch.unibas.dmi.dbis.reqman.ui.common.CourseInfoView;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleStringProperty;

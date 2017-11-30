@@ -2,7 +2,6 @@ package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
-import ch.unibas.dmi.dbis.reqman.management.EntityManager;
 import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
 import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
@@ -13,11 +12,9 @@ import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.RadioMenuItem;
-import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -276,11 +273,15 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleShowOverview(ActionEvent event) {
+    throw new UnsupportedOperationException("Not implemented yet");
+    // TODO
+    /*
     if (mainScene.isEvaluatorActive()) {
       if (evaluatorHandler.isGroupLoaded()) {
         evaluatorHandler.showOverview();
       }
     }
+    */
   }
   
   @Override
@@ -301,6 +302,9 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleExportOverview(ActionEvent event) {
+    throw new UnsupportedOperationException("Not implemented yet");
+    // TODO
+    /*
     LOGGER.traceEntry();
     if (mainScene.isEvaluatorActive()) {
       if (evaluatorHandler.isGroupLoaded()) {
@@ -319,6 +323,7 @@ public class MainHandler implements MenuHandler {
         Utils.showErrorDialog("Export Failed", "Cannot export an overview if no groups are loaded");
       }
     }
+    */
   }
   
   @Override

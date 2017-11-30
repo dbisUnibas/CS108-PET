@@ -1,10 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.ui.common.CourseInfoView;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
 import javafx.scene.Cursor;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
