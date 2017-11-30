@@ -82,14 +82,14 @@ public class MainHandler implements MenuHandler {
     }
     try {
       
-      if(EntityController.getInstance().isStorageManagerReady() ){
+      if (EntityController.getInstance().isStorageManagerReady()) {
         LOGGER.debug("Open Catalogue - course loaded");
         EntityController.getInstance().openCatalogue();
         mainScene.setActive(MainScene.Mode.EDITOR);
         editorHandler.setupEditor();
-      }else if(event.isConsumed()){
+      } else if (event.isConsumed()) {
         LOGGER.warn("Something went very wrong");
-      }else{
+      } else {
         LOGGER.debug("Open catalogue and course");
         handleOpenCourse(event);
         event.consume();
@@ -168,6 +168,9 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleExportCat(ActionEvent event) {
+    throw new UnsupportedOperationException("Not implemented yet");
+    // TODO
+    /*
     if (!EntityManager.getInstance().isCatalogueLoaded()) {
       return;
     }
@@ -182,23 +185,32 @@ public class MainHandler implements MenuHandler {
       EntityManager.getInstance().exportCatalogue(f);
       mainScene.indicateWaiting(false);
     }
+    */
   }
   
   @Override
   public void handleExportGroups(ActionEvent event) {
+    throw new UnsupportedOperationException("Not implemented yet");
+    // TODO
+    /*
     if (!evaluatorHandler.isGroupLoaded()) {
       return;
     }
     evaluatorHandler.exportAllGroups();
+    */
   }
   
   @Override
   public void handleExportGroup(ActionEvent event) {
+    throw new UnsupportedOperationException("Not implemented yet");
+    // TODO
+    /*
     if (!evaluatorHandler.isGroupLoaded()) {
       return;
     }
     // TODO ensure correct mode
     throw new UnsupportedOperationException("NYI");
+    */
   }
   
   @Override
