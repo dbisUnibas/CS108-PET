@@ -299,6 +299,10 @@ public class EntityFactory {
     return course;
   }
   
+  public void link(Group group, Course course) {
+    group.setCourse(course);
+  }
+  
   ProgressSummary createProgressSummary(Milestone ms) {
     ProgressSummary ps = new ProgressSummary();
     ps.setMilestoneUUID(ms.getUuid());

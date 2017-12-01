@@ -38,7 +38,7 @@ public class MainHandler implements MenuHandler {
     this.evaluatorHandler = evaluatorHandler;
     this.evaluatorHandler.setOnFirstGroup(() -> {
       manager.enableGroupNeeded();
-      evaluatorHandler.enableEvalautor();
+      evaluatorHandler.enableEvaluator();
     });
     this.editorHandler = editorHandler;
   }
@@ -84,6 +84,7 @@ public class MainHandler implements MenuHandler {
         EntityController.getInstance().openCatalogue();
         mainScene.setActive(MainScene.Mode.EDITOR);
         editorHandler.setupEditor();
+        manager.enableCatalogueNeeded();
       } else if (event.isConsumed()) {
         LOGGER.warn("Something went very wrong");
       } else {
@@ -366,7 +367,7 @@ public class MainHandler implements MenuHandler {
     }
     mainScene.setActive(MainScene.Mode.EDITOR);
     editorHandler.setupEditor();
-    manager.enableCatalogueNeeded();
+    manager.enableCatalogueNeeded(); // TODO fix and / or change to courseNeeded
   }
   
   @Override

@@ -126,6 +126,10 @@ public class EvaluatorView extends HBox implements TitleProvider {
     tabPane.getTabs().remove(tab);
   }
   
+  public void refreshCourseInfoView() {
+    courseView.refresh();
+  }
+  
   void enableAll() {
     LOGGER.traceEntry();
     groupView.setDisable(false);

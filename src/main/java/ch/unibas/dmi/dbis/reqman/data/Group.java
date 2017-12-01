@@ -408,6 +408,7 @@ public class Group extends VersionedEntity implements Comparable<Group> {
     return courseUuid;
   }
   
+  
   public UUID getCatalogueUuid() {
     return catalogueUuid;
   }

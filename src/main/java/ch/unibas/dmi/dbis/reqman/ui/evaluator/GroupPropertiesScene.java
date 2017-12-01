@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.data.Group> {
   
   private static final Logger LOGGER = LogManager.getLogger(GroupPropertiesScene.class);
-  private final String catalogueName;
   private final EvaluatorHandler handler;
   private TextField tfName;
   private TextField tfProjectName;
@@ -40,7 +39,6 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
   
   GroupPropertiesScene(EvaluatorHandler handler) {
     this.handler = handler;
-    this.catalogueName = handler.getName();
     
     populateScene();
   }
@@ -67,9 +65,9 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         return;
       }
       List<Member> members = tableData.stream().map(ObservableMember::getMember).collect(Collectors.toList());
-      if(group == null){
-        group = EntityController.getInstance().getEntityFactory().createGroup(name, members.toArray(new Member[0]));
-      }else{
+      if (group == null) {
+        group = EntityController.getInstance().createGroup(name, members.toArray(new Member[0]));
+      } else {
         group.setName(name);
         group.setMembers(members);
       }
@@ -257,10 +255,18 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     private final Member member;
     
     public ObservableMember(Member member) {
-      this.member = member;
-      this.name = new SimpleStringProperty(member.getName());
-      this.firstName = new SimpleStringProperty(member.getFirstName());
-      this.email = new SimpleStringProperty(member.getEmail());
+      if (member == null) {
+        this.member = null;
+        name = new SimpleStringProperty();
+        firstName = new SimpleStringProperty();
+        email = new SimpleStringProperty();
+      } else {
+        this.member = member;
+        this.name = new SimpleStringProperty(member.getName());
+        this.firstName = new SimpleStringProperty(member.getFirstName());
+        this.email = new SimpleStringProperty(member.getEmail());
+      }
+      
     }
     
     public static String convertToString(ObservableMember m) {

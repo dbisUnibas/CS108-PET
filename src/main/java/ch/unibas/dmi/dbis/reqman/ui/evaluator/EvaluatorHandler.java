@@ -2,28 +2,21 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.Callback;
 import ch.unibas.dmi.dbis.reqman.common.Version;
-import ch.unibas.dmi.dbis.reqman.data.*;
-import ch.unibas.dmi.dbis.reqman.management.CatalogueNameMismatchException;
-import ch.unibas.dmi.dbis.reqman.management.EntityManager;
-import ch.unibas.dmi.dbis.reqman.management.NonUniqueGroupNameException;
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Group;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Progress;
 import ch.unibas.dmi.dbis.reqman.ui.MenuManager;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
-import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.layout.HBox;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,9 +30,6 @@ import java.util.UUID;
 public class EvaluatorHandler implements EventHandler<CUDEvent> {
   
   private final static Logger LOGGER = LogManager.getLogger(EvaluatorHandler.class);
-  
-  @Deprecated
-  private final EntityManager manager = EntityManager.getInstance();
   
   /**
    * A reference to the actual UI this class controls
@@ -76,23 +66,16 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   public List<Milestone> getMilestones() {
-    return new ArrayList<>(manager.getObservableMilestones());
+    return new ArrayList<>(EntityController.getInstance().getObservableMilestones());
   }
   
-  public String getName() {
-    return manager.getCatalogueName();
-  }
-  
-  public String getDescription() {
-    return manager.getDescription();
-  }
   
   public boolean isCatalogueLoaded() {
-    return manager.isCatalogueLoaded();
+    return EntityController.getInstance().hasCatalogue();
   }
   
   public Catalogue getCatalogue() {
-    return manager.getCatalogue();
+    return EntityController.getInstance().getCatalogue();
   }
   
   @Override
@@ -186,9 +169,11 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   public void handleOpenGroups(ActionEvent actionEvent) {
-    if (!manager.isCatalogueLoaded()) {
+    if (!EntityController.getInstance().hasCatalogue()) {
       return;
     }
+    throw new UnsupportedOperationException("Not implemented yet");
+    /*
     FileChooser fc = Utils.createGroupFileChooser("Open");
     if (manager.hasLastOpenLocation()) {
       fc.setInitialDirectory(manager.getLastOpenLocation());
@@ -217,9 +202,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
       }, this::handleOpenGroupException);
     }
     // USER ABORT
+    */
   }
   
   public void handleSaveGroup(ActionEvent actionEvent) {
+    throw new UnsupportedOperationException("Not implemented yet");
+    /*
     Group active = evaluator.getActiveGroup();
     if (manager.hasGroupFile(active)) {
       assemble(active);
@@ -227,9 +215,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     } else {
       handleSaveGroupAs(actionEvent);
     }
+    */
   }
   
   public void handleSaveGroupAs(ActionEvent event) {
+    throw new UnsupportedOperationException("Not implemented yet");
+    /*
     FileChooser fc = Utils.createGroupFileChooser("Save As");
     if (manager.hasLastSaveLocation()) {
       fc.setInitialDirectory(manager.getLastSaveLocation());
@@ -239,6 +230,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
       assemble(evaluator.getActiveGroup());
       manager.saveGroupAs(evaluator.getActiveGroup(), f);
     }
+    */
   }
   
   public void reloadRequirements() {
@@ -249,11 +241,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   
   public void processCatalogueOpened(Catalogue cat) {
     LOGGER.traceEntry("Param: {}", cat);
-    LOGGER.info("Opened catalogue " + manager.getCatalogueFile().getPath());
+    LOGGER.info("Opened catalogue ");
     evaluator.enableAll();
     MenuManager.getInstance().setupGlobalMilestoneMenu(this.getMilestones());
     MenuManager.getInstance().enableCatalogueNeeded();
-    evaluator.displayCatalogueInfo(manager.getCatalogue());
   }
   
   public void setGlobalMilestoneChoice(Milestone ms) {
@@ -271,15 +262,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   public ObservableList<Progress> progressList(Group g) {
-    return manager.getObservableProgress(g);
+    return EntityController.getInstance().getObservableProgress(g);
   }
   
-  public Progress getProgressForRequirement(Group group, Requirement requirement) {
-    return manager.getProgressForRequirement(group, requirement);
-  }
   
   public Group getGroupByName(String name) {
-    for (Group g : manager.groupList()) {
+    for (Group g : EntityController.getInstance().groupList()) {
       if (g.getName().equals(name)) {
         return g;
       }
@@ -288,6 +276,8 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   public void exportAllGroups() {
+    throw new UnsupportedOperationException("Not implemented yet");
+    /*
     LOGGER.traceEntry();
     if (!isCatalogueLoaded()) {
       LOGGER.debug(":exportAllGroups - No catalogue set. Returning");
@@ -305,9 +295,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
     
     manager.exportAllGroups(dir);
+    */
   }
   
   public void showOverview() {
+    throw new UnsupportedOperationException("Not implemented yet");
+    /*
     if (!manager.isCatalogueLoaded() || (manager.groupList() == null || manager.groupList().isEmpty())) {
       return;
     }
@@ -325,15 +318,20 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     box.getChildren().add(view);
     PopupStage popupStage = new PopupStage("Overview", webScene);
     popupStage.showAndWait();
+    */
   }
   
   public void stop() {
+    return;
+    // Silently ignoring
+    // TODO
+    /*
     LOGGER.traceEntry();
     manager.groupList().forEach(g -> {
       if (isDirty(g)) {
         manager.saveAsBackup(g);
       }
-    });
+    });*/
   }
   
   public boolean isDirty(Group group) {
@@ -341,19 +339,25 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   public boolean isGroupLoaded() {
-    return !manager.groupList().isEmpty();
+    return EntityController.getInstance().hasGroups();
   }
   
-  public void enableEvalautor() {
+  public void enableEvaluator() {
     evaluator.enableAll();
   }
   
-  boolean isGroupNameUnique(String name) {
-    return manager.isGroupNameUnique(name);
+  public void refreshCourseInfoView() {
+    evaluator.refreshCourseInfoView();
   }
   
+  @Deprecated
+  boolean isGroupNameUnique(String name) {
+    return true;
+  }
+  
+  @Deprecated
   Milestone getMilestoneByOrdinal(int ordinal) {
-    return manager.getMilestoneByOrdinal(ordinal);
+    return null;
   }
   
   void setEvaluatorView(EvaluatorView view) {
@@ -361,7 +365,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   ObservableList<Group> groupList() {
-    return manager.groupList();
+    return EntityController.getInstance().groupList();
   }
   
   void markDirty(Group activeGroup) {
@@ -390,7 +394,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
     LOGGER.entry(gr);
     // ADD GROUP
-    manager.addGroup(gr);
     loadGroupUI(gr);
     
     handleFirstGroupPresent();
@@ -398,7 +401,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   
   private void handleFirstGroupPresent() {
     LOGGER.traceEntry();
-    if (manager.groupList().size() >= 1) {
+    if (EntityController.getInstance().groupList().size() >= 1) {
       LOGGER.trace(":handleFirstGroupPresent" + " - First group");
       if (firstGroupCallback != null) {
         firstGroupCallback.call();
@@ -418,6 +421,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   
   private void loadGroupUI(Group g) {
     LOGGER.traceEntry("Group: {}", g);
+    /*
     if (manager.getLastOpenException() != null) {
       LOGGER.warn("Caught Exception");
       Exception e = manager.getLastOpenException();
@@ -433,7 +437,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         Utils.showErrorDialog("Duplication error", message);
       }
     }
-    
+    */
     addGroupToMap(g, null);
   }
   

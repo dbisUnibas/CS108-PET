@@ -47,6 +47,9 @@ public class EntityController {
   private StorageManager storageManager;
   
   private HashMap<UUID, GroupAnalyser> groupAnalyserMap = new HashMap<>();
+  private ObservableList<Group> observableGroups = FXCollections.observableArrayList();
+  private HashMap<UUID, ObservableList<Progress>> progressGroupMap = new HashMap<>();
+  private HashMap<UUID, ObservableList<ProgressSummary>> summaryGroupMap = new HashMap<>();
   private ObservableList<Requirement> observableRequirements;
   private ObservableList<Milestone> observableMilestones;
   
@@ -107,6 +110,22 @@ public class EntityController {
     return cat;
   }
   
+  public boolean hasGroups() {
+    return !observableGroups.isEmpty();
+  }
+  
+  public ObservableList<Group> groupList() {
+    return observableGroups;
+  }
+  
+  public ObservableList<Progress> getObservableProgress(Group g) {
+    return progressGroupMap.get(g.getUuid());
+  }
+  
+  public ObservableList<ProgressSummary> getObservableProgressSummaries(Group g){
+    return summaryGroupMap.get(g.getUuid());
+  }
+  
   private void setupObservableCatalogueLists(){
     observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
     observableMilestones = FXCollections.observableArrayList();
@@ -137,7 +156,7 @@ public class EntityController {
     return courseManager;
   }
   
-  
+  // TODO make private
   public EntityFactory getEntityFactory() {
     return entityFactory;
   }
@@ -152,25 +171,54 @@ public class EntityController {
     }
   }
   
+  public Group createGroup(String name, Member... members){
+    Group g = entityFactory.createGroup(name, members);
+    entityFactory.link(g, getCourse());
+    addGroup(g);
+    return g;
+  }
+  
+  public void addGroup(Group g){
+    observableGroups.add(g);
+    addGroupAnalyser(g, new GroupAnalyser(getCourse(), getCatalogue(), g));
+    progressGroupMap.put(g.getUuid(), FXCollections.observableArrayList(g.getProgressList()));
+    summaryGroupMap.put(g.getUuid(), FXCollections.observableArrayList(g.getProgressSummaries()));
+  }
+  
+  public void removeGroup(Group g){
+    observableGroups.remove(g);
+    removeGroupAnalyser(g);
+    progressGroupMap.remove(g.getUuid());
+    summaryGroupMap.remove(g.getUuid());
+  }
+  
+  public Group getGroup(UUID id){
+    for(Group g : observableGroups){
+      if(g.getUuid().equals(id)){
+        return g;
+      }
+    }
+    return null;
+  }
   
   public boolean isEmpty() {
     return groupAnalyserMap.isEmpty();
   }
   
-  public GroupAnalyser getGroupAnalyser(Object key) {
-    return groupAnalyserMap.get(key);
+  public GroupAnalyser getGroupAnalyser(Group key) {
+    return groupAnalyserMap.get(key.getUuid());
   }
   
-  public boolean containsGroupAnalyserFor(Object key) {
-    return groupAnalyserMap.containsKey(key);
+  public boolean containsGroupAnalyserFor(Group key) {
+    return groupAnalyserMap.containsKey(key.getUuid());
   }
   
-  public GroupAnalyser addGroupAnalyser(UUID key, GroupAnalyser value) {
-    return groupAnalyserMap.put(key, value);
+  public GroupAnalyser addGroupAnalyser(Group key, GroupAnalyser value) {
+    return groupAnalyserMap.put(key.getUuid(), value);
   }
   
-  public GroupAnalyser removeGroupAnalyser(Object key) {
-    return groupAnalyserMap.remove(key);
+  public GroupAnalyser removeGroupAnalyser(Group key) {
+    return groupAnalyserMap.remove(key.getUuid());
   }
   
   public ObservableList<Requirement> getObservableRequirements() {
