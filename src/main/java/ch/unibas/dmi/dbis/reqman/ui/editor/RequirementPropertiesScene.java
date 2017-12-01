@@ -83,7 +83,12 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
     
-    if(requirement== null){
+    if(!rbBinary.isSelected() && maxPoints == 0){
+      Utils.showErrorDialog("Invalid Configuration", "A non-binary requirement cannot have 0 points, as having \"0 of 0 points\" is kind of strange.\n" +
+          "May change your requirement to be binary or consider re-thinking the valuation.");
+      return;
+    }
+    if (requirement == null) {
       if (rbMalus.isSelected()) {
         // Malus
         requirement = EntityController.getInstance().createMalusRequirement(name, excerpt, maxPoints, min, max);
@@ -97,28 +102,27 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         // regular
         requirement = EntityController.getInstance().createRequirement(name, excerpt, maxPoints, min, max);
       }
-    }else{
+    } else {
       requirement.setName(name);
       requirement.setExcerpt(excerpt);
       requirement.setMaxPoints(maxPoints);
       requirement.setMinimalMilestoneUUID(min.getUuid());
       requirement.setMaximalMilestoneUUID(max.getUuid());
       
-      if(rbMalus.isSelected()){
+      if (rbMalus.isSelected()) {
         requirement.setType(Requirement.Type.MALUS);
-      }else if(rbBonus.isSelected()){
+      } else if (rbBonus.isSelected()) {
         requirement.setType(Requirement.Type.BONUS);
-      }else{
+      } else {
         requirement.setType(Requirement.Type.REGULAR);
         requirement.setBinary(rbBinary.isSelected());
       }
     }
     
+    requirement.setDescription(desc);
+    requirement.setCategory(cat);
     
-      requirement.setDescription(desc);
-      requirement.setCategory(cat);
     
-      
     if (!predecessors.isEmpty()) {
       predecessors.stream().forEach(requirement::addPredecessor);
     }
@@ -305,11 +309,11 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       cbMaxMS.getSelectionModel().select(max);
       spinnerPoints.getValueFactory().setValue(requirement.getMaxPoints());
       
-      switch(requirement.getType()){
+      switch (requirement.getType()) {
         case REGULAR:
-          if(requirement.isBinary()){
+          if (requirement.isBinary()) {
             rbBinary.setSelected(true);
-          }else{
+          } else {
             rbRegular.setSelected(true);
           }
           break;

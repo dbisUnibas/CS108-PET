@@ -9,7 +9,10 @@ import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -18,7 +21,6 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -277,7 +279,7 @@ public class RequirementTableView extends BorderPane {
     typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
   
     TableColumn<ObservableRequirement, String> categoryColumn = new TableColumn<>("Category");
-    typeColumn.setCellValueFactory(c -> c.getValue().typeProperty());
+    typeColumn.setCellValueFactory(c -> c.getValue().categoryProperty());
     typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     
     
