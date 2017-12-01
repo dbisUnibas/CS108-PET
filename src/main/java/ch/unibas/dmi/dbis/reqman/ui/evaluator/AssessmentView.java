@@ -391,11 +391,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         List<Progress> actives = getActiveProgresses(activeMS);
         LOGGER.debug("Active Progresses: " + actives.toString());
         for (Progress p : actives) {
-            activeProgressViews.add(new ProgressView(p, handler.getCatalogue().getRequirementForProgress(p), handler.getCatalogue()));
+            activeProgressViews.add(new ProgressView(p));
             LOGGER.debug("Added PV for " + p.getRequirementName());
         }
         activeProgressViews.forEach(pv -> {
-            pv.setActiveMilestone(activeMS);
             verifyPredecessorsAchieved(pv);
             pv.addPointsChangeListener(this);
             pv.addDirtyListener(this);
