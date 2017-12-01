@@ -133,6 +133,10 @@ public class Utils {
     return fc;
   }
   
+  public static void applyDefaultSpacing(Node node) {
+    node.setStyle("-fx-padding: 10px; -fx-spacing: 10px;"+node.getStyle());
+  }
+  
   public static class MilestoneCell extends ListCell<Milestone> {
     
     @Override
