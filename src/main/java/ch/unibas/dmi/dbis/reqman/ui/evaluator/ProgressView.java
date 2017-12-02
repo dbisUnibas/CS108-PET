@@ -177,6 +177,7 @@ public class ProgressView extends VBox {
           yesBtn.setToggleGroup(toggleGroup);
           noBtn = new RadioButton("No");
           noBtn.setToggleGroup(toggleGroup);
+          points = new Label();
         } else {
           spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1d);
           spinnerPoints.setEditable(true);
@@ -266,7 +267,7 @@ public class ProgressView extends VBox {
     control = new HBox();
     Utils.applyDefaultSpacing(control);
     collapseButton.setOnAction(this::handleCollapse);
-    collapsible.setStyle("-fx-background-color: white;-fx-padding: 10px; -fx-spacing: 10px;-fx-border-width: 1px;-fx-border-color: silver");
+    //collapsible.setStyle("-fx-background-color: white;-fx-padding: 10px; -fx-spacing: 10px;-fx-border-width: 1px;-fx-border-color: silver"); // collapsible is null
   }
   
   private void layoutCollapsibleView() {
@@ -280,7 +281,7 @@ public class ProgressView extends VBox {
       top.setRight(side);
     }
     // Set the top part.
-    getChildren().set(0, top);
+    getChildren().add(top);
     setFillWidth(true);
     top.prefWidthProperty().bind(widthProperty());
   }

@@ -2,10 +2,11 @@ package ch.unibas.dmi.dbis.reqman.analysis;
 
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.data.*;
-import com.sun.org.apache.regexp.internal.RE;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -132,6 +133,14 @@ public class CatalogueAnalyser {
   
   public List<Requirement> findRequirementsForCategory(String category){
     return catalogue.getRequirements().stream().filter(r->StringUtils.containsNullSafe(r.getCategory(), category)).collect(Collectors.toList());
+  }
+  
+  public Milestone getMilestoneOf(ProgressSummary progressSummary) {
+    return getMilestoneById(progressSummary.getMilestoneUUID());
+  }
+  
+  public List<Requirement> getRequirementsFor(ProgressSummary progressSummary) {
+    return getRequirementsFor(getMilestoneOf(progressSummary));
   }
   
   boolean containsRequirementPattern(Requirement requirement, String pattern){

@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.data;
 import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -258,9 +259,8 @@ public class Group extends VersionedEntity implements Comparable<Group> {
   
   /**
    * @param progressList
-   * @deprecated Removed due to different architecture
    */
-  @Deprecated
+  @JsonIgnore
   public void setProgressList(List<Progress> progressList) {
     this.progressList.clear();
     this.progressList.addAll(progressList);
@@ -424,5 +424,21 @@ public class Group extends VersionedEntity implements Comparable<Group> {
   
   void setCourse(Course course) {
     courseUuid = course.getUuid();
+  }
+  
+  @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("Group{");
+    sb.append("uuid=").append(uuid);
+    sb.append(", courseUuid=").append(courseUuid);
+    sb.append(", catalogueUuid=").append(catalogueUuid);
+    sb.append(", name='").append(name).append('\'');
+    sb.append(", projectName='").append(projectName).append('\'');
+    sb.append(", members=").append(members);
+    sb.append(", progressList=").append(progressList);
+    sb.append(", progressSummaries=").append(progressSummaries);
+    sb.append(", exportFileName='").append(exportFileName).append('\'');
+    sb.append('}');
+    return sb.toString();
   }
 }

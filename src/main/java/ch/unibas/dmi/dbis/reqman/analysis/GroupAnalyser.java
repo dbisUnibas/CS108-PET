@@ -18,14 +18,14 @@ public class GroupAnalyser {
   private final Course course;
   private final Catalogue catalogue;
   private final CatalogueAnalyser catalogueAnalyser;
-  private final CourseManager manager;
+  private final CourseManager courseManager;
   
   public GroupAnalyser(Course course, Catalogue catalogue, Group group) {
     this.group = group;
     this.course = course;
     this.catalogue = catalogue;
     this.catalogueAnalyser = new CatalogueAnalyser(course, catalogue);
-    this.manager = new CourseManager(course, catalogue);
+    this.courseManager = new CourseManager(course, catalogue);
   }
   
   public List<Progress> getProgressFor(ProgressSummary summary) {
@@ -50,7 +50,7 @@ public class GroupAnalyser {
   
   public Requirement getRequirementOf(@NotNull  Progress progress) {
     for (Requirement r : catalogue.getRequirements()) {
-      if (r.getUuid().equals(progress.getUuid())) {
+      if (r.getUuid().equals(progress.getRequirementUUID())) {
         return r;
       }
     }
@@ -137,6 +137,8 @@ public class GroupAnalyser {
   }
   
   boolean matchesProgressSummary(Progress p, ProgressSummary ps) {
-    return p.getProgressSummaryUUID().equals(ps.getUuid());
+    Requirement req = getRequirementOf(p);
+    Milestone ms = catalogueAnalyser.getMilestoneOf(ps);
+    return catalogueAnalyser.matchesMilestone(req, ms);
   }
 }

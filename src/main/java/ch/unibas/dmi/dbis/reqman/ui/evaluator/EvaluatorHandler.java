@@ -1,13 +1,10 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.Callback;
-import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
-import ch.unibas.dmi.dbis.reqman.data.Progress;
-import ch.unibas.dmi.dbis.reqman.ui.MenuManager;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
@@ -17,7 +14,6 @@ import javafx.event.EventHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -63,10 +59,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   
   public void setStatusBar(StatusBar statusBar) {
     this.statusBar = statusBar;
-  }
-  
-  public List<Milestone> getMilestones() {
-    return new ArrayList<>(EntityController.getInstance().getObservableMilestones());
   }
   
   
@@ -233,47 +225,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     */
   }
   
-  public void reloadRequirements() {
-    groupViewMap.values().forEach(av -> {
-      av.reloadRequirements(true);
-    });
-  }
-  
-  public void processCatalogueOpened(Catalogue cat) {
-    LOGGER.traceEntry("Param: {}", cat);
-    LOGGER.info("Opened catalogue ");
-    evaluator.enableAll();
-    MenuManager.getInstance().setupGlobalMilestoneMenu(this.getMilestones());
-    MenuManager.getInstance().enableCatalogueNeeded();
-  }
-  
-  public void setGlobalMilestoneChoice(Milestone ms) {
-    LOGGER.traceEntry("Ms: {}", ms);
-    this.activeMS = ms;
-    for (AssessmentView av : groupViewMap.values()) {
-      LOGGER.trace("Setting milestone " + ms.getName() + " for AV: " + av.getActiveGroup().getName());
-      av.selectMilestone(ms);
-    }
-  }
-  
-  public void resetGlobalMilestoneChoice() {
-    LOGGER.debug("Resetting global milestone choice");
-    this.activeMS = null;
-  }
-  
-  public ObservableList<Progress> progressList(Group g) {
-    return EntityController.getInstance().getObservableProgress(g);
-  }
-  
-  
-  public Group getGroupByName(String name) {
-    for (Group g : EntityController.getInstance().groupList()) {
-      if (g.getName().equals(name)) {
-        return g;
-      }
-    }
-    return null;
-  }
   
   public void exportAllGroups() {
     throw new UnsupportedOperationException("Not implemented yet");
@@ -438,7 +389,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
       }
     }
     */
-    addGroupToMap(g, null);
+    addTab(g, false);
   }
   
   private void addGroupToMap(Group group, AssessmentView view) {
@@ -447,15 +398,15 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
       groupViewMap.put(group.getName(), view);
       if (activeMS != null) {
         LOGGER.trace(":addGroupToInternalStorage - Selecting activeMS: " + activeMS.getName());
-        view.selectMilestone(activeMS);
+        
       }
     } else {
       if (activeMS != null) {
         LOGGER.trace(":addGroupToMap - Creating AV with pre-set MS: " + activeMS.getName());
-        groupViewMap.put(group.getName(), new AssessmentView(this, group, activeMS));
+        
       } else {
         LOGGER.trace(":addGroupToMap - Creating AV without pre-set MS");
-        groupViewMap.put(group.getName(), new AssessmentView(this, group));
+        
       }
     }
     addTab(group, false);
@@ -472,22 +423,21 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   private void addTab(Group active, boolean fresh) {
+    AssessmentView av = assessmentViewMap.get(active);
+    if(av == null){
+      av = createAssessmentView(active);
+    }
     if (evaluator.isGroupTabbed(active)) {
       // Do not open another tab for already tabbed group.
     } else {
-      evaluator.addGroupTab(groupViewMap.get(active.getName()), fresh);
+      
+      evaluator.addGroupTab(av, fresh);
     }
-    evaluator.setActiveTab(active.getName());
+    evaluator.setActiveTab(active);
   }
   
-  private void assemble(Group g) {
-    AssessmentView v = groupViewMap.get(g.getName());
-    LOGGER.trace(":assemble");
-    LOGGER.entry(g);
-    g.setProgressList(v.getProgressListForSaving(true)); // TODO not trimming on export?
-    LOGGER.debug("Set progress list");
-    g.setProgressSummaryList(v.getSummaries());
-    LOGGER.debug("Set summaries");
-    g.setVersion(Version.getInstance().getVersion());
+  private AssessmentView createAssessmentView(Group group) {
+    return new AssessmentView(group);
   }
+  
 }

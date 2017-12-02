@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Creates entities that are linked with each other.
@@ -303,10 +305,25 @@ public class EntityFactory {
     group.setCourse(course);
   }
   
-  ProgressSummary createProgressSummary(Milestone ms) {
+  public List<ProgressSummary> createProgressSummaries() {
+    ensureCatalogueSet("Create ProgressSummary List");
+    return catalogue.getMilestones().stream().map(this::createProgressSummary).collect(Collectors.toList());
+  }
+  
+  private ProgressSummary createProgressSummary(Milestone ms) {
     ProgressSummary ps = new ProgressSummary();
     ps.setMilestoneUUID(ms.getUuid());
     return ps;
+  }
+  
+  public List<Progress> createProgressList(){
+    return catalogue.getRequirements().stream().map(this::createProgressFor).collect(Collectors.toList());
+  }
+  
+  private Progress createProgressFor(Requirement requirement){
+    Progress p = new Progress();
+    p.setRequirementUUID(requirement.getUuid());
+    return p;
   }
   
   /**

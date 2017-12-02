@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -126,6 +127,17 @@ public class EntityController {
     return summaryGroupMap.get(g.getUuid());
   }
   
+  public List<ProgressSummary> createProgressSummaries() {
+    return entityFactory.createProgressSummaries();
+  }
+  
+  public ObservableList<Progress> getObservableProgressOf(@NotNull Group group, @NotNull ProgressSummary progressSummary) {
+    LOGGER.debug("ObservableProgressOf {} @ {}", group, progressSummary);
+    GroupAnalyser analyser = getGroupAnalyser(group);
+    ObservableList<Progress> list = FXCollections.observableList(analyser.getProgressFor(progressSummary) );
+    return list;
+  }
+  
   private void setupObservableCatalogueLists(){
     observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
     observableMilestones = FXCollections.observableArrayList();
@@ -174,7 +186,10 @@ public class EntityController {
   public Group createGroup(String name, Member... members){
     Group g = entityFactory.createGroup(name, members);
     entityFactory.link(g, getCourse());
+    g.setProgressSummaryList(entityFactory.createProgressSummaries());
+    g.setProgressList(entityFactory.createProgressList());
     addGroup(g);
+    LOGGER.debug("Created {}", g);
     return g;
   }
   

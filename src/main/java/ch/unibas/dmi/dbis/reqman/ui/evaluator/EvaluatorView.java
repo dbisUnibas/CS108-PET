@@ -17,6 +17,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.UUID;
 
 /**
  * TODO: Write JavaDoc
@@ -37,6 +38,7 @@ public class EvaluatorView extends HBox implements TitleProvider {
   private GroupListView groupView;
   private CourseInfoView courseView;
   private HashMap<String, Tab> legacyGroupTabMap = new HashMap<>();
+  private HashMap<UUID, Tab> groupTapMap = new HashMap<>();
   
   public EvaluatorView(EvaluatorHandler handler) {
     super();
@@ -64,13 +66,13 @@ public class EvaluatorView extends HBox implements TitleProvider {
   public void addGroupTab(AssessmentView view, boolean fresh) {
     Tab tab = new Tab();
     
-    tab.setUserData(view.getActiveGroup().getName());
+    tab.setUserData(view.getActiveGroup());
     tab.setText(view.getActiveGroup().getName());
     view.bindToParentSize(rightContent);
     tab.setContent(view);
     tabPane.getTabs().addAll(tab);
     
-    legacyGroupTabMap.put(view.getActiveGroup().getName(), tab);
+    groupTapMap.put(view.getActiveGroup().getUuid(), tab);
     if (fresh) {
       markDirty(view.getActiveGroup());
     }
@@ -101,23 +103,9 @@ public class EvaluatorView extends HBox implements TitleProvider {
     return tab.getStyleClass().contains("modified");
   }
   
-  public void setActiveTab(AssessmentView assessmentView) {
-    setActiveTab(assessmentView.getActiveGroup().getName());
-  }
-  
-  public void setActiveTab(String name) {
-    LOGGER.trace(":setActiveTab");
-    LOGGER.entry(name);
-    Tab toActive = legacyGroupTabMap.get(name);
+  public void setActiveTab(Group group){
+    Tab toActive = groupTapMap.get(group.getUuid());
     tabPane.getSelectionModel().select(toActive);
-  }
-  
-  public Group getActiveGroup() {
-    Tab tab = tabPane.getSelectionModel().getSelectedItem();
-    if (tab.getUserData() instanceof String) {
-      return handler.getGroupByName((String) tab.getUserData());
-    }
-    return null;
   }
   
   public void removeTab(Group g) {

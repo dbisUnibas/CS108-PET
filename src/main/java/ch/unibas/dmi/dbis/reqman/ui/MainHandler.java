@@ -296,7 +296,6 @@ public class MainHandler implements MenuHandler {
   public void handleShowEvaluator(ActionEvent event) {
     if (mainScene.isEditorActive()) {
       mainScene.setActive(MainScene.Mode.EVALUATOR);
-      evaluatorHandler.reloadRequirements();
     }
     
   }
@@ -331,7 +330,7 @@ public class MainHandler implements MenuHandler {
   public void resetGlobalMilestoneChoice() {
     if (mainScene.isEvaluatorActive()) {
       if (evaluatorHandler.isGroupLoaded()) {
-        evaluatorHandler.resetGlobalMilestoneChoice();
+        LOGGER.debug("Resetting global milestone choice");
       }
     }
   }
@@ -340,7 +339,7 @@ public class MainHandler implements MenuHandler {
   public void setGlobalMilestoneChoice(Milestone ms) {
     LOGGER.traceEntry();
     if (mainScene.isEvaluatorActive()) {
-      evaluatorHandler.setGlobalMilestoneChoice(ms);
+      LOGGER.debug("Setting global milestone to {}", ms);
     }
     
   }

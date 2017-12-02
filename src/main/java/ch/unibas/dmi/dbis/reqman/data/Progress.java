@@ -12,9 +12,13 @@ import java.util.UUID;
  */
 public class Progress {
   
+  @Deprecated
   public static final double NO_POINTS = -999;
+  
+  public static final double NO_PROGRESS = -1d;
+  
   private final UUID uuid;
-  private double fraction = -1d;
+  private double fraction = NO_PROGRESS;
   private UUID requirementUUID;
   private Date assessmentDate = null;
   private UUID progressSummaryUUID;
@@ -156,6 +160,16 @@ public class Progress {
     } else {
       percentage = points / max;
     }
+  }
+  
+  /**
+   * Returns whether this progress was freshly created.
+   * A non-freshly created progress was either loaded from a group file
+   * or was modified by a user.
+   * @return Whether this progress was freshly created. Then it returns {@code true}, {@code false} otherwise.
+   */
+  public boolean isFresh(){
+    return fraction == NO_PROGRESS;
   }
   
   @Deprecated

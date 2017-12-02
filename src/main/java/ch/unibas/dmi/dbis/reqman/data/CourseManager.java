@@ -1,7 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 
 /**
  * TODO: write JavaDoc
@@ -59,5 +61,11 @@ public class CourseManager implements Comparator<Milestone> {
   @Override
   public int compare(Milestone o1, Milestone o2) {
     return getMilestoneDate(o1).compareTo(getMilestoneDate(o2));
+  }
+  
+  public Milestone getFirstMilestone() {
+    List<Milestone> milestones = new ArrayList<>(catalogue.getMilestones());
+    milestones.sort(this);
+    return milestones.get(0);
   }
 }
