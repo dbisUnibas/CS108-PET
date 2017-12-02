@@ -4,7 +4,6 @@ import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Group;
-import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Progress;
 import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
@@ -63,10 +62,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     layoutComponents();
     
     loadGroup();
-    Milestone firstMS = EntityController.getInstance().getCourseManager().getFirstMilestone();
-    displayProgressViews(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(firstMS));
+    //Milestone firstMS = EntityController.getInstance().getCourseManager().getFirstMilestone();
+    //displayProgressViews(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(firstMS));
+    summaryCb.getSelectionModel().selectFirst();
   }
-  
   
   @Override
   public void pointsChanged(double newValue) {
@@ -149,9 +148,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     scrollPane.setContent(content);
     setCenter(scrollPane);
-    
+    Utils.applyDefaultSpacing(footerContainer);
     footerContainer.setAlignment(Pos.CENTER_RIGHT);
-    footerContainer.getChildren().addAll(maxPointLbl, pointsLbl, sumLbl);
+    footerContainer.getChildren().addAll(sumLbl,pointsLbl,maxPointLbl);
     setBottom(footerContainer);
     
   }
@@ -162,7 +161,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     activeProgressViews.clear();
     for(Progress p : progressList){
-      activeProgressViews.add( new ProgressView(p));
+      activeProgressViews.add( new ProgressView(p, progressSummary));
     }
     
     for(ProgressView pv : activeProgressViews){

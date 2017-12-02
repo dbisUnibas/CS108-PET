@@ -196,8 +196,8 @@ public class EntityController {
   public void addGroup(Group g){
     observableGroups.add(g);
     addGroupAnalyser(g, new GroupAnalyser(getCourse(), getCatalogue(), g));
-    progressGroupMap.put(g.getUuid(), FXCollections.observableArrayList(g.getProgressList()));
-    summaryGroupMap.put(g.getUuid(), FXCollections.observableArrayList(g.getProgressSummaries()));
+    progressGroupMap.put(g.getUuid(), FXCollections.observableList(g.getProgressList()));
+    summaryGroupMap.put(g.getUuid(), FXCollections.observableList(g.getProgressSummaries()));
   }
   
   public void removeGroup(Group g){

@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Progress;
+import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.event.ActionEvent;
@@ -96,6 +97,7 @@ public class ProgressView extends VBox {
   /* === Model / Controller === */
   private Progress progress;
   private Requirement requirement;
+  private ProgressSummary progressSummary;
   
   // Todo Check what to do
   private List<PointsChangeListener> listeners = new ArrayList<>();
@@ -106,9 +108,10 @@ public class ProgressView extends VBox {
    * Creates a new ProgressView and ints all
    * @param progress
    */
-  public ProgressView(Progress progress) {
+  public ProgressView(Progress progress, ProgressSummary progressSummary) {
     this();
     this.progress = progress;
+    this.progressSummary = progressSummary;
     this.requirement = EntityController.getInstance().getCatalogueAnalyser().getRequirementById(progress.getRequirementUUID());
     initComponents();
     layoutComponents();
@@ -382,7 +385,10 @@ public class ProgressView extends VBox {
   
   private void processAssessment(){
     progress.setAssessmentDate(new Date() );
+    progress.setProgressSummaryUUID(progressSummary.getUuid());
+    LOGGER.debug("Processing assessment: {}",progress);
     updatePointsDisplay();
+    notifyPointsListener();
   }
   
   

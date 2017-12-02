@@ -29,7 +29,7 @@ public class GroupAnalyser {
   }
   
   public List<Progress> getProgressFor(ProgressSummary summary) {
-    return group.getProgressList().stream().filter(p -> matchesProgressSummary(p, summary)).collect(Collectors.toList());
+    return group.getProgressList().stream().filter(p -> matchesProgressMilestone(p, summary)).collect(Collectors.toList());
   }
   
   public double getActualPoints(Progress progress) {
@@ -116,12 +116,23 @@ public class GroupAnalyser {
   }
   
   public double getSumFor(ProgressSummary ps){
-    return getProgressFor(ps).stream().mapToDouble(this::getActualPoints).sum();
+    return getProgressForProgressSummary(ps).stream().mapToDouble(this::getActualPoints).sum();
   }
   
-  boolean matchesProgressSummary(Progress p, ProgressSummary ps) {
+  public List<Progress> getProgressForProgressSummary(ProgressSummary ps){
+    return group.getProgressList().stream().filter( p -> matchesProgressSummary(p, ps)).collect(Collectors.toList());
+  }
+  
+  boolean matchesProgressMilestone(Progress p, ProgressSummary ps) {
     Requirement req = getRequirementOf(p);
     Milestone ms = catalogueAnalyser.getMilestoneOf(ps);
     return catalogueAnalyser.matchesMilestone(req, ms);
+  }
+  
+  boolean matchesProgressSummary(Progress p, ProgressSummary ps){
+    if(p.getProgressSummaryUUID() == null){
+      return false; // Then the case, if the progress was not yet assessed
+    }
+    return p.getProgressSummaryUUID().equals(ps.getUuid());
   }
 }
