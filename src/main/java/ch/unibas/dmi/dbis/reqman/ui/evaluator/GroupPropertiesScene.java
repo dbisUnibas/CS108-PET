@@ -88,6 +88,9 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
       if (StringUtils.isNotEmpty(tfExportFileName.getText())) {
         group.setExportFileName(tfExportFileName.getText());
       }
+      if(StringUtils.isNotBlank(projectName)){
+        group.setProjectName(projectName);
+      }
       dismiss();
     } else {
       String msg = "";
