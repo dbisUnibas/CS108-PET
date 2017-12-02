@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.analysis;
 
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.data.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -164,5 +165,30 @@ public class CatalogueAnalyser {
   
   private Comparator<Milestone> getMilestoneDateComparator() {
     return Comparator.comparing(courseManager::getMilestoneDate);
+  }
+  
+  public double getActualPoints(@NotNull Progress progress) {
+    Requirement r = getRequirementOf(progress);
+    if(r == null){
+      throw new IllegalArgumentException("No such requirement "+progress.getRequirementUUID());
+    }else{
+      switch(r.getType()){
+        case REGULAR:
+        case BONUS:
+          return progress.getFraction() * r.getMaxPoints();
+        case MALUS:
+          return -1 * progress.getFraction() * r.getMaxPoints();
+      }
+    }
+    return Double.NaN; // unreachable?
+  }
+  
+  public Requirement getRequirementOf(@NotNull Progress progress) {
+    for (Requirement r : catalogue.getRequirements()) {
+      if (r.getUuid().equals(progress.getRequirementUUID())) {
+        return r;
+      }
+    }
+    return null;
   }
 }

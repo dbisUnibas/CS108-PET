@@ -123,7 +123,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     scrollPane = new ScrollPane();
     footerContainer = new HBox();
     sumLbl = new Label("Points:");
-    pointsLbl = new Label();
+    pointsLbl = new Label("0");
     maxPointLbl = new Label(POINTS_MAX_POINTS_SEPARATOR+StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum()));
   }
   

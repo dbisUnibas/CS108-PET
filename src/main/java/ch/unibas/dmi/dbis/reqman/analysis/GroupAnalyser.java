@@ -33,28 +33,11 @@ public class GroupAnalyser {
   }
   
   public double getActualPoints(Progress progress) {
-    Requirement r = getRequirementOf(progress);
-    if(r == null){
-      throw new IllegalArgumentException("No such requirement "+progress.getRequirementUUID());
-    }else{
-      switch(r.getType()){
-        case REGULAR:
-        case BONUS:
-          return progress.getFraction() * r.getMaxPoints();
-        case MALUS:
-          return -1 * progress.getFraction() * r.getMaxPoints();
-      }
-    }
-    return Double.NaN; // unreachable?
+    return catalogueAnalyser.getActualPoints(progress);
   }
   
   public Requirement getRequirementOf(@NotNull  Progress progress) {
-    for (Requirement r : catalogue.getRequirements()) {
-      if (r.getUuid().equals(progress.getRequirementUUID())) {
-        return r;
-      }
-    }
-    return null;
+    return catalogueAnalyser.getRequirementOf(progress);
   }
   
   public Progress getProgressFor(@NotNull Requirement requirement){

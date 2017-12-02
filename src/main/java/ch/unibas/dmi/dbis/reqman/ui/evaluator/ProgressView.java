@@ -177,9 +177,10 @@ public class ProgressView extends VBox {
           yesBtn.setToggleGroup(toggleGroup);
           noBtn = new RadioButton("No");
           noBtn.setToggleGroup(toggleGroup);
-          points = new Label();
+          points = new Label("0");
         } else {
           spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1d);
+          spinnerPoints.getEditor().setPrefColumnCount(StringUtils.prettyPrint(requirement.getMaxPoints()).length()+4);
           spinnerPoints.setEditable(true);
         }
         break;
@@ -187,7 +188,7 @@ public class ProgressView extends VBox {
       case MALUS:
         type = new Label(requirement.getType().toString());
         check = new CheckBox();
-        points = new Label();
+        points = new Label("0");
         break;
     }
   }
@@ -243,6 +244,7 @@ public class ProgressView extends VBox {
   }
   
   private void layoutAssessmentComponents() {
+    Utils.applyDefaultSpacing(assessmentWrapper);
     switch(requirement.getType()){
       case REGULAR:
         if(requirement.isBinary() ){
@@ -307,6 +309,7 @@ public class ProgressView extends VBox {
           spinnerPoints.valueProperty().addListener((observable, oldValue, newValue) -> {
             if (Double.compare(oldValue, newValue) != 0) { // Only if really new value
               progress.setFraction(newValue / requirement.getMaxPoints());
+              processAssessment();
             }
           });
         }
@@ -316,6 +319,15 @@ public class ProgressView extends VBox {
         check.setOnAction(this::handleCheck);
         break;
     }
+    
+  }
+  
+  private void updatePointsDisplay() {
+    // Only update point display, if in non-spinner environment
+    if(points != null){
+      points.setText(StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getActualPoints(progress)));
+    }
+    
   }
   
   private void handleYesNo(ActionEvent event){
@@ -370,6 +382,7 @@ public class ProgressView extends VBox {
   
   private void processAssessment(){
     progress.setAssessmentDate(new Date() );
+    updatePointsDisplay();
   }
   
   
