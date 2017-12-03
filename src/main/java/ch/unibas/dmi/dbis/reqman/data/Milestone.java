@@ -25,7 +25,7 @@ public class Milestone {
   /**
    * @deprecated Since SNAPSHOT-2.0.0: Repalced by reference to time
    */
-  @Deprecated
+  @Deprecated  @JsonIgnore
   private Date date;
   
   public Milestone() {
