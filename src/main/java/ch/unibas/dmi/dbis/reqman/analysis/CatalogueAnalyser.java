@@ -93,6 +93,10 @@ public class CatalogueAnalyser {
     return getRequirementsFor(ms).stream().filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
+  public double getMaximalRegularSumFor(ProgressSummary ps){
+    return getMaximalRegularSumFor(getMilestoneOf(ps));
+  }
+  
   /**
    * Returns the maximal sum of all bonus requirements.
    * In other words, the resulting sum is the maximal available bonus points to get.

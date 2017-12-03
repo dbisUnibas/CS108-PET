@@ -159,6 +159,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     detachProgressViews();
     ObservableList<Progress> progressList = EntityController.getInstance().getObservableProgressOf(group, progressSummary);
     
+    double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(progressSummary);
+    maxPointLbl.setText(POINTS_MAX_POINTS_SEPARATOR+StringUtils.prettyPrint(sum));
+    
     activeProgressViews.clear();
     for(Progress p : progressList){
       activeProgressViews.add( new ProgressView(p, progressSummary));

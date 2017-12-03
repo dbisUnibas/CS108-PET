@@ -309,6 +309,7 @@ public class EntityController {
         //OperationFactory.createSaveCatalogueOperation(getCatalogue(), null).start();
         try {
           storageManager.saveCatalogue(getCatalogue());
+          storageManager.saveCourse(getCourse()); // because times could have been added
         } catch (IOException e) {
           LOGGER.catching(e);
           // TODO What to do
