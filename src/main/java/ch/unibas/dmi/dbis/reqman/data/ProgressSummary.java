@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.UUID;
 
 /**
@@ -13,6 +15,7 @@ public class ProgressSummary {
   private UUID milestoneUUID;
   
   @Deprecated
+  @JsonIgnore
   private int milestoneOrdinal;
   
   private String internalComment;

@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -18,6 +20,7 @@ public class Milestone {
    * @deprecated Since SNAPSHOT-2.0.0: Replaced by Time's natural ordering
    */
   @Deprecated
+  @JsonIgnore
   private int ordinal = 0;
   /**
    * @deprecated Since SNAPSHOT-2.0.0: Repalced by reference to time

@@ -71,6 +71,7 @@ public class Group extends VersionedEntity implements Comparable<Group> {
    * @deprecated Got replaced by {@link Group#members}
    */
   @Deprecated
+  @JsonIgnore
   private List<String> legacyMembers;
   /**
    * The reference name of the catalogue this group tracks the progress of
@@ -78,6 +79,7 @@ public class Group extends VersionedEntity implements Comparable<Group> {
    * @deprecated Got replaced by Group{@link #courseUuid}
    */
   @Deprecated
+  @JsonIgnore
   private String catalogueName;
   /**
    * The list of {@link Progress} of this group.

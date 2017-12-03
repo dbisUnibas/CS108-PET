@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
-import ch.unibas.dmi.dbis.reqman.common.NamedEntity;
 import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -26,6 +25,7 @@ public class Catalogue extends VersionedEntity{
   /**
    * @deprecated Replaced by {@link Course#getName()}
    */
+  @JsonIgnore
   @Deprecated
   private String lecture;
   private String name;
@@ -33,6 +33,7 @@ public class Catalogue extends VersionedEntity{
   /**
    * @deprecated Replaced by {@link Course#getSemester()}
    */
+  @JsonIgnore
   @Deprecated
   private String semester;
   

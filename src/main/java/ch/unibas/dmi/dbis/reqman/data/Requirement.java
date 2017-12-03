@@ -57,7 +57,7 @@ public class Requirement {
   /**
    * A list of predecessor requirement names this requirement depends on.
    */
-  @Deprecated
+  @Deprecated @JsonIgnore
   private List<String> predecessorNames = new Vector<>();
   /**
    * A map of key-value-pairs related to export this requirement
@@ -73,30 +73,15 @@ public class Requirement {
    *
    * @deprecated Since SNAPSHOT-2.0.0: UUIDs were introduced for cross-references
    */
-  @Deprecated
+  @Deprecated @JsonIgnore
   private int minMilestoneOrdinal;
   /**
    * The maximal milestone ordinal this requirement must be met
    *
    * @deprecated Since SNAPSHOT-2.0.0: UUIDs were introduced for cross-references
    */
-  @Deprecated
+  @Deprecated @JsonIgnore
   private int maxMilestoneOrdinal;
-  /**
-   * Whether this requirement is mandatory or not.
-   *
-   * @deprecated Since SNAPSHOT-2.0.0: The requirement type was introduced
-   */
-  @Deprecated
-  private boolean mandatory;
-  /**
-   * Whether this requirement has a malus role or not.
-   * So to speak if maxPoints is negative or not.
-   *
-   * @deprecated Since SNAPSHOT-2.0.0: The requirement type was introduced
-   */
-  @Deprecated
-  private boolean malus;
   
   /**
    * The default constructor for a requirement.
@@ -128,8 +113,6 @@ public class Requirement {
     this.maxMilestoneOrdinal = maxMilestoneOrdinal;
     this.maxPoints = maxPoints;
     this.binary = binary;
-    this.mandatory = mandatory;
-    this.malus = malus;
   }
   
   @Deprecated
@@ -255,22 +238,22 @@ public class Requirement {
     this.description = description;
   }
   
-  @Deprecated
+  @Deprecated @JsonIgnore
   public int getMinMilestoneOrdinal() {
     return minMilestoneOrdinal;
   }
   
-  @Deprecated
+  @Deprecated @JsonIgnore
   public void setMinMilestoneOrdinal(int minMilestoneOrdinal) {
     this.minMilestoneOrdinal = minMilestoneOrdinal;
   }
   
-  @Deprecated
+  @Deprecated @JsonIgnore
   public int getMaxMilestoneOrdinal() {
     return maxMilestoneOrdinal;
   }
   
-  @Deprecated
+  @Deprecated @JsonIgnore
   public void setMaxMilestoneOrdinal(int maxMilestoneOrdinal) {
     this.maxMilestoneOrdinal = maxMilestoneOrdinal;
   }
@@ -291,22 +274,22 @@ public class Requirement {
     this.binary = binary;
   }
   
+  @JsonIgnore
   public boolean isMandatory() {
     return type.equals(Type.REGULAR);
   }
   
-  @Deprecated
+  @Deprecated @JsonIgnore
   public void setMandatory(boolean mandatory) {
-    this.mandatory = mandatory;
   }
   
+  @JsonIgnore
   public boolean isMalus() {
     return type.equals(Type.MALUS);
   }
   
-  @Deprecated
+  @Deprecated @JsonIgnore
   public void setMalus(boolean malus) {
-    this.malus = malus;
   }
   
   public String removeProperty(String key) {
@@ -350,7 +333,7 @@ public class Requirement {
     return predecessors.add(requirement.getUuid());
   }
   
-  public boolean removePRedecessor(Requirement requirement) {
+  public boolean removePredecessor(Requirement requirement) {
     return predecessors.remove(requirement.getUuid());
   }
   
