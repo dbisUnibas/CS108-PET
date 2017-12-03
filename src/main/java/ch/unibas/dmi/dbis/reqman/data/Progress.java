@@ -173,6 +173,7 @@ public class Progress {
     return fraction == NO_PROGRESS;
   }
   
+  
   @Deprecated
   @JsonIgnore
   public double getPointsSensitive(Catalogue catalogue) {
@@ -181,10 +182,9 @@ public class Progress {
     return factor * r.getMaxPoints();
   }
   
-  @Deprecated
   @JsonIgnore
   public boolean hasProgress() {
-    return percentage > 0;
+    return fraction > 0;
   }
   
   @Deprecated

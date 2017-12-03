@@ -78,7 +78,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     prefHeightProperty().bind(parent.heightProperty());
     scrollPane.prefWidthProperty().bind(widthProperty());
     scrollPane.prefHeightProperty().bind(heightProperty());
-    bindContent();
+    //bindContent();
+    scrollPane.setFitToWidth(true);
   }
   
   private void updateSumDisplay() {

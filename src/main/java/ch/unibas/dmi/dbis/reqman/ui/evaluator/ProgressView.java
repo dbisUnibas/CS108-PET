@@ -8,12 +8,11 @@ import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -240,6 +239,7 @@ public class ProgressView extends VBox {
     collapsibleContainer.add(commentLbl, 0, 2);
     collapsibleContainer.add(taComment, 1, 2, 3, 1);
     setCollapsible(collapsibleContainer);
+    setBorder(new Border(new BorderStroke(Color.SILVER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
   }
   
   public void setCollapsible(Node node) {
@@ -248,6 +248,7 @@ public class ProgressView extends VBox {
   
   private void layoutAssessmentComponents() {
     Utils.applyDefaultSpacing(assessmentWrapper);
+    assessmentContainer.setAlignment(Pos.CENTER_RIGHT);
     switch(requirement.getType()){
       case REGULAR:
         if(requirement.isBinary() ){
@@ -263,6 +264,7 @@ public class ProgressView extends VBox {
     }
     assessmentContainer.addRow(0,assessmentWrapper);
     assessmentContainer.addRow(1, categoryLbl, category);
+    assessmentContainer.prefWidthProperty().bind(widthProperty().multiply(0.4));
   }
   
   private void initCollapsibleView() {
@@ -393,7 +395,25 @@ public class ProgressView extends VBox {
   
   
   private void loadProgress() {
-  
+    if(progress != null && !progress.isFresh()){
+      switch(requirement.getType()){
+        case REGULAR:
+          if(requirement.isBinary()){
+            boolean prog = progress.hasProgress();
+            yesBtn.setSelected(prog);
+            noBtn.setSelected(!prog);
+          }else{
+            spinnerPoints.getValueFactory().setValue(progress.getFraction() * requirement.getMaxPoints());
+          }
+          break;
+        case BONUS:
+        case MALUS:
+          boolean prog = progress.hasProgress();
+          check.setSelected(prog);
+          break;
+      }
+      taComment.setText(progress.getComment());
+    }
   }
   
   
