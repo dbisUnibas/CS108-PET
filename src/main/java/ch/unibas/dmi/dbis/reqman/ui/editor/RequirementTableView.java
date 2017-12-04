@@ -279,8 +279,8 @@ public class RequirementTableView extends BorderPane {
     typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
   
     TableColumn<ObservableRequirement, String> categoryColumn = new TableColumn<>("Category");
-    typeColumn.setCellValueFactory(c -> c.getValue().categoryProperty());
-    typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+    categoryColumn.setCellValueFactory(c -> c.getValue().categoryProperty());
+    categoryColumn.setCellFactory(TextFieldTableCell.forTableColumn());
     
     
     table.getColumns().addAll(nameColumn, pointsColumn, minMSColumn, maxMSColumn, typeColumn, categoryColumn);
