@@ -102,6 +102,8 @@ public class ProgressView extends VBox {
   private List<PointsChangeListener> listeners = new ArrayList<>();
   private List<DirtyListener> dirtyListeners = new ArrayList<>();
   
+  // TODO Add last modified timestamp display
+  
   
   /**
    * Creates a new ProgressView and ints all
