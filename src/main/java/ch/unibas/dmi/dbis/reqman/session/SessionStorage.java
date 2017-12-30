@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.session;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -10,6 +12,7 @@ import java.util.function.Function;
  *
  * @author loris.sauter
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SessionStorage {
   
   private Date date;
