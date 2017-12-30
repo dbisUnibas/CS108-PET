@@ -2,7 +2,10 @@ package ch.unibas.dmi.dbis.reqman.control;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
+import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.data.*;
+import ch.unibas.dmi.dbis.reqman.session.SessionManager;
+import ch.unibas.dmi.dbis.reqman.session.SessionStorage;
 import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
 import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import javafx.collections.FXCollections;
@@ -47,6 +50,8 @@ public class EntityController {
   
   private StorageManager storageManager;
   
+  private SessionManager sessionManager;
+  
   private HashMap<UUID, GroupAnalyser> groupAnalyserMap = new HashMap<>();
   private ObservableList<Group> observableGroups = FXCollections.observableArrayList();
   private HashMap<UUID, ObservableList<Progress>> progressGroupMap = new HashMap<>();
@@ -56,6 +61,8 @@ public class EntityController {
   
   
   private EntityController() {
+    sessionManager = new SessionManager();
+    loadSession();
   }
   
   public static EntityController getInstance() {
@@ -350,5 +357,34 @@ public class EntityController {
     }
     setupObservableCatalogueLists();
     loadedCatalogue();
+  }
+  
+  public void loadSession(){
+    if(sessionManager.hasSession() ){
+      sessionManager.loadSession();
+      SessionStorage session = sessionManager.getSessionStorage();
+      LOGGER.info("Loaded session {}", session);
+      if(storageManager != null){
+        storageManager.setSaveDir(new File(session.getLastUsedDir()));
+      }else{
+        storageManager = StorageManager.getInstance(new File(session.getLastUsedDir()));
+      }
+    }else{
+      LOGGER.info("No session available");
+    }
+  }
+  
+  public void saveSession() throws IOException{
+    if(storageManager != null){
+      LOGGER.info("Storing session...");
+      SessionStorage session = new SessionStorage();
+      session.setDate(new Date() );
+      session.setVersion(Version.getInstance().getVersion());
+      session.setLastUsedDir(storageManager.getSaveDir().getAbsolutePath());
+      sessionManager.storeSession(session);
+      LOGGER.info("Stored session {}",session);
+    }else{
+      LOGGER.info("No StorageManager found, not writing a sesison");
+    }
   }
 }

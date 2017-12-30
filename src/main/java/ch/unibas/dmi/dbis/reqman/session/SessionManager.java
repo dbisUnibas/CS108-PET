@@ -1,11 +1,13 @@
 package ch.unibas.dmi.dbis.reqman.session;
 
 import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -87,16 +89,35 @@ public class SessionManager {
   /**
    * Stores the given session file.
    * The location is a file named {@link #SESSION_FILE_NAME} in a folder named {@link #REQMAN_DIRECTORY} in the user's home directory.
+   * If the application is unable to create that directory, it writes the file named {@link #SESSION_FILE_NAME} to the user's home directory.
    * @param session
    */
   public boolean storeSession(SessionStorage session){
     Path location = Paths.get(System.getProperty("user.home"), REQMAN_DIRECTORY, SESSION_FILE_NAME);
+    if(!makeReqManDirIfNotExistent() ){
+      location = Paths.get(System.getProperty("user.home"), SESSION_FILE_NAME);
+    }
     try {
       JSONUtils.writeToJSONFile(session, location.toFile());
       return true;
     } catch (IOException e) {
       LOGGER.warn("Couldn't write session to {} for reason {}", location, e);
       return false;
+    }
+  }
+  
+  private boolean makeReqManDirIfNotExistent(){
+    Path loc = Paths.get(System.getProperty("user.home"), REQMAN_DIRECTORY);
+    if(!Files.isDirectory(loc)){
+      try {
+        Files.createDirectory(loc);
+        return true;
+      } catch (IOException e) {
+        LOGGER.catching(Level.ERROR, e);
+        return false;
+      }
+    }else{
+      return  true;
     }
   }
   

@@ -137,4 +137,15 @@ public class SessionStorage {
   public void replaceAllData(BiFunction<? super String, ? super String, ? extends String> function) {
     data.replaceAll(function);
   }
+  
+  @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("SessionStorage{");
+    sb.append("date=").append(date);
+    sb.append(", version='").append(version).append('\'');
+    sb.append(", lastUsedDir='").append(lastUsedDir).append('\'');
+    sb.append(", data=").append(data);
+    sb.append('}');
+    return sb.toString();
+  }
 }

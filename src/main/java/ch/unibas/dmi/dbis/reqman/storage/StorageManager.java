@@ -239,6 +239,7 @@ public class StorageManager {
   }
   
   public void setSaveDir(File saveDir) {
+    LOGGER.debug("Set savedir to {}", saveDir);
     this.dir = saveDir;
   }
   

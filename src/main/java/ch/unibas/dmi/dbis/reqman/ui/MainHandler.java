@@ -12,6 +12,7 @@ import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.RadioMenuItem;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -397,6 +398,12 @@ public class MainHandler implements MenuHandler {
   
   void stop() {
     evaluatorHandler.stop();
+    try {
+      EntityController.getInstance().saveSession();
+    } catch (IOException e) {
+      LOGGER.warn("Couldn't store session for reason, {}", e);
+      LOGGER.catching(Level.WARN, e);
+    }
   }
   
   void checkGroupsPresent() {
