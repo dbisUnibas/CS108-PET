@@ -71,7 +71,7 @@ public class EvaluatorView extends HBox implements TitleProvider {
     view.bindToParentSize(rightContent);
     tab.setContent(view);
     tabPane.getTabs().addAll(tab);
-    
+    tab.setUserData(view.getActiveGroup().getUuid());
     groupTapMap.put(view.getActiveGroup().getUuid(), tab);
     if (fresh) {
       markDirty(view.getActiveGroup());
@@ -116,6 +116,18 @@ public class EvaluatorView extends HBox implements TitleProvider {
   
   public void refreshCourseInfoView() {
     courseView.refresh();
+  }
+  
+  public UUID getActiveGroupUUID() {
+    Tab tab = tabPane.getSelectionModel().getSelectedItem();
+    Object obj = tab.getUserData();
+    if(obj instanceof UUID){
+      UUID groupID = (UUID)obj;
+      return groupID;
+    }else{
+      LOGGER.error("A tab without group-id was found. This should not happen. Saving will probably not work!");
+      return null;
+    }
   }
   
   void enableAll() {

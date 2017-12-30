@@ -145,6 +145,49 @@ public class EntityController {
     return list;
   }
   
+  public void saveGroup(UUID groupUuid){
+    if(groupUuid != null){
+      LOGGER.debug("Progress-size: {}", getGroup(groupUuid).getProgressList().size());
+      if(storageManager != null){
+        try {
+          storageManager.saveGroup(groupUuid);
+        } catch (IOException e) {
+          LOGGER.catching(e);
+          // TODO WHat to do
+        }
+      }else{
+        throw LOGGER.throwing(new IllegalStateException("Cannot save group if no StorageManager is available"));
+      }
+    }
+  }
+  
+  private void attachProgress(Group g){
+    List<Progress> progressList = progressGroupMap.get(g.getUuid());
+    g.setProgressList(progressList);
+  }
+  
+  private void attachProgress(UUID groupUuid){
+    Group g = getGroup(groupUuid);
+    attachProgress(g);
+  }
+  
+  public void saveGroupAs(Group g) {
+    if (g != null) {
+      if (storageManager != null) {
+        LOGGER.debug("Saving group with name {}", g.getName());
+        try {
+          storageManager.saveGroup(g);
+          
+        } catch (IOException e) {
+          LOGGER.catching(e);
+          // TODO What to do
+        }
+      } else {
+        throw LOGGER.throwing(new IllegalStateException("Cannot save group as if no StorageManager is available"));
+      }
+    }
+  }
+  
   private void setupObservableCatalogueLists(){
     observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
     observableMilestones = FXCollections.observableArrayList();
@@ -193,7 +236,7 @@ public class EntityController {
   public Group createGroup(String name, Member... members){
     Group g = entityFactory.createGroup(name, members);
     entityFactory.link(g, getCourse());
-    g.setProgressSummaryList(entityFactory.createProgressSummaries());
+    g.setProgressSummaries(entityFactory.createProgressSummaries());
     g.setProgressList(entityFactory.createProgressList());
     addGroup(g);
     LOGGER.debug("Created {}", g);

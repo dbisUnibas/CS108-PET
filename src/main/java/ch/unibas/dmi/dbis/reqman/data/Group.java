@@ -81,6 +81,7 @@ public class Group extends VersionedEntity implements Comparable<Group> {
   @Deprecated
   @JsonIgnore
   private String catalogueName;
+  
   /**
    * The list of {@link Progress} of this group.
    */
@@ -262,7 +263,6 @@ public class Group extends VersionedEntity implements Comparable<Group> {
   /**
    * @param progressList
    */
-  @JsonIgnore
   public void setProgressList(List<Progress> progressList) {
     this.progressList.clear();
     this.progressList.addAll(progressList);
@@ -284,7 +284,7 @@ public class Group extends VersionedEntity implements Comparable<Group> {
     return progressSummaries.remove(progressSummary);
   }
   
-  public void setProgressSummaryList(List<ProgressSummary> progressSummaryList) {
+  public void setProgressSummaries(List<ProgressSummary> progressSummaryList) {
     this.progressSummaries.clear();
     this.progressSummaries.addAll(progressSummaryList);
   }

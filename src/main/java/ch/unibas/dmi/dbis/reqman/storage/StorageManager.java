@@ -207,6 +207,15 @@ public class StorageManager {
     }
   }
   
+  public boolean hasGroupSaveFile(UUID groupUuid){
+    for(SaveFile sf : groupSaveFileList){
+      if(groupUuid.equals( ((Group)sf.getEntity()).getUuid())){
+        return true;
+      }
+    }
+    return false;
+  }
+  
   
   private static List<String> getKnownExtensions(){
     ArrayList<String> list = new ArrayList<>();

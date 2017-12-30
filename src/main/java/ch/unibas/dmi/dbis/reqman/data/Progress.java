@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.Date;
 import java.util.UUID;
@@ -28,7 +27,7 @@ public class Progress {
   private String requirementName;
   @Deprecated @JsonIgnore
   private int milestoneOrdinal;
-  @Deprecated @JsonPropertyOrder
+  @Deprecated @JsonIgnore
   private double points = 0;
   @Deprecated @JsonIgnore
   private double percentage = -1d;

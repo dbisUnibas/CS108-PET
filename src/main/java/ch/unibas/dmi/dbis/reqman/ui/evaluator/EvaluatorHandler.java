@@ -11,9 +11,11 @@ import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.stage.DirectoryChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -198,31 +200,33 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   public void handleSaveGroup(ActionEvent actionEvent) {
-    throw new UnsupportedOperationException("Not implemented yet");
-    /*
-    Group active = evaluator.getActiveGroup();
-    if (manager.hasGroupFile(active)) {
-      assemble(active);
-      manager.saveGroup(active);
-    } else {
-      handleSaveGroupAs(actionEvent);
+    UUID groupID = evaluator.getActiveGroupUUID();
+    LOGGER.debug("Saving group with id {}", groupID);
+    if(EntityController.getInstance().getStorageManager().hasGroupSaveFile(groupID)){
+      EntityController.getInstance().saveGroup(groupID);
+      LOGGER.info("Saved group {}", groupID);
+    }else{
+      LOGGER.debug("No save file for group {} found. Using current save dir");
+      Group g = EntityController.getInstance().getGroup(groupID);
+      EntityController.getInstance().saveGroupAs(g);
+      LOGGER.info("Group {} saved.", g.getName());
     }
-    */
+    
   }
   
   public void handleSaveGroupAs(ActionEvent event) {
-    throw new UnsupportedOperationException("Not implemented yet");
-    /*
-    FileChooser fc = Utils.createGroupFileChooser("Save As");
-    if (manager.hasLastSaveLocation()) {
-      fc.setInitialDirectory(manager.getLastSaveLocation());
+    UUID groupID = evaluator.getActiveGroupUUID();
+    Group g = EntityController.getInstance().getGroup(groupID);
+    if(g == null){
+      LOGGER.error("Cannot save a null-group. Ignoring.");
+    }else{
+      LOGGER.debug("Saving group ({}) as...", g.getName());
+      DirectoryChooser dc = Utils.createDirectoryChooser("Save as");
+      File dir = dc.showDialog(evaluator.getScene().getWindow());
+      LOGGER.debug("Chosen dir={}", dir);
+      EntityController.getInstance().setupSaveDirectory(dir);
+      EntityController.getInstance().saveGroupAs(g);
     }
-    File f = fc.showSaveDialog(evaluator.getScene().getWindow());
-    if (f != null) {
-      assemble(evaluator.getActiveGroup());
-      manager.saveGroupAs(evaluator.getActiveGroup(), f);
-    }
-    */
   }
   
   
