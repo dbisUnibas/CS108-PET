@@ -14,7 +14,7 @@ public class Member {
    * The mandatory name of the person.
    * May only be the firstname, if the full name is not important
    */
-  private final String name;
+  private String name;
   /**
    * The first name of the person
    */
@@ -23,6 +23,10 @@ public class Member {
    * The email address of the person
    */
   private String email;
+  
+  public Member(){
+  
+  }
   
   /**
    * Creates a new {@link Member} by the given name

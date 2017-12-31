@@ -140,7 +140,7 @@ public class StorageManager {
     
     Group group = (Group) groupFile.getEntity();
     
-    Catalogue cat = openCatalogue(); // Checks if catalogue is matchin on its own.
+    Catalogue cat = getCatalogue(); // Checks if catalogue is matchin on its own.
     Course course = getCourse(); // Loaded / opened due call of openCatalogue()
     
     boolean matchingCourse = matchingUuid(group.getCourseUuid(), course.getUuid());
@@ -153,9 +153,6 @@ public class StorageManager {
       }else{
         ex = new UuidMismatchException(group.getCourseUuid(), course.getUuid());
       }
-      // Resetting the other opened files
-      catalogueSaveFile = null;
-      courseSaveFile=null;
       throw ex;
     }
     

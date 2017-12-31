@@ -221,7 +221,7 @@ public class EditorHandler implements EventHandler<CUDEvent> {
   }
   
   public void openCourse() {
-    LOGGER.debug("Open coruse");
+    LOGGER.debug("Open course");
     FileChooser fc = Utils.createFileChooser("Open Course");
     fc.getExtensionFilters().add(ReqmanFile.Type.COURSE.getExtensionFilter());
     

@@ -16,10 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * The {@link EntityController} controls all entities during a session.
@@ -176,6 +173,17 @@ public class EntityController {
         throw LOGGER.throwing(new IllegalStateException("Cannot save group as if no StorageManager is available"));
       }
     }
+  }
+  
+  public List<Group> openGroups(List<File> files) throws UuidMismatchException, IOException {
+    LOGGER.debug("Opening group files {}", files);
+    List<Group> groupList = new ArrayList<>();
+    for (File g : files) {
+      Group group = storageManager.openGroup(g);
+      addGroup(group);
+      groupList.add(group);
+    }
+    return groupList;
   }
   
   private void setupObservableCatalogueLists(){

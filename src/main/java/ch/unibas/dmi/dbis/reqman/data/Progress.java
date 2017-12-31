@@ -168,6 +168,7 @@ public class Progress {
    * or was modified by a user.
    * @return Whether this progress was freshly created. Then it returns {@code true}, {@code false} otherwise.
    */
+  @JsonIgnore
   public boolean isFresh(){
     return fraction == NO_PROGRESS;
   }

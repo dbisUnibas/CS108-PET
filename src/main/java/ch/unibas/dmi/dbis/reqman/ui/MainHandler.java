@@ -75,7 +75,13 @@ public class MainHandler implements MenuHandler {
   public void handleOpenCat(ActionEvent event) {
     if (EntityController.getInstance().hasCatalogue()) {
       LOGGER.warn("Cannot handle re-opening of catalogue. Silently ignoring");
-//      Utils.showErrorDialog("Cannot load another catalogue", "Currently (ReqMan v" + Version.getInstance().getVersion() + ") cannot switch catalgoues during runitme.\n Please save your work and restart the application. ");
+      /*
+      TODO:
+      * Reset EntityController
+      * All Handlers
+      * Save all open files
+      * perform open.
+       */
       return;
     }
     try {
@@ -94,24 +100,6 @@ public class MainHandler implements MenuHandler {
         event.consume();
         handleOpenCat(event);
       }
-      
-      // Currently not needed:
-      /*
-      FileChooser fc = Utils.createFileChooser("Open Catalogue");
-      fc.getExtensionFilters().add(ReqmanFile.Type.CATALOGUE.getExtensionFilter());
-      File f = fc.showOpenDialog(null);
-      if (f != null) {
-        if (mainScene.isEditorActive()) {
-          LOGGER.debug("Opening catalogue in editor");
-          // EDITOR
-          editorHandler.setupEditor();
-        } else {
-          // EVALUATOR
-          LOGGER.debug("Opening catalogue in evalautor");
-          evaluatorHandler.processCatalogueOpened(EntityController.getInstance().getCatalogue());
-        }
-      }*/
-      
     } catch (IllegalStateException ex) {
       LOGGER.catching(ex);
       Utils.showErrorDialog("Error on loading catalgoue", ex.getMessage());
@@ -130,11 +118,18 @@ public class MainHandler implements MenuHandler {
     if (mainScene.isEditorActive()) {
       handleShowEvaluator(event);
     }
-    evaluatorHandler.handleOpenGroups(event);
-    if (!evaluatorHandler.isGroupLoaded()) {
-      return;
+    if(EntityController.getInstance().hasCourse() ){
+      LOGGER.debug("Opening group(s) with course set...");
+      if(EntityController.getInstance().hasCatalogue()){
+        LOGGER.debug("... and catalogue set");
+        evaluatorHandler.handleOpenGroups(event);
+        manager.enableGroupNeeded();
+      }else{
+        // First open catalogue
+      }
+      // First open course, then catalogue
     }
-    manager.enableGroupNeeded();
+    LOGGER.debug("Opening performed");
   }
   
   @Override

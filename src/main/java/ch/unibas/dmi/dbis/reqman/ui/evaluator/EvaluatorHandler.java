@@ -5,6 +5,8 @@ import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.storage.ReqmanFile;
+import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
@@ -12,10 +14,12 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -166,37 +170,25 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     if (!EntityController.getInstance().hasCatalogue()) {
       return;
     }
-    throw new UnsupportedOperationException("Not implemented yet");
-    /*
-    FileChooser fc = Utils.createGroupFileChooser("Open");
-    if (manager.hasLastOpenLocation()) {
-      fc.setInitialDirectory(manager.getLastOpenLocation());
+    FileChooser fc = Utils.createFileChooser("Open Groups");
+    if(EntityController.getInstance().getStorageManager() != null && EntityController.getInstance().getStorageManager().getSaveDir() != null){
+      fc.setInitialDirectory(EntityController.getInstance().getStorageManager().getSaveDir());
     }
-    List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow());
-    if (files == null) {
-      return; // USER ABORT
-    }
-    if (files.size() == 1) {
-      if (!manager.isAnyGroupFilePresent(files).isEmpty()) {
-        Utils.showErrorDialog("Duplicate group files", "Cannot open a group twice");
+    fc.getExtensionFilters().add(ReqmanFile.Type.GROUP.getExtensionFilter());
+    List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow() );
+    if(files == null){
+      return; // user abort
+    }else{
+      List<Group> groups = null;
+      try {
+        groups = EntityController.getInstance().openGroups(files);
+      } catch (UuidMismatchException | IOException e) {
+        LOGGER.catching(e);
+        Utils.showErrorDialog("Exception while opening groups", "The following exception was caught:\n\t"+e.getMessage());
         return;
       }
-      manager.openGroup(files.get(0), (g) -> {
-        handleFirstGroupPresent();
-        loadGroupUI(g);
-      }, this::handleOpenGroupException);
-      
-    } else if (files.size() >= 2) {
-      List<File> dupes = manager.isAnyGroupFilePresent(files);
-      List<File> noDupes = new ArrayList<>(files);
-      noDupes.removeAll(dupes);
-      manager.openGroups(noDupes, (list) -> {
-        loadGroupUI(list);
-        handleFirstGroupPresent();
-      }, this::handleOpenGroupException);
+      groups.forEach(this::loadGroupUI);
     }
-    // USER ABORT
-    */
   }
   
   public void handleSaveGroup(ActionEvent actionEvent) {
