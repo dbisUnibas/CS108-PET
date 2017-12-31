@@ -27,6 +27,8 @@ import java.io.IOException;
 public class MainHandler implements MenuHandler {
   
   private static final Logger LOGGER = LogManager.getLogger(MainHandler.class);
+  public static final String EXPORT_DISABLED_REASON = "The export feature is currently being re-written.\n" +
+      "In particular, the complete export language is subject to change.";
   
   private static MainHandler instance = null;
   private final EvaluatorHandler evaluatorHandler;
@@ -181,7 +183,7 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleExportCat(ActionEvent event) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    Utils.showFeatureDisabled("Export Catalogue", EXPORT_DISABLED_REASON);
     // TODO Re-Implement export catalogue / course
     /*
     if (!EntityManager.getInstance().isCatalogueLoaded()) {
@@ -203,7 +205,7 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleExportGroups(ActionEvent event) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    Utils.showFeatureDisabled("Export multiple Groups", EXPORT_DISABLED_REASON);
     // TODO Re-Implement export groups
     /*
     if (!evaluatorHandler.isGroupLoaded()) {
@@ -215,7 +217,7 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleExportGroup(ActionEvent event) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    Utils.showFeatureDisabled("Export single Group", EXPORT_DISABLED_REASON);
     // TODO Re-Implement export group
   }
   

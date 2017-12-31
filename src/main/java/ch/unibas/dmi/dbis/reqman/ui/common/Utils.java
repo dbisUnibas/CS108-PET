@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
+import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -119,6 +120,14 @@ public class Utils {
     alert.setHeaderText(header);
     alert.setContentText(content);
     alert.showAndWait();
+  }
+  
+  public static void showFeatureDisabled(String featureName, String reason){
+    showWarningDialog("Feature Disabled", String.format("Feature %s disabled", featureName), String.format("The feature %s, is in the current version (%s) disabled.\n\nThe reason for this is:\n%s", featureName, Version.getInstance().getVersion(), reason));
+  }
+  
+  public static void showFeatureDisabled(String featureName){
+    showFeatureDisabled(featureName, "");
   }
   
   public static DirectoryChooser createDirectoryChooser(String title) {
