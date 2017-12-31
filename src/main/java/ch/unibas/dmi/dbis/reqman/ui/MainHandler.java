@@ -11,6 +11,7 @@ import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.scene.control.RadioMenuItem;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -42,6 +43,8 @@ public class MainHandler implements MenuHandler {
       evaluatorHandler.enableEvaluator();
     });
     this.editorHandler = editorHandler;
+    // TODO hack ?
+    manager.enableOpenItems();
   }
   
   public static MainHandler getInstance(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
@@ -53,7 +56,6 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleNewCatalogue(ActionEvent event) {
-    // TODO ensure correct mode ?
     editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.CATALOGUE));
     if (!editorHandler.isCatalogueLoaded()) {
       return;
@@ -64,6 +66,7 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleNewGroup(ActionEvent event) {
+    // TODO load catalogue if no set. Ignore mode
     if (!mainScene.isEvaluatorActive()) {
       return;
     }
@@ -118,6 +121,7 @@ public class MainHandler implements MenuHandler {
     if (mainScene.isEditorActive()) {
       handleShowEvaluator(event);
     }
+    boolean catCoursNeeded = false;
     if(EntityController.getInstance().hasCourse() ){
       LOGGER.debug("Opening group(s) with course set...");
       if(EntityController.getInstance().hasCatalogue()){
@@ -125,9 +129,20 @@ public class MainHandler implements MenuHandler {
         evaluatorHandler.handleOpenGroups(event);
         manager.enableGroupNeeded();
       }else{
-        // First open catalogue
+        // No cat set
+        catCoursNeeded = true;
       }
-      // First open course, then catalogue
+      // No course set
+      catCoursNeeded = true;
+    }else if(event.isConsumed() ){
+      LOGGER.warn("Open Groups: Already consumed event. Ignronign");
+    }
+    if(catCoursNeeded){
+      LOGGER.debug("Opening groups and loading cat/course");
+      ActionEvent catEvent = event.copyFor(event, Event.NULL_SOURCE_TARGET);
+      handleOpenCat(catEvent); // Loads course as well
+      event.consume();
+      handleOpenGroups(event);
     }
     LOGGER.debug("Opening performed");
   }

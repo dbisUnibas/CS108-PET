@@ -94,6 +94,7 @@ public class MenuManager {
   
   private ArrayList<String> catNeeded = new ArrayList<>();
   private ArrayList<String> groupNeeded = new ArrayList<>();
+  private ArrayList<String> openItems = new ArrayList<>();
   
   private HashMap<String, String> activeKeyBindings = new HashMap<>();
   
@@ -111,8 +112,11 @@ public class MenuManager {
     registerMenuItem(ITEM_NEW_GROUP, itemNewGroup = new MenuItem("New Group..."));
     catNeeded.add(ITEM_NEW_GROUP);
     registerMenuItem(ITEM_OPEN_COURSE, itemOpenCourse = new MenuItem("Open Course..."));
+    openItems.add(ITEM_OPEN_COURSE);
     registerMenuItem(ITEM_OPEN_CAT, itemOpenCat = new MenuItem("Open Catalogue..."));
+    openItems.add(ITEM_OPEN_CAT);
     registerMenuItem(ITEM_OPEN_GROUPS, itemOpenGroup = new MenuItem("Open Group..."));
+    openItems.add(ITEM_OPEN_GROUPS);
     catNeeded.add(ITEM_OPEN_GROUPS);
     
     registerEditorItem(ITEM_SAVE_COURSE, itemSaveCourse = new MenuItem("Save Course"));
@@ -239,6 +243,10 @@ public class MenuManager {
     disableEditorItems();
     disableGroupNeeded();
     disableEvaluatorItems();
+  }
+  
+  public void enableOpenItems() {
+    setDisableForItems(openItems, false);
   }
   
   private void loadDefaultKeyBindings() {
