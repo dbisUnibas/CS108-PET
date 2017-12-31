@@ -43,7 +43,6 @@ public class MainHandler implements MenuHandler {
       evaluatorHandler.enableEvaluator();
     });
     this.editorHandler = editorHandler;
-    // TODO hack ?
     manager.enableOpenItems();
   }
   
@@ -84,7 +83,7 @@ public class MainHandler implements MenuHandler {
     if (EntityController.getInstance().hasCatalogue()) {
       LOGGER.warn("Cannot handle re-opening of catalogue. Silently ignoring");
       /*
-      TODO:
+      TODO re-open / new-open catalogue:
       * Reset EntityController
       * All Handlers
       * Save all open files
@@ -155,7 +154,6 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleSaveCat(ActionEvent event) {
-    // TODO ensure correct mode ?
     editorHandler.saveCatalogue();
   }
   
@@ -169,7 +167,6 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleSaveCatAs(ActionEvent event) {
-    // TODO ensure correct mode ?
     editorHandler.saveAsCatalogue();
   }
   
@@ -184,7 +181,7 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleExportCat(ActionEvent event) {
     throw new UnsupportedOperationException("Not implemented yet");
-    // TODO
+    // TODO Re-Implement export catalogue / course
     /*
     if (!EntityManager.getInstance().isCatalogueLoaded()) {
       return;
@@ -206,7 +203,7 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleExportGroups(ActionEvent event) {
     throw new UnsupportedOperationException("Not implemented yet");
-    // TODO
+    // TODO Re-Implement export groups
     /*
     if (!evaluatorHandler.isGroupLoaded()) {
       return;
@@ -218,14 +215,7 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleExportGroup(ActionEvent event) {
     throw new UnsupportedOperationException("Not implemented yet");
-    // TODO
-    /*
-    if (!evaluatorHandler.isGroupLoaded()) {
-      return;
-    }
-    // TODO ensure correct mode
-    throw new UnsupportedOperationException("NYI");
-    */
+    // TODO Re-Implement export group
   }
   
   @Override
@@ -292,7 +282,7 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleShowOverview(ActionEvent event) {
     throw new UnsupportedOperationException("Not implemented yet");
-    // TODO
+    // TODO Re-Implement show overview
     /*
     if (mainScene.isEvaluatorActive()) {
       if (evaluatorHandler.isGroupLoaded()) {
@@ -320,7 +310,7 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleExportOverview(ActionEvent event) {
     throw new UnsupportedOperationException("Not implemented yet");
-    // TODO
+    // TODO Re-Implement export Overview
     /*
     LOGGER.traceEntry();
     if (mainScene.isEvaluatorActive()) {
@@ -383,7 +373,7 @@ public class MainHandler implements MenuHandler {
     }
     mainScene.setActive(MainScene.Mode.EDITOR);
     editorHandler.setupEditor();
-    manager.enableCatalogueNeeded(); // TODO fix and / or change to courseNeeded
+    manager.enableCatalogueNeeded();
   }
   
   @Override
