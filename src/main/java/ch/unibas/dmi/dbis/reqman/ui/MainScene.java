@@ -115,6 +115,7 @@ public class MainScene extends TitledScene {
     topContainer.getChildren().add(menuManager.getMenuBar());
     root.setBottom(statusBar);
     mainHandler.checkGroupsPresent();
+    evaluator.disableAll();
   }
   
   enum Mode {

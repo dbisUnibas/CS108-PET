@@ -44,6 +44,7 @@ public class MainHandler implements MenuHandler {
     });
     this.editorHandler = editorHandler;
     manager.enableOpenItems();
+    
   }
   
   public static MainHandler getInstance(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {

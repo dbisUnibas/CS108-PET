@@ -182,7 +182,7 @@ public class EvaluatorView extends HBox implements TitleProvider {
     groupView = new GroupListView(handler);
   }
   
-  private void disableAll() {
+  public void disableAll() {
     groupView.setDisable(true);
     courseView.setDisable(true);
     tabPane.setDisable(true);

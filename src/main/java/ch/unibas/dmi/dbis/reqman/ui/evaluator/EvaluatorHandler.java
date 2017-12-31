@@ -97,7 +97,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   
   public void handleModification(CUDEvent event) {
     LOGGER.traceEntry();
-    // TODO
+    // TODO Re-Implement modification of group
     return;
     /*
     switch (event.getTargetEntity()) {
@@ -124,7 +124,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   
   public void handleDeletion(CUDEvent event) {
     return;
-    // TODO
+    // TODO Re-Implemet deletion of group
     /*
     switch (event.getTargetEntity()) {
       case GROUP:
@@ -275,7 +275,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   public void stop() {
     return;
     // Silently ignoring
-    // TODO
+    // TODO Re-Implement backups
     /*
     LOGGER.traceEntry();
     manager.groupList().forEach(g -> {
