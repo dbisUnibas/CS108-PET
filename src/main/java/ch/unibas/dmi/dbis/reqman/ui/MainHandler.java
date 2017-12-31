@@ -184,6 +184,7 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleExportCat(ActionEvent event) {
     Utils.showFeatureDisabled("Export Catalogue", EXPORT_DISABLED_REASON);
+    return;
     // TODO Re-Implement export catalogue / course
     /*
     if (!EntityManager.getInstance().isCatalogueLoaded()) {
@@ -206,6 +207,7 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleExportGroups(ActionEvent event) {
     Utils.showFeatureDisabled("Export multiple Groups", EXPORT_DISABLED_REASON);
+    return;
     // TODO Re-Implement export groups
     /*
     if (!evaluatorHandler.isGroupLoaded()) {
@@ -284,7 +286,8 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleShowOverview(ActionEvent event) {
-    throw new UnsupportedOperationException("Not implemented yet");
+    Utils.showFeatureDisabled("Points Overview", "The old overview is being replaced by a new one");
+    return;
     // TODO Re-Implement show overview
     /*
     if (mainScene.isEvaluatorActive()) {
