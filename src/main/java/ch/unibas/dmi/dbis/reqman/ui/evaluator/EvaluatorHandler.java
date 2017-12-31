@@ -158,6 +158,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         } else {
           LOGGER.trace(":handleCreation - new create");
           gr = EvaluatorPromptFactory.promptGroup(this);
+          if(gr == null){
+            LOGGER.debug("User aborted creation of group");
+            return;
+          }
         }
         handleAddGroup(gr);
         break;

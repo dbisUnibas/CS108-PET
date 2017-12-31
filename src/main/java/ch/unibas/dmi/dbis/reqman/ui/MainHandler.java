@@ -66,12 +66,17 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleNewGroup(ActionEvent event) {
-    // TODO load catalogue if no set. Ignore mode
-    if (!mainScene.isEvaluatorActive()) {
-      return;
+    if (EntityController.getInstance().hasCourse() && EntityController.getInstance().hasCatalogue()) {
+      boolean changeMode = false;
+      if (!mainScene.isEvaluatorActive()) {
+        changeMode = true;
+      }
+      evaluatorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.GROUP));
+      manager.enableGroupNeeded();
+      if (changeMode) {
+        mainScene.setActive(MainScene.Mode.EVALUATOR);
+      }
     }
-    evaluatorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.GROUP));
-    manager.enableGroupNeeded();
   }
   
   @Override
