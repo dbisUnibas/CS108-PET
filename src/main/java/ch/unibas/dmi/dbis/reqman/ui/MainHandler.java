@@ -122,22 +122,23 @@ public class MainHandler implements MenuHandler {
       handleShowEvaluator(event);
     }
     boolean catCoursNeeded = false;
-    if(EntityController.getInstance().hasCourse() ){
+    if (EntityController.getInstance().hasCourse()) {
       LOGGER.debug("Opening group(s) with course set...");
-      if(EntityController.getInstance().hasCatalogue()){
+      if (EntityController.getInstance().hasCatalogue()) {
         LOGGER.debug("... and catalogue set");
         evaluatorHandler.handleOpenGroups(event);
         manager.enableGroupNeeded();
-      }else{
+      } else {
         // No cat set
         catCoursNeeded = true;
       }
+    } else if (event.isConsumed()) {
+      LOGGER.warn("Open Groups: Already consumed event. Ignoring");
+    } else {
       // No course set
       catCoursNeeded = true;
-    }else if(event.isConsumed() ){
-      LOGGER.warn("Open Groups: Already consumed event. Ignronign");
     }
-    if(catCoursNeeded){
+    if (catCoursNeeded) {
       LOGGER.debug("Opening groups and loading cat/course");
       ActionEvent catEvent = event.copyFor(event, Event.NULL_SOURCE_TARGET);
       handleOpenCat(catEvent); // Loads course as well
