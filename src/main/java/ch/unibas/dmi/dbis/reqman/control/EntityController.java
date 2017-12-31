@@ -161,16 +161,6 @@ public class EntityController {
     }
   }
   
-  private void attachProgress(Group g){
-    List<Progress> progressList = progressGroupMap.get(g.getUuid());
-    g.setProgressList(progressList);
-  }
-  
-  private void attachProgress(UUID groupUuid){
-    Group g = getGroup(groupUuid);
-    attachProgress(g);
-  }
-  
   public void saveGroupAs(Group g) {
     if (g != null) {
       if (storageManager != null) {
