@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
 import javafx.scene.Cursor;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,6 +22,8 @@ public class EditorView extends BorderPane implements TitleProvider {
   private RequirementTableView reqTableView;
   private MilestonesListView msView;
   private CourseInfoView infoView;
+  private VBox topBox;
+  private RequirementSearchBar filterBar;
   private String title = "Editor";
   
   public EditorView(EditorHandler handler) {
@@ -50,6 +53,10 @@ public class EditorView extends BorderPane implements TitleProvider {
   
   public CourseInfoView getCourseInfoView() {
     return infoView;
+  }
+  
+  public void closeFilterBar() {
+    topBox.getChildren().remove(filterBar);
   }
   
   void enableAll() {
@@ -85,13 +92,26 @@ public class EditorView extends BorderPane implements TitleProvider {
     
     splitter.prefWidthProperty().bind(widthProperty());
     splitter.prefHeightProperty().bind(heightProperty());
+    
+    filterBar = new RequirementSearchBar(handler);
+    filterBar.prefWidthProperty().bind(widthProperty());
+    
+    topBox = new VBox();
+  }
+  
+  public void showFilterBar(){
+    filterBar.clear();
+    topBox.getChildren().add(0,filterBar);
   }
   
   private void layoutComponents() {
     LOGGER_UI.trace(":layoutComps");
     splitter.getItems().addAll(msView, reqTableView);
     splitter.setDividerPositions(0.33);
-    setTop(infoView);
+    
+    topBox.getChildren().add(infoView);
+    setTop(topBox);
+    
     
     infoView.prefWidthProperty().bind(widthProperty());
     

@@ -47,6 +47,8 @@ public class MenuManager {
   public static final String ITEM_EXPORT_OVERVIEW = "itemExportOverview";
   public static final String ITEM_EDITOR = "itemEditor";
   public static final String ITEM_EVALUATOR = "itemEvaluator";
+  public static final String ITEM_SHOW_FILTER_BAR_EDIOR = "itemEditorFilterShow";
+  public static final String ITEM_CLEAR_FILTER_EDITOR = "itemEditorFilterClear";
   public static final String ITEM_PRESENTATION_MODE = "itemPresentation";
   public static final String CLEAR_GLOBAL_MS_KEY = "clear";
   private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
@@ -87,6 +89,8 @@ public class MenuManager {
   private MenuItem itemExportOverview;
   private MenuItem itemEditor;
   private MenuItem itemEvaluator;
+  private MenuItem itemEditorFilterShow;
+  private MenuItem itemEditorFilterClear;
   private MenuItem itemPresentation;
   private MenuBar menuBar = new MenuBar();
   private ArrayList<String> editorItems = new ArrayList<>();
@@ -146,6 +150,8 @@ public class MenuManager {
     
     registerMenuItem(ITEM_EDITOR, itemEditor = new MenuItem("Editor"));
     registerMenuItem(ITEM_EVALUATOR, itemEvaluator = new MenuItem("Evaluator"));
+    registerMenuItem(ITEM_SHOW_FILTER_BAR_EDIOR, itemEditorFilterShow = new MenuItem("Show Editor Filter"));
+    registerMenuItem(ITEM_CLEAR_FILTER_EDITOR, itemEditorFilterClear = new MenuItem("Clear Editor Filter"));
     registerMenuItem(ITEM_PRESENTATION_MODE, itemPresentation = new RadioMenuItem("Presentation Mode"));
     
     assembleMenus();
@@ -361,6 +367,12 @@ public class MenuManager {
             case ITEM_EXPORT_OVERVIEW:
               handler.handleExportOverview(event);
               break;
+            case ITEM_CLEAR_FILTER_EDITOR:
+              handler.handleClearEditorFilter(event);
+              break;
+            case ITEM_SHOW_FILTER_BAR_EDIOR:
+              handler.handleShowEditorFilterBar(event);
+              break;
             default:
               // Silently ignoring -> may log issue?
           }
@@ -444,7 +456,7 @@ public class MenuManager {
     
     menuEvaluate.getItems().addAll(itemShowOverview, itemExportOverview, new SeparatorMenuItem(), menuGlobalMilestone);
     
-    menuView.getItems().addAll(itemEditor, itemEvaluator, new SeparatorMenuItem(), itemPresentation);
+    menuView.getItems().addAll(itemEditor, itemEvaluator, new SeparatorMenuItem(), itemEditorFilterShow, itemEditorFilterClear,new SeparatorMenuItem(), itemPresentation);
   }
   
   private void registerEditorItem(String key, MenuItem item) {

@@ -28,6 +28,8 @@ import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.List;
+
 /**
  * TODO: write JavaDoc
  *
@@ -141,6 +143,16 @@ public class RequirementTableView extends BorderPane {
     tableData.add(ObservableRequirement.fromRequirement(requirement));
     table.refresh();
     updatePoints();
+  }
+  
+  public void displayOnly(List<Requirement> requirementList) {
+    tableData.clear();
+    setRequirements(FXCollections.observableList(requirementList), EntityController.getInstance().getCatalogue());
+  }
+  
+  public void displayAll() {
+    tableData.clear();
+    setRequirements(EntityController.getInstance().getObservableRequirements(), EntityController.getInstance().getCatalogue());
   }
   
   private void updatePoints() {

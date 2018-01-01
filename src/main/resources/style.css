@@ -34,3 +34,7 @@ TODO: Needs re-styling (margin?)
     -fx-background-color: white !important;
 }
 
+.darkened {
+    -fx-background-color: #bdbdbd ; /* Material grey lighten-1 */
+}
+

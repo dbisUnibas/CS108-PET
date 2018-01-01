@@ -397,6 +397,22 @@ public class MainHandler implements MenuHandler {
     editorHandler.saveAsCourse();
   }
   
+  @Override
+  public void handleClearEditorFilter(ActionEvent event) {
+    LOGGER.debug("Clearing editor filter");
+    if(EntityController.getInstance().hasCatalogue()){
+      editorHandler.displayAllRequirements();
+    }
+  }
+  
+  @Override
+  public void handleShowEditorFilterBar(ActionEvent event) {
+    if(EntityController.getInstance().hasCatalogue()){
+      editorHandler.showFilterBar();
+    }
+    mainScene.setActive(MainScene.Mode.EDITOR);
+  }
+  
   public void setMainScene(MainScene mainScene) {
     this.mainScene = mainScene;
   }

@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Layer between (G)UI and internal logic.
@@ -138,13 +139,13 @@ public class EditorHandler implements EventHandler<CUDEvent> {
         Catalogue oldCat = EntityController.getInstance().getCatalogue();
         Catalogue newCat = EditorPromptFactory.promptCatalogue(oldCat);
         LOGGER.debug("Modificaiton of catalaogue: old={}, new={}", oldCat, newCat);
-        setupCatalogueInfo();
+        setupCourseCatalogueInfo();
         break;
       case COURSE:
         Course oldCourse = EntityController.getInstance().getCourse();
         Course newCourse = EditorPromptFactory.promptCourse(oldCourse);
         LOGGER.debug("Modification of course: old={}, new={}", oldCourse, newCourse);
-        setupCatalogueInfo();
+        setupCourseCatalogueInfo();
         break;
       case REQUIREMENT:
         if (evt.getDelivery() instanceof RequirementTableView.ObservableRequirement) {
@@ -175,11 +176,23 @@ public class EditorHandler implements EventHandler<CUDEvent> {
       editor.getMilestoneView().setItems(EntityController.getInstance().getObservableMilestones());
     }
     
-    // TODO Cleanup
-    setupCatalogueInfo();
+    setupCourseCatalogueInfo();
     
     editor.enableAll();
-    
+  }
+  
+  public void displayOnly(List<Requirement> requirementList){
+    LOGGER.trace("DisplayOnly{}",requirementList);
+    if(EntityController.getInstance().hasCatalogue() ){
+      editor.getRequirementsView().displayOnly(requirementList);
+    }
+  }
+  
+  public void displayAllRequirements(){
+    LOGGER.trace("DisplayAllRequirements");
+    if(EntityController.getInstance().hasCatalogue()){
+      editor.getRequirementsView().displayAll();
+    }
   }
   
   public void saveCatalogue() {
@@ -263,11 +276,19 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     return editor.getRequirementsView().getSelectedRequirement();
   }
   
+  public void closeFilterBar() {
+    editor.closeFilterBar();
+  }
+  
+  public void showFilterBar(){
+    editor.showFilterBar();
+  }
+  
   void setEditorView(EditorView view) {
     this.editor = view;
   }
   
-  private void setupCatalogueInfo() {
+  private void setupCourseCatalogueInfo() {
     LOGGER.debug("setupCatalogueInfo called");
     editor.getCourseInfoView().refresh();
   }

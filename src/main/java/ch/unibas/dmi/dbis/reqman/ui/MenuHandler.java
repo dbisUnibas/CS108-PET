@@ -67,4 +67,8 @@ public interface MenuHandler {
   void handleSaveCourse(ActionEvent event);
   
   void handleSaveCourseAs(ActionEvent event);
+  
+  void handleClearEditorFilter(ActionEvent event);
+  
+  void handleShowEditorFilterBar(ActionEvent event);
 }
