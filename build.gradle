@@ -227,17 +227,17 @@ static String readVersion() {
     File f = new File('version.properties')
     p.load(f.newDataInputStream())
     //Integer build = (p.getProperty('artifactBuildNumber') as Integer)
-    String prefix = p.getProperty('artifactVersionPrefix')
-    prefix = prefix == null ? '' : prefix+'-'
+    String suffix = p.getProperty('artifactVersionSuffix')
+    suffix = suffix == null ? '' : suffix
     Integer fix = (p.getProperty('artifactFixVersion') as Integer)
     Integer minor = (p.getProperty('artifactMinorVersion') as Integer)
     Integer major = (p.getProperty('artifactMajorVersion') as Integer)
-    return prefix+major.toString() + '.' + minor + '.' + fix /*+ '-b' + build.toString()*/
+    return major.toString() + '.' + minor + '.' + fix +"-"+suffix/*+ '-b' + build.toString()*/
 }
 
 void printVersion() {
     setVersion(readVersion())
-    println(project.version)
+    println('v'+project.version)
 }
 
 /**
@@ -250,6 +250,7 @@ task setupVersion {
     doFirst {
         String v = readVersion()
         setVersion(v)
+        printVersion()
     }
 }
 
