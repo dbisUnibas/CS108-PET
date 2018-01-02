@@ -1,15 +1,18 @@
-package ch.unibas.dmi.dbis.reqman.ui.editor;
+package ch.unibas.dmi.dbis.reqman.ui.common;
 
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
-import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
@@ -19,9 +22,9 @@ import java.util.List;
  *
  * @author loris.sauter
  */
-public class RequirementSearchBar extends HBox {
+public class FilterBar extends HBox {
   
-  private final EditorHandler editorHandler;
+  private final FilterActionHandler handler;
   private Label nameLbl;
   private Label containsLbl;
   private Label infoLbl;
@@ -31,8 +34,8 @@ public class RequirementSearchBar extends HBox {
   private Button resetBtn;
   private Button closeBtn;
   
-  public RequirementSearchBar(EditorHandler editorHandler) {
-    this.editorHandler = editorHandler;
+  public FilterBar(FilterActionHandler handler) {
+    this.handler = handler;
     initComponents();
     layoutComponents();
   }
@@ -65,17 +68,37 @@ public class RequirementSearchBar extends HBox {
   }
   
   private void handleClose(ActionEvent actionEvent) {
-    editorHandler.closeFilterBar();
+//    handler.closeFilterBar();
+    // TODO Solution with parent passed and reference is stored.
+    Parent p = getParent();
+    if(p instanceof Pane){
+      ((Pane)p).getChildren().remove(this);
+    }else{
+      setVisible(false);
+    }
+  }
+  
+  public void show(){
+    setVisible(true);
   }
   
   private void handleReset(ActionEvent actionEvent) {
-    editorHandler.displayAllRequirements();
+    handler.resetFilter();
+    infoLbl.setText("");
+    searchInput.clear();
   }
   
   private void handleFilter(ActionEvent actionEvent) {
     String pattern = searchInput.getText();
     if (StringUtils.isNotBlank(pattern)) {
-      List<Requirement> filtered = null;
+      int amount = handler.applyFilter(pattern, modeCB.getSelectionModel().getSelectedItem());
+      if(amount == 0){
+        infoLbl.setText("No matches found!");
+      }else{
+        infoLbl.setText(String.format("Showing %d matche(s)", amount));
+      }
+    }
+      /*List<Requirement> filtered = null;
       
       switch (modeCB.getSelectionModel().getSelectedItem()) {
         case NAME:
@@ -93,11 +116,11 @@ public class RequirementSearchBar extends HBox {
         return;
       }
       infoLbl.setText(String.format("Showing %d matche(s)", filtered.size()));
-      editorHandler.displayOnly(filtered);
-    }
+      handler.displayOnly(filtered);
+    }*/
   }
   
-  enum Mode {
+  public enum Mode {
     NAME,
     TEXT,
     CATEGORY;

@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.ui.common.CourseInfoView;
+import ch.unibas.dmi.dbis.reqman.ui.common.FilterBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
 import javafx.scene.Cursor;
 import javafx.scene.control.SplitPane;
@@ -23,7 +24,7 @@ public class EditorView extends BorderPane implements TitleProvider {
   private MilestonesListView msView;
   private CourseInfoView infoView;
   private VBox topBox;
-  private RequirementSearchBar filterBar;
+  private FilterBar filterBar;
   private String title = "Editor";
   
   public EditorView(EditorHandler handler) {
@@ -93,7 +94,7 @@ public class EditorView extends BorderPane implements TitleProvider {
     splitter.prefWidthProperty().bind(widthProperty());
     splitter.prefHeightProperty().bind(heightProperty());
     
-    filterBar = new RequirementSearchBar(handler);
+    filterBar = new FilterBar(handler);
     filterBar.prefWidthProperty().bind(widthProperty());
     
     topBox = new VBox();

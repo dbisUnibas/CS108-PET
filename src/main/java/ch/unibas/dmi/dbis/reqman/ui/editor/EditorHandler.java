@@ -7,6 +7,8 @@ import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.storage.ReqmanFile;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
+import ch.unibas.dmi.dbis.reqman.ui.common.FilterActionHandler;
+import ch.unibas.dmi.dbis.reqman.ui.common.FilterBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
@@ -25,7 +27,7 @@ import java.util.List;
  *
  * @author loris.sauter
  */
-public class EditorHandler implements EventHandler<CUDEvent> {
+public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandler {
   
   private static final Logger LOGGER = LogManager.getLogger(EditorHandler.class);
   
@@ -181,16 +183,16 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     editor.enableAll();
   }
   
-  public void displayOnly(List<Requirement> requirementList){
-    LOGGER.trace("DisplayOnly{}",requirementList);
-    if(EntityController.getInstance().hasCatalogue() ){
+  public void displayOnly(List<Requirement> requirementList) {
+    LOGGER.trace("DisplayOnly{}", requirementList);
+    if (EntityController.getInstance().hasCatalogue()) {
       editor.getRequirementsView().displayOnly(requirementList);
     }
   }
   
-  public void displayAllRequirements(){
+  public void displayAllRequirements() {
     LOGGER.trace("DisplayAllRequirements");
-    if(EntityController.getInstance().hasCatalogue()){
+    if (EntityController.getInstance().hasCatalogue()) {
       editor.getRequirementsView().displayAll();
     }
   }
@@ -280,8 +282,36 @@ public class EditorHandler implements EventHandler<CUDEvent> {
     editor.closeFilterBar();
   }
   
-  public void showFilterBar(){
+  public void showFilterBar() {
     editor.showFilterBar();
+  }
+  
+  @Override
+  public int applyFilter(String pattern, FilterBar.Mode mode) {
+    List<Requirement> filtered = null;
+    
+    switch (mode) {
+      case NAME:
+        filtered = EntityController.getInstance().getCatalogueAnalyser().findRequirementsNameContains(pattern);
+        break;
+      case TEXT:
+        filtered = EntityController.getInstance().getCatalogueAnalyser().findRequirementsContaining(pattern);
+        break;
+      case CATEGORY:
+        filtered = EntityController.getInstance().getCatalogueAnalyser().findRequirementsForCategory(pattern);
+        break;
+    }
+    if (filtered == null) {
+      return 0;
+    }
+    displayOnly(filtered);
+    return filtered.size();
+  }
+  
+  
+  @Override
+  public void resetFilter() {
+    displayAllRequirements();
   }
   
   void setEditorView(EditorView view) {

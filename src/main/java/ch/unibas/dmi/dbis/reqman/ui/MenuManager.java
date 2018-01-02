@@ -150,8 +150,8 @@ public class MenuManager {
     
     registerMenuItem(ITEM_EDITOR, itemEditor = new MenuItem("Editor"));
     registerMenuItem(ITEM_EVALUATOR, itemEvaluator = new MenuItem("Evaluator"));
-    registerMenuItem(ITEM_SHOW_FILTER_BAR_EDIOR, itemEditorFilterShow = new MenuItem("Show Editor Filter"));
-    registerMenuItem(ITEM_CLEAR_FILTER_EDITOR, itemEditorFilterClear = new MenuItem("Clear Editor Filter"));
+    registerMenuItem(ITEM_SHOW_FILTER_BAR_EDIOR, itemEditorFilterShow = new MenuItem("Show Filter Bar"));
+    registerMenuItem(ITEM_CLEAR_FILTER_EDITOR, itemEditorFilterClear = new MenuItem("Clear Filter"));
     registerMenuItem(ITEM_PRESENTATION_MODE, itemPresentation = new RadioMenuItem("Presentation Mode"));
     
     assembleMenus();
@@ -368,10 +368,10 @@ public class MenuManager {
               handler.handleExportOverview(event);
               break;
             case ITEM_CLEAR_FILTER_EDITOR:
-              handler.handleClearEditorFilter(event);
+              handler.handleClearFilter(event);
               break;
             case ITEM_SHOW_FILTER_BAR_EDIOR:
-              handler.handleShowEditorFilterBar(event);
+              handler.handleShowFilterBar(event);
               break;
             default:
               // Silently ignoring -> may log issue?

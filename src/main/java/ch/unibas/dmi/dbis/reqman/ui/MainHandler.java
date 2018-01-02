@@ -26,10 +26,9 @@ import java.io.IOException;
  */
 public class MainHandler implements MenuHandler {
   
-  private static final Logger LOGGER = LogManager.getLogger(MainHandler.class);
   public static final String EXPORT_DISABLED_REASON = "The export feature is currently being re-written.\n" +
       "In particular, the complete export language is subject to change.";
-  
+  private static final Logger LOGGER = LogManager.getLogger(MainHandler.class);
   private static MainHandler instance = null;
   private final EvaluatorHandler evaluatorHandler;
   private final EditorHandler editorHandler;
@@ -398,19 +397,36 @@ public class MainHandler implements MenuHandler {
   }
   
   @Override
-  public void handleClearEditorFilter(ActionEvent event) {
-    LOGGER.debug("Clearing editor filter");
-    if(EntityController.getInstance().hasCatalogue()){
-      editorHandler.displayAllRequirements();
+  public void handleClearFilter(ActionEvent event) {
+    LOGGER.debug("Clearing filter");
+    switch (mainScene.getActiveMode()) {
+      case EDITOR:
+        if (EntityController.getInstance().hasCatalogue()) {
+          editorHandler.displayAllRequirements();
+        }
+        break;
+      case EVALUATOR:
+        
+        break;
     }
+    
   }
   
   @Override
-  public void handleShowEditorFilterBar(ActionEvent event) {
-    if(EntityController.getInstance().hasCatalogue()){
-      editorHandler.showFilterBar();
+  public void handleShowFilterBar(ActionEvent event) {
+    LOGGER.debug("Showing filter bar");
+    switch (mainScene.getActiveMode()) {
+      case EDITOR:
+        LOGGER.debug("Showing editor filter");
+        if (EntityController.getInstance().hasCatalogue()) {
+          editorHandler.showFilterBar();
+        }
+        mainScene.setActive(MainScene.Mode.EDITOR);
+        break;
+      case EVALUATOR:
+        break;
     }
-    mainScene.setActive(MainScene.Mode.EDITOR);
+    
   }
   
   public void setMainScene(MainScene mainScene) {
