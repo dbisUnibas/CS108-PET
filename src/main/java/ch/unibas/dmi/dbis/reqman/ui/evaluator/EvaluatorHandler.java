@@ -102,6 +102,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         LOGGER.trace(":handleModificaiton");
         Group gr = EntityController.getInstance().getGroup(evaluator.getActiveGroupUUID());
         EvaluatorPromptFactory.promptGroup(gr);
+        evaluator.updateDisplayOf(gr);
         LOGGER.trace(":handleModification - Done");
         break;
       default:

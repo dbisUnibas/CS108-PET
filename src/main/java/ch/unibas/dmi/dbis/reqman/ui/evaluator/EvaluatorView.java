@@ -131,6 +131,12 @@ public class EvaluatorView extends HBox implements TitleProvider {
     }
   }
   
+  public void updateDisplayOf(Group gr) {
+    Tab tab = groupTapMap.get(gr.getUuid());
+    tab.setText(gr.getName());
+    groupView.updateDisplayOf(gr);
+  }
+  
   void enableAll() {
     LOGGER.traceEntry();
     groupView.setDisable(false);
