@@ -163,7 +163,7 @@ public class EntityController {
       if (storageManager != null) {
         LOGGER.debug("Saving group with name {}", g.getName());
         try {
-          storageManager.saveGroup(g);
+          storageManager.saveGroupSensitively(g);
           
         } catch (IOException e) {
           LOGGER.catching(e);

@@ -79,6 +79,23 @@ public class SaveFile<T extends VersionedEntity> {
     JSONUtils.writeToJSONFile(entity, file);
   }
   
+  public void saveSensitively() throws IOException{
+    // No file set:
+    if (dir == null) {
+      throw new RuntimeException("No directory given");
+    }
+  
+    if (file == null) {
+      file = new File(getSaveFilePath());
+    }
+    int suffix = 1;
+    while(file.exists()){
+      file = new File(getSaveFileName(suffix++));
+    }
+    entity.setVersion(Version.getInstance().getVersion());
+    JSONUtils.writeToJSONFile(entity, file);
+  }
+  
   public void open() throws IOException {
     if (file != null) {
       // Case 1: File directly specified (e.g. per user dialog)
@@ -128,15 +145,22 @@ public class SaveFile<T extends VersionedEntity> {
     return dir;
   }
   
-  // TODO reduce visibility
-  public String getSaveFileName() {
+  String getSaveFileName() {
     return entity.getName().replace(' ', '_') + IOUtils.EXTENSION_SEPARATOR + getDesignatedExtension();
   }
   
-  // TODO reduce visiblity
-  public String getSaveFilePath() {
+  private String getSaveFileName(int no){
+    return entity.getName().replace(' ', '_')+'-'+no+IOUtils.EXTENSION_SEPARATOR+getDesignatedExtension();
+  }
+  
+  String getSaveFilePath() {
     return dir.getPath() + IOUtils.FILE_SEPARATOR + getSaveFileName();
   }
+  
+  private String getSaveFilePath(int no){
+    return dir.getPath() + IOUtils.FILE_SEPARATOR + getSaveFileName(no);
+  }
+  
   
   private String getDesignatedExtension() {
     if (entity == null) {

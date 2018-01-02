@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.storage;
 
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Course;
 import ch.unibas.dmi.dbis.reqman.data.Group;
@@ -166,12 +167,13 @@ public class StorageManager {
     courseSaveFile.setSaveDirectory(dir);
     LOGGER.debug("Course savePath={}",courseSaveFile.getSaveFilePath());
     courseSaveFile.save();
-    LOGGER.debug("Saved course!");
+    LOGGER.debug("Saved course to {}", courseSaveFile.getSaveFilePath());
   }
   
   public void saveCourse() throws IOException{
     LOGGER.debug("Saving to {}",courseSaveFile.getSaveFilePath());
     courseSaveFile.save();
+    LOGGER.debug("Saved course to {}", courseSaveFile.getSaveFilePath());
   }
   
   public void saveCatalogue(Catalogue catalogue) throws IOException {
@@ -180,26 +182,36 @@ public class StorageManager {
     catalogueSaveFile.setSaveDirectory(dir);
     LOGGER.debug("Catalogue savePath={}", catalogueSaveFile.getSaveFilePath());
     catalogueSaveFile.save();
-    LOGGER.debug("Saved catalogue!");
+    LOGGER.debug("Saved catalogue to {}", catalogueSaveFile.getSaveFilePath());
   }
   
   public void saveCatalogue() throws IOException {
     catalogueSaveFile.save();
+    LOGGER.debug("Saved catalogue to {}", catalogueSaveFile.getSaveFilePath());
   }
   
-  public void saveGroup(Group group) throws IOException {
+  public void saveGroup(Group group, boolean sensitively) throws IOException {
     // TODO handle existing group
+    LOGGER.debug("Save group with group obj as param");
     checkIfDirSet();
     SaveFile groupFile = SaveFile.createForEntity(group);
     groupFile.setSaveDirectory(dir);
-    groupFile.save();
+    if(sensitively){
+      groupFile.saveSensitively();
+    }else{
+      groupFile.save();
+    }
+    LOGGER.debug("Saved group to {}", groupFile.getSaveFilePath());
     groupSaveFileList.add(groupFile);
   }
   
   public void saveGroup(UUID groupUuid) throws IOException {
     for (SaveFile sf : groupSaveFileList) {
       if (groupUuid.equals(((Group) sf.getEntity()).getUuid())){
-        sf.save();
+        LOGGER.debug("Trying to save at {}", sf.getSaveFilePath());
+        sf.saveSensitively();
+        LOGGER.debug("Saved group to {}", sf.getSaveFilePath());
+        return;
       }
     }
   }
@@ -247,6 +259,15 @@ public class StorageManager {
   public void setSaveDir(File saveDir) {
     LOGGER.debug("Set savedir to {}", saveDir);
     this.dir = saveDir;
+  }
+  
+  public void saveGroupSensitively(Group g) throws IOException {
+    LOGGER.debug("Saving group saensitively");
+    if(hasGroupSaveFile(g.getUuid())){
+      saveGroup(g.getUuid());
+    }else{
+      saveGroup(g, true);
+    }
   }
   
   private void checkIfDirSet() throws RuntimeException{
