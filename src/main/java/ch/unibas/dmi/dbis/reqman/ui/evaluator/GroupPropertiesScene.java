@@ -16,6 +16,7 @@ import javafx.scene.input.MouseButton;
 import javafx.util.Callback;
 import org.apache.commons.lang.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -219,10 +220,8 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
   
   private void loadMembers() {
     if (group != null) {
-      for (Member m : group.getMembers()) {
-        ObservableMember om = ObservableMember.fromMember(m);
-        tableData.add(om);
-      }
+      tableData.clear();
+      tableData.addAll(Arrays.stream(group.getMembers()).map(ObservableMember::fromMember).collect(Collectors.toList()));
     } else {
       setMemberListOnlyEmpty();
     }
