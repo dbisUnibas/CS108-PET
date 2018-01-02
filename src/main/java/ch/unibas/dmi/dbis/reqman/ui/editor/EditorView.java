@@ -1,9 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.ui.common.CourseInfoView;
-import ch.unibas.dmi.dbis.reqman.ui.common.FilterBar;
-import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
+import ch.unibas.dmi.dbis.reqman.ui.common.*;
 import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -58,6 +57,20 @@ public class EditorView extends BorderPane implements TitleProvider {
   
   public void closeFilterBar() {
     topBox.getChildren().remove(filterBar);
+  }
+  
+  public void showStatistics() {
+    CatalogueStatisticsView view = new CatalogueStatisticsView();
+    Scene scene = new Scene(view);
+    PopupStage stage = new PopupStage("Catalogue Overview", scene,false);
+    // Following code hides the stage asap the focus is lost
+    stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+      if(!stage.isFocused()){
+        stage.hide();
+      }
+    });
+    stage.show();
+    
   }
   
   void enableAll() {

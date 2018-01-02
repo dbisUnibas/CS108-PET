@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,12 +51,13 @@ public class MenuManager {
   public static final String ITEM_EVALUATOR = "itemEvaluator";
   public static final String ITEM_SHOW_FILTER_BAR_EDIOR = "itemEditorFilterShow";
   public static final String ITEM_CLEAR_FILTER_EDITOR = "itemEditorFilterClear";
+  public static final String ITEM_SHOW_CATALOGUE_STATISTICS = "itemShowCatalogueStatistics";
   public static final String ITEM_PRESENTATION_MODE = "itemPresentation";
   public static final String CLEAR_GLOBAL_MS_KEY = "clear";
   private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
   private static MenuManager instance = null;
   private final ToggleGroup toggleMilestone = new ToggleGroup();
-  
+  private final MenuItem itemSplitGroup;
   private HashMap<String, MenuItem> menuItems = new HashMap<>();
   private HashMap<String, Menu> menus = new HashMap<>();
   private Menu menuFile;
@@ -64,7 +66,6 @@ public class MenuManager {
   private Menu menuView;
   private Menu menuHelp;
   private Menu menuGlobalMilestone;
-  
   private MenuItem itemNewCourse;
   private MenuItem itemNewCat;
   private MenuItem itemNewGroup;
@@ -87,13 +88,13 @@ public class MenuManager {
   private MenuItem itemModReq;
   private MenuItem itemModMS;
   private MenuItem itemModGroup;
-  private final MenuItem itemSplitGroup;
   private MenuItem itemShowOverview;
   private MenuItem itemExportOverview;
   private MenuItem itemEditor;
   private MenuItem itemEvaluator;
   private MenuItem itemEditorFilterShow;
   private MenuItem itemEditorFilterClear;
+  private MenuItem itemShowCatalogueStatistics;
   private MenuItem itemPresentation;
   private MenuBar menuBar = new MenuBar();
   private ArrayList<String> editorItems = new ArrayList<>();
@@ -156,6 +157,9 @@ public class MenuManager {
     registerMenuItem(ITEM_EVALUATOR, itemEvaluator = new MenuItem("Evaluator"));
     registerMenuItem(ITEM_SHOW_FILTER_BAR_EDIOR, itemEditorFilterShow = new MenuItem("Show Filter Bar"));
     registerMenuItem(ITEM_CLEAR_FILTER_EDITOR, itemEditorFilterClear = new MenuItem("Clear Filter"));
+    registerMenuItem(ITEM_SHOW_CATALOGUE_STATISTICS, itemShowCatalogueStatistics = new MenuItem("Catalogue Overview..."));
+    catNeeded.addAll(Arrays.asList(ITEM_CLEAR_FILTER_EDITOR, ITEM_SHOW_FILTER_BAR_EDIOR, ITEM_SHOW_CATALOGUE_STATISTICS));
+    
     registerMenuItem(ITEM_PRESENTATION_MODE, itemPresentation = new RadioMenuItem("Presentation Mode"));
     
     assembleMenus();
@@ -380,6 +384,9 @@ public class MenuManager {
             case ITEM_SPLIT_GROUP:
               handler.handleSplitGroup(event);
               break;
+            case ITEM_SHOW_CATALOGUE_STATISTICS:
+              handler.handleCatalogueStatistics(event);
+              break;
             default:
               // Silently ignoring -> may log issue?
           }
@@ -389,6 +396,7 @@ public class MenuManager {
   }
   
   private void assembleMenus() {
+    /* === FILE MENU === */
     menuFile.getItems().addAll(
         itemNewCourse,
         itemNewCat,
@@ -402,6 +410,7 @@ public class MenuManager {
         new SeparatorMenuItem(),
         itemQuit
     );
+    /* === EDIT MENU === */
     menuEdit.getItems().addAll(itemNewReq, itemNewMS,
         new SeparatorMenuItem(),
         itemModCat,
@@ -450,11 +459,9 @@ public class MenuManager {
           
         }
       }
-
-
-            /*
-            Conclusion: Only if *newly* selected the event is fired and thus handled in here.
-             */
+      /*
+      Conclusion: Only if *newly* selected the event is fired and thus handled in here.
+       */
       if (toggleMilestone.getSelectedToggle() != null && toggleMilestone.getSelectedToggle().getUserData() instanceof Milestone) {
         Milestone ms = (Milestone) toggleMilestone.getSelectedToggle().getUserData();
         LOGGER.debug("Selected: " + ms.getName());
@@ -462,9 +469,20 @@ public class MenuManager {
       }
     });
     
+    /* === EVALUATE MENU ===*/
     menuEvaluate.getItems().addAll(itemShowOverview, itemExportOverview, new SeparatorMenuItem(), menuGlobalMilestone);
     
-    menuView.getItems().addAll(itemEditor, itemEvaluator, new SeparatorMenuItem(), itemEditorFilterShow, itemEditorFilterClear,new SeparatorMenuItem(), itemPresentation);
+    /* === VIEW MENU === */
+    menuView.getItems().addAll(
+        itemEditor,
+        itemEvaluator,
+        new SeparatorMenuItem(),
+        itemEditorFilterShow,
+        itemEditorFilterClear,
+        new SeparatorMenuItem(),
+        itemShowCatalogueStatistics,
+        new SeparatorMenuItem(),
+        itemPresentation);
   }
   
   private void registerEditorItem(String key, MenuItem item) {

@@ -439,6 +439,11 @@ public class MainHandler implements MenuHandler {
     }
   }
   
+  @Override
+  public void handleCatalogueStatistics(ActionEvent event) {
+    editorHandler.showStatistics();
+  }
+  
   public void setMainScene(MainScene mainScene) {
     this.mainScene = mainScene;
   }

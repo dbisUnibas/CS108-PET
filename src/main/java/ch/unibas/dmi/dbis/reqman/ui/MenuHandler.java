@@ -73,4 +73,6 @@ public interface MenuHandler {
   void handleShowFilterBar(ActionEvent event);
   
   void handleSplitGroup(ActionEvent event);
+  
+  void handleCatalogueStatistics(ActionEvent event);
 }

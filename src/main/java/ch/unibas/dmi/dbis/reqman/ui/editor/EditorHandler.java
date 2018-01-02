@@ -314,6 +314,10 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
     displayAllRequirements();
   }
   
+  public void showStatistics() {
+    editor.showStatistics();
+  }
+  
   void setEditorView(EditorView view) {
     this.editor = view;
   }
