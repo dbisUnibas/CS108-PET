@@ -15,8 +15,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseButton;
 import javafx.util.Callback;
 import org.apache.commons.lang.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,8 +26,6 @@ import java.util.stream.Collectors;
  */
 public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.data.Group> {
   
-  private static final Logger LOGGER = LogManager.getLogger(GroupPropertiesScene.class);
-  private final EvaluatorHandler handler;
   private TextField tfName;
   private TextField tfProjectName;
   private TextField tfExportFileName;
@@ -37,14 +33,12 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
   private ch.unibas.dmi.dbis.reqman.data.Group group = null;
   private ObservableList<ObservableMember> tableData;
   
-  GroupPropertiesScene(EvaluatorHandler handler) {
-    this.handler = handler;
-    
+  GroupPropertiesScene() {
     populateScene();
   }
   
-  GroupPropertiesScene(EvaluatorHandler handler, Group group) {
-    this(handler);
+  GroupPropertiesScene(Group group) {
+    this();
     this.group = group;
     loadGroup();
   }
@@ -60,10 +54,6 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
     String projectName = tfProjectName.getText();
     
     if (StringUtils.isNotEmpty(name)) {
-      if (!handler.isGroupNameUnique(name)) {
-        Utils.showWarningDialog("Invalid group name", "Group names must be unique. There is already another group with name: \n\n" + name);
-        return;
-      }
       boolean empty = false;
       if(tableData.size() == 1){
         if(tableData.get(0).isEmpty() ){

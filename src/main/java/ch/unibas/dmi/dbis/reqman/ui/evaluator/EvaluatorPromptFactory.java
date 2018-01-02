@@ -34,13 +34,13 @@ public class EvaluatorPromptFactory {
         return popup.prompt();
     }
 
-    static Group promptGroup(EvaluatorHandler handler) {
-        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(handler));
+    static Group promptGroup() {
+        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene());
         return popup.prompt();
     }
 
-    static Group promptGroup(Group group, EvaluatorHandler handler) {
-        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(handler, group));
+    static Group promptGroup(Group group) {
+        PromptPopup<Group> popup = new PromptPopup<>(new GroupPropertiesScene(group));
         return popup.prompt();
     }
 

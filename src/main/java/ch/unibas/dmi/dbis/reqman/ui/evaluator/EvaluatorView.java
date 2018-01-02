@@ -60,19 +60,20 @@ public class EvaluatorView extends HBox implements TitleProvider {
   }
   
   public boolean isGroupTabbed(Group active) {
-    return false;
+    return groupTapMap.containsKey(active.getUuid());
   }
   
   public void addGroupTab(AssessmentView view, boolean fresh) {
     Tab tab = new Tab();
-    
-    tab.setUserData(view.getActiveGroup());
     tab.setText(view.getActiveGroup().getName());
     view.bindToParentSize(rightContent);
     tab.setContent(view);
     tabPane.getTabs().addAll(tab);
     tab.setUserData(view.getActiveGroup().getUuid());
     groupTapMap.put(view.getActiveGroup().getUuid(), tab);
+    tab.setOnClosed(event -> {
+      groupTapMap.remove(tab.getUserData());
+    });
     if (fresh) {
       markDirty(view.getActiveGroup());
     }
@@ -109,8 +110,8 @@ public class EvaluatorView extends HBox implements TitleProvider {
   }
   
   public void removeTab(Group g) {
-    Tab tab = legacyGroupTabMap.get(g.getName());
-    legacyGroupTabMap.remove(g.getName());
+    Tab tab = groupTapMap.get(g.getUuid());
+    groupTapMap.remove(g.getUuid());
     tabPane.getTabs().remove(tab);
   }
   

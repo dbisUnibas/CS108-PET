@@ -97,29 +97,16 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   
   public void handleModification(CUDEvent event) {
     LOGGER.traceEntry();
-    // TODO Re-Implement modification of group
-    return;
-    /*
     switch (event.getTargetEntity()) {
       case GROUP:
         LOGGER.trace(":handleModificaiton");
-        Group gr = evaluator.getActiveGroup();
-        assemble(gr);
-        // DONT FORGET TO UPDATE ALL NAME REFERNECES, IF NAME CHANGED!
-        Group mod = EvaluatorPromptFactory.promptGroup(gr, this);
-        mod.setProgressList(gr.getProgressList());
-        mod.setVersion(gr.getVersion());
-        mod.setProgressSummaryList(gr.getProgressSummaries());
-        //manager.replaceGroup(gr, mod);
-        CUDEvent del = CUDEvent.generateDeletionEvent(event, TargetEntity.GROUP, -1, gr);
-        handleDeletion(del);
-        CUDEvent add = CUDEvent.generateCreationEvent(event, TargetEntity.GROUP, mod);
-        handleCreation(add);
+        Group gr = EntityController.getInstance().getGroup(evaluator.getActiveGroupUUID());
+        EvaluatorPromptFactory.promptGroup(gr);
         LOGGER.trace(":handleModification - Done");
         break;
       default:
         // Ignoring
-    }*/
+    }
   }
   
   public void handleDeletion(CUDEvent event) {
@@ -157,7 +144,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
           gr = (Group) event.getDelivery();
         } else {
           LOGGER.trace(":handleCreation - new create");
-          gr = EvaluatorPromptFactory.promptGroup(this);
+          gr = EvaluatorPromptFactory.promptGroup();
           if(gr == null){
             LOGGER.debug("User aborted creation of group");
             return;
@@ -332,14 +319,18 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   void openGroupTab(Group group) {
-    addTab(group, false);
+    if(evaluator.isGroupTabbed(group)){
+      LOGGER.debug("Not re-adding groupt tab if group {} already open", group.getName());
+    }else{
+      addTab(group, false);
+    }
   }
   
   private void handleAddGroup(Group gr) {
     LOGGER.traceEntry();
     if (gr == null) {
       LOGGER.trace(":handleAddGroup - new create");
-      gr = EvaluatorPromptFactory.promptGroup(this);
+      gr = EvaluatorPromptFactory.promptGroup();
     } else {
       LOGGER.trace(":handleAddGroup - re-create");
     }
