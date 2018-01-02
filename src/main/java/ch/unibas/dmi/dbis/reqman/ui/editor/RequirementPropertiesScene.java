@@ -24,6 +24,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 
 import java.util.HashMap;
 import java.util.List;
@@ -109,11 +111,11 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       requirement.setMinimalMilestoneUUID(min.getUuid());
       requirement.setMaximalMilestoneUUID(max.getUuid());
       
-      if(rbRegular.isSelected() ){
+      if (rbRegular.isSelected()) {
         requirement.setType(Requirement.Type.REGULAR);
-      }else if(rbBonus.isSelected()){
+      } else if (rbBonus.isSelected()) {
         requirement.setType(Requirement.Type.BONUS);
-      }else if(rbMalus.isSelected()){
+      } else if (rbMalus.isSelected()) {
         requirement.setType(Requirement.Type.MALUS);
       }
       requirement.setBinary(cbBinary.isSelected());
@@ -217,12 +219,22 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     typeGroup.setStyle("-fx-spacing: 10px");
     ToggleGroup typeButtons = new ToggleGroup();
     rbRegular.setToggleGroup(typeButtons);
+    rbRegular.setTooltip(new Tooltip("A regular requirement."));
     rbBonus.setToggleGroup(typeButtons);
+    rbBonus.setTooltip(new Tooltip("A bonus requirement's points do not count to the sum."));
+    rbBonus.selectedProperty().addListener((observable, oldValue, newValue) -> cbBinary.setSelected(newValue));
     rbMalus.setToggleGroup(typeButtons);
-    
+    rbMalus.setTooltip(new Tooltip("A malus requirement's point are handled negative. Thus this requirement should not be fulfilled."));
+    rbMalus.selectedProperty().addListener((observable, oldValue, newValue) -> cbBinary.setSelected(newValue));
     rbRegular.setSelected(true);
     
-    typeGroup.getChildren().addAll(rbRegular, rbBonus, rbMalus, cbBinary);
+    cbBinary.setTooltip(new Tooltip("If this requirement cannot be partially fulfilled (selected) or might be partially fulfilled (unselected)."));
+    
+    Label binaryInfo = new Label("(Bonus and Malus defaults to binary being selected.)");
+    Font old = binaryInfo.getFont();
+    binaryInfo.setFont(Font.font(old.getFamily(), FontPosture.ITALIC, old.getSize()));
+    
+    typeGroup.getChildren().addAll(rbRegular, rbBonus, rbMalus, cbBinary, binaryInfo);
     GridPane.setHgrow(typeGroup, Priority.ALWAYS);
     
     
