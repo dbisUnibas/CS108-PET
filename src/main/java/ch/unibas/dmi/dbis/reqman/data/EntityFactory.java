@@ -170,6 +170,14 @@ public class EntityFactory {
     return createRequirement(name, excerpt, maxPoints, minMS, maxMS, true, Requirement.Type.MALUS);
   }
   
+  public Requirement createMalusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS, boolean binary) {
+    return createRequirement(name, excerpt, maxPoints, minMS, maxMS, binary, Requirement.Type.MALUS);
+  }
+  
+  public Requirement createBonusRequirement(String name, String excerpt, double maxPoints, Milestone minMS, Milestone maxMS, boolean binary) {
+    return createRequirement(name, excerpt, maxPoints, minMS, maxMS, binary, Requirement.Type.BONUS);
+  }
+  
   /**
    * Creates a group of given members and links it with the current course.
    *
@@ -286,7 +294,7 @@ public class EntityFactory {
     cat.setName(name);
     course.setCatalogueUUID(cat.getUuid());
     this.catalogue = cat;
-    manager = new CourseManager(course,catalogue);
+    manager = new CourseManager(course, catalogue);
     return cat;
   }
   
@@ -320,20 +328,8 @@ public class EntityFactory {
     return new ArrayList<>(source.getProgressList());
   }
   
-  private ProgressSummary createProgressSummary(Milestone ms) {
-    ProgressSummary ps = new ProgressSummary();
-    ps.setMilestoneUUID(ms.getUuid());
-    return ps;
-  }
-  
-  public List<Progress> createProgressList(){
+  public List<Progress> createProgressList() {
     return catalogue.getRequirements().stream().map(this::createProgressFor).collect(Collectors.toList());
-  }
-  
-  private Progress createProgressFor(Requirement requirement){
-    Progress p = new Progress();
-    p.setRequirementUUID(requirement.getUuid());
-    return p;
   }
   
   /**
@@ -357,6 +353,18 @@ public class EntityFactory {
     
     // TODO Linking to group?
     
+    return p;
+  }
+  
+  private ProgressSummary createProgressSummary(Milestone ms) {
+    ProgressSummary ps = new ProgressSummary();
+    ps.setMilestoneUUID(ms.getUuid());
+    return ps;
+  }
+  
+  private Progress createProgressFor(Requirement requirement) {
+    Progress p = new Progress();
+    p.setRequirementUUID(requirement.getUuid());
     return p;
   }
   

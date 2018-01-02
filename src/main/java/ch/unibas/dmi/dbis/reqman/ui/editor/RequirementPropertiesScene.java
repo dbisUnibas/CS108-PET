@@ -45,7 +45,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   private ComboBox<Milestone> cbMaxMS = new ComboBox<>();
   private Spinner spinnerPoints = new Spinner(0d, Double.MAX_VALUE, 0.0);
   private RadioButton rbRegular = new RadioButton("Regular");
-  private RadioButton rbBinary = new RadioButton("Binary");
+  private CheckBox cbBinary = new CheckBox("Binary");
   private RadioButton rbBonus = new RadioButton("Bonus");
   private RadioButton rbMalus = new RadioButton("Malus");
   private Requirement requirement = null;
@@ -83,19 +83,19 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     Milestone max = cbMaxMS.getValue() == null ? min : cbMaxMS.getValue();
     
-    if(!rbBinary.isSelected() && maxPoints == 0){
-      Utils.showErrorDialog("Invalid Configuration", "A non-binary requirement cannot have 0 points, as having \"0 of 0 points\" is kind of strange.\n" +
+    if (!cbBinary.isSelected() && maxPoints == 0) {
+      Utils.showErrorDialog("Invalid Configuration", "A non-binary requirement cannot have 0 points, as having \"0 of 0 points\" is a tautology.\n" +
           "May change your requirement to be binary or consider re-thinking the valuation.");
       return;
     }
     if (requirement == null) {
       if (rbMalus.isSelected()) {
         // Malus
-        requirement = EntityController.getInstance().createMalusRequirement(name, excerpt, maxPoints, min, max);
+        requirement = EntityController.getInstance().createMalusRequirement(name, excerpt, maxPoints, min, max, cbBinary.isSelected());
       } else if (rbBonus.isSelected()) {
         // Bonus
-        requirement = EntityController.getInstance().createBonusRequirement(name, excerpt, maxPoints, min, max);
-      } else if (rbBinary.isSelected()) {
+        requirement = EntityController.getInstance().createBonusRequirement(name, excerpt, maxPoints, min, max, cbBinary.isSelected());
+      } else if (cbBinary.isSelected()) {
         // binary
         requirement = EntityController.getInstance().createBinaryRequirement(name, excerpt, maxPoints, min, max);
       } else {
@@ -109,14 +109,14 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       requirement.setMinimalMilestoneUUID(min.getUuid());
       requirement.setMaximalMilestoneUUID(max.getUuid());
       
-      if (rbMalus.isSelected()) {
-        requirement.setType(Requirement.Type.MALUS);
-      } else if (rbBonus.isSelected()) {
-        requirement.setType(Requirement.Type.BONUS);
-      } else {
+      if(rbRegular.isSelected() ){
         requirement.setType(Requirement.Type.REGULAR);
-        requirement.setBinary(rbBinary.isSelected());
+      }else if(rbBonus.isSelected()){
+        requirement.setType(Requirement.Type.BONUS);
+      }else if(rbMalus.isSelected()){
+        requirement.setType(Requirement.Type.MALUS);
       }
+      requirement.setBinary(cbBinary.isSelected());
     }
     
     requirement.setDescription(desc);
@@ -213,19 +213,16 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     buttonWrapper.setOnCancel(event -> getWindow().hide());
     
-    // TODO create new button groups
-    
     HBox typeGroup = new HBox();
     typeGroup.setStyle("-fx-spacing: 10px");
     ToggleGroup typeButtons = new ToggleGroup();
     rbRegular.setToggleGroup(typeButtons);
-    rbBinary.setToggleGroup(typeButtons);
     rbBonus.setToggleGroup(typeButtons);
     rbMalus.setToggleGroup(typeButtons);
     
     rbRegular.setSelected(true);
     
-    typeGroup.getChildren().addAll(rbRegular, rbBinary, rbBonus, rbMalus);
+    typeGroup.getChildren().addAll(rbRegular, rbBonus, rbMalus, cbBinary);
     GridPane.setHgrow(typeGroup, Priority.ALWAYS);
     
     
@@ -311,11 +308,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       
       switch (requirement.getType()) {
         case REGULAR:
-          if (requirement.isBinary()) {
-            rbBinary.setSelected(true);
-          } else {
-            rbRegular.setSelected(true);
-          }
+          rbRegular.setSelected(true);
           break;
         case BONUS:
           rbBonus.setSelected(true);
@@ -324,6 +317,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
           rbMalus.setSelected(true);
           break;
       }
+      cbBinary.setSelected(requirement.isBinary());
       
       loadPredecessors();
       loadProperties();
