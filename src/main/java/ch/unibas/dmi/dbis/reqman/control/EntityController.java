@@ -416,6 +416,8 @@ public class EntityController {
     }
     setupObservableCatalogueLists();
     loadedCatalogue();
+    Set<String> categories = catalogueAnalyser.getCategories();
+    LOGGER.debug("Found {} categories: {}", categories.size(), categories);
   }
   
   public void loadSession(){

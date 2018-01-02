@@ -4,10 +4,7 @@ import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.data.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -138,6 +135,16 @@ public class CatalogueAnalyser {
   
   public List<Requirement> findRequirementsForCategory(String category){
     return catalogue.getRequirements().stream().filter(r->StringUtils.containsNullSafe(r.getCategory(), category)).collect(Collectors.toList());
+  }
+  
+  public List<Requirement> findRequirementsByType(Requirement.Type type){
+    return catalogue.getRequirements().stream().filter(r -> r.getType().equals(type)).collect(Collectors.toList());
+  }
+  
+  public Set<String> getCategories(){
+    Set<String> set = new TreeSet<>();
+    catalogue.getRequirements().stream().filter(r -> !StringUtils.isNullOrEmpty(r.getCategory())).forEach(r -> set.add(r.getCategory()));
+    return set;
   }
   
   public Milestone getMilestoneOf(ProgressSummary progressSummary) {
