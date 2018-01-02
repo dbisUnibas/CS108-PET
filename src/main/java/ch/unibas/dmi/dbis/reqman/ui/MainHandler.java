@@ -429,6 +429,16 @@ public class MainHandler implements MenuHandler {
     
   }
   
+  @Override
+  public void handleSplitGroup(ActionEvent event) {
+    if(EntityController.getInstance().hasGroups()){
+      mainScene.setActive(MainScene.Mode.EVALUATOR);
+      evaluatorHandler.handleSplit(event);
+    }else{
+      LOGGER.debug("Cannot split group if there is no group available");
+    }
+  }
+  
   public void setMainScene(MainScene mainScene) {
     this.mainScene = mainScene;
   }

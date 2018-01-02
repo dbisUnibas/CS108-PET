@@ -43,6 +43,7 @@ public class MenuManager {
   public static final String ITEM_MOD_REQ = "itemModReq";
   public static final String ITEM_MOD_MS = "itemModMS";
   public static final String ITEM_MOD_GROUP = "itemModGroup";
+  public static final String ITEM_SPLIT_GROUP = "itemSplitGroup";
   public static final String ITEM_SHOW_OVERVIEW = "itemShowOverview";
   public static final String ITEM_EXPORT_OVERVIEW = "itemExportOverview";
   public static final String ITEM_EDITOR = "itemEditor";
@@ -54,6 +55,7 @@ public class MenuManager {
   private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
   private static MenuManager instance = null;
   private final ToggleGroup toggleMilestone = new ToggleGroup();
+  
   private HashMap<String, MenuItem> menuItems = new HashMap<>();
   private HashMap<String, Menu> menus = new HashMap<>();
   private Menu menuFile;
@@ -85,6 +87,7 @@ public class MenuManager {
   private MenuItem itemModReq;
   private MenuItem itemModMS;
   private MenuItem itemModGroup;
+  private final MenuItem itemSplitGroup;
   private MenuItem itemShowOverview;
   private MenuItem itemExportOverview;
   private MenuItem itemEditor;
@@ -142,6 +145,7 @@ public class MenuManager {
     registerEditorItem(ITEM_MOD_REQ, itemModReq = new MenuItem("Modify Requirement..."), true);
     registerEditorItem(ITEM_MOD_MS, itemModMS = new MenuItem("Modify Milestone..."), true);
     registerEvaluatorItem(ITEM_MOD_GROUP, itemModGroup = new MenuItem("Modify Group"), true);
+    registerEvaluatorItem(ITEM_SPLIT_GROUP, itemSplitGroup = new MenuItem("Split Group..."), true);
     
     registerEvaluatorItem(ITEM_SHOW_OVERVIEW, itemShowOverview = new MenuItem("Show Overview"), true);
     registerEvaluatorItem("menuGlobalMS", menuGlobalMilestone = new Menu("Set Global Milestone"), true);
@@ -373,6 +377,9 @@ public class MenuManager {
             case ITEM_SHOW_FILTER_BAR_EDIOR:
               handler.handleShowFilterBar(event);
               break;
+            case ITEM_SPLIT_GROUP:
+              handler.handleSplitGroup(event);
+              break;
             default:
               // Silently ignoring -> may log issue?
           }
@@ -400,7 +407,8 @@ public class MenuManager {
         itemModCat,
         itemModReq,
         itemModMS,
-        itemModGroup
+        itemModGroup,
+        itemSplitGroup
     );
     
     // The set-milestone-forall-groups menu related handling

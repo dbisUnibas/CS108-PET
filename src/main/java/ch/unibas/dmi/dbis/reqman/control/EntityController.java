@@ -186,6 +186,16 @@ public class EntityController {
     return groupList;
   }
   
+  public Group copyGroup(Group source, String name, Member... members) {
+    Group g = entityFactory.createGroup(name, members);
+    entityFactory.link(g, getCourse());
+    g.setProgressSummaries(entityFactory.copyProgressSummaries(source));
+    g.setProgressList(entityFactory.copyProgressList(source));
+    addGroup(g);
+    LOGGER.debug("Created {}", g);
+    return g;
+  }
+  
   private void setupObservableCatalogueLists(){
     observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
     observableMilestones = FXCollections.observableArrayList();

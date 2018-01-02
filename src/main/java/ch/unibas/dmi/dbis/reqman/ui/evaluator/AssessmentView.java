@@ -82,6 +82,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     scrollPane.setFitToWidth(true);
   }
   
+  public void recalculatePoints() {
+    updateSumDisplay();
+  }
+  
   private void updateSumDisplay() {
     double sum = EntityController.getInstance().getGroupAnalyser(group).getSumFor(summaryCb.getSelectionModel().getSelectedItem());
     if(sum < 0){
@@ -153,7 +157,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     footerContainer.setAlignment(Pos.CENTER_RIGHT);
     footerContainer.getChildren().addAll(sumLbl,pointsLbl,maxPointLbl);
     setBottom(footerContainer);
-    
   }
   
   private void displayProgressViews(ProgressSummary progressSummary){

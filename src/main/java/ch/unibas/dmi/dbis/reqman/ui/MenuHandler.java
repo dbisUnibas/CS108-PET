@@ -71,4 +71,6 @@ public interface MenuHandler {
   void handleClearFilter(ActionEvent event);
   
   void handleShowFilterBar(ActionEvent event);
+  
+  void handleSplitGroup(ActionEvent event);
 }

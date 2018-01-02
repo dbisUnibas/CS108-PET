@@ -141,10 +141,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         Group gr;
         LOGGER.trace(":handleCreation");
         if (event.getDelivery() instanceof Group) {
-          LOGGER.trace(":handleCreation - re-create");
-          gr = (Group) event.getDelivery();
+          LOGGER.warn(":handleCreation - re-create. THIS SHOULD NOT BE CALLED");
+          return;
         } else {
-          LOGGER.trace(":handleCreation - new create");
+          LOGGER.debug(":handleCreation - new create");
           gr = EvaluatorPromptFactory.promptGroup();
           if(gr == null){
             LOGGER.debug("User aborted creation of group");
@@ -156,6 +156,21 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
       default:
         // Ignoring
     }
+  }
+  
+  private void handleAddGroup(Group group){
+    handleAddGroup(group, false);
+  }
+  
+  public void handleSplit(ActionEvent event){
+    LOGGER.debug("Handling splitting");
+    Group split = EvaluatorPromptFactory.promptSplit();
+    if(split == null){
+      // User abort?!
+      LOGGER.debug("User abort");
+      return;
+    }
+    handleAddGroup(split, true);
   }
   
   public void handleOpenGroups(ActionEvent actionEvent) {
@@ -179,7 +194,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
         Utils.showErrorDialog("Exception while opening groups", "The following exception was caught:\n\t"+e.getMessage());
         return;
       }
-      groups.forEach(this::loadGroupUI);
+      groups.forEach(this::loadGroupUIAndRefresh);
     }
   }
   
@@ -327,7 +342,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
   }
   
-  private void handleAddGroup(Group gr) {
+  private void handleAddGroup(Group gr, boolean recalulate) {
     LOGGER.traceEntry();
     if (gr == null) {
       LOGGER.trace(":handleAddGroup - new create");
@@ -337,7 +352,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     }
     LOGGER.entry(gr);
     // ADD GROUP
-    loadGroupUI(gr);
+    loadGroupUI(gr, recalulate);
     
     handleFirstGroupPresent();
   }
@@ -359,10 +374,18 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
   }
   
   private void loadGroupUI(List<Group> groups) {
-    groups.forEach(this::loadGroupUI);
+    groups.forEach(this::loadGroupUIAndRefresh);
   }
   
-  private void loadGroupUI(Group g) {
+  private void loadGroupUI(Group g){
+    loadGroupUI(g, false);
+  }
+  
+  private void loadGroupUIAndRefresh(Group g){
+    loadGroupUI(g, true);
+  }
+  
+  private void loadGroupUI(Group g, boolean recalulate) {
     LOGGER.traceEntry("Group: {}", g);
     /*
     if (manager.getLastOpenException() != null) {
@@ -381,7 +404,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
       }
     }
     */
-    addTab(g, false);
+    if(recalulate){
+      addTabAndRefresh(g);
+    }else{
+      addTab(g, false);
+    }
+    
   }
   
   private void addGroupToMap(Group group, AssessmentView view) {
@@ -414,8 +442,22 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
     evaluator.removeTab(g);
   }
   
+  private void addTabAndRefresh(Group group){
+    AssessmentView av = assessmentViewMap.get(group.getUuid());
+    if(av == null){
+      av = createAssessmentView(group);
+    }
+    av.recalculatePoints();
+    if(evaluator.isGroupTabbed(group)){
+      // Do not open another tab for alraedy tabbed group
+    }else{
+      evaluator.addGroupTab(av, false);
+    }
+    evaluator.setActiveTab(group);
+  }
+  
   private void addTab(Group active, boolean fresh) {
-    AssessmentView av = assessmentViewMap.get(active);
+    AssessmentView av = assessmentViewMap.get(active.getUuid());
     if(av == null){
       av = createAssessmentView(active);
     }

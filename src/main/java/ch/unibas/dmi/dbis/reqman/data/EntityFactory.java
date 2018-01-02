@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.data;
 import ch.unibas.dmi.dbis.reqman.ui.common.MandatoryFieldsMissingException;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -309,6 +310,14 @@ public class EntityFactory {
   public List<ProgressSummary> createProgressSummaries() {
     ensureCatalogueSet("Create ProgressSummary List");
     return catalogue.getMilestones().stream().map(this::createProgressSummary).collect(Collectors.toList());
+  }
+  
+  public List<ProgressSummary> copyProgressSummaries(Group source) {
+    return new ArrayList<>(source.getProgressSummaries());
+  }
+  
+  public List<Progress> copyProgressList(Group source) {
+    return new ArrayList<>(source.getProgressList());
   }
   
   private ProgressSummary createProgressSummary(Milestone ms) {
