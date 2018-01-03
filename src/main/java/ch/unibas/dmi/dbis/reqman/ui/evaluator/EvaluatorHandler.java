@@ -21,6 +21,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -200,7 +201,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   
   @Override
   public void resetFilter() {
-  
+    assessmentViewMap.get(evaluator.getActiveGroupUUID()).displayAll();
   }
   
   private void handleAddGroup(Group group){
@@ -430,26 +431,9 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     loadGroupUI(g, true);
   }
   
-  private void loadGroupUI(Group g, boolean recalulate) {
+  private void loadGroupUI(Group g, boolean recalculate) {
     LOGGER.traceEntry("Group: {}", g);
-    /*
-    if (manager.getLastOpenException() != null) {
-      LOGGER.warn("Caught Exception");
-      Exception e = manager.getLastOpenException();
-      if (e instanceof CatalogueNameMismatchException) {
-        CatalogueNameMismatchException cnme = (CatalogueNameMismatchException) e;
-        String message = String.format("Could not finish opening group from file %s.\n" +
-            "The specified group (name: %s)'s catalogue signature is: %s\n" +
-            "Current catalogue name: %s", cnme.getGroupFile().getPath(), cnme.getGroupName(), cnme.getGroupCatName(), cnme.getCatName());
-        Utils.showErrorDialog("Catalogue signature mismatch", message);
-      } else if (e instanceof NonUniqueGroupNameException) {
-        NonUniqueGroupNameException nugne = (NonUniqueGroupNameException) e;
-        String message = String.format("Cannot finish opening of group %s, there exists alread a group with that name.", nugne.getName());
-        Utils.showErrorDialog("Duplication error", message);
-      }
-    }
-    */
-    if(recalulate){
+    if(recalculate){
       addTabAndRefresh(g);
     }else{
       addTab(g, false);
@@ -488,26 +472,33 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   }
   
   private void addTabAndRefresh(Group group){
-    AssessmentView av = assessmentViewMap.get(group.getUuid());
-    if(av == null){
-      av = createAssessmentView(group);
-    }
+    AssessmentView av = getAssessmentView(group);
     av.recalculatePoints();
     if(evaluator.isGroupTabbed(group)){
       // Do not open another tab for alraedy tabbed group
+      av.recalculatePoints();
     }else{
       evaluator.addGroupTab(av, false);
     }
     evaluator.setActiveTab(group);
   }
   
-  private void addTab(Group active, boolean fresh) {
-    AssessmentView av = assessmentViewMap.get(active.getUuid());
+  @NotNull
+  private AssessmentView getAssessmentView(Group group) {
+    AssessmentView av = assessmentViewMap.get(group.getUuid());
     if(av == null){
-      av = createAssessmentView(active);
+      av = createAssessmentView(group);
+      assessmentViewMap.put(group.getUuid(), av);
     }
+    return av;
+  }
+  
+  
+  private void addTab(Group active, boolean fresh) {
+    AssessmentView av = getAssessmentView(active);
     if (evaluator.isGroupTabbed(active)) {
       // Do not open another tab for already tabbed group.
+      av.recalculatePoints();
     } else {
       
       evaluator.addGroupTab(av, fresh);

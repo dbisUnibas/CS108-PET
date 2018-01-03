@@ -88,14 +88,33 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     updateSumDisplay();
   }
   
+  public void displayAll() {
+    displayProgressViews(summaryCb.getSelectionModel().getSelectedItem());
+    updateSumDisplay();
+  }
+  
   private void updateSumDisplay() {
     double sum = EntityController.getInstance().getGroupAnalyser(group).getSumFor(summaryCb.getSelectionModel().getSelectedItem());
+    updateSumDisplay(sum);
+  }
+  
+  private void updateSumDisplay(double sum){
     if(sum < 0){
       pointsLbl.setTextFill(Color.RED);
     }else{
       pointsLbl.setTextFill(Color.BLACK);
     }
     pointsLbl.setText(StringUtils.prettyPrint(sum));
+    LOGGER.debug("Setting sum text: {}, request:{}",sum, EntityController.getInstance().getGroupAnalyser(group).getSumFor(getActiveProgressSummary()) );
+  }
+  
+  private void updateSumDisplay(boolean onlyVisible){
+    if(onlyVisible){
+      double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
+      updateSumDisplay(sum);
+    }else {
+      updateSumDisplay();
+    }
   }
   
   public Group getActiveGroup() {

@@ -61,6 +61,8 @@ public class ProgressView extends VBox {
    */
   private ToggleButton collapseButton;
   
+  // TODO Handle non-binary malus/bonus requirement
+  
   /* === ProgressView === */
   private GridPane headerContainer;
   private Label heading;
@@ -107,6 +109,7 @@ public class ProgressView extends VBox {
   
   /**
    * Creates a new ProgressView and ints all
+   *
    * @param progress
    */
   public ProgressView(Progress progress, ProgressSummary progressSummary) {
@@ -160,6 +163,10 @@ public class ProgressView extends VBox {
     }
   }
   
+  public void setCollapsible(Node node) {
+    this.collapsible = node;
+  }
+  
   void addDirtyListener(DirtyListener listener) {
     dirtyListeners.add(listener);
   }
@@ -184,7 +191,7 @@ public class ProgressView extends VBox {
           points = new Label("0");
         } else {
           spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1d);
-          spinnerPoints.getEditor().setPrefColumnCount(StringUtils.prettyPrint(requirement.getMaxPoints()).length()+4);
+          spinnerPoints.getEditor().setPrefColumnCount(StringUtils.prettyPrint(requirement.getMaxPoints()).length() + 4);
           spinnerPoints.setEditable(true);
         }
         break;
@@ -235,7 +242,7 @@ public class ProgressView extends VBox {
     setHeader(headerContainer);
     setSide(assessmentContainer);
     
-    collapsibleContainer.addRow(0,minMSLbl, minMS, maxMSLbl, maxMS);
+    collapsibleContainer.addRow(0, minMSLbl, minMS, maxMSLbl, maxMS);
     collapsibleContainer.add(descLbl, 0, 1);
     collapsibleContainer.add(taDesc, 1, 1, 3, 1);
     collapsibleContainer.add(commentLbl, 0, 2);
@@ -244,18 +251,14 @@ public class ProgressView extends VBox {
     setBorder(new Border(new BorderStroke(Color.SILVER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
   }
   
-  public void setCollapsible(Node node) {
-    this.collapsible = node;
-  }
-  
   private void layoutAssessmentComponents() {
     Utils.applyDefaultSpacing(assessmentWrapper);
     assessmentContainer.setAlignment(Pos.CENTER_RIGHT);
-    switch(requirement.getType()){
+    switch (requirement.getType()) {
       case REGULAR:
-        if(requirement.isBinary() ){
-          assessmentWrapper.getChildren().addAll(yesBtn,noBtn,points,maxPoints);
-        }else{
+        if (requirement.isBinary()) {
+          assessmentWrapper.getChildren().addAll(yesBtn, noBtn, points, maxPoints);
+        } else {
           assessmentWrapper.getChildren().addAll(spinnerPoints, maxPoints);
         }
         break;
@@ -264,7 +267,7 @@ public class ProgressView extends VBox {
         assessmentWrapper.getChildren().addAll(check, points, maxPoints);
         break;
     }
-    assessmentContainer.addRow(0,assessmentWrapper);
+    assessmentContainer.addRow(0, assessmentWrapper);
     assessmentContainer.addRow(1, categoryLbl, category);
     assessmentContainer.prefWidthProperty().bind(widthProperty().multiply(0.4));
   }
@@ -295,18 +298,18 @@ public class ProgressView extends VBox {
     top.prefWidthProperty().bind(widthProperty());
   }
   
-  private void setupControlHandlers(){
+  private void setupControlHandlers() {
     setupCommentHandling();
     setupAssessmentHandling();
   }
   
   private void setupAssessmentHandling() {
-    switch(requirement.getType()){
+    switch (requirement.getType()) {
       case REGULAR:
-        if(requirement.isBinary() ){
+        if (requirement.isBinary()) {
           yesBtn.setOnAction(this::handleYesNo);
           noBtn.setOnAction(this::handleYesNo);
-        }else{
+        } else {
           // Solution by: http://stackoverflow.com/a/39380146
           spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue) {
@@ -331,42 +334,42 @@ public class ProgressView extends VBox {
   
   private void updatePointsDisplay() {
     // Only update point display, if in non-spinner environment
-    if(points != null){
+    if (points != null) {
       points.setText(StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getActualPoints(progress)));
     }
     
   }
   
-  private void handleYesNo(ActionEvent event){
-    if(yesBtn.equals(event.getSource() )){
+  private void handleYesNo(ActionEvent event) {
+    if (yesBtn.equals(event.getSource())) {
       LOGGER.debug("Handling Yes!");
       progress.setFraction(1);
-    }else if(noBtn.equals(event.getSource())){
+    } else if (noBtn.equals(event.getSource())) {
       LOGGER.debug("Handling No!");
       progress.setFraction(0);
-    }else{
+    } else {
       LOGGER.debug("Ignoring unknown event source: {}", event);
       return;
     }
     processAssessment();
   }
   
-  private void handleCheck(ActionEvent event){
-    if(check.isSelected() ){
+  private void handleCheck(ActionEvent event) {
+    if (check.isSelected()) {
       LOGGER.debug("Handling check");
       progress.setFraction(1);
-    }else{
+    } else {
       LOGGER.debug("Handling uncheck");
       progress.setFraction(0);
     }
     processAssessment();
   }
   
-  private void setupCommentHandling(){
+  private void setupCommentHandling() {
     taComment.textProperty().addListener((observable, oldValue, newValue) -> {
-      if(newValue == null || newValue.isEmpty()){
+      if (newValue == null || newValue.isEmpty()) {
         LOGGER.debug("Null or empty comment");
-      }else{
+      } else {
         progress.setComment(newValue);
       }
     });
@@ -387,24 +390,24 @@ public class ProgressView extends VBox {
     event.consume();
   }
   
-  private void processAssessment(){
-    progress.setAssessmentDate(new Date() );
+  private void processAssessment() {
+    progress.setAssessmentDate(new Date());
     progress.setProgressSummaryUUID(progressSummary.getUuid());
-    LOGGER.debug("Processing assessment: {}",progress);
+    LOGGER.debug("Processing assessment: {}", progress);
     updatePointsDisplay();
     notifyPointsListener();
   }
   
   
   private void loadProgress() {
-    if(progress != null && !progress.isFresh()){
-      switch(requirement.getType()){
+    if (progress != null && !progress.isFresh()) {
+      switch (requirement.getType()) {
         case REGULAR:
-          if(requirement.isBinary()){
+          if (requirement.isBinary()) {
             boolean prog = progress.hasProgress();
             yesBtn.setSelected(prog);
             noBtn.setSelected(!prog);
-          }else{
+          } else {
             spinnerPoints.getValueFactory().setValue(progress.getFraction() * requirement.getMaxPoints());
           }
           break;
@@ -414,6 +417,7 @@ public class ProgressView extends VBox {
           check.setSelected(prog);
           break;
       }
+      updatePointsDisplay();
       taComment.setText(progress.getComment());
     }
   }
