@@ -197,7 +197,7 @@ public class StorageManager {
     SaveFile groupFile = SaveFile.createForEntity(group);
     groupFile.setSaveDirectory(dir);
     if(sensitively){
-      groupFile.saveSensitively();
+      groupFile.save();
     }else{
       groupFile.save();
     }
@@ -209,7 +209,7 @@ public class StorageManager {
     for (SaveFile sf : groupSaveFileList) {
       if (groupUuid.equals(((Group) sf.getEntity()).getUuid())){
         LOGGER.debug("Trying to save at {}", sf.getSaveFilePath());
-        sf.saveSensitively();
+        sf.save();
         LOGGER.debug("Saved group to {}", sf.getSaveFilePath());
         return;
       }

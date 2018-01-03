@@ -79,7 +79,7 @@ public class SaveFile<T extends VersionedEntity> {
     JSONUtils.writeToJSONFile(entity, file);
   }
   
-  public void saveSensitively() throws IOException{
+  private void saveSensitively() throws IOException{
     // No file set:
     if (dir == null) {
       throw new RuntimeException("No directory given");
