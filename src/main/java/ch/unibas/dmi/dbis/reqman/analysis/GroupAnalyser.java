@@ -127,6 +127,10 @@ public class GroupAnalyser {
     return list.stream().map(this::getProgressFor).collect(Collectors.toList());
   }
   
+  public List<Progress> getProgressFor(List<Requirement> list, ProgressSummary ps){
+    return getProgressFor(list).stream().filter(p->matchesProgressMilestone(p, ps)).collect(Collectors.toList());
+  }
+  
   public double getSumFor(List<Progress> list){
     return list.stream().mapToDouble(this::getActualPoints).sum();
   }

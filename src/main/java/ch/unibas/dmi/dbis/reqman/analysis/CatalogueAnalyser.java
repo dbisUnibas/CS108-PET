@@ -94,6 +94,10 @@ public class CatalogueAnalyser {
     return list.stream().filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
+  public double getMaximalRegularSumForProgressList(List<Progress> list){
+    return list.stream().map(this::getRequirementOf).filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
+  }
+  
   public double getMaximalRegularSumFor(ProgressSummary ps){
     return getMaximalRegularSumFor(getMilestoneOf(ps));
   }
