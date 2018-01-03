@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.ui.common.CourseInfoView;
+import ch.unibas.dmi.dbis.reqman.ui.common.FilterBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorView;
 import javafx.geometry.Insets;
@@ -24,7 +25,7 @@ import java.util.UUID;
  *
  * @author loris.sauter
  */
-public class EvaluatorView extends HBox implements TitleProvider {
+public class EvaluatorView extends VBox implements TitleProvider {
   
   final static Logger LOGGER = LogManager.getLogger(EditorView.class);
   
@@ -35,6 +36,7 @@ public class EvaluatorView extends HBox implements TitleProvider {
   private VBox leftContent;
   private VBox rightContent;
   private TabPane tabPane;
+  private FilterBar filterBar;
   private GroupListView groupView;
   private CourseInfoView courseView;
   private HashMap<String, Tab> legacyGroupTabMap = new HashMap<>();
@@ -137,6 +139,10 @@ public class EvaluatorView extends HBox implements TitleProvider {
     groupView.updateDisplayOf(gr);
   }
   
+  public void showFilterBar() {
+    getChildren().add(0, filterBar);
+  }
+  
   void enableAll() {
     LOGGER.traceEntry();
     groupView.setDisable(false);
@@ -187,6 +193,8 @@ public class EvaluatorView extends HBox implements TitleProvider {
     
     courseView = new CourseInfoView();
     groupView = new GroupListView(handler);
+    
+    filterBar = new FilterBar(handler);
   }
   
   public void disableAll() {

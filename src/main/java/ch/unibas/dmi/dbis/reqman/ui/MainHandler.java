@@ -420,10 +420,17 @@ public class MainHandler implements MenuHandler {
         LOGGER.debug("Showing editor filter");
         if (EntityController.getInstance().hasCatalogue()) {
           editorHandler.showFilterBar();
+        }else{
+          LOGGER.debug("Not showing filter bar because no catalogue available");
         }
-        mainScene.setActive(MainScene.Mode.EDITOR);
         break;
       case EVALUATOR:
+        LOGGER.debug("Showing evaluator filter");
+        if(EntityController.getInstance().hasGroups()){
+          evaluatorHandler.showFilterBar();
+        }else{
+          LOGGER.debug("Not showing filter bar because no groups available");
+        }
         break;
     }
     

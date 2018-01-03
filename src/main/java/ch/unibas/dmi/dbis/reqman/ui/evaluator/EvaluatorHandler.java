@@ -5,9 +5,12 @@ import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.storage.ReqmanFile;
 import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
+import ch.unibas.dmi.dbis.reqman.ui.common.FilterActionHandler;
+import ch.unibas.dmi.dbis.reqman.ui.common.FilterBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import javafx.collections.ObservableList;
@@ -29,7 +32,7 @@ import java.util.UUID;
  *
  * @author loris.sauter
  */
-public class EvaluatorHandler implements EventHandler<CUDEvent> {
+public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHandler{
   
   private final static Logger LOGGER = LogManager.getLogger(EvaluatorHandler.class);
   
@@ -156,6 +159,25 @@ public class EvaluatorHandler implements EventHandler<CUDEvent> {
       default:
         // Ignoring
     }
+  }
+  
+  public void showFilterBar() {
+    evaluator.showFilterBar();
+  }
+  
+  @Override
+  public int applyFilter(String pattern, FilterBar.Mode mode) {
+    return 0;
+  }
+  
+  @Override
+  public int applyFilter(Requirement.Type type) {
+    return 0;
+  }
+  
+  @Override
+  public void resetFilter() {
+  
   }
   
   private void handleAddGroup(Group group){

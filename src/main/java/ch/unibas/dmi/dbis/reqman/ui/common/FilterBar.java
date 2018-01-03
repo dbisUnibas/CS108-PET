@@ -1,8 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
-import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
-import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.scene.Parent;
@@ -12,10 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.List;
 
 /**
  * TODO: Write JavaDoc
@@ -29,6 +24,7 @@ public class FilterBar extends HBox {
   private Label containsLbl;
   private Label infoLbl;
   private ComboBox<Mode> modeCB;
+  private ComboBox<Requirement.Type> typeCB;
   private TextField searchInput;
   private Button filterBtn;
   private Button resetBtn;
@@ -42,6 +38,10 @@ public class FilterBar extends HBox {
   
   public void clear() {
     searchInput.clear();
+  }
+  
+  public void show() {
+    setVisible(true);
   }
   
   private void layoutComponents() {
@@ -58,6 +58,9 @@ public class FilterBar extends HBox {
     modeCB = new ComboBox<>();
     modeCB.setItems(FXCollections.observableArrayList(Mode.values()));
     modeCB.getSelectionModel().select(Mode.TEXT);
+    
+    typeCB = new ComboBox<>();
+    typeCB.setItems(FXCollections.observableArrayList(Requirement.Type.values()));
     searchInput = new TextField();
     filterBtn = new Button("Filter");
     filterBtn.setOnAction(this::handleFilter);
@@ -65,21 +68,28 @@ public class FilterBar extends HBox {
     resetBtn.setOnAction(this::handleReset);
     closeBtn = new Button("Close");
     closeBtn.setOnAction(this::handleClose);
+    
+    modeCB.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
+      if (newValue.equals(Mode.TYPE)) {
+        getChildren().remove(3);
+        getChildren().add(3, typeCB);
+        typeCB.getSelectionModel().selectFirst();
+      } else {
+        getChildren().remove(3);
+        getChildren().add(3, searchInput);
+      }
+    }));
   }
   
   private void handleClose(ActionEvent actionEvent) {
 //    handler.closeFilterBar();
     // TODO Solution with parent passed and reference is stored.
     Parent p = getParent();
-    if(p instanceof Pane){
-      ((Pane)p).getChildren().remove(this);
-    }else{
+    if (p instanceof Pane) {
+      ((Pane) p).getChildren().remove(this);
+    } else {
       setVisible(false);
     }
-  }
-  
-  public void show(){
-    setVisible(true);
   }
   
   private void handleReset(ActionEvent actionEvent) {
@@ -89,41 +99,27 @@ public class FilterBar extends HBox {
   }
   
   private void handleFilter(ActionEvent actionEvent) {
+    int amount = -1;
     String pattern = searchInput.getText();
     if (StringUtils.isNotBlank(pattern)) {
-      int amount = handler.applyFilter(pattern, modeCB.getSelectionModel().getSelectedItem());
-      if(amount == 0){
-        infoLbl.setText("No matches found!");
-      }else{
-        infoLbl.setText(String.format("Showing %d matche(s)", amount));
-      }
+      amount = handler.applyFilter(pattern, modeCB.getSelectionModel().getSelectedItem());
+    } else if (typeCB.getSelectionModel().getSelectedItem() != null) {
+      amount = handler.applyFilter(typeCB.getSelectionModel().getSelectedItem());
     }
-      /*List<Requirement> filtered = null;
-      
-      switch (modeCB.getSelectionModel().getSelectedItem()) {
-        case NAME:
-          filtered = EntityController.getInstance().getCatalogueAnalyser().findRequirementsNameContains(pattern);
-          break;
-        case TEXT:
-          filtered = EntityController.getInstance().getCatalogueAnalyser().findRequirementsContaining(pattern);
-          break;
-        case CATEGORY:
-          filtered = EntityController.getInstance().getCatalogueAnalyser().findRequirementsForCategory(pattern);
-          break;
-      }
-      if (filtered == null) {
-        infoLbl.setText("No matches found");
-        return;
-      }
-      infoLbl.setText(String.format("Showing %d matche(s)", filtered.size()));
-      handler.displayOnly(filtered);
-    }*/
+    if (amount == 0) {
+      infoLbl.setText("No matches found!");
+    } else if (amount == -1) {
+      // do nothing
+    } else {
+      infoLbl.setText(String.format("Showing %d matche(s)", amount));
+    }
   }
   
   public enum Mode {
     NAME,
     TEXT,
-    CATEGORY;
+    CATEGORY,
+    TYPE;
     
     @Override
     public String toString() {

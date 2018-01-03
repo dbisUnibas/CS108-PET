@@ -123,6 +123,14 @@ public class GroupAnalyser {
     return group.getProgressList().stream().filter( p -> matchesProgressSummary(p, ps)).collect(Collectors.toList());
   }
   
+  public List<Progress> getProgressFor(List<Requirement> list){
+    return list.stream().map(this::getProgressFor).collect(Collectors.toList());
+  }
+  
+  public double getSumFor(List<Progress> list){
+    return list.stream().mapToDouble(this::getActualPoints).sum();
+  }
+  
   boolean matchesProgressMilestone(Progress p, ProgressSummary ps) {
     Requirement req = getRequirementOf(p);
     Milestone ms = catalogueAnalyser.getMilestoneOf(ps);
@@ -135,4 +143,7 @@ public class GroupAnalyser {
     }
     return p.getProgressSummaryUUID().equals(ps.getUuid());
   }
+  
+  
+  
 }
