@@ -1,11 +1,13 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
+import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.data.Progress;
 import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -131,6 +133,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     maxPointLbl = new Label(POINTS_MAX_POINTS_SEPARATOR+StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum()));
   }
   
+  private ProgressSummary getActiveProgressSummary(){
+    return summaryCb.getSelectionModel().getSelectedItem();
+  }
+  
   private void layoutComponents() {
     // Forge top aka title bar:
     headerContainer.setAlignment(Pos.CENTER_LEFT);
@@ -164,7 +170,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     ObservableList<Progress> progressList = EntityController.getInstance().getObservableProgressOf(group, progressSummary);
     
     double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(progressSummary);
-    maxPointLbl.setText(POINTS_MAX_POINTS_SEPARATOR+StringUtils.prettyPrint(sum));
+    setupMaxPointsDisplay(sum);
     
     activeProgressViews.clear();
     for(Progress p : progressList){
@@ -175,6 +181,35 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
       pv.addPointsChangeListener(this);
     }
     
+    attachProgressViews();
+  }
+  
+  private void setupMaxPointsDisplay(double sum){
+    maxPointLbl.setText(POINTS_MAX_POINTS_SEPARATOR+StringUtils.prettyPrint(sum));
+  }
+  
+  private ObservableList<Progress> currentlyFilteredProgress;
+  
+  void displayProgressViews(List<Requirement> toDisplay){
+    detachProgressViews();
+    if(currentlyFilteredProgress != null){
+      currentlyFilteredProgress.clear();
+    }
+    GroupAnalyser analyser = EntityController.getInstance().getGroupAnalyser(group);
+    currentlyFilteredProgress = FXCollections.observableList(analyser.getProgressFor(toDisplay, getActiveProgressSummary()));
+    
+    double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
+    setupMaxPointsDisplay(sum);
+  
+    activeProgressViews.clear();
+    for(Progress p : currentlyFilteredProgress){
+      activeProgressViews.add( new ProgressView(p, getActiveProgressSummary()));
+    }
+  
+    for(ProgressView pv : activeProgressViews){
+      pv.addPointsChangeListener(this);
+    }
+  
     attachProgressViews();
   }
   

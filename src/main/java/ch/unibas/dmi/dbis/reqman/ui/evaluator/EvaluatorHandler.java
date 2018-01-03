@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.Callback;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
@@ -167,12 +168,34 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   
   @Override
   public int applyFilter(String pattern, FilterBar.Mode mode) {
-    return 0;
+    CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
+    List<Requirement> requirements = null;
+    
+    switch(mode){
+      case NAME:
+        requirements = analyser.findRequirementsNameContains(pattern);
+        break;
+      case TEXT:
+        requirements = analyser.findRequirementsContaining(pattern);
+        break;
+      case CATEGORY:
+        requirements = analyser.findRequirementsForCategory(pattern);
+        break;
+      case TYPE:
+        // Should not happen
+        break;
+    }
+    
+    assessmentViewMap.get(evaluator.getActiveGroupUUID()).displayProgressViews(requirements);
+    return requirements.size();
   }
   
   @Override
   public int applyFilter(Requirement.Type type) {
-    return 0;
+    CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
+    List<Requirement> requirements = analyser.findRequirementsByType(type);
+    assessmentViewMap.get(evaluator.getActiveGroupUUID()).displayProgressViews(requirements);
+    return requirements.size();
   }
   
   @Override
