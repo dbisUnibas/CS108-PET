@@ -2,10 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
-import ch.unibas.dmi.dbis.reqman.data.Milestone;
-import ch.unibas.dmi.dbis.reqman.data.Progress;
-import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
-import ch.unibas.dmi.dbis.reqman.data.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
@@ -61,7 +58,6 @@ public class ProgressView extends VBox {
    */
   private ToggleButton collapseButton;
   
-  // TODO Handle non-binary malus/bonus requirement
   
   /* === ProgressView === */
   private GridPane headerContainer;
@@ -95,16 +91,21 @@ public class ProgressView extends VBox {
   private Label commentLbl;
   private TextArea taComment;
   
+  private Label lastModifiedLbl;
+  private Label lastModifiedDisplay;
+  private Label predecessorLbl;
+  private ScrollPane predecessorScroll;
+  
+  
   /* === Model / Controller === */
   private Progress progress;
   private Requirement requirement;
   private ProgressSummary progressSummary;
+  private Group group;
   
-  // Todo Check what to do
   private List<PointsChangeListener> listeners = new ArrayList<>();
   private List<DirtyListener> dirtyListeners = new ArrayList<>();
   
-  // TODO Add last modified timestamp display
   
   
   /**
@@ -112,11 +113,12 @@ public class ProgressView extends VBox {
    *
    * @param progress
    */
-  public ProgressView(Progress progress, ProgressSummary progressSummary) {
+  public ProgressView(Group group, Progress progress, ProgressSummary progressSummary) {
     this();
     this.progress = progress;
     this.progressSummary = progressSummary;
     this.requirement = EntityController.getInstance().getCatalogueAnalyser().getRequirementById(progress.getRequirementUUID());
+    this.group = group;
     initComponents();
     layoutComponents();
     setupControlHandlers();
@@ -237,6 +239,12 @@ public class ProgressView extends VBox {
     commentLbl = new Label("Comment");
     taComment = new TextArea();
     
+    lastModifiedLbl = new Label("Assessment on");
+    lastModifiedDisplay = new Label();
+    predecessorLbl = new Label("Predecessors");
+    predecessorScroll = new ScrollPane();
+    predecessorScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    predecessorScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
     initAssessmentComponents();
   }
   
@@ -252,6 +260,10 @@ public class ProgressView extends VBox {
     collapsibleContainer.add(taDesc, 1, 1, 3, 1);
     collapsibleContainer.add(commentLbl, 0, 2);
     collapsibleContainer.add(taComment, 1, 2, 3, 1);
+    collapsibleContainer.add(lastModifiedLbl, 0, 3);
+    collapsibleContainer.add(lastModifiedDisplay, 1,3, 3,1);
+    collapsibleContainer.add(predecessorLbl, 0, 4);
+    collapsibleContainer.add(predecessorScroll, 1, 4, 3, 1);
     setCollapsible(collapsibleContainer);
     setBorder(new Border(new BorderStroke(Color.SILVER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
   }
@@ -406,6 +418,7 @@ public class ProgressView extends VBox {
     progress.setProgressSummaryUUID(progressSummary.getUuid());
     LOGGER.debug("Processing assessment: {}", progress);
     updatePointsDisplay();
+    displayAssessmentDate();
     notifyPointsListener();
   }
   
@@ -430,6 +443,31 @@ public class ProgressView extends VBox {
       }
       updatePointsDisplay();
       taComment.setText(progress.getComment());
+      displayAssessmentDate();
+      updatePredecessorDisplay();
+    }
+  }
+  
+  public void updatePredecessorDisplay() {
+    HBox box = new HBox();
+    Utils.applyDefaultSpacing(box);
+    EntityController.getInstance().getCatalogueAnalyser().getPredecessors(requirement).forEach(r -> {
+      Progress predProg = EntityController.getInstance().getGroupAnalyser(group).getProgressFor(r);
+      if(predProg.hasProgress()){
+        box.getChildren().add(new Label(r.getName()));
+      }else{
+        Label lbl = new Label(r.getName());
+        lbl.setTextFill(Color.RED);
+        box.getChildren().add(lbl);
+      }
+    });
+    predecessorScroll.setContent(box);
+  }
+  
+  private void displayAssessmentDate(){
+    SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy 'at' HH:mm");
+    if(progress.getAssessmentDate() != null){
+      lastModifiedDisplay.setText(df.format(progress.getAssessmentDate()));
     }
   }
   

@@ -122,11 +122,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
       if(EntityController.getInstance().getGroupAnalyser(group).isProgressUnlocked(p)){
         // Everything fine: Progress unlocked
         pv.setLocked(false);
-        LOGGER.debug("Unlocking pv of {}", pv.getRequirement().getName());
+        LOGGER.trace("Unlocking pv of {}", pv.getRequirement().getName());
       }else{
         pv.setLocked(true);
-        LOGGER.debug("Locking pv of {}", pv.getRequirement().getName());
+        LOGGER.trace("Locking pv of {}", pv.getRequirement().getName());
       }
+      pv.updatePredecessorDisplay();
     }
   }
   
@@ -143,7 +144,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     activeProgressViews.clear();
     for (Progress p : currentlyFilteredProgress) {
-      activeProgressViews.add(new ProgressView(p, getActiveProgressSummary()));
+      activeProgressViews.add(new ProgressView(group,p, getActiveProgressSummary()));
     }
     
     for (ProgressView pv : activeProgressViews) {
@@ -237,7 +238,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     activeProgressViews.clear();
     for (Progress p : progressList) {
-      activeProgressViews.add(new ProgressView(p, progressSummary));
+      activeProgressViews.add(new ProgressView(group,p, progressSummary));
     }
     
     for (ProgressView pv : activeProgressViews) {
