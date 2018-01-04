@@ -23,15 +23,21 @@ public class Progress {
   private Date assessmentDate = null;
   private UUID progressSummaryUUID;
   private String comment;
-  @Deprecated @JsonIgnore
+  
+  @Deprecated
+  @JsonIgnore
   private String requirementName;
-  @Deprecated @JsonIgnore
+  @Deprecated
+  @JsonIgnore
   private int milestoneOrdinal;
-  @Deprecated @JsonIgnore
+  @Deprecated
+  @JsonIgnore
   private double points = 0;
-  @Deprecated @JsonIgnore
+  @Deprecated
+  @JsonIgnore
   private double percentage = -1d;
-  @Deprecated @JsonIgnore
+  @Deprecated
+  @JsonIgnore
   private Date date = null;
   
   public Progress() {
@@ -49,6 +55,15 @@ public class Progress {
   @Deprecated
   public Progress(Requirement req) {
     this(req.getName(), req.getMinMilestoneOrdinal(), 0);
+  }
+  
+  public Progress(Progress progress) {
+    this();
+    fraction = progress.getFraction();
+    requirementUUID = progress.getRequirementUUID();
+    assessmentDate = progress.getAssessmentDate();
+    progressSummaryUUID = progress.getProgressSummaryUUID();
+    comment = progress.getComment();
   }
   
   public double getFraction() {
@@ -166,10 +181,11 @@ public class Progress {
    * Returns whether this progress was freshly created.
    * A non-freshly created progress was either loaded from a group file
    * or was modified by a user.
+   *
    * @return Whether this progress was freshly created. Then it returns {@code true}, {@code false} otherwise.
    */
   @JsonIgnore
-  public boolean isFresh(){
+  public boolean isFresh() {
     return fraction == NO_PROGRESS;
   }
   

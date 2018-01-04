@@ -3,10 +3,7 @@ package ch.unibas.dmi.dbis.reqman.data;
 import ch.unibas.dmi.dbis.reqman.ui.common.MandatoryFieldsMissingException;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -321,15 +318,28 @@ public class EntityFactory {
   }
   
   public List<ProgressSummary> copyProgressSummaries(Group source) {
-    return new ArrayList<>(source.getProgressSummaries());
+    return source.getProgressSummaries().stream().map(ProgressSummary::new).collect(Collectors.toList());
   }
   
   public List<Progress> copyProgressList(Group source) {
-    return new ArrayList<>(source.getProgressList());
+    return source.getProgressList().stream().map(Progress::new).collect(Collectors.toList());
   }
   
   public List<Progress> createProgressList() {
     return catalogue.getRequirements().stream().map(this::createProgressFor).collect(Collectors.toList());
+  }
+  
+  public void appendMissing(List<Progress> progressList) {
+    Set<UUID> reqUuids = catalogue.getRequirements().stream().map(Requirement::getUuid).collect(Collectors.toSet());
+    Map<UUID, Requirement> reqMap = new TreeMap<>();
+    catalogue.getRequirements().forEach(r -> reqMap.put(r.getUuid(), r));
+    Set<UUID> progReqUuids = progressList.stream().map(Progress::getRequirementUUID).collect(Collectors.toSet());
+    boolean hasMissing = reqUuids.removeAll(progReqUuids);
+    if(hasMissing){
+      for(UUID reqUuid : reqUuids){
+        progressList.add(createProgressFor(reqMap.get(reqUuid)));
+      }
+    }
   }
   
   /**

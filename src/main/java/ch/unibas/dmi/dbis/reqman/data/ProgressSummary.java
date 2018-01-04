@@ -29,8 +29,17 @@ public class ProgressSummary {
     this.externalComment = externalComment;
   }
   
+  
+  
   public ProgressSummary() {
     this.uuid = UUID.randomUUID();
+  }
+  
+  public ProgressSummary(ProgressSummary ps){
+    this();
+    milestoneUUID = ps.getMilestoneUUID();
+    internalComment = ps.getInternalComment();
+    externalComment = ps.getExternalComment();
   }
   
   
@@ -102,4 +111,5 @@ public class ProgressSummary {
     sb.append('}');
     return sb.toString();
   }
+  
 }
