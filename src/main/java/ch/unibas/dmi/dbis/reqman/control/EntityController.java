@@ -262,9 +262,11 @@ public class EntityController {
   public void addGroup(Group g){
     observableGroups.add(g);
     addGroupAnalyser(g, new GroupAnalyser(getCourse(), getCatalogue(), g));
-    entityFactory.appendMissing(g.getProgressList());
+    int missingProgresses = entityFactory.appendMissingProgresses(g);
     progressGroupMap.put(g.getUuid(), FXCollections.observableList(g.getProgressList()));
+    int missingSummaries = entityFactory.appendMissingProgressSummaries(g);
     summaryGroupMap.put(g.getUuid(), FXCollections.observableList(g.getProgressSummaries()));
+    LOGGER.debug("Added group ({}) and added {} missing progresses and {} missing progress summareis",g.getName(), missingProgresses, missingSummaries);
   }
   
   public void removeGroup(Group g){

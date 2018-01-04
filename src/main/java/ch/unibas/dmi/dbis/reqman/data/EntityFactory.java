@@ -329,17 +329,34 @@ public class EntityFactory {
     return catalogue.getRequirements().stream().map(this::createProgressFor).collect(Collectors.toList());
   }
   
-  public void appendMissing(List<Progress> progressList) {
+  public int appendMissingProgresses(Group group) {
+    List<Progress> progressList = group.getProgressList();
     Set<UUID> reqUuids = catalogue.getRequirements().stream().map(Requirement::getUuid).collect(Collectors.toSet());
     Map<UUID, Requirement> reqMap = new TreeMap<>();
     catalogue.getRequirements().forEach(r -> reqMap.put(r.getUuid(), r));
     Set<UUID> progReqUuids = progressList.stream().map(Progress::getRequirementUUID).collect(Collectors.toSet());
     boolean hasMissing = reqUuids.removeAll(progReqUuids);
+    int missing = reqUuids.size();
     if(hasMissing){
-      for(UUID reqUuid : reqUuids){
-        progressList.add(createProgressFor(reqMap.get(reqUuid)));
-      }
+      reqUuids.stream().map(reqUuid -> createProgressFor(reqMap.get(reqUuid))).forEach(progressList::add);
     }
+    group.setProgressList(progressList);
+    return missing;
+  }
+  
+  public int appendMissingProgressSummaries(Group group) {
+    List<ProgressSummary> summaries = group.getProgressSummaries();
+    Set<UUID> msIds = catalogue.getMilestones().stream().map(Milestone::getUuid).collect(Collectors.toSet());
+    Map<UUID, Milestone> msMap = new TreeMap<>();
+    catalogue.getMilestones().forEach(ms -> msMap.put(ms.getUuid(), ms));
+    Set<UUID> summariesIds = summaries.stream().map(ProgressSummary::getMilestoneUUID).collect(Collectors.toSet());
+    boolean hasMissing = msIds.removeAll(summariesIds);
+    int missing = msIds.size();
+    if(hasMissing){
+      msIds.stream().map(msId -> createProgressSummary(msMap.get(msId))).forEach(summaries::add);
+    }
+    group.setProgressSummaries(summaries);
+    return missing;
   }
   
   /**
