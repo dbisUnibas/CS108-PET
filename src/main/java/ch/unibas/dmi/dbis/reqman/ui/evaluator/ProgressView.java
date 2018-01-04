@@ -215,7 +215,7 @@ public class ProgressView extends VBox {
     String sign = requirement.isMalus() ? "-" : "";
     maxPoints = new Label("/ " + sign + StringUtils.prettyPrint(requirement.getMaxPoints()));
     
-    categoryLbl = new Label("Category");
+    categoryLbl = new Label("Category:");
     category = new Label(requirement.getCategory());
     
     collapsibleContainer = Utils.generateDefaultGridPane();
@@ -267,9 +267,15 @@ public class ProgressView extends VBox {
         assessmentWrapper.getChildren().addAll(check, points, maxPoints);
         break;
     }
-    assessmentContainer.addRow(0, assessmentWrapper);
-    assessmentContainer.addRow(1, categoryLbl, category);
+    HBox categoryWrapper = new HBox();
+    Utils.applyDefaultSpacing(categoryWrapper);
+    categoryWrapper.setAlignment(Pos.CENTER_RIGHT);
+    categoryWrapper.getChildren().addAll(categoryLbl, category);
+    assessmentContainer.add(assessmentWrapper,0,0,2,1);
+    assessmentContainer.add(categoryWrapper, 0, 1, 2, 1);
+//    assessmentContainer.addRow(1, categoryLbl, category);
     assessmentContainer.prefWidthProperty().bind(widthProperty().multiply(0.4));
+    assessmentContainer.setMinWidth(Math.max(assessmentWrapper.getWidth(), categoryWrapper.getWidth())+5); // 5 Totally a magic number
   }
   
   private void initCollapsibleView() {

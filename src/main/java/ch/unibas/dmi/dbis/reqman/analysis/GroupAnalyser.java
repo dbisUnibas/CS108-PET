@@ -104,7 +104,7 @@ public class GroupAnalyser {
     int predecessorsFulfilled = 0;
     for(Requirement r : catalogueAnalyser.getPredecessors(getRequirementOf(progress))){
       Progress p = getProgressFor(r);
-      if(p.getFraction() > 0){
+      if(p.hasProgress()){
         predecessorsFulfilled++;
       }
     }
