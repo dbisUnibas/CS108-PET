@@ -132,7 +132,7 @@ public class GroupAnalyser {
   }
   
   public double getSumFor(List<Progress> list){
-    return list.stream().mapToDouble(this::getActualPoints).sum();
+    return list.stream().filter(Progress::hasProgress).mapToDouble(this::getActualPoints).sum();
   }
   
   boolean matchesProgressMilestone(Progress p, ProgressSummary ps) {
