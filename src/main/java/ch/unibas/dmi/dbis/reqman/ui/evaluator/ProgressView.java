@@ -107,7 +107,6 @@ public class ProgressView extends VBox {
   private List<DirtyListener> dirtyListeners = new ArrayList<>();
   
   
-  
   /**
    * Creates a new ProgressView and ints all
    *
@@ -174,6 +173,22 @@ public class ProgressView extends VBox {
     taComment.setDisable(locked);
   }
   
+  public void updatePredecessorDisplay() {
+    HBox box = new HBox();
+    Utils.applyDefaultSpacing(box);
+    EntityController.getInstance().getCatalogueAnalyser().getPredecessors(requirement).forEach(r -> {
+      Progress predProg = EntityController.getInstance().getGroupAnalyser(group).getProgressFor(r);
+      if (predProg.hasProgress()) {
+        box.getChildren().add(new Label(r.getName()));
+      } else {
+        Label lbl = new Label(r.getName());
+        lbl.setTextFill(Color.RED);
+        box.getChildren().add(lbl);
+      }
+    });
+    predecessorScroll.setContent(box);
+  }
+  
   void addDirtyListener(DirtyListener listener) {
     dirtyListeners.add(listener);
   }
@@ -204,9 +219,16 @@ public class ProgressView extends VBox {
         break;
       case BONUS:
       case MALUS:
-        type = new Label(requirement.getType().toString());
-        check = new CheckBox();
-        points = new Label("0");
+        if (requirement.isBinary()) {
+          type = new Label(requirement.getType().toString());
+          check = new CheckBox();
+          points = new Label("0");
+        } else {
+          spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1d);
+          spinnerPoints.getEditor().setPrefColumnCount(StringUtils.prettyPrint(requirement.getMaxPoints()).length() + 4); // 4 is totally a magic number
+          spinnerPoints.setEditable(true);
+        }
+        
         break;
     }
   }
@@ -261,7 +283,7 @@ public class ProgressView extends VBox {
     collapsibleContainer.add(commentLbl, 0, 2);
     collapsibleContainer.add(taComment, 1, 2, 3, 1);
     collapsibleContainer.add(lastModifiedLbl, 0, 3);
-    collapsibleContainer.add(lastModifiedDisplay, 1,3, 3,1);
+    collapsibleContainer.add(lastModifiedDisplay, 1, 3, 3, 1);
     collapsibleContainer.add(predecessorLbl, 0, 4);
     collapsibleContainer.add(predecessorScroll, 1, 4, 3, 1);
     setCollapsible(collapsibleContainer);
@@ -281,18 +303,23 @@ public class ProgressView extends VBox {
         break;
       case BONUS:
       case MALUS:
-        assessmentWrapper.getChildren().addAll(check, points, maxPoints);
+        if (requirement.isBinary()) {
+          assessmentWrapper.getChildren().addAll(check, points, maxPoints);
+        } else {
+          assessmentWrapper.getChildren().addAll(spinnerPoints, maxPoints);
+        }
+        
         break;
     }
     HBox categoryWrapper = new HBox();
     Utils.applyDefaultSpacing(categoryWrapper);
     categoryWrapper.setAlignment(Pos.CENTER_RIGHT);
     categoryWrapper.getChildren().addAll(categoryLbl, category);
-    assessmentContainer.add(assessmentWrapper,0,0,2,1);
+    assessmentContainer.add(assessmentWrapper, 0, 0, 2, 1);
     assessmentContainer.add(categoryWrapper, 0, 1, 2, 1);
 //    assessmentContainer.addRow(1, categoryLbl, category);
     assessmentContainer.prefWidthProperty().bind(widthProperty().multiply(0.4));
-    assessmentContainer.setMinWidth(Math.max(assessmentWrapper.getWidth(), categoryWrapper.getWidth())+5); // 5 Totally a magic number
+    assessmentContainer.setMinWidth(Math.max(assessmentWrapper.getWidth(), categoryWrapper.getWidth()) + 5); // 5 Totally a magic number
   }
   
   private void initCollapsibleView() {
@@ -333,26 +360,34 @@ public class ProgressView extends VBox {
           yesBtn.setOnAction(this::handleYesNo);
           noBtn.setOnAction(this::handleYesNo);
         } else {
-          // Solution by: http://stackoverflow.com/a/39380146
-          spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
-            if (!newValue) {
-              spinnerPoints.increment(0);
-            }
-          });
-          spinnerPoints.valueProperty().addListener((observable, oldValue, newValue) -> {
-            if (Double.compare(oldValue, newValue) != 0) { // Only if really new value
-              progress.setFraction(newValue / requirement.getMaxPoints());
-              processAssessment();
-            }
-          });
+          setupSpinner();
         }
         break;
       case BONUS:
       case MALUS:
-        check.setOnAction(this::handleCheck);
+        if (requirement.isBinary()) {
+          check.setOnAction(this::handleCheck);
+        } else {
+          setupSpinner();
+        }
         break;
     }
     
+  }
+  
+  private void setupSpinner() {
+    // Solution by: http://stackoverflow.com/a/39380146
+    spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!newValue) {
+        spinnerPoints.increment(0);
+      }
+    });
+    spinnerPoints.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (Double.compare(oldValue, newValue) != 0) { // Only if really new value
+        progress.setFraction(newValue / requirement.getMaxPoints());
+        processAssessment();
+      }
+    });
   }
   
   private void updatePointsDisplay() {
@@ -422,7 +457,6 @@ public class ProgressView extends VBox {
     notifyPointsListener();
   }
   
-  
   private void loadProgress() {
     if (progress != null && !progress.isFresh()) {
       switch (requirement.getType()) {
@@ -448,25 +482,9 @@ public class ProgressView extends VBox {
     }
   }
   
-  public void updatePredecessorDisplay() {
-    HBox box = new HBox();
-    Utils.applyDefaultSpacing(box);
-    EntityController.getInstance().getCatalogueAnalyser().getPredecessors(requirement).forEach(r -> {
-      Progress predProg = EntityController.getInstance().getGroupAnalyser(group).getProgressFor(r);
-      if(predProg.hasProgress()){
-        box.getChildren().add(new Label(r.getName()));
-      }else{
-        Label lbl = new Label(r.getName());
-        lbl.setTextFill(Color.RED);
-        box.getChildren().add(lbl);
-      }
-    });
-    predecessorScroll.setContent(box);
-  }
-  
-  private void displayAssessmentDate(){
+  private void displayAssessmentDate() {
     SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy 'at' HH:mm");
-    if(progress.getAssessmentDate() != null){
+    if (progress.getAssessmentDate() != null) {
       lastModifiedDisplay.setText(df.format(progress.getAssessmentDate()));
     }
   }
