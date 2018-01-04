@@ -53,8 +53,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   private Label maxPointLbl;
   private Label pointsLbl;
   private List<ProgressView> activeProgressViews = new ArrayList<>();
+  private ObservableList<Progress> currentlyFilteredProgress;
   
-  AssessmentView(Group group){
+  AssessmentView(Group group) {
     super();
     LOGGER.debug("Initializing for group {}", group);
     
@@ -63,7 +64,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     initComponents();
     layoutComponents();
     
-    loadGroup();
     //Milestone firstMS = EntityController.getInstance().getCourseManager().getFirstMilestone();
     //displayProgressViews(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(firstMS));
     summaryCb.getSelectionModel().selectFirst();
@@ -72,7 +72,11 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   @Override
   public void pointsChanged(double newValue) {
     LOGGER.trace("Points changed");
-    updateSumDisplay();
+    if(currentlyFilteredProgress != null && !currentlyFilteredProgress.isEmpty()){
+      updateSumDisplay(true);
+    }else{
+      updateSumDisplay();
+    }
   }
   
   public void bindToParentSize(Region parent) {
@@ -93,30 +97,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     updateSumDisplay();
   }
   
-  private void updateSumDisplay() {
-    double sum = EntityController.getInstance().getGroupAnalyser(group).getSumFor(summaryCb.getSelectionModel().getSelectedItem());
-    updateSumDisplay(sum);
-  }
-  
-  private void updateSumDisplay(double sum){
-    if(sum < 0){
-      pointsLbl.setTextFill(Color.RED);
-    }else{
-      pointsLbl.setTextFill(Color.BLACK);
-    }
-    pointsLbl.setText(StringUtils.prettyPrint(sum));
-    LOGGER.debug("Setting sum text: {}, request:{}",sum, EntityController.getInstance().getGroupAnalyser(group).getSumFor(getActiveProgressSummary()) );
-  }
-  
-  private void updateSumDisplay(boolean onlyVisible){
-    if(onlyVisible){
-      double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
-      updateSumDisplay(sum);
-    }else {
-      updateSumDisplay();
-    }
-  }
-  
   public Group getActiveGroup() {
     return group;
   }
@@ -133,8 +113,52 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
   }
   
-  private void loadGroup() {
-    LOGGER.debug("Load group");
+  void displayProgressViews(List<Requirement> toDisplay) {
+    detachProgressViews();
+    if (currentlyFilteredProgress != null) {
+      currentlyFilteredProgress.clear();
+    }
+    GroupAnalyser analyser = EntityController.getInstance().getGroupAnalyser(group);
+    currentlyFilteredProgress = FXCollections.observableList(analyser.getProgressFor(toDisplay, getActiveProgressSummary()));
+    
+    double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
+    setupMaxPointsDisplay(sum);
+    
+    activeProgressViews.clear();
+    for (Progress p : currentlyFilteredProgress) {
+      activeProgressViews.add(new ProgressView(p, getActiveProgressSummary()));
+    }
+    
+    for (ProgressView pv : activeProgressViews) {
+      pv.addPointsChangeListener(this);
+    }
+    
+    attachProgressViews();
+    updateSumDisplay(true);
+  }
+  
+  private void updateSumDisplay() {
+    double sum = EntityController.getInstance().getGroupAnalyser(group).getSumFor(summaryCb.getSelectionModel().getSelectedItem());
+    updateSumDisplay(sum);
+  }
+  
+  private void updateSumDisplay(double sum) {
+    if (sum < 0) {
+      pointsLbl.setTextFill(Color.RED);
+    } else {
+      pointsLbl.setTextFill(Color.BLACK);
+    }
+    pointsLbl.setText(StringUtils.prettyPrint(sum));
+    LOGGER.debug("Setting sum text: {}, request:{}", sum, EntityController.getInstance().getGroupAnalyser(group).getSumFor(getActiveProgressSummary()));
+  }
+  
+  private void updateSumDisplay(boolean onlyVisible) {
+    if (onlyVisible) {
+      double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
+      updateSumDisplay(sum);
+    } else {
+      updateSumDisplay();
+    }
   }
   
   private void initComponents() {
@@ -149,10 +173,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     footerContainer = new HBox();
     sumLbl = new Label("Points:");
     pointsLbl = new Label("0");
-    maxPointLbl = new Label(POINTS_MAX_POINTS_SEPARATOR+StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum()));
+    maxPointLbl = new Label(POINTS_MAX_POINTS_SEPARATOR + StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum()));
   }
   
-  private ProgressSummary getActiveProgressSummary(){
+  private ProgressSummary getActiveProgressSummary() {
     return summaryCb.getSelectionModel().getSelectedItem();
   }
   
@@ -162,8 +186,11 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     headerContainer.getChildren().addAll(choiceLbl, summaryCb, Utils.createHFill(), summaryBtn);
     Utils.applyDefaultSpacing(headerContainer);
     
-    if(EntityController.getInstance().hasCatalogue()){
-      summaryCb.setItems(FXCollections.observableArrayList(EntityController.getInstance().createProgressSummaries() ));
+    if (EntityController.getInstance().hasCatalogue()) {
+      if (group != null) {
+        summaryCb.setItems(EntityController.getInstance().getObservableProgressSummaries(group));
+      }
+//      summaryCb.setItems(FXCollections.observableArrayList(EntityController.getInstance().createProgressSummaries() ));
       summaryCb.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
         LOGGER.debug("Selected ProgressSummary: {}", newValue);
         CatalogueAnalyser analyiser = EntityController.getInstance().getCatalogueAnalyser();
@@ -180,11 +207,11 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     setCenter(scrollPane);
     Utils.applyDefaultSpacing(footerContainer);
     footerContainer.setAlignment(Pos.CENTER_RIGHT);
-    footerContainer.getChildren().addAll(sumLbl,pointsLbl,maxPointLbl);
+    footerContainer.getChildren().addAll(sumLbl, pointsLbl, maxPointLbl);
     setBottom(footerContainer);
   }
   
-  private void displayProgressViews(ProgressSummary progressSummary){
+  private void displayProgressViews(ProgressSummary progressSummary) {
     detachProgressViews();
     ObservableList<Progress> progressList = EntityController.getInstance().getObservableProgressOf(group, progressSummary);
     
@@ -192,51 +219,25 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     setupMaxPointsDisplay(sum);
     
     activeProgressViews.clear();
-    for(Progress p : progressList){
-      activeProgressViews.add( new ProgressView(p, progressSummary));
+    for (Progress p : progressList) {
+      activeProgressViews.add(new ProgressView(p, progressSummary));
     }
     
-    for(ProgressView pv : activeProgressViews){
+    for (ProgressView pv : activeProgressViews) {
       pv.addPointsChangeListener(this);
     }
     
     attachProgressViews();
   }
   
-  private void setupMaxPointsDisplay(double sum){
-    maxPointLbl.setText(POINTS_MAX_POINTS_SEPARATOR+StringUtils.prettyPrint(sum));
-  }
-  
-  private ObservableList<Progress> currentlyFilteredProgress;
-  
-  void displayProgressViews(List<Requirement> toDisplay){
-    detachProgressViews();
-    if(currentlyFilteredProgress != null){
-      currentlyFilteredProgress.clear();
-    }
-    GroupAnalyser analyser = EntityController.getInstance().getGroupAnalyser(group);
-    currentlyFilteredProgress = FXCollections.observableList(analyser.getProgressFor(toDisplay, getActiveProgressSummary()));
-    
-    double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
-    setupMaxPointsDisplay(sum);
-  
-    activeProgressViews.clear();
-    for(Progress p : currentlyFilteredProgress){
-      activeProgressViews.add( new ProgressView(p, getActiveProgressSummary()));
-    }
-  
-    for(ProgressView pv : activeProgressViews){
-      pv.addPointsChangeListener(this);
-    }
-  
-    attachProgressViews();
+  private void setupMaxPointsDisplay(double sum) {
+    maxPointLbl.setText(POINTS_MAX_POINTS_SEPARATOR + StringUtils.prettyPrint(sum));
   }
   
   private void handleComments(ActionEvent event) {
     LOGGER.debug("Handling commenting");
+    
   }
-  
-  
   
   
   private void attachProgressViews() {

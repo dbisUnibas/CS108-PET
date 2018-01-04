@@ -204,6 +204,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     assessmentViewMap.get(evaluator.getActiveGroupUUID()).displayAll();
   }
   
+  public void resetFilterForAll(){
+    assessmentViewMap.values().forEach(AssessmentView::displayAll);
+  }
+  
   private void handleAddGroup(Group group){
     handleAddGroup(group, false);
   }

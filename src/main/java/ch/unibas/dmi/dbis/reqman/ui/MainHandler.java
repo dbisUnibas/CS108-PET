@@ -406,7 +406,9 @@ public class MainHandler implements MenuHandler {
         }
         break;
       case EVALUATOR:
-        
+        if(EntityController.getInstance().hasGroups()){
+          evaluatorHandler.resetFilterForAll();
+        }
         break;
     }
     
