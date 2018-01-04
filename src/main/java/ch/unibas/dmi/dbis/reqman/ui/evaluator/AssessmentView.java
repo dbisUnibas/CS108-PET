@@ -247,6 +247,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     attachProgressViews();
     checkDependencies();
+    updateSumDisplay();
   }
   
   private void setupMaxPointsDisplay(double sum) {

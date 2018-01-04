@@ -258,8 +258,10 @@ public class ProgressView extends VBox {
     descLbl = new Label("Description");
     taDesc = new TextArea(requirement.getDescription());
     taDesc.setEditable(false);
+    taDesc.setPrefRowCount(4); // is totally a magic number
     commentLbl = new Label("Comment");
     taComment = new TextArea();
+    taComment.setPrefRowCount(4);
     
     lastModifiedLbl = new Label("Assessment on");
     lastModifiedDisplay = new Label();
@@ -471,8 +473,12 @@ public class ProgressView extends VBox {
           break;
         case BONUS:
         case MALUS:
-          boolean prog = progress.hasProgress();
-          check.setSelected(prog);
+          if (requirement.isBinary()) {
+            check.setSelected(progress.hasProgress());
+          } else {
+            spinnerPoints.getValueFactory().setValue(progress.getFraction() * requirement.getMaxPoints());
+          }
+          
           break;
       }
       updatePointsDisplay();
