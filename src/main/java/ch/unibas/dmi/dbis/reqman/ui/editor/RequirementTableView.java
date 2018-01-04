@@ -139,10 +139,25 @@ public class RequirementTableView extends BorderPane {
   }
   
   public void updateRequirement(Requirement requirement) {
-    removeFromTable(requirement);
-    tableData.add(ObservableRequirement.fromRequirement(requirement));
+    ObservableRequirement toUpdate = getDisplayOf(requirement);
+    if(toUpdate != null){
+      toUpdate.update(requirement);
+    }else{
+      removeFromTable(requirement);
+      tableData.add(ObservableRequirement.fromRequirement(requirement));
+    }
+    
     table.refresh();
     updatePoints();
+  }
+  
+  private ObservableRequirement getDisplayOf(Requirement requirement) {
+    for(ObservableRequirement dispReq : tableData){
+      if(dispReq.getRequirement().equals(requirement)){
+        return dispReq;
+      }
+    }
+    return null;
   }
   
   public void displayOnly(List<Requirement> requirementList) {
@@ -384,7 +399,17 @@ public class RequirementTableView extends BorderPane {
     public Requirement getRequirement() {
       return requirement;
     }
-    
+  
+    public void update(Requirement requirement) {
+      this.requirement = requirement;
+      name.set(requirement.getName());
+      points.set(requirement.getMaxPoints());
+      category.set(requirement.getCategory());
+      type.set(requirement.getType().toString());
+      minMSName.set(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(requirement.getMinimalMilestoneUUID()).getName());
+      maxMSName.set(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(requirement.getMaximalMilestoneUUID()).getName());
+    }
+  
     double getPoints() {
       return points.get();
     }
