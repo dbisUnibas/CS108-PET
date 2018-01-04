@@ -24,16 +24,6 @@ public class EvaluatorPromptFactory {
     return popup.prompt();
   }
   
-  public static ProgressSummary promptSummary(Milestone ms, String groupName) {
-    PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName));
-    return popup.prompt();
-  }
-  
-  public static ProgressSummary promptSummary(Milestone ms, String groupName, ProgressSummary summary) {
-    PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName, summary));
-    return popup.prompt();
-  }
-  
   public static Group promptSplit() {
     PromptPopup<Group> popup = new PromptPopup<>(new SplitGroupScene());
     return popup.prompt();
@@ -49,13 +39,9 @@ public class EvaluatorPromptFactory {
     return popup.prompt();
   }
   
-  static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor) {
-    PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName), acceptor);
-    popup.showPrompt();
-  }
   
-  static void showSummary(Milestone ms, String groupName, Consumer<ProgressSummary> acceptor, ProgressSummary summary) {
-    PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(ms, groupName, summary), acceptor);
+  public static void showProgressSummary(Group group, ProgressSummary selectedItem) {
+    PromptPopup<ProgressSummary> popup = new PromptPopup<>(new ProgressSummaryScene(group, selectedItem));
     popup.showPrompt();
   }
 }

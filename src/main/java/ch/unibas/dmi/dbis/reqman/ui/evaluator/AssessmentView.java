@@ -256,7 +256,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   
   private void handleComments(ActionEvent event) {
     LOGGER.debug("Handling commenting");
-    
+    EvaluatorPromptFactory.showProgressSummary(group, summaryCb.getSelectionModel().getSelectedItem());
   }
   
   
