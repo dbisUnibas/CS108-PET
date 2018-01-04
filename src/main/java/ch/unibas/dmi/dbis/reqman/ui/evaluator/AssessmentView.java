@@ -67,6 +67,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     //Milestone firstMS = EntityController.getInstance().getCourseManager().getFirstMilestone();
     //displayProgressViews(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(firstMS));
     summaryCb.getSelectionModel().selectFirst();
+    checkDependencies();
   }
   
   @Override
@@ -77,6 +78,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     }else{
       updateSumDisplay();
     }
+    checkDependencies();
   }
   
   public void bindToParentSize(Region parent) {
@@ -95,6 +97,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   public void displayAll() {
     displayProgressViews(summaryCb.getSelectionModel().getSelectedItem());
     updateSumDisplay();
+    checkDependencies();
   }
   
   public Group getActiveGroup() {
@@ -111,6 +114,20 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   public void unmarkDirty() {
     LOGGER.trace("Undirty");
     
+  }
+  
+  void checkDependencies(){
+    for(ProgressView pv : activeProgressViews){
+      Progress p = pv.getProgress();
+      if(EntityController.getInstance().getGroupAnalyser(group).isProgressUnlocked(p)){
+        // Everything fine: Progress unlocked
+        pv.setLocked(false);
+        LOGGER.debug("Unlocking pv of {}", pv.getRequirement().getName());
+      }else{
+        pv.setLocked(true);
+        LOGGER.debug("Locking pv of {}", pv.getRequirement().getName());
+      }
+    }
   }
   
   void displayProgressViews(List<Requirement> toDisplay) {
@@ -135,6 +152,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     attachProgressViews();
     updateSumDisplay(true);
+    checkDependencies();
   }
   
   private void updateSumDisplay() {
@@ -227,6 +245,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     }
     
     attachProgressViews();
+    checkDependencies();
   }
   
   private void setupMaxPointsDisplay(double sum) {

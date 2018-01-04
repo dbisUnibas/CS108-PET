@@ -167,6 +167,11 @@ public class ProgressView extends VBox {
     this.collapsible = node;
   }
   
+  public void setLocked(boolean locked) {
+    assessmentContainer.setDisable(locked);
+    taComment.setDisable(locked);
+  }
+  
   void addDirtyListener(DirtyListener listener) {
     dirtyListeners.add(listener);
   }
@@ -427,7 +432,6 @@ public class ProgressView extends VBox {
       taComment.setText(progress.getComment());
     }
   }
-  
   
   private void notifyPointsListener() {
     listeners.forEach(l -> l.pointsChanged(progress.getPoints()));
