@@ -1,8 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
-import ch.unibas.dmi.dbis.reqman.common.NamedEntity;
 import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -12,6 +12,7 @@ import java.util.*;
  *
  * @author loris.sauter
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Course extends VersionedEntity{
   
   private final UUID uuid;

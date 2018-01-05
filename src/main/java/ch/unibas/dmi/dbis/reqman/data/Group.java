@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
 import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,6 +18,7 @@ import java.util.*;
  *
  * @author loris.sauter
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Group extends VersionedEntity implements Comparable<Group> {
   
   

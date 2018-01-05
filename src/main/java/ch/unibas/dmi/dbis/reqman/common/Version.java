@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,6 +12,7 @@ import java.util.Properties;
  *
  * @author loris.sauter
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Version {
   
   public static final String NO_VERSION = "N/A";

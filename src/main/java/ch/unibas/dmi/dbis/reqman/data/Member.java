@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 /**
  * A {@link Member} is an abstraction of a person, represented by the triple <code>< name, firstName, email ></code>
  * <p>
@@ -8,6 +10,7 @@ package ch.unibas.dmi.dbis.reqman.data;
  *
  * @author loris.sauter
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Member {
   
   /**

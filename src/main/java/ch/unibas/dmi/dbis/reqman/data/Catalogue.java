@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.data;
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.*;
 
@@ -19,6 +20,7 @@ import java.util.*;
  *
  * @author loris.sauter
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Catalogue extends VersionedEntity{
   
   private final UUID uuid;
