@@ -15,6 +15,8 @@ import javafx.scene.control.TextField;
  */
 public class CoursePropertiesScene extends AbstractVisualCreator<Course> {
   
+  // TODO Checkbox for negativeReminderAllowed
+  
   private Course course = null;
   private TextField tfName = new TextField("Course"); // Default name
   private TextField ftSemester = new TextField();

@@ -29,6 +29,8 @@ import java.util.List;
  */
 public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandler {
   
+  // TODO: catalogue open, create new course
+  
   private static final Logger LOGGER = LogManager.getLogger(EditorHandler.class);
   
   private EditorView editor = null;
