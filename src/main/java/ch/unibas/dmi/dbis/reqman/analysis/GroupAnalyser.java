@@ -112,11 +112,15 @@ public class GroupAnalyser {
   }
   
   public double getSum(){
-    return group.getProgressList().stream().mapToDouble(this::getActualPoints).sum();
+    return group.getProgressSummaries().stream().mapToDouble(this::getSumFor).sum();
   }
   
   public double getSumFor(ProgressSummary ps){
-    return getProgressForProgressSummary(ps).stream().mapToDouble(this::getActualPoints).sum();
+    double sum = getProgressForProgressSummary(ps).stream().mapToDouble(this::getActualPoints).sum();
+    if(!course.isNegativeReminderAllowed()){
+      return sum < 0 ? 0d : sum;
+    }
+    return sum;
   }
   
   public List<Progress> getProgressForProgressSummary(ProgressSummary ps){

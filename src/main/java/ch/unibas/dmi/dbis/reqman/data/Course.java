@@ -20,6 +20,7 @@ public class Course extends VersionedEntity{
   private String name;
   private String semester;
   private UUID catalogueUUID;
+  private boolean negativeReminderAllowed;
   private Set<UUID> groupUUIDs;
   private Set<Time> timeEntities;
   
@@ -94,6 +95,14 @@ public class Course extends VersionedEntity{
       }
     }
     return false;
+  }
+  
+  public boolean isNegativeReminderAllowed() {
+    return negativeReminderAllowed;
+  }
+  
+  public void setNegativeReminderAllowed(boolean negativeReminderAllowed) {
+    this.negativeReminderAllowed = negativeReminderAllowed;
   }
   
   /**
