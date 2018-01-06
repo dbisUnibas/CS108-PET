@@ -157,10 +157,10 @@ public class CatalogueConverter {
       boolean mandatory = Boolean.valueOf(req.get(MANDATORY_KEY).toString());
       boolean malus = Boolean.valueOf(req.get(MALUS_KEY).toString());
       
-      if(mandatory){
-        requirement.setType(Requirement.Type.REGULAR);
-      }else if(malus){
+      if(malus && mandatory){
         requirement.setType(Requirement.Type.MALUS);
+      }else if(mandatory && !malus){
+        requirement.setType(Requirement.Type.REGULAR);
       }else{
         requirement.setType(Requirement.Type.BONUS);
       }
