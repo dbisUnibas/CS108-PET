@@ -12,6 +12,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import org.jetbrains.annotations.NotNull;
+import org.kordamp.ikonli.dashicons.Dashicons;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
  * TODO: write JavaDoc
@@ -24,6 +27,16 @@ public class Utils {
   public static final String HEAVY_PLUS = "\u2795";
   public static final String HEAVY_MINUS = "\u2212";
   public static final String ARROW_UP = "\u25b2";
+  
+  public static final String DASHICONS_CARET_UP = "dashicons-arrow-up";
+  public static final String DASHICONS_CARET_DOWN = "dashicons-arrow-down";
+  public static final String DASHICONS_CARET_UP_ALT = "dashicons-up-alt2";
+  public static final String DASHICONS_CARET_DONW_ALT = "dashicons-down-alt2";
+  public static final String DASHICONS_PLUS_THIN = "dashicons-plus-light";
+  public static final String DASHICONS_MINUS_THIN = "dashicons-minus-light";
+  
+  public static final int ICON_WIDHT = 15; // px, totally magic
+  
   public static final FileChooser.ExtensionFilter[] JSON_ANY_FILTER = new FileChooser.ExtensionFilter[]{
       new FileChooser.ExtensionFilter("JSON", "*.json"),
       new FileChooser.ExtensionFilter("Any", "*.*")
@@ -69,23 +82,60 @@ public class Utils {
   }
   
   public static Button createArrowUpButton() {
-    Button b = new Button(ARROW_UP);
-    b.setStyle("-fx-text-fill: dimgray;");
-    return b;
+    return createArrowUpButton(false);
+  }
+  
+  public static Button createArrowUpButton(boolean unicode){
+    return createArrowButton(unicode, ARROW_UP, Dashicons.ARROW_UP_ALT2);
+  }
+  
+  @NotNull
+  private static Button createArrowButton(boolean unicode, String arrowUp, Dashicons icon) {
+    if(unicode){
+      Button b = new Button(arrowUp);
+      b.setStyle("-fx-text-fill: dimgray;");
+      return b;
+    }else{
+      FontIcon fi = new FontIcon(icon);
+      fi.setIconSize(ICON_WIDHT);
+      return new Button("",fi);
+    }
   }
   
   public static Button createArrowDownButton() {
-    Button b = new Button(ARROW_DOWN);
-    b.setStyle("-fx-text-fill: dimgray;");
-    return b;
+    return createArrowDownButton(false);
+  }
+  
+  public static Button createArrowDownButton(boolean unicode){
+    return createArrowButton(unicode, ARROW_DOWN, Dashicons.ARROW_DOWN_ALT2);
   }
   
   public static Button createPlusButton() {
-    return new Button(HEAVY_PLUS); // Unicode: heavy plus sign
+    return createPlusButton(false);
+  }
+  
+  public static Button createPlusButton(boolean unicode){
+    if(unicode){
+      return new Button(HEAVY_PLUS);
+    }else{
+      FontIcon fi = new FontIcon(Dashicons.PLUS_LIGHT);
+      fi.setIconSize(ICON_WIDHT);
+      return new Button("",fi);
+    }
   }
   
   public static Button createMinusButton() {
-    return new Button(HEAVY_MINUS); // Unicode: heavy minus sign
+    return createMinusButton(false);
+  }
+  
+  public static Button createMinusButton(boolean unicode){
+    if(unicode){
+      return new Button(HEAVY_MINUS);
+    }else{
+      FontIcon fi = new FontIcon(Dashicons.MINUS);
+      fi.setIconSize(ICON_WIDHT);
+      return new Button("",fi);
+    }
   }
   
   public static FileChooser createCatalogueFileChooser(String action) {

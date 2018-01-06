@@ -39,6 +39,10 @@ dependencies {
 
     compile 'com.intellij:annotations:12.0'
 
+    compile group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: '2.1.1'
+    compile 'org.kordamp.ikonli:ikonli-dashicons-pack:2.1.1'
+
+
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.1'
 
