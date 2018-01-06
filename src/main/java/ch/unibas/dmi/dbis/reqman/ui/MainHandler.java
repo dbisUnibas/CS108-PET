@@ -13,10 +13,12 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.control.RadioMenuItem;
+import javafx.stage.FileChooser;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -406,7 +408,7 @@ public class MainHandler implements MenuHandler {
         }
         break;
       case EVALUATOR:
-        if(EntityController.getInstance().hasGroups()){
+        if (EntityController.getInstance().hasGroups()) {
           evaluatorHandler.resetFilterForAll();
         }
         break;
@@ -422,15 +424,15 @@ public class MainHandler implements MenuHandler {
         LOGGER.debug("Showing editor filter");
         if (EntityController.getInstance().hasCatalogue()) {
           editorHandler.showFilterBar();
-        }else{
+        } else {
           LOGGER.debug("Not showing filter bar because no catalogue available");
         }
         break;
       case EVALUATOR:
         LOGGER.debug("Showing evaluator filter");
-        if(EntityController.getInstance().hasGroups()){
+        if (EntityController.getInstance().hasGroups()) {
           evaluatorHandler.showFilterBar();
-        }else{
+        } else {
           LOGGER.debug("Not showing filter bar because no groups available");
         }
         break;
@@ -440,10 +442,10 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleSplitGroup(ActionEvent event) {
-    if(EntityController.getInstance().hasGroups()){
+    if (EntityController.getInstance().hasGroups()) {
       mainScene.setActive(MainScene.Mode.EVALUATOR);
       evaluatorHandler.handleSplit(event);
-    }else{
+    } else {
       LOGGER.debug("Cannot split group if there is no group available");
     }
   }
@@ -451,6 +453,35 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleCatalogueStatistics(ActionEvent event) {
     editorHandler.showStatistics();
+  }
+  
+  @Override
+  public void handleImport(ActionEvent event) {
+    if(Utils.showConfirmationDialog("Import Catalogue", "You will lose unsafed changes on both, groups and catalogue / course.\nAre you sure to continue?")){
+      mainScene.setActive(MainScene.Mode.EDITOR);
+      FileChooser fc = Utils.createFileChooser("Import Catalogue");
+      File f = fc.showOpenDialog(mainScene.getWindow());
+      evaluatorHandler.closeAll();
+      editorHandler.closeAll();
+      EntityController.getInstance().reset();
+      try {
+        if (EntityController.getInstance().convertOld(f)) {
+          Utils.showInfoDialog("Conversion Finished", "The conversion finished and will be displayed.");
+          editorHandler.setupEditor();
+          manager.enableCatalogueNeeded();
+          manager.enableEditorItems();
+        }
+      } catch (RuntimeException ex) {
+        LOGGER.fatal("Exception in conversion");
+        LOGGER.catching(Level.FATAL, ex);
+        Utils.showErrorDialog("Error - " + ex.getClass().getSimpleName(),
+            "An exception occurred",
+            "An uncaught exception occurred. The exception is of type " + ex.getClass().getSimpleName() + ".\n" +
+                "The exception's message is as follows:\n\t" + ex.getMessage() + "\n" +
+                "ReqMan probably would still work, but re-start is recommended.\n");
+      }
+    }
+    
   }
   
   public void setMainScene(MainScene mainScene) {

@@ -75,4 +75,6 @@ public interface MenuHandler {
   void handleSplitGroup(ActionEvent event);
   
   void handleCatalogueStatistics(ActionEvent event);
+  
+  void handleImport(ActionEvent event);
 }

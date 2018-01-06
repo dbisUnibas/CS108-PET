@@ -330,6 +330,16 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
     editor.showStatistics();
   }
   
+  public void closeAll() {
+    LOGGER.info("Close All");
+    reset();
+    editor.closeAll();
+  }
+  
+  private void reset() {
+  
+  }
+  
   void setEditorView(EditorView view) {
     this.editor = view;
   }

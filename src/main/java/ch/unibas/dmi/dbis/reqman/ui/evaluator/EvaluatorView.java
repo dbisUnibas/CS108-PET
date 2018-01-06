@@ -11,7 +11,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
@@ -141,6 +140,12 @@ public class EvaluatorView extends VBox implements TitleProvider {
   
   public void showFilterBar() {
     getChildren().add(0, filterBar);
+  }
+  
+  public void closeAll() {
+    this.groupTapMap.clear();
+    this.tabPane.getTabs().clear();
+    this.groupView.getItems().clear();
   }
   
   void enableAll() {

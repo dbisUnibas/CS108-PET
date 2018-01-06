@@ -151,6 +151,10 @@ public class RequirementTableView extends BorderPane {
     updatePoints();
   }
   
+  public void clear() {
+    tableData.clear();
+  }
+  
   private ObservableRequirement getDisplayOf(Requirement requirement) {
     for(ObservableRequirement dispReq : tableData){
       if(dispReq.getRequirement().equals(requirement)){

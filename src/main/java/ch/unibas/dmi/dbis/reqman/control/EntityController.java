@@ -57,6 +57,23 @@ public class EntityController {
   private ObservableList<Milestone> observableMilestones;
   
   
+  public void reset(){
+    catalogueAnalyser = null;
+    entityFactory = null;
+    storageManager = null;
+    sessionManager = null;
+    groupAnalyserMap.clear();
+    observableGroups.clear();
+    progressGroupMap.clear();
+    summaryGroupMap.clear();
+    if(observableMilestones != null){
+      observableMilestones.clear();
+    }
+    if(observableRequirements != null){
+      observableRequirements.clear();
+    }
+  }
+  
   private EntityController() {
     sessionManager = new SessionManager();
     loadSession();
@@ -135,7 +152,7 @@ public class EntityController {
     return progressGroupMap.get(g.getUuid());
   }
   
-  public ObservableList<ProgressSummary> getObservableProgressSummaries(Group g){
+  public ObservableList<ProgressSummary> getObservableProgressSummaries(Group g) {
     return summaryGroupMap.get(g.getUuid());
   }
   
@@ -146,21 +163,21 @@ public class EntityController {
   public ObservableList<Progress> getObservableProgressOf(@NotNull Group group, @NotNull ProgressSummary progressSummary) {
     LOGGER.debug("ObservableProgressOf {} @ {}", group, progressSummary);
     GroupAnalyser analyser = getGroupAnalyser(group);
-    ObservableList<Progress> list = FXCollections.observableList(analyser.getProgressFor(progressSummary) );
+    ObservableList<Progress> list = FXCollections.observableList(analyser.getProgressFor(progressSummary));
     return list;
   }
   
-  public void saveGroup(UUID groupUuid){
-    if(groupUuid != null){
+  public void saveGroup(UUID groupUuid) {
+    if (groupUuid != null) {
       LOGGER.debug("Progress-size: {}", getGroup(groupUuid).getProgressList().size());
-      if(storageManager != null){
+      if (storageManager != null) {
         try {
           storageManager.saveGroup(groupUuid);
         } catch (IOException e) {
           LOGGER.catching(e);
           // TODO WHat to do
         }
-      }else{
+      } else {
         throw LOGGER.throwing(new IllegalStateException("Cannot save group if no StorageManager is available"));
       }
     }
@@ -204,19 +221,6 @@ public class EntityController {
     return g;
   }
   
-  private void setupObservableCatalogueLists(){
-    observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
-    observableMilestones = FXCollections.observableArrayList();
-    
-    observableMilestones.addAll(getCatalogue().getMilestones());
-    observableRequirements.addAll(getCatalogue().getRequirements());
-  }
-  
-  private void loadedCatalogue(){
-    catalogueAnalyser = new CatalogueAnalyser(getCourse(), getCatalogue());
-    courseManager = new CourseManager(getCourse(), getCatalogue());
-  }
-  
   public Course getCourse() {
     if (entityFactory == null) {
       return null;
@@ -224,11 +228,9 @@ public class EntityController {
     return entityFactory.getCourse();
   }
   
-  
   public CatalogueAnalyser getCatalogueAnalyser() {
     return catalogueAnalyser;
   }
-  
   
   public CourseManager getCourseManager() {
     return courseManager;
@@ -249,7 +251,7 @@ public class EntityController {
     }
   }
   
-  public Group createGroup(String name, Member... members){
+  public Group createGroup(String name, Member... members) {
     Group g = entityFactory.createGroup(name, members);
     entityFactory.link(g, getCourse());
     g.setProgressSummaries(entityFactory.createProgressSummaries());
@@ -259,26 +261,26 @@ public class EntityController {
     return g;
   }
   
-  public void addGroup(Group g){
+  public void addGroup(Group g) {
     observableGroups.add(g);
     addGroupAnalyser(g, new GroupAnalyser(getCourse(), getCatalogue(), g));
     int missingProgresses = entityFactory.appendMissingProgresses(g);
     progressGroupMap.put(g.getUuid(), FXCollections.observableList(g.getProgressList()));
     int missingSummaries = entityFactory.appendMissingProgressSummaries(g);
     summaryGroupMap.put(g.getUuid(), FXCollections.observableList(g.getProgressSummaries()));
-    LOGGER.debug("Added group ({}) and added {} missing progresses and {} missing progress summareis",g.getName(), missingProgresses, missingSummaries);
+    LOGGER.debug("Added group ({}) and added {} missing progresses and {} missing progress summareis", g.getName(), missingProgresses, missingSummaries);
   }
   
-  public void removeGroup(Group g){
+  public void removeGroup(Group g) {
     observableGroups.remove(g);
     removeGroupAnalyser(g);
     progressGroupMap.remove(g.getUuid());
     summaryGroupMap.remove(g.getUuid());
   }
   
-  public Group getGroup(UUID id){
-    for(Group g : observableGroups){
-      if(g.getUuid().equals(id)){
+  public Group getGroup(UUID id) {
+    for (Group g : observableGroups) {
+      if (g.getUuid().equals(id)) {
         return g;
       }
     }
@@ -409,13 +411,13 @@ public class EntityController {
   }
   
   public void openCatalogue() throws IOException, UuidMismatchException {
-    if(storageManager.getCourse() != null){
+    if (storageManager.getCourse() != null) {
       Course c = getCourse();
-      entityFactory = EntityFactory.createFactoryFor(c, storageManager.openCatalogue() );
-    }else{
+      entityFactory = EntityFactory.createFactoryFor(c, storageManager.openCatalogue());
+    } else {
       Catalogue cat = storageManager.openCatalogue();
       Course c = storageManager.getCourse();
-      entityFactory = EntityFactory.createFactoryFor(c,cat);
+      entityFactory = EntityFactory.createFactoryFor(c, cat);
     }
     setupObservableCatalogueLists();
     loadedCatalogue();
@@ -423,32 +425,78 @@ public class EntityController {
     LOGGER.debug("Found {} categories: {}", categories.size(), categories);
   }
   
-  public void loadSession(){
-    if(sessionManager.hasSession() ){
+  public boolean convertOld(File file) throws RuntimeException{
+    CatalogueConverter converter = new CatalogueConverter();
+    
+    try{
+      converter.convert(Version.forString("2.0.0"), file);
+      
+      if(converter.getLastException() == null){
+        // seemingly all good
+        
+        Catalogue cat = converter.getCatalogue();
+        Course c = converter.getCourse();
+        
+        if(cat == null){
+          throw new RuntimeException("Converted to null catalogue");
+        }
+        if(c == null){
+          throw new RuntimeException("Converted to null course");
+        }
+        
+        entityFactory = EntityFactory.createFactoryFor(c,cat);
+        setupObservableCatalogueLists();
+        loadedCatalogue();
+        LOGGER.info("Conversion finished");
+        return true;
+      }else{
+        throw new RuntimeException("Exception during conversion.", converter.getLastException());
+      }
+    }catch (Throwable t){
+      LOGGER.fatal("Exception during conversion {}", t);
+      throw new RuntimeException("Exception during conversion.", t);
+    }
+  }
+  
+  public void loadSession() {
+    if (sessionManager.hasSession()) {
       sessionManager.loadSession();
       SessionStorage session = sessionManager.getSessionStorage();
       LOGGER.info("Loaded session {}", session);
-      if(storageManager != null){
+      if (storageManager != null) {
         storageManager.setSaveDir(new File(session.getLastUsedDir()));
-      }else{
+      } else {
         storageManager = StorageManager.getInstance(new File(session.getLastUsedDir()));
       }
-    }else{
+    } else {
       LOGGER.info("No session available");
     }
   }
   
-  public void saveSession() throws IOException{
-    if(storageManager != null){
+  public void saveSession() throws IOException {
+    if (storageManager != null) {
       LOGGER.info("Storing session...");
       SessionStorage session = new SessionStorage();
-      session.setDate(new Date() );
+      session.setDate(new Date());
       session.setVersion(Version.getInstance().getVersion());
       session.setLastUsedDir(storageManager.getSaveDir().getAbsolutePath());
       sessionManager.storeSession(session);
-      LOGGER.info("Stored session {}",session);
-    }else{
+      LOGGER.info("Stored session {}", session);
+    } else {
       LOGGER.info("No StorageManager found, not writing a sesison");
     }
+  }
+  
+  private void setupObservableCatalogueLists() {
+    observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
+    observableMilestones = FXCollections.observableArrayList();
+    
+    observableMilestones.addAll(getCatalogue().getMilestones());
+    observableRequirements.addAll(getCatalogue().getRequirements());
+  }
+  
+  private void loadedCatalogue() {
+    catalogueAnalyser = new CatalogueAnalyser(getCourse(), getCatalogue());
+    courseManager = new CourseManager(getCourse(), getCatalogue());
   }
 }

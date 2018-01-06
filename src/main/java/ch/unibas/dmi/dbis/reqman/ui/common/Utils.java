@@ -5,6 +5,7 @@ import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ListCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -15,6 +16,8 @@ import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
 import org.kordamp.ikonli.dashicons.Dashicons;
 import org.kordamp.ikonli.javafx.FontIcon;
+
+import java.util.Optional;
 
 /**
  * TODO: write JavaDoc
@@ -172,6 +175,18 @@ public class Utils {
     alert.showAndWait();
   }
   
+  public static boolean showConfirmationDialog(String header, String content) {
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Caution");
+    alert.setHeaderText(header);
+    alert.setContentText(content);
+    Optional<ButtonType> out = alert.showAndWait();
+    if(out.isPresent() ){
+      return out.get().equals(ButtonType.OK);
+    }
+    return false;
+  }
+  
   public static void showFeatureDisabled(String featureName, String reason){
     showWarningDialog("Feature Disabled", String.format("Feature %s disabled", featureName), String.format("The feature %s, is in the current version (%s) disabled.\n\nThe reason for this is:\n%s", featureName, Version.getInstance().getVersion(), reason));
   }
@@ -195,6 +210,8 @@ public class Utils {
   public static void applyDefaultSpacing(Node node) {
     node.setStyle("-fx-padding: 10px; -fx-spacing: 10px;"+node.getStyle());
   }
+  
+  
   
   public static class MilestoneCell extends ListCell<Milestone> {
     

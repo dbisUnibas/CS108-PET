@@ -54,6 +54,7 @@ public class MenuManager {
   public static final String ITEM_SHOW_CATALOGUE_STATISTICS = "itemShowCatalogueStatistics";
   public static final String ITEM_PRESENTATION_MODE = "itemPresentation";
   public static final String CLEAR_GLOBAL_MS_KEY = "clear";
+  public static final String ITEM_IMPORT = "itemImport";
   private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
   private static MenuManager instance = null;
   private final ToggleGroup toggleMilestone = new ToggleGroup();
@@ -96,6 +97,7 @@ public class MenuManager {
   private MenuItem itemEditorFilterClear;
   private MenuItem itemShowCatalogueStatistics;
   private MenuItem itemPresentation;
+  private MenuItem itemImport;
   private MenuBar menuBar = new MenuBar();
   private ArrayList<String> editorItems = new ArrayList<>();
   private ArrayList<String> evaluatorItems = new ArrayList<>();
@@ -124,6 +126,8 @@ public class MenuManager {
     registerMenuItem(ITEM_OPEN_CAT, itemOpenCat = new MenuItem("Open Catalogue..."));
     openItems.add(ITEM_OPEN_CAT);
     registerMenuItem(ITEM_OPEN_GROUPS, itemOpenGroup = new MenuItem("Open Group..."));
+    registerMenuItem(ITEM_IMPORT, itemImport = new MenuItem("Import Catalogue..."));
+    openItems.add(ITEM_IMPORT);
     openItems.add(ITEM_OPEN_GROUPS);
     catNeeded.add(ITEM_OPEN_GROUPS);
     
@@ -387,6 +391,9 @@ public class MenuManager {
             case ITEM_SHOW_CATALOGUE_STATISTICS:
               handler.handleCatalogueStatistics(event);
               break;
+            case ITEM_IMPORT:
+              handler.handleImport(event);
+              break;
             default:
               // Silently ignoring -> may log issue?
           }
@@ -407,6 +414,8 @@ public class MenuManager {
         itemSaveCourse, itemSaveCourseAs, itemSaveCat, itemSaveCatAs, itemSaveGroup, itemSaveGroupAs,
         new SeparatorMenuItem(),
         itemExportCat, itemExportGroups/*,itemExportGroup /*TODO implement*/,
+        new SeparatorMenuItem(),
+        itemImport,
         new SeparatorMenuItem(),
         itemQuit
     );

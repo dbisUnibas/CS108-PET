@@ -208,6 +208,16 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     assessmentViewMap.values().forEach(AssessmentView::displayAll);
   }
   
+  public void closeAll() {
+    LOGGER.info("Close All");
+    reset();
+    evaluator.closeAll();
+  }
+  
+  private void reset() {
+    this.assessmentViewMap.clear();
+  }
+  
   private void handleAddGroup(Group group){
     handleAddGroup(group, false);
   }

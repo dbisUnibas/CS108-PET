@@ -64,13 +64,17 @@ public class EditorView extends BorderPane implements TitleProvider {
     Scene scene = new Scene(view);
     PopupStage stage = new PopupStage("Catalogue Overview", scene,false);
     // Following code hides the stage asap the focus is lost
-    stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+    /*stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
       if(!stage.isFocused()){
         stage.hide();
       }
-    });
+    });*/
     stage.show();
     
+  }
+  
+  public void closeAll() {
+    reqTableView.clear();
   }
   
   void enableAll() {
