@@ -39,12 +39,14 @@ dependencies {
 
     compile 'com.intellij:annotations:12.0'
 
-    compile group: 'org.kordamp.ikonli', name: 'ikonli-javafx', version: '2.1.1'
-    compile 'org.kordamp.ikonli:ikonli-dashicons-pack:2.1.1'
+    compile 'org.kordamp.ikonli:ikonli-javafx:2.1.1'
+    //compile 'org.kordamp.ikonli:ikonli-dashicons-pack:2.1.1' // Maven central invalid --> not found on maven central (currently ?)
+    compile 'org.kordamp.ikonli:ikonli-openiconic-pack:2.1.1'
 
 
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.1'
+
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
@@ -73,6 +75,9 @@ jar {
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    manifest{
+        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication'
+    }
 }
 
 processResources {
@@ -98,21 +103,6 @@ tasks.withType(Javadoc) {
     options.addStringOption('Xdoclint:none', '-quiet')
 }
 
-task incrementTest {
-    doLast {
-        Properties p = new Properties()
-        File pF = new File('version.properties')
-        p.load(pF.newDataInputStream())
-        Integer fix = (p.getProperty('artifactFixVersion') as Integer)
-        logger.debug('fix version: ' + fix.toString())
-        Integer nextFix = fix + 1
-        logger.debug('next fix version: ' + nextFix.toString())
-        p.setProperty('artifactFixVersion', nextFix.toString())
-        p.store(pF.newWriter(), null)
-        p.load(pF.newDataInputStream())
-    }
-}
-
 
 task deployUpdater(type: Jar, dependsOn: classes) {
     appendix = 'updater'
@@ -126,18 +116,6 @@ task deployUpdater(type: Jar, dependsOn: classes) {
     doLast {
         println('Deployed updater: ' + jar.getArchiveName())
     }
-}
-
-/*
- * Goal: filter in Version.java @v@ and replace with actual version. Then comiple with it.
- * by : http://stackoverflow.com/a/33475075
- */
-
-
-gradle.taskGraph.whenReady {
-    taskGraph ->
-        jar.appendix = ''
-        jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication')
 }
 
 /**

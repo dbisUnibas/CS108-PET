@@ -14,8 +14,9 @@ import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
-import org.kordamp.ikonli.dashicons.Dashicons;
+import org.kordamp.ikonli.openiconic.Openiconic;
 import org.kordamp.ikonli.javafx.FontIcon;
+import org.kordamp.ikonli.openiconic.OpeniconicIkonHandler;
 
 import java.util.Optional;
 
@@ -89,11 +90,11 @@ public class Utils {
   }
   
   public static Button createArrowUpButton(boolean unicode){
-    return createArrowButton(unicode, ARROW_UP, Dashicons.ARROW_UP_ALT2);
+    return createArrowButton(unicode, ARROW_UP, Openiconic.CARET_TOP);
   }
   
   @NotNull
-  private static Button createArrowButton(boolean unicode, String arrowUp, Dashicons icon) {
+  private static Button createArrowButton(boolean unicode, String arrowUp, Openiconic icon) {
     if(unicode){
       Button b = new Button(arrowUp);
       b.setStyle("-fx-text-fill: dimgray;");
@@ -110,7 +111,7 @@ public class Utils {
   }
   
   public static Button createArrowDownButton(boolean unicode){
-    return createArrowButton(unicode, ARROW_DOWN, Dashicons.ARROW_DOWN_ALT2);
+    return createArrowButton(unicode, ARROW_DOWN, Openiconic.CARET_BOTTOM);
   }
   
   public static Button createPlusButton() {
@@ -121,7 +122,7 @@ public class Utils {
     if(unicode){
       return new Button(HEAVY_PLUS);
     }else{
-      FontIcon fi = new FontIcon(Dashicons.PLUS_LIGHT);
+      FontIcon fi = new FontIcon(Openiconic.PLUS);
       fi.setIconSize(ICON_WIDHT);
       return new Button("",fi);
     }
@@ -135,7 +136,7 @@ public class Utils {
     if(unicode){
       return new Button(HEAVY_MINUS);
     }else{
-      FontIcon fi = new FontIcon(Dashicons.MINUS);
+      FontIcon fi = new FontIcon(Openiconic.MINUS);
       fi.setIconSize(ICON_WIDHT);
       return new Button("",fi);
     }
