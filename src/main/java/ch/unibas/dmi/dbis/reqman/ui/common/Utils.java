@@ -86,7 +86,7 @@ public class Utils {
   }
   
   public static Button createArrowUpButton() {
-    return createArrowUpButton(false);
+    return createArrowUpButton(true);
   }
   
   public static Button createArrowUpButton(boolean unicode){
@@ -96,9 +96,7 @@ public class Utils {
   @NotNull
   private static Button createArrowButton(boolean unicode, String arrowUp, Openiconic icon) {
     if(unicode){
-      Button b = new Button(arrowUp);
-      b.setStyle("-fx-text-fill: dimgray;");
-      return b;
+      return createUnicodCaretUp();
     }else{
       FontIcon fi = new FontIcon(icon);
       fi.setIconSize(ICON_WIDHT);
@@ -106,16 +104,28 @@ public class Utils {
     }
   }
   
+  private static Button createUnicodCaretUp(){
+    Button b = new Button(ARROW_UP);
+    b.setStyle("-fx-text-fill: dimgray;");
+    return b;
+  }
+  
   public static Button createArrowDownButton() {
-    return createArrowDownButton(false);
+    return createArrowDownButton(true);
   }
   
   public static Button createArrowDownButton(boolean unicode){
-    return createArrowButton(unicode, ARROW_DOWN, Openiconic.CARET_BOTTOM);
+    return unicode ? createUnicodCaretDown() : createArrowButton(unicode, ARROW_DOWN, Openiconic.CARET_BOTTOM);
+  }
+  
+  private static Button createUnicodCaretDown() {
+    Button b = new Button(ARROW_DOWN);
+    b.setStyle("-fx-text-fill: dimgray;");
+    return b;
   }
   
   public static Button createPlusButton() {
-    return createPlusButton(false);
+    return createPlusButton(true);
   }
   
   public static Button createPlusButton(boolean unicode){
@@ -129,7 +139,7 @@ public class Utils {
   }
   
   public static Button createMinusButton() {
-    return createMinusButton(false);
+    return createMinusButton(true);
   }
   
   public static Button createMinusButton(boolean unicode){
