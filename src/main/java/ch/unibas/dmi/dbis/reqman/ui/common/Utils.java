@@ -2,11 +2,10 @@ package ch.unibas.dmi.dbis.reqman.ui.common;
 
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.ui.svg.SVGLoader;
+import ch.unibas.dmi.dbis.reqman.ui.svg.SVGNode;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -14,10 +13,10 @@ import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import org.jetbrains.annotations.NotNull;
-import org.kordamp.ikonli.openiconic.Openiconic;
 import org.kordamp.ikonli.javafx.FontIcon;
-import org.kordamp.ikonli.openiconic.OpeniconicIkonHandler;
+import org.kordamp.ikonli.openiconic.Openiconic;
 
+import java.io.IOException;
 import java.util.Optional;
 
 /**
@@ -45,6 +44,9 @@ public class Utils {
       new FileChooser.ExtensionFilter("JSON", "*.json"),
       new FileChooser.ExtensionFilter("Any", "*.*")
   };
+  
+  private static Node arrowDownIcon = null;
+  private static Node arrowUpIcon = null;
   
   /**
    * Creates the widely used {@link GridPane} with its default styling.
@@ -86,70 +88,90 @@ public class Utils {
   }
   
   public static Button createArrowUpButton() {
-    return createArrowUpButton(true);
-  }
-  
-  public static Button createArrowUpButton(boolean unicode){
-    return createArrowButton(unicode, ARROW_UP, Openiconic.CARET_TOP);
-  }
-  
-  @NotNull
-  private static Button createArrowButton(boolean unicode, String arrowUp, Openiconic icon) {
-    if(unicode){
-      return createUnicodCaretUp();
-    }else{
-      FontIcon fi = new FontIcon(icon);
-      fi.setIconSize(ICON_WIDHT);
-      return new Button("",fi);
+    try {
+      SVGNode node = SVGLoader.load("feather/chevron-up");
+      return new Button("", node);
+    } catch (IOException e) {
+      return new Button(ARROW_UP);
     }
   }
   
-  private static Button createUnicodCaretUp(){
-    Button b = new Button(ARROW_UP);
-    b.setStyle("-fx-text-fill: dimgray;");
-    return b;
+  public static Button createArrowUpButton(boolean unicode) {
+    return createArrowButton(unicode, ARROW_UP, Openiconic.CARET_TOP);
   }
   
   public static Button createArrowDownButton() {
-    return createArrowDownButton(true);
+    try {
+      SVGNode node = SVGLoader.load("feather/chevron-down");
+      return new Button("", node);
+    } catch (IOException e) {
+      return new Button(ARROW_DOWN);
+    }
   }
   
-  public static Button createArrowDownButton(boolean unicode){
+  public static Button createArrowDownButton(boolean unicode) {
     return unicode ? createUnicodCaretDown() : createArrowButton(unicode, ARROW_DOWN, Openiconic.CARET_BOTTOM);
   }
   
-  private static Button createUnicodCaretDown() {
-    Button b = new Button(ARROW_DOWN);
-    b.setStyle("-fx-text-fill: dimgray;");
-    return b;
-  }
-  
   public static Button createPlusButton() {
-    return createPlusButton(true);
+    return createPlusButton(false);
   }
   
-  public static Button createPlusButton(boolean unicode){
-    if(unicode){
+  public static Button createPlusButton(boolean unicode) {
+    if (unicode) {
       return new Button(HEAVY_PLUS);
-    }else{
-      FontIcon fi = new FontIcon(Openiconic.PLUS);
+    } else {
+      /*FontIcon fi = new FontIcon(Openiconic.PLUS);
       fi.setIconSize(ICON_WIDHT);
-      return new Button("",fi);
+      return new Button("",fi);*/
+      try {
+        SVGNode node = SVGLoader.load("feather/plus");
+        return new Button("", node);
+      } catch (IOException e) {
+        return new Button(HEAVY_PLUS);
+      }
     }
   }
   
   public static Button createMinusButton() {
-    return createMinusButton(true);
+    return createMinusButton(false);
   }
   
-  public static Button createMinusButton(boolean unicode){
-    if(unicode){
+  public static Button createMinusButton(boolean unicode) {
+    if (unicode) {
       return new Button(HEAVY_MINUS);
-    }else{
-      FontIcon fi = new FontIcon(Openiconic.MINUS);
+    } else {
+     /* FontIcon fi = new FontIcon(Openiconic.MINUS);
       fi.setIconSize(ICON_WIDHT);
-      return new Button("",fi);
+      return new Button("",fi);*/
+      try {
+        SVGNode node = SVGLoader.load("feather/minus");
+        return new Button("", node);
+      } catch (IOException e) {
+        return new Button(HEAVY_MINUS);
+      }
     }
+  }
+  
+  public static ToggleButton createArrowUpToggle() {
+    return new ToggleButton("", arrowUpIcon);
+  }
+  
+  public static Node createArrowUpNode() {
+    if (arrowUpIcon == null) {
+      try {
+        arrowUpIcon = SVGLoader.load("feather/chevron-up");
+      } catch (IOException e) {
+        arrowUpIcon = new Label(ARROW_UP);
+      }
+    }else if(arrowUpIcon instanceof SVGNode){
+      return ((SVGNode)arrowUpIcon).copy();
+    }
+    return arrowUpIcon;
+  }
+  
+  public static ToggleButton createArrowDownToggle() {
+    return new ToggleButton("", createArrowDownNode());
   }
   
   public static FileChooser createCatalogueFileChooser(String action) {
@@ -178,31 +200,23 @@ public class Utils {
     return r;
   }
   
-  private static void showDialog(Alert.AlertType type, String title, String header, String content) {
-    Alert alert = new Alert(type);
-    alert.setTitle(title);
-    alert.setHeaderText(header);
-    alert.setContentText(content);
-    alert.showAndWait();
-  }
-  
   public static boolean showConfirmationDialog(String header, String content) {
     Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
     alert.setTitle("Caution");
     alert.setHeaderText(header);
     alert.setContentText(content);
     Optional<ButtonType> out = alert.showAndWait();
-    if(out.isPresent() ){
+    if (out.isPresent()) {
       return out.get().equals(ButtonType.OK);
     }
     return false;
   }
   
-  public static void showFeatureDisabled(String featureName, String reason){
+  public static void showFeatureDisabled(String featureName, String reason) {
     showWarningDialog("Feature Disabled", String.format("Feature %s disabled", featureName), String.format("The feature %s, is in the current version (%s) disabled.\n\nThe reason for this is:\n%s", featureName, Version.getInstance().getVersion(), reason));
   }
   
-  public static void showFeatureDisabled(String featureName){
+  public static void showFeatureDisabled(String featureName) {
     showFeatureDisabled(featureName, "");
   }
   
@@ -219,10 +233,52 @@ public class Utils {
   }
   
   public static void applyDefaultSpacing(Node node) {
-    node.setStyle("-fx-padding: 10px; -fx-spacing: 10px;"+node.getStyle());
+    node.setStyle("-fx-padding: 10px; -fx-spacing: 10px;" + node.getStyle());
   }
   
+  public static Node createArrowDownNode() {
+    if (arrowDownIcon == null) {
+      try {
+        arrowDownIcon = SVGLoader.load("feather/chevron-down");
+      } catch (IOException e) {
+        arrowDownIcon = new Label(ARROW_DOWN);
+      }
+    }else if(arrowDownIcon instanceof SVGNode){
+      return ((SVGNode)arrowDownIcon).copy();
+    }
+    return arrowDownIcon;
+  }
   
+  @NotNull
+  private static Button createArrowButton(boolean unicode, String arrowUp, Openiconic icon) {
+    if (unicode) {
+      return createUnicodCaretUp();
+    } else {
+      FontIcon fi = new FontIcon(icon);
+      fi.setIconSize(ICON_WIDHT);
+      return new Button("", fi);
+    }
+  }
+  
+  private static Button createUnicodCaretUp() {
+    Button b = new Button(ARROW_UP);
+    b.setStyle("-fx-text-fill: dimgray;");
+    return b;
+  }
+  
+  private static Button createUnicodCaretDown() {
+    Button b = new Button(ARROW_DOWN);
+    b.setStyle("-fx-text-fill: dimgray;");
+    return b;
+  }
+  
+  private static void showDialog(Alert.AlertType type, String title, String header, String content) {
+    Alert alert = new Alert(type);
+    alert.setTitle(title);
+    alert.setHeaderText(header);
+    alert.setContentText(content);
+    alert.showAndWait();
+  }
   
   public static class MilestoneCell extends ListCell<Milestone> {
     

@@ -46,4 +46,8 @@ public class SVGNode extends Region {
   private void setup(){
     super.getChildren().add(canvas);
   }
+  
+  public SVGNode copy(){
+    return new SVGNode(desc);
+  }
 }

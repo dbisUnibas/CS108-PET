@@ -28,8 +28,8 @@ public class SVGPolyline implements SVGShape{
     yPoints = new double[size];
     xPoints = new double[size];
     for(int i=0; i<size; i++){
-      xPoints[i] = coordinates[i];
-      yPoints[i] = coordinates[i+1];
+      xPoints[i] = coordinates[i*2];
+      yPoints[i] = coordinates[i*2+1];
     }
   }
   

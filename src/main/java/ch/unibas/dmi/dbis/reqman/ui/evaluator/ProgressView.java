@@ -327,7 +327,7 @@ public class ProgressView extends VBox {
   private void initCollapsibleView() {
     // Containers
     top = new BorderPane();
-    collapseButton = new ToggleButton(Utils.ARROW_DOWN);
+    collapseButton = new ToggleButton("", Utils.createArrowDownNode());
     control = new HBox();
     Utils.applyDefaultSpacing(control);
     collapseButton.setOnAction(this::handleCollapse);
@@ -437,12 +437,12 @@ public class ProgressView extends VBox {
   
   private void handleCollapse(ActionEvent event) {
     if (collapseButton.isSelected()) {
-      collapseButton.setText(Utils.ARROW_UP);
+      collapseButton.setGraphic(Utils.createArrowUpNode());
       if (collapsible != null) {
         getChildren().add(collapsible);
       }
     } else {
-      collapseButton.setText(Utils.ARROW_DOWN);
+      collapseButton.setGraphic(Utils.createArrowDownNode());
       if (collapsible != null) {
         getChildren().remove(collapsible);
       }
