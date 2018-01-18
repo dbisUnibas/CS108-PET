@@ -4,6 +4,8 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * TODO: Write JavaDoc
@@ -12,16 +14,30 @@ import java.io.IOException;
  */
 public class SVGLoader {
   
-  private SVGLoader(){
-    // No instance
+  private static SVGLoader instance = null;
+  
+  public static SVGLoader getInstance(){
+    if(instance == null){
+      instance = new SVGLoader();
+    }
+    return instance;
   }
   
-  // TODO make singleton and add cache, so that only once parsed.
+  private Map<String, SVGDescription> cache;
+  private SVGParser parser = new SVGParser();
   
-  public static SVGNode load(String path) throws IOException {
-    SVGParser parser = new SVGParser();
+  private SVGLoader(){
+    cache = new HashMap<>();
+  }
+  
+  public SVGNode load(String path) throws IOException {
     try {
-      SVGDescription desc = parser.parse(path);
+      SVGDescription desc;
+      if(cache.containsKey(path)){
+        desc =  cache.get(path);
+      }else{
+        desc = parser.parse(path);
+      }
       return new SVGNode(desc);
     } catch (ParserConfigurationException | SAXException e) {
       // TODO Add smart handling of exceptions

@@ -89,7 +89,7 @@ public class Utils {
   
   public static Button createArrowUpButton() {
     try {
-      SVGNode node = SVGLoader.load("feather/chevron-up");
+      SVGNode node = SVGLoader.getInstance().load("feather/chevron-up");
       return new Button("", node);
     } catch (IOException e) {
       return new Button(ARROW_UP);
@@ -102,7 +102,7 @@ public class Utils {
   
   public static Button createArrowDownButton() {
     try {
-      SVGNode node = SVGLoader.load("feather/chevron-down");
+      SVGNode node = SVGLoader.getInstance().load("feather/chevron-down");
       return new Button("", node);
     } catch (IOException e) {
       return new Button(ARROW_DOWN);
@@ -125,7 +125,7 @@ public class Utils {
       fi.setIconSize(ICON_WIDHT);
       return new Button("",fi);*/
       try {
-        SVGNode node = SVGLoader.load("feather/plus");
+        SVGNode node = SVGLoader.getInstance().load("feather/plus");
         return new Button("", node);
       } catch (IOException e) {
         return new Button(HEAVY_PLUS);
@@ -145,7 +145,7 @@ public class Utils {
       fi.setIconSize(ICON_WIDHT);
       return new Button("",fi);*/
       try {
-        SVGNode node = SVGLoader.load("feather/minus");
+        SVGNode node = SVGLoader.getInstance().load("feather/minus");
         return new Button("", node);
       } catch (IOException e) {
         return new Button(HEAVY_MINUS);
@@ -160,7 +160,7 @@ public class Utils {
   public static Node createArrowUpNode() {
     if (arrowUpIcon == null) {
       try {
-        arrowUpIcon = SVGLoader.load("feather/chevron-up");
+        arrowUpIcon = SVGLoader.getInstance().load("feather/chevron-up");
       } catch (IOException e) {
         arrowUpIcon = new Label(ARROW_UP);
       }
@@ -239,7 +239,7 @@ public class Utils {
   public static Node createArrowDownNode() {
     if (arrowDownIcon == null) {
       try {
-        arrowDownIcon = SVGLoader.load("feather/chevron-down");
+        arrowDownIcon = SVGLoader.getInstance().load("feather/chevron-down");
       } catch (IOException e) {
         arrowDownIcon = new Label(ARROW_DOWN);
       }
