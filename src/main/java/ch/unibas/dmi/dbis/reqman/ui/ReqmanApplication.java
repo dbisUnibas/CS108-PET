@@ -46,6 +46,7 @@ public class ReqmanApplication extends Application {
     scene = new MainScene();
     primaryStage.setScene(scene);
     primaryStage.setTitle(scene.getTitle());
+    Utils.applyLogoIcon(primaryStage);
     primaryStage.show();
   }
   

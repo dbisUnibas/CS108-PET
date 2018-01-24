@@ -4,19 +4,25 @@ import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.svg.SVGLoader;
 import ch.unibas.dmi.dbis.reqman.ui.svg.SVGNode;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 import org.kordamp.ikonli.javafx.FontIcon;
 import org.kordamp.ikonli.openiconic.Openiconic;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -47,6 +53,22 @@ public class Utils {
   
   private static Node arrowDownIcon = null;
   private static Node arrowUpIcon = null;
+  
+  private static List<Image> iconList = null;
+  
+  public static List<Image> getIconList(){
+    if(iconList == null){
+      iconList = new ArrayList<>();
+      for(int i=16; i<=1024; i*=2){
+        iconList.add(new Image(Utils.class.getClassLoader().getResourceAsStream("logo/logo"+i+".png")));
+      }
+    }
+    return iconList;
+  }
+  
+  public static void applyLogoIcon(Stage s){
+    s.getIcons().addAll(getIconList() );
+  }
   
   /**
    * Creates the widely used {@link GridPane} with its default styling.
