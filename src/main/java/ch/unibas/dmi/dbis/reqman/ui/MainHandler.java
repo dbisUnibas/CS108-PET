@@ -97,7 +97,7 @@ public class MainHandler implements MenuHandler {
     }
     try {
       
-      if (EntityController.getInstance().isStorageManagerReady()) {
+      if (EntityController.getInstance().hasCourse()) {
         LOGGER.debug("Open Catalogue - course loaded");
         EntityController.getInstance().openCatalogue();
         mainScene.setActive(MainScene.Mode.EDITOR);

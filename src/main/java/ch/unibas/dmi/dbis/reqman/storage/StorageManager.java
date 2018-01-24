@@ -58,6 +58,13 @@ public class StorageManager {
   public static StorageManager getInstance(File dir){
     if(instance == null){
       instance = new StorageManager(dir);
+    }else{
+      File currentDir = instance.getSaveDir();
+      instance.LOGGER.debug("Receiving opening with dir={}, currentDir={}", dir, currentDir);
+      if(!dir.equals(currentDir)){
+        instance.setSaveDir(dir);
+        instance.LOGGER.debug("Prepared directory: dir={}", instance.getSaveDir());
+      }
     }
     return instance;
   }
@@ -99,7 +106,7 @@ public class StorageManager {
   public Course openCourse(File file) throws IOException{
     courseSaveFile = SaveFile.createForSaveFile(file, Course.class);
     courseSaveFile.open();
-    LOGGER.debug("Opened coruse:{}", courseSaveFile.getEntity());
+    LOGGER.debug("Opened course:{}", courseSaveFile.getEntity());
     return (Course)courseSaveFile.getEntity();
   }
   
