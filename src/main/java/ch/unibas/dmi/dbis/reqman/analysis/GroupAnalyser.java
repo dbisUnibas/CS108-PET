@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.analysis;
 import ch.unibas.dmi.dbis.reqman.data.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -150,6 +151,10 @@ public class GroupAnalyser {
       return false; // Then the case, if the progress was not yet assessed
     }
     return p.getProgressSummaryUUID().equals(ps.getUuid());
+  }
+  
+  public Comparator<Progress> getProgressComparator(){
+    return Comparator.comparing(this::getRequirementOf, catalogueAnalyser.getRequirementComparator());
   }
   
   
