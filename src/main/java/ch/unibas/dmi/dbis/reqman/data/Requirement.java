@@ -395,8 +395,8 @@ public class Requirement {
   public enum Type {
     
     REGULAR,
-    BONUS,
-    MALUS;
+    MALUS,
+    BONUS;
   
     @Override
     public String toString() {

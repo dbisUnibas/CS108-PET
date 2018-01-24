@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.analysis;
 
+import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.data.*;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
  *
  * @author loris.sauter
  */
-public class CatalogueAnalyser {
+public class CatalogueAnalyser{
   
   private final Catalogue catalogue;
   private final Course course;
@@ -67,7 +68,7 @@ public class CatalogueAnalyser {
    * @return
    */
   public List<Requirement> getRequirementsFor(Milestone milestone) {
-    return catalogue.getRequirements().stream().filter(r -> matchesMinimalMilestone(r, milestone)).collect(Collectors.toList());
+    return catalogue.getRequirements().stream().filter(r -> matchesMinimalMilestone(r, milestone)).sorted(getRequirementComparator()).collect(Collectors.toList());
   }
   
   /**
@@ -164,6 +165,16 @@ public class CatalogueAnalyser {
     return getRequirementsFor(getMilestoneOf(progressSummary));
   }
   
+  
+  
+  private Comparator<Requirement> getRequirementMinimalMilestoneComparator(){
+    return Comparator.comparing(courseManager::getMinimalMilestone, courseManager);
+  }
+  
+  public Comparator<Requirement> getRequirementComparator(){
+    return getRequirementMinimalMilestoneComparator().thenComparing(Requirement::getType, SortingUtils.REQUIREMENT_TYPE_COMPARATOR).thenComparing(Requirement::getName);
+  }
+  
   boolean containsRequirementPattern(Requirement requirement, String pattern){
     boolean inName = StringUtils.containsNullSafe(requirement.getName(), pattern);
     boolean inExcerpt = StringUtils.containsNullSafe(requirement.getExcerpt(), pattern);
@@ -210,5 +221,9 @@ public class CatalogueAnalyser {
       }
     }
     return null;
+  }
+  
+  public CourseManager getCourseManager() {
+    return courseManager;
   }
 }

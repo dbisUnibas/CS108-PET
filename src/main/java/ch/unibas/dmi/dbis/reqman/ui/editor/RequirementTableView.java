@@ -83,6 +83,7 @@ public class RequirementTableView extends BorderPane {
     LOGGER.traceEntry();
     LOGGER.debug("Requirements={}\ncat={}", requirements, catalogue);
     tableData.clear();
+    requirements.sort(EntityController.getInstance().getCatalogueAnalyser().getRequirementComparator());
     requirements.forEach(r -> tableData.add(ObservableRequirement.fromRequirement(r)));
     LOGGER.trace(":setRequirements - Created " + tableData.size() + " observable requirements");
     requirements.addListener(new ListChangeListener<Requirement>() {
