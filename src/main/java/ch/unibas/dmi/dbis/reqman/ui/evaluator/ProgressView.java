@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
@@ -322,6 +323,7 @@ public class ProgressView extends VBox {
 //    assessmentContainer.addRow(1, categoryLbl, category);
     assessmentContainer.prefWidthProperty().bind(widthProperty().multiply(0.4));
     assessmentContainer.setMinWidth(Math.max(assessmentWrapper.getWidth(), categoryWrapper.getWidth()) + 5); // 5 Totally a magic number
+    
   }
   
   private void initCollapsibleView() {
@@ -353,6 +355,7 @@ public class ProgressView extends VBox {
   private void setupControlHandlers() {
     setupCommentHandling();
     setupAssessmentHandling();
+    
   }
   
   private void setupAssessmentHandling() {
@@ -374,7 +377,40 @@ public class ProgressView extends VBox {
         }
         break;
     }
-    
+    setupResetHandling();
+  }
+  
+  private void setupResetHandling() {
+    assessmentWrapper.setOnMouseClicked(event -> {
+      if (event.getButton().equals(MouseButton.SECONDARY)) {
+        LOGGER.debug("Resetting due to RClick {} ({})", requirement.getName(), progress.getUuid());
+        
+        handleReset();
+      }
+    });
+  }
+  
+  private void handleReset() {
+    progress.reset();
+    switch (requirement.getType()) {
+      case REGULAR:
+        if (requirement.isBinary()) {
+          yesBtn.setSelected(false);
+          noBtn.setSelected(false);
+        } else {
+          spinnerPoints.getValueFactory().setValue(0d);
+        }
+        break;
+      case MALUS:
+      case BONUS:
+        if (requirement.isBinary()) {
+          check.setSelected(false);
+        } else {
+          spinnerPoints.getValueFactory().setValue(0d);
+        }
+        break;
+    }
+    processAssessment();
   }
   
   private void setupSpinner() {
@@ -394,10 +430,15 @@ public class ProgressView extends VBox {
   
   private void updatePointsDisplay() {
     // Only update point display, if in non-spinner environment
-    if (points != null) {
-      points.setText(StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getActualPoints(progress)));
+    if(!progress.isFresh()){
+      if (points != null) {
+        points.setText(StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getActualPoints(progress)));
+      }
+    }else{
+      if(points != null){
+        points.setText("0");
+      }
     }
-    
   }
   
   private void handleYesNo(ActionEvent event) {
@@ -492,6 +533,8 @@ public class ProgressView extends VBox {
     SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy 'at' HH:mm");
     if (progress.getAssessmentDate() != null) {
       lastModifiedDisplay.setText(df.format(progress.getAssessmentDate()));
+    }else{
+      lastModifiedDisplay.setText("");
     }
   }
   

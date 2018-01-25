@@ -252,4 +252,10 @@ public class Progress {
     result = 31 * result + (comment != null ? comment.hashCode() : 0);
     return result;
   }
+  
+  @JsonIgnore
+  public void reset() {
+    fraction=NO_PROGRESS;
+    assessmentDate = null;
+  }
 }
