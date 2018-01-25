@@ -118,7 +118,7 @@ public class MainScene extends TitledScene {
     evaluator.disableAll();
   }
   
-  enum Mode {
+  public enum Mode {
     EDITOR,
     EVALUATOR
   }

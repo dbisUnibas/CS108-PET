@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.session;
 
+import ch.unibas.dmi.dbis.reqman.ui.MainScene;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.*;
@@ -18,6 +20,45 @@ public class SessionStorage {
   private Date date;
   private String version;
   private String lastUsedDir;
+  private boolean enabled;
+  
+  private MainScene.Mode lastOpenMode;
+  
+  private List<String> lastOpenGroups;
+  
+  private UUID lastActiveProgressSummary;
+  
+  public boolean isEnabled() {
+    return enabled;
+  }
+  
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+  
+  public MainScene.Mode getLastOpenMode() {
+    return lastOpenMode;
+  }
+  
+  public void setLastOpenMode(MainScene.Mode lastOpenMode) {
+    this.lastOpenMode = lastOpenMode;
+  }
+  
+  public List<String> getLastOpenGroups() {
+    return lastOpenGroups;
+  }
+  
+  public void setLastOpenGroups(List<String> lastOpenGroups) {
+    this.lastOpenGroups = lastOpenGroups;
+  }
+  
+  public UUID getLastActiveProgressSummary() {
+    return lastActiveProgressSummary;
+  }
+  
+  public void setLastActiveProgressSummary(UUID lastActiveProgressSummary) {
+    this.lastActiveProgressSummary = lastActiveProgressSummary;
+  }
   
   private HashMap<String, String> data;
   
@@ -52,7 +93,7 @@ public class SessionStorage {
   public int dataSize() {
     return data.size();
   }
-  
+  @JsonIgnore
   public boolean isDataEmpty() {
     return data.isEmpty();
   }
