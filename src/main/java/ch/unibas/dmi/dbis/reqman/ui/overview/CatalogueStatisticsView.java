@@ -22,7 +22,7 @@ public class CatalogueStatisticsView extends VBox {
   
   private static final Logger LOGGER = LogManager.getLogger();
   
-  private TreeTableView<SimpleDisplayItem> treeTableView;
+  private TreeTableView<CatalogueOverviewItem> treeTableView;
   private EntityController ctrl;
   private CatalogueAnalyser analyser;
   
@@ -37,36 +37,84 @@ public class CatalogueStatisticsView extends VBox {
   
   private void layoutComps() {
     getChildren().add(treeTableView);
+    treeTableView.prefWidthProperty().bind(widthProperty());
+    treeTableView.prefHeightProperty().bind(heightProperty());
+    treeTableView.setMinHeight(200);
+    treeTableView.setMinWidth(200);
   }
   
   private void setupTreeTable() {
     ctrl = EntityController.getInstance();
     analyser = ctrl.getCatalogueAnalyser();
     Catalogue cat = ctrl.getCatalogue();
-    TreeItem<SimpleDisplayItem> root = new TreeItem<>(new SimpleDisplayItem(cat.getName(), analyser.getMaximalRegularSum()));
+    CatalogueOverviewItemFactory factory = new CatalogueOverviewItemFactory(analyser);
+    TreeItem<CatalogueOverviewItem> root = new TreeItem<>(factory.createFor(cat));
     root.setExpanded(true);
     cat.getMilestones().forEach(ms -> {
-      TreeItem<SimpleDisplayItem> msItem = new TreeItem<>(createFor(ms));
+      TreeItem<CatalogueOverviewItem> msItem = new TreeItem<>(factory.createFor(ms));
       msItem.setExpanded(true);
       analyser.getRequirementsFor(ms).stream().sorted(analyser.getRequirementComparator()).forEach(r -> {
-        TreeItem<SimpleDisplayItem> reqItem = new TreeItem<>(createFor(r));
+        TreeItem<CatalogueOverviewItem> reqItem = new TreeItem<>(factory.createFor(r));
         msItem.getChildren().add(reqItem);
       });
       root.getChildren().add(msItem);
     });
     
-    TreeTableColumn<SimpleDisplayItem, String> nameCol = new TreeTableColumn<>("Name");
-    nameCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<SimpleDisplayItem, String> param) ->
+    TreeTableColumn<CatalogueOverviewItem, String> nameCol = new TreeTableColumn<>("Name");
+    nameCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
         new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
     
-    TreeTableColumn<SimpleDisplayItem, String> pointsCol = new TreeTableColumn<>("Points");
-    pointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<SimpleDisplayItem, String> param) ->
-        new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getPoints())));
+    TreeTableColumn<CatalogueOverviewItem, String> pointsCol = new TreeTableColumn<>("Actual Points");
+    pointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
+        new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getActualPoints())));
+  
+    TreeTableColumn<CatalogueOverviewItem, String> typeCol = new TreeTableColumn<>("Type");
+    typeCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
+        new ReadOnlyStringWrapper(param.getValue().getValue().getType()));
+  
+    TreeTableColumn<CatalogueOverviewItem, String> regularPointsCol = new TreeTableColumn<>("Regular Points");
+    regularPointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
+    {
+      if(param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.REGULAR.toString())){
+        return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getRegularPoints()));
+      }else{
+        return new ReadOnlyStringWrapper("");
+      }
+    });
+  
+    TreeTableColumn<CatalogueOverviewItem, String> bonusPointsCol = new TreeTableColumn<>("Bonus Points");
+    bonusPointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
+    {
+      if(param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.BONUS.toString())){
+        return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getBonusPoints()));
+      }else{
+        return new ReadOnlyStringWrapper("");
+      }
+    });
+  
+    TreeTableColumn<CatalogueOverviewItem, String> malusPointsCol = new TreeTableColumn<>("Malus Points");
+    malusPointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
+    {
+      if(param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.MALUS.toString())){
+        return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getMalusPoints()));
+      }else{
+        return new ReadOnlyStringWrapper("");
+      }
+    });
+  
+    TreeTableColumn<CatalogueOverviewItem, String> categoryCol = new TreeTableColumn<>("Category");
+    categoryCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
+        new ReadOnlyStringWrapper(param.getValue().getValue().getCategory()));
     
     treeTableView = new TreeTableView<>(root);
     
     treeTableView.getColumns().add(nameCol);
     treeTableView.getColumns().add(pointsCol);
+    treeTableView.getColumns().add(typeCol);
+    treeTableView.getColumns().add(regularPointsCol);
+    treeTableView.getColumns().add(bonusPointsCol);
+    treeTableView.getColumns().add(malusPointsCol);
+    treeTableView.getColumns().add(categoryCol);
     nameCol.setPrefWidth(150);
   
     treeTableView.setTableMenuButtonVisible(true);
