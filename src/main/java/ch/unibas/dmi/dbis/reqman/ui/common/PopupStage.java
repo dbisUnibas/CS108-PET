@@ -28,7 +28,7 @@ public class PopupStage extends Stage {
         this.content = content;
         this.title = title;
 
-
+        Utils.applyLogoIcon(this);
         initComponents(modality);
     }
 
