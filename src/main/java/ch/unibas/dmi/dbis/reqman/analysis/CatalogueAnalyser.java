@@ -121,6 +121,9 @@ public class CatalogueAnalyser{
     return catalogue.getRequirements().stream().filter(Requirement::isMalus).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
+  public double getMaximalMalusSumFor(Milestone ms){
+    return getRequirementsFor(ms).stream().filter(Requirement::isMalus).mapToDouble(Requirement::getMaxPoints).sum();
+  }
   
   public List<Requirement> getPredecessors(Requirement requirement){
     List<Requirement> predecessors = new ArrayList<>();

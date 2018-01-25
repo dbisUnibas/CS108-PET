@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
 import ch.unibas.dmi.dbis.reqman.ui.common.*;
+import ch.unibas.dmi.dbis.reqman.ui.overview.CatalogueStatisticsView;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;

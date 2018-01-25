@@ -20,7 +20,7 @@ public class SessionStorage {
   private Date date;
   private String version;
   private String lastUsedDir;
-  private boolean enabled;
+  private boolean enabled = true;
   
   private MainScene.Mode lastOpenMode;
   

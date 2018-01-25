@@ -1,4 +1,4 @@
-package ch.unibas.dmi.dbis.reqman.ui.common;
+package ch.unibas.dmi.dbis.reqman.ui.overview;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
@@ -7,10 +7,11 @@ import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import javafx.beans.property.*;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 /**
  * TODO: Write JavaDoc
@@ -18,6 +19,8 @@ import javafx.scene.layout.VBox;
  * @author loris.sauter
  */
 public class CatalogueStatisticsView extends VBox {
+  
+  private static final Logger LOGGER = LogManager.getLogger();
   
   private TreeTableView<SimpleDisplayItem> treeTableView;
   private EntityController ctrl;
@@ -45,7 +48,7 @@ public class CatalogueStatisticsView extends VBox {
     cat.getMilestones().forEach(ms -> {
       TreeItem<SimpleDisplayItem> msItem = new TreeItem<>(createFor(ms));
       msItem.setExpanded(true);
-      analyser.getRequirementsFor(ms).forEach(r -> {
+      analyser.getRequirementsFor(ms).stream().sorted(analyser.getRequirementComparator()).forEach(r -> {
         TreeItem<SimpleDisplayItem> reqItem = new TreeItem<>(createFor(r));
         msItem.getChildren().add(reqItem);
       });
@@ -67,6 +70,16 @@ public class CatalogueStatisticsView extends VBox {
     nameCol.setPrefWidth(150);
   
     treeTableView.setTableMenuButtonVisible(true);
+    
+    treeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    treeTableView.getSelectionModel().setCellSelectionEnabled(false);
+    
+    treeTableView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
+      LOGGER.debug("SelectionIndex changed: old={}, new={}", observable,oldValue,newValue);
+      // Overall, the index is not so important, but this property can be used to get notified about the selection (and changes)!
+    });
+    
+    
   }
   
   
