@@ -7,12 +7,16 @@ import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import javafx.beans.property.*;
-import javafx.scene.control.*;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.java2d.pipe.SpanShapeRenderer;
+
+import java.util.stream.Collectors;
 
 /**
  * TODO: Write JavaDoc
@@ -39,7 +43,7 @@ public class CatalogueStatisticsView extends VBox {
   }
   
   private void layoutComps() {
-    getChildren().addAll(treeTableView,summaryView);
+    getChildren().addAll(treeTableView, summaryView);
     VBox.setVgrow(treeTableView, Priority.SOMETIMES);
   }
   
@@ -67,41 +71,41 @@ public class CatalogueStatisticsView extends VBox {
     TreeTableColumn<CatalogueOverviewItem, String> pointsCol = new TreeTableColumn<>("Actual Points");
     pointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
         new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getActualPoints())));
-  
+    
     TreeTableColumn<CatalogueOverviewItem, String> typeCol = new TreeTableColumn<>("Type");
     typeCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
         new ReadOnlyStringWrapper(param.getValue().getValue().getType()));
-  
+    
     TreeTableColumn<CatalogueOverviewItem, String> regularPointsCol = new TreeTableColumn<>("Regular Points");
     regularPointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
     {
-      if(param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.REGULAR.toString())){
+      if (param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.REGULAR.toString())) {
         return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getRegularPoints()));
-      }else{
+      } else {
         return new ReadOnlyStringWrapper("");
       }
     });
-  
+    
     TreeTableColumn<CatalogueOverviewItem, String> bonusPointsCol = new TreeTableColumn<>("Bonus Points");
     bonusPointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
     {
-      if(param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.BONUS.toString())){
+      if (param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.BONUS.toString())) {
         return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getBonusPoints()));
-      }else{
+      } else {
         return new ReadOnlyStringWrapper("");
       }
     });
-  
+    
     TreeTableColumn<CatalogueOverviewItem, String> malusPointsCol = new TreeTableColumn<>("Malus Points");
     malusPointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
     {
-      if(param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.MALUS.toString())){
+      if (param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.MALUS.toString())) {
         return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getMalusPoints()));
-      }else{
+      } else {
         return new ReadOnlyStringWrapper("");
       }
     });
-  
+    
     TreeTableColumn<CatalogueOverviewItem, String> categoryCol = new TreeTableColumn<>("Category");
     categoryCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
         new ReadOnlyStringWrapper(param.getValue().getValue().getCategory()));
@@ -116,18 +120,26 @@ public class CatalogueStatisticsView extends VBox {
     treeTableView.getColumns().add(malusPointsCol);
     treeTableView.getColumns().add(categoryCol);
     nameCol.setPrefWidth(150);
-  
+    
     treeTableView.setTableMenuButtonVisible(true);
     
     treeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     treeTableView.getSelectionModel().setCellSelectionEnabled(false);
     
     treeTableView.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-      LOGGER.debug("SelectionIndex changed: old={}, new={}", observable,oldValue,newValue);
+      LOGGER.debug("SelectionIndex changed: old={}, new={}", observable, oldValue, newValue);
       // Overall, the index is not so important, but this property can be used to get notified about the selection (and changes)!
+      if (newValue.intValue() != -1) {
+        handleSelection();
+      }else{
+        summaryView.clearSelected();
+      }
     });
     
-    
+  }
+  
+  private void handleSelection() {
+    summaryView.update(treeTableView.getSelectionModel().getSelectedCells().stream().map(o -> o.getTreeItem().getValue()).collect(Collectors.toList() ));
   }
   
   
