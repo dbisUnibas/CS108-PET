@@ -51,7 +51,7 @@ public class CatalogueOverviewItemFactory {
     
     item.setName(requirement.getName());
     item.setType(requirement.getType().toString());
-    item.setActualPoints(requirement.isMalus() ? -1d : 1d * requirement.getMaxPoints());
+    item.setActualPoints((requirement.isMalus() ? -1d : 1d) * requirement.getMaxPoints());
     item.setCategory(requirement.getCategory());
     switch(requirement.getType()){
       case REGULAR:
