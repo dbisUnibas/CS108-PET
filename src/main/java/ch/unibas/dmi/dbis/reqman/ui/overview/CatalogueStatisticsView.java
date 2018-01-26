@@ -8,6 +8,7 @@ import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import javafx.beans.property.*;
 import javafx.scene.control.*;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,10 +38,7 @@ public class CatalogueStatisticsView extends VBox {
   
   private void layoutComps() {
     getChildren().add(treeTableView);
-    treeTableView.prefWidthProperty().bind(widthProperty());
-    treeTableView.prefHeightProperty().bind(heightProperty());
-    treeTableView.setMinHeight(200);
-    treeTableView.setMinWidth(200);
+    VBox.setVgrow(treeTableView, Priority.ALWAYS);
   }
   
   private void setupTreeTable() {
