@@ -26,6 +26,7 @@ public class CatalogueStatisticsView extends VBox {
   private TreeTableView<CatalogueOverviewItem> treeTableView;
   private EntityController ctrl;
   private CatalogueAnalyser analyser;
+  private CatalogueSummaryView summaryView;
   
   public CatalogueStatisticsView() {
     initComps();
@@ -34,11 +35,12 @@ public class CatalogueStatisticsView extends VBox {
   
   private void initComps() {
     setupTreeTable();
+    summaryView = new CatalogueSummaryView(EntityController.getInstance().getCatalogueAnalyser());
   }
   
   private void layoutComps() {
-    getChildren().add(treeTableView);
-    VBox.setVgrow(treeTableView, Priority.ALWAYS);
+    getChildren().addAll(treeTableView,summaryView);
+    VBox.setVgrow(treeTableView, Priority.SOMETIMES);
   }
   
   private void setupTreeTable() {
