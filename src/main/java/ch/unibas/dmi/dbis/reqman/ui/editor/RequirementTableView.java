@@ -181,6 +181,7 @@ public class RequirementTableView extends BorderPane {
       totalPoints.set(analyser.getMaximalRegularSum());
       totalBonus.set(analyser.getMaximalBonusSum());
       totalMalus.set(analyser.getMaximalMalusSum());
+      
     }
     
   }
