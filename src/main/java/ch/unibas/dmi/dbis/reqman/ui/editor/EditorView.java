@@ -71,7 +71,11 @@ public class EditorView extends BorderPane implements TitleProvider {
       }
     });*/
     stage.show();
-    
+    reqTableView.setOnPointsChanged(pts -> {
+      if(stage.isShowing()){
+        view.update();
+      }
+    });
   }
   
   public void closeAll() {

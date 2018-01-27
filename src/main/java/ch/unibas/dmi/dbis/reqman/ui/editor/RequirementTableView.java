@@ -29,6 +29,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * TODO: write JavaDoc
@@ -38,7 +40,7 @@ import java.util.List;
 public class RequirementTableView extends BorderPane {
   
   private static final Logger LOGGER = LogManager.getLogger(RequirementTableView.class);
-  EventHandler<CUDEvent> modifyHandler = null;
+  private EventHandler<CUDEvent> modifyHandler = null;
   private Label title;
   private HBox header;
   private Button addBtn;
@@ -56,9 +58,15 @@ public class RequirementTableView extends BorderPane {
   private SimpleDoubleProperty totalBonus;
   private SimpleDoubleProperty totalMalus;
   
+  private Consumer<Double> changedConsumer;
+  
   RequirementTableView() {
     initComponents();
     layoutComponents();
+  }
+  
+  public void setOnPointsChanged(Consumer<Double> consumer){
+    changedConsumer = consumer;
   }
   
   public void setOnAdd(EventHandler<CUDEvent> handler) {
@@ -181,7 +189,9 @@ public class RequirementTableView extends BorderPane {
       totalPoints.set(analyser.getMaximalRegularSum());
       totalBonus.set(analyser.getMaximalBonusSum());
       totalMalus.set(analyser.getMaximalMalusSum());
-      
+      if(changedConsumer != null){
+        changedConsumer.accept(analyser.getMaximalRegularSum());
+      }
     }
     
   }

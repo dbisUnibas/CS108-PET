@@ -138,6 +138,14 @@ public class CatalogueStatisticsView extends VBox {
     
   }
   
+  public void update(){
+    getChildren().remove(treeTableView);
+    treeTableView = null;
+    setupTreeTable();
+    getChildren().add(0, treeTableView);
+    summaryView.update();
+  }
+  
   private void handleSelection() {
     summaryView.update(treeTableView.getSelectionModel().getSelectedCells().stream().map(o -> o.getTreeItem().getValue()).collect(Collectors.toList() ));
   }
