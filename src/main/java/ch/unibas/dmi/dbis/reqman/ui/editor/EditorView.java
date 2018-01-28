@@ -94,7 +94,9 @@ public class EditorView extends BorderPane implements TitleProvider {
   }
   
   public void stop() {
-    statisticsCloser.apply(null);
+    if(statisticsCloser != null){
+      statisticsCloser.apply(null);
+    }
   }
   
   void enableAll() {

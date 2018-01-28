@@ -13,10 +13,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
@@ -50,8 +47,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   private Group group;
   private HBox footerContainer;
   private Label sumLbl;
-  private Label maxPointLbl;
-  private Label pointsLbl;
+  private Label maxVisibleLbl;
+  private Label visiblePoints;
+  private Label maxTotalLbl;
+  private Label totalPoints;
   private List<ProgressView> activeProgressViews = new ArrayList<>();
   private ObservableList<Progress> currentlyFilteredProgress;
   
@@ -137,6 +136,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
       currentlyFilteredProgress.clear();
     }
     GroupAnalyser analyser = EntityController.getInstance().getGroupAnalyser(group);
+    toDisplay.sort(EntityController.getInstance().getCatalogueAnalyser().getRequirementComparator());
     currentlyFilteredProgress = FXCollections.observableList(analyser.getProgressFor(toDisplay, getActiveProgressSummary()));
     
     double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
@@ -157,23 +157,43 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   }
   
   private void updateSumDisplay() {
-    double sum = EntityController.getInstance().getGroupAnalyser(group).getSumFor(summaryCb.getSelectionModel().getSelectedItem());
-    updateSumDisplay(sum);
+    if(summaryCb.getSelectionModel().getSelectedItem() == null){
+      return;
+    }
+    double visible = EntityController.getInstance().getGroupAnalyser(group).getSumFor(summaryCb.getSelectionModel().getSelectedItem());
+    double visibleMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(summaryCb.getSelectionModel().getSelectedItem());
+    double total = EntityController.getInstance().getGroupAnalyser(group).getSum();
+    double totalMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum();
+    updatePointsSummary(visible,visibleMax,total,totalMax);
   }
   
-  private void updateSumDisplay(double sum) {
-    if (sum < 0) {
-      pointsLbl.setTextFill(Color.RED);
-    } else {
-      pointsLbl.setTextFill(Color.BLACK);
+  private void updatePointsSummary(double visible, double visibleMax, double total, double totalMax){
+    displaySensitivelyPoints(visiblePoints,visible,false);
+    displaySensitivelyPoints(maxVisibleLbl,visibleMax,true);
+    displaySensitivelyPoints(totalPoints,total,false);
+    displaySensitivelyPoints(maxTotalLbl, totalMax, true);
+  }
+  
+  private void displaySensitivelyPoints(Label lbl, double points, boolean paranthesis){
+    if(points < 0){
+      lbl.setTextFill(Color.RED);
+    }else{
+      lbl.setTextFill(Color.BLACK);
     }
-    pointsLbl.setText(StringUtils.prettyPrint(sum));
+    if(paranthesis){
+      lbl.setText("("+StringUtils.prettyPrint(points)+")");
+    }else{
+      lbl.setText(StringUtils.prettyPrint(points));
+    }
   }
   
   private void updateSumDisplay(boolean onlyVisible) {
     if (onlyVisible) {
-      double sum = EntityController.getInstance().getGroupAnalyser(group).getSumFor(currentlyFilteredProgress);
-      updateSumDisplay(sum);
+      double visible = EntityController.getInstance().getGroupAnalyser(group).getSumFor(currentlyFilteredProgress);
+      double visibleMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
+      double total = EntityController.getInstance().getGroupAnalyser(group).getSum();
+      double totalMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum();
+      updatePointsSummary(visible,visibleMax,total,totalMax);
     } else {
       updateSumDisplay();
     }
@@ -189,9 +209,16 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     content = new VBox();
     scrollPane = new ScrollPane();
     footerContainer = new HBox();
-    sumLbl = new Label("Points:");
-    pointsLbl = new Label("0");
-    maxPointLbl = new Label(POINTS_MAX_POINTS_SEPARATOR + StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum()));
+    sumLbl = new Label("Visible Points (Total Points): ");
+    sumLbl.setTooltip(new Tooltip("Summarizes the currently displayed points."));
+    totalPoints = new Label("0");
+    totalPoints.setTooltip(new Tooltip("The total amount of points this group has made."));
+    visiblePoints = new Label("0");
+    visiblePoints.setTooltip(new Tooltip("The amount of currently visible this group has made."));
+    maxTotalLbl = new Label("0");
+    maxTotalLbl.setTooltip(new Tooltip("The maximal amount of regular points to get."));
+    maxVisibleLbl = new Label("0");
+    maxVisibleLbl.setTooltip(new Tooltip("The maximal amount of regular points currently visible."));
   }
   
   private ProgressSummary getActiveProgressSummary() {
@@ -225,8 +252,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     setCenter(scrollPane);
     Utils.applyDefaultSpacing(footerContainer);
     footerContainer.setAlignment(Pos.CENTER_RIGHT);
-    footerContainer.getChildren().addAll(sumLbl, pointsLbl, maxPointLbl);
+    footerContainer.getChildren().addAll(sumLbl, Utils.createHFill(),visiblePoints,maxVisibleLbl, new Label(POINTS_MAX_POINTS_SEPARATOR),totalPoints, maxTotalLbl);
     setBottom(footerContainer);
+    
+    updateSumDisplay();
   }
   
   private void displayProgressViews(ProgressSummary progressSummary) {
@@ -251,7 +280,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   }
   
   private void setupMaxPointsDisplay(double sum) {
-    maxPointLbl.setText(POINTS_MAX_POINTS_SEPARATOR + StringUtils.prettyPrint(sum));
+    maxTotalLbl.setText(POINTS_MAX_POINTS_SEPARATOR + StringUtils.prettyPrint(sum));
   }
   
   private void handleComments(ActionEvent event) {
