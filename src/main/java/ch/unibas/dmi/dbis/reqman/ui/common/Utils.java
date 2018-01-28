@@ -4,8 +4,6 @@ import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.svg.SVGLoader;
 import ch.unibas.dmi.dbis.reqman.ui.svg.SVGNode;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -22,6 +20,7 @@ import org.kordamp.ikonli.openiconic.Openiconic;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,10 +57,13 @@ public class Utils {
   
   public static List<Image> getIconList(){
     if(iconList == null){
+      List<String> pathList = new ArrayList<>();
       iconList = new ArrayList<>();
       for(int i=16; i<=1024; i*=2){
-        iconList.add(new Image(Utils.class.getClassLoader().getResourceAsStream("logo/logo"+i+".png")));
+        pathList.add("logo/logo"+i+".png");
       }
+      pathList.sort(Comparator.reverseOrder());
+      pathList.forEach(path -> iconList.add(new Image(Utils.class.getClassLoader().getResourceAsStream(path))));
     }
     return iconList;
   }
@@ -83,6 +85,10 @@ public class Utils {
   
   public static void applyDefaultGridSetup(GridPane grid) {
     grid.setStyle("-fx-padding: 10px; -fx-spacing: 10px; -fx-hgap: 10px;-fx-vgap: 10px");
+  }
+  
+  public static void applyDefaultFineGridSpacing(GridPane grid){
+    grid.setStyle("-fx-padding: 2px; -fx-spacing: 2px; -fx-hgap: 2px;-fx-vgap: 1px");
   }
   
   public static void showInfoDialog(String title, String header, String content) {

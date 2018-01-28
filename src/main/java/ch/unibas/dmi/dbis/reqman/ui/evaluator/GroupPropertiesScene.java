@@ -64,7 +64,10 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
       
       List<Member> members = tableData.stream().map(ObservableMember::getMember).collect(Collectors.toList());
       
-      if(empty || (members == null || members.size() == 0)){
+      //TEMPORARY:
+      empty = false;
+      
+      if(empty){
         Utils.showWarningDialog("Invalid Members", "The group has too few members, at least one is needed!");
         return;
       }
@@ -73,7 +76,9 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
         group = EntityController.getInstance().createGroup(name, members.toArray(new Member[0]));
       } else {
         group.setName(name);
-        group.setMembers(members);
+        if(!members.isEmpty()){
+          group.setMembers(members);
+        }
       }
       
       if (StringUtils.isNotEmpty(tfExportFileName.getText())) {

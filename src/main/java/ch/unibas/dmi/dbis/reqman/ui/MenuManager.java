@@ -271,6 +271,7 @@ public class MenuManager {
     activeKeyBindings.put(ITEM_OPEN_CAT, "Ctrl+L");
     activeKeyBindings.put(ITEM_SAVE_CAT, "Alt+S");
     activeKeyBindings.put(ITEM_SAVE_CAT_AS, "Alt+Shift+S");
+    activeKeyBindings.put(ITEM_NEW_GROUP, "Ctrl+G");
     activeKeyBindings.put(ITEM_OPEN_GROUPS, "Ctrl+O");
     activeKeyBindings.put(ITEM_SAVE_GROUP, "Ctrl+S");
     activeKeyBindings.put(ITEM_SAVE_GROUP_AS, "Ctrl+Shift+S");

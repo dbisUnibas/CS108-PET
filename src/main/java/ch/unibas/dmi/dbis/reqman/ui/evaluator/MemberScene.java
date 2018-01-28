@@ -66,7 +66,7 @@ public class MemberScene extends AbstractVisualCreator<Member> {
   @Override
   protected void populateScene() {
     Label lblName = new Label("Name*");
-    Label lblSurname = new Label("Surname*");
+    Label lblSurname = new Label("Surname");
     Label lblEmail = new Label("Email");
     
     tfName = new TextField();

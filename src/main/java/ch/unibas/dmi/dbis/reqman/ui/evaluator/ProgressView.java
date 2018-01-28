@@ -237,9 +237,11 @@ public class ProgressView extends VBox {
   private void initComponents() {
     headerContainer = Utils.generateDefaultGridPane();
     heading = new Label(requirement.getName());
+    type = new Label(requirement.getType().toString());
     heading.setStyle("-fx-font-size: 1.5em;-fx-font-weight: bold;");
     excerpt = new Label(requirement.getExcerpt());
     assessmentContainer = Utils.generateDefaultGridPane();
+    Utils.applyDefaultFineGridSpacing(assessmentContainer);
     assessmentWrapper = new HBox();
     
     String sign = requirement.isMalus() ? "-" : "";
@@ -315,13 +317,18 @@ public class ProgressView extends VBox {
         break;
     }
     HBox categoryWrapper = new HBox();
+    HBox typeWrapper = new HBox();
+    Utils.applyDefaultSpacing(typeWrapper);
     Utils.applyDefaultSpacing(categoryWrapper);
+    typeWrapper.setAlignment(Pos.CENTER_RIGHT);
     categoryWrapper.setAlignment(Pos.CENTER_RIGHT);
     categoryWrapper.getChildren().addAll(categoryLbl, category);
+    typeWrapper.getChildren().addAll(new Label("Type:"), type);
     assessmentContainer.add(assessmentWrapper, 0, 0, 2, 1);
-    assessmentContainer.add(categoryWrapper, 0, 1, 2, 1);
+    assessmentContainer.add(typeWrapper, 0, 1, 2, 1);
+    assessmentContainer.add(categoryWrapper, 0, 2, 2, 1);
 //    assessmentContainer.addRow(1, categoryLbl, category);
-    assessmentContainer.prefWidthProperty().bind(widthProperty().multiply(0.4));
+    assessmentContainer.prefWidthProperty().bind(widthProperty().multiply(0.35));
     assessmentContainer.setMinWidth(Math.max(assessmentWrapper.getWidth(), categoryWrapper.getWidth()) + 5); // 5 Totally a magic number
     
   }
