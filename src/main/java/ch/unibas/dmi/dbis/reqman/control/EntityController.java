@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The {@link EntityController} controls all entities during a session.
@@ -498,5 +499,16 @@ public class EntityController {
   private void loadedCatalogue() {
     catalogueAnalyser = new CatalogueAnalyser(getCourse(), getCatalogue());
     courseManager = new CourseManager(getCourse(), getCatalogue());
+    
+    fixPredecessors();
+  }
+  
+  private void fixPredecessors() {
+    List<Requirement> list = getCatalogue().getRequirements().stream().filter(r -> r.getPredecessors().length > 0).collect(Collectors.toList());
+    LOGGER.debug("Fixing {} times predecessors", list.size());
+    list.forEach(requirement -> {
+      LOGGER.debug("Potential predecessor-dupes: {}",requirement);
+      catalogueAnalyser.cleanPredecessors(requirement);
+    });
   }
 }

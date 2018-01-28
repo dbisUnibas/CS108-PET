@@ -176,6 +176,11 @@ public class CatalogueAnalyser{
     return getRequirementsFor(getMilestoneOf(progressSummary));
   }
   
+  public void cleanPredecessors(Requirement requirement) {
+    List<Requirement> predecessors = getPredecessors(requirement);
+    Set<Requirement> predecessorSet = new HashSet<>(predecessors);
+    requirement.setAllPredecessors(predecessorSet);
+  }
   
   
   private Comparator<Requirement> getRequirementMinimalMilestoneComparator(){

@@ -423,7 +423,9 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       if (selected == null) {
         return;
       }
-      predecessors.add(selected);
+      if(!predecessors.contains(selected)){
+        predecessors.add(selected);
+      }
     });
     
     pane.setStyle("-fx-border-width: 1; -fx-border-color: silver;");

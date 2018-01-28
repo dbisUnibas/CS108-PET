@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * The class {@link Requirement} represents a requirement as defined by the definitions document.
@@ -122,6 +123,11 @@ public class Requirement {
     predecessorNames.clear();
   }
   
+  
+  @JsonIgnore
+  public boolean hasPredecessors(){
+    return !predecessors.isEmpty();
+  }
   
   public void clearPropertiesMap() {
     propertiesMap.clear();
@@ -332,7 +338,10 @@ public class Requirement {
   }
   
   public boolean addPredecessor(Requirement requirement) {
-    return predecessors.add(requirement.getUuid());
+    if(!predecessors.contains(requirement.getUuid())){
+      return predecessors.add(requirement.getUuid());
+    }
+    return false;
   }
   
   public boolean removePredecessor(Requirement requirement) {
@@ -342,6 +351,8 @@ public class Requirement {
   public UUID[] getPredecessors() {
     return predecessors.toArray(new UUID[0]);
   }
+  
+  
   
   public Type getType() {
     return type;
@@ -390,6 +401,17 @@ public class Requirement {
    */
   public UUID getUuid() {
     return uuid;
+  }
+  
+  @JsonIgnore
+  public void setAllPredecessors(Set<Requirement> predecessors) {
+    this.predecessors.clear();
+    this.predecessors.addAll(predecessors.stream().map(Requirement::getUuid).collect(Collectors.toSet()));
+  }
+  
+  public void setPredecessors(UUID[] predecessors){
+    this.predecessors.clear();
+    this.predecessors.addAll(Arrays.asList(predecessors));
   }
   
   public enum Type {
