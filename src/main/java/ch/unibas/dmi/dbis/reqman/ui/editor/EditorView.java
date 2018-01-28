@@ -1,6 +1,9 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.ui.common.*;
+import ch.unibas.dmi.dbis.reqman.ui.common.CourseInfoView;
+import ch.unibas.dmi.dbis.reqman.ui.common.FilterBar;
+import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
+import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
 import ch.unibas.dmi.dbis.reqman.ui.overview.CatalogueStatisticsView;
 import javafx.scene.Cursor;
 import javafx.scene.Scene;
@@ -9,6 +12,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.function.Function;
 
 /**
  * TODO: Write JavaDoc
@@ -60,6 +65,8 @@ public class EditorView extends BorderPane implements TitleProvider {
     topBox.getChildren().remove(filterBar);
   }
   
+  private Function<Void,Void> statisticsCloser;
+  
   public void showStatistics() {
     CatalogueStatisticsView view = new CatalogueStatisticsView();
     Scene scene = new Scene(view);
@@ -76,10 +83,18 @@ public class EditorView extends BorderPane implements TitleProvider {
         view.update();
       }
     });
+    statisticsCloser = (unused) -> {
+      stage.close();
+      return null;
+    };
   }
   
   public void closeAll() {
     reqTableView.clear();
+  }
+  
+  public void stop() {
+    statisticsCloser.apply(null);
   }
   
   void enableAll() {

@@ -48,6 +48,7 @@ public class ReqmanApplication extends Application {
     primaryStage.setTitle(scene.getTitle());
     Utils.applyLogoIcon(primaryStage);
     primaryStage.show();
+    primaryStage.setOnCloseRequest(event -> stop());
   }
   
   @Override
@@ -55,7 +56,6 @@ public class ReqmanApplication extends Application {
     if (scene != null) {
       scene.stop();
     }
-    
   }
   
   private void handleUncaughtException(Thread t, Throwable e) {
