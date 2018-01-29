@@ -272,7 +272,7 @@ public class RenderManager {
   public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
       new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
       new Field<Requirement, String>("excerpt", Field.Type.NORMAL, Requirement::getExcerpt),
-      new Field<Requirement, String>("type", Field.Type.NORMAL, r -> r.getType().toString()),
+      new Field<Requirement, String>("type", Field.Type.NORMAL, r -> r.getType().toString().toLowerCase()),
       new Field<Requirement, String>("category", Field.Type.NORMAL, Requirement::getCategory),
       new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPoints),
       new SubEntityField<Requirement, Milestone>("minMS", (requirement -> {
