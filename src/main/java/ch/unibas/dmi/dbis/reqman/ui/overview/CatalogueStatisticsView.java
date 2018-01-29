@@ -37,6 +37,14 @@ public class CatalogueStatisticsView extends VBox {
     layoutComps();
   }
   
+  public void update() {
+    getChildren().remove(treeTableView);
+    treeTableView = null;
+    setupTreeTable();
+    getChildren().add(0, treeTableView);
+    summaryView.update();
+  }
+  
   private void initComps() {
     setupTreeTable();
     summaryView = new CatalogueSummaryView(EntityController.getInstance().getCatalogueAnalyser());
@@ -79,31 +87,52 @@ public class CatalogueStatisticsView extends VBox {
     TreeTableColumn<CatalogueOverviewItem, String> regularPointsCol = new TreeTableColumn<>("Regular Points");
     regularPointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
     {
-      if (param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.REGULAR.toString())) {
-        return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getRegularPoints()));
-      } else {
-        return new ReadOnlyStringWrapper("");
+      switch (param.getValue().getValue().getEntityType()) {
+        case CATALOGUE:
+        case MILESTONE:
+          return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getRegularPoints()));
+        case REQUIREMENT:
+          if (param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.REGULAR.toString())) {
+            return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getRegularPoints()));
+          } else {
+            return new ReadOnlyStringWrapper("");
+          }
       }
+      return new ReadOnlyStringWrapper("");
     });
     
     TreeTableColumn<CatalogueOverviewItem, String> bonusPointsCol = new TreeTableColumn<>("Bonus Points");
     bonusPointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
     {
-      if (param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.BONUS.toString())) {
-        return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getBonusPoints()));
-      } else {
-        return new ReadOnlyStringWrapper("");
+      switch (param.getValue().getValue().getEntityType()) {
+        case CATALOGUE:
+        case MILESTONE:
+          return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getBonusPoints()));
+        case REQUIREMENT:
+          if (param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.BONUS.toString())) {
+            return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getBonusPoints()));
+          } else {
+            return new ReadOnlyStringWrapper("");
+          }
       }
+      return new ReadOnlyStringWrapper("");
     });
     
     TreeTableColumn<CatalogueOverviewItem, String> malusPointsCol = new TreeTableColumn<>("Malus Points");
     malusPointsCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<CatalogueOverviewItem, String> param) ->
     {
-      if (param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.MALUS.toString())) {
-        return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getMalusPoints()));
-      } else {
-        return new ReadOnlyStringWrapper("");
+      switch (param.getValue().getValue().getEntityType()) {
+        case CATALOGUE:
+        case MILESTONE:
+          return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getMalusPoints()));
+        case REQUIREMENT:
+          if (param.getValue().getValue().getType().equalsIgnoreCase(Requirement.Type.MALUS.toString())) {
+            return new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getMalusPoints()));
+          } else {
+            return new ReadOnlyStringWrapper("");
+          }
       }
+      return new ReadOnlyStringWrapper("");
     });
     
     TreeTableColumn<CatalogueOverviewItem, String> categoryCol = new TreeTableColumn<>("Category");
@@ -131,23 +160,15 @@ public class CatalogueStatisticsView extends VBox {
       // Overall, the index is not so important, but this property can be used to get notified about the selection (and changes)!
       if (newValue.intValue() != -1) {
         handleSelection();
-      }else{
+      } else {
         summaryView.clearSelected();
       }
     });
     
   }
   
-  public void update(){
-    getChildren().remove(treeTableView);
-    treeTableView = null;
-    setupTreeTable();
-    getChildren().add(0, treeTableView);
-    summaryView.update();
-  }
-  
   private void handleSelection() {
-    summaryView.update(treeTableView.getSelectionModel().getSelectedCells().stream().map(o -> o.getTreeItem().getValue()).collect(Collectors.toList() ));
+    summaryView.update(treeTableView.getSelectionModel().getSelectedCells().stream().map(o -> o.getTreeItem().getValue()).collect(Collectors.toList()));
   }
   
   

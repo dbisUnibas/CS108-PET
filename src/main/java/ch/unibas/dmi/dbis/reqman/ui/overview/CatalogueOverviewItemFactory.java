@@ -58,7 +58,7 @@ public class CatalogueOverviewItemFactory {
         item.setRegularPoints(requirement.getMaxPoints());
         break;
       case MALUS:
-        item.setMalusPoints(requirement.getMaxPoints()*-1d);
+        item.setMalusPoints(requirement.getMaxPoints());
         break;
       case BONUS:
         item.setBonusPoints(requirement.getMaxPoints());
