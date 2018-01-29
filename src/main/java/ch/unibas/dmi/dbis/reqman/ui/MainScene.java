@@ -10,6 +10,7 @@ import javafx.scene.Cursor;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import org.controlsfx.control.NotificationPane;
 
 /**
  * TODO: Write JavaDoc
@@ -31,6 +32,8 @@ public class MainScene extends TitledScene {
   private StatusBar statusBar;
   
   private MainHandler mainHandler;
+  
+  private NotificationPane notificationPane;
   
   private Mode active;
   
@@ -84,11 +87,17 @@ public class MainScene extends TitledScene {
     active = mode;
   }
   
+  void showNotification(String text){
+    notificationPane.show(text);
+  }
+  
   void indicateWaiting(boolean waiting) {
     getRoot().setCursor(waiting ? Cursor.WAIT : Cursor.DEFAULT);
   }
   
   private void initComponents() {
+    notificationPane = new NotificationPane();
+    notificationPane.setShowFromTop(true);
     root = new BorderPane();
     topContainer = new VBox();
     
@@ -111,7 +120,8 @@ public class MainScene extends TitledScene {
   }
   
   private void layoutComponents() {
-    setRoot(root);
+    notificationPane.setContent(root);
+    setRoot(notificationPane);
     root.setTop(topContainer);
     topContainer.getChildren().add(menuManager.getMenuBar());
     root.setBottom(statusBar);

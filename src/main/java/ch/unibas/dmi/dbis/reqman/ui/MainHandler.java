@@ -192,7 +192,7 @@ public class MainHandler implements MenuHandler {
     FileChooser exportConfigFC = new FileChooser();
     exportConfigFC.setTitle("Templating Config");
     File exportConfig = exportConfigFC.showOpenDialog(mainScene.getWindow());
-    if(exportConfig == null){
+    if (exportConfig == null) {
       // Userabort
       return;
     }
@@ -204,6 +204,7 @@ public class MainHandler implements MenuHandler {
       LOGGER.debug("Exporting to {}", f);
       try {
         ExportHelper.exportCatalogue(exportConfig, f);
+        mainScene.showNotification("Export finished to " + f.getAbsolutePath());
       } catch (FileNotFoundException e) {
         LOGGER.catching(Level.FATAL, e);
       }
@@ -462,7 +463,7 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleImport(ActionEvent event) {
-    if(Utils.showConfirmationDialog("Import Catalogue", "You will lose unsafed changes on both, groups and catalogue / course.\nAre you sure to continue?")){
+    if (Utils.showConfirmationDialog("Import Catalogue", "You will lose unsafed changes on both, groups and catalogue / course.\nAre you sure to continue?")) {
       mainScene.setActive(MainScene.Mode.EDITOR);
       FileChooser fc = Utils.createFileChooser("Import Catalogue");
       File f = fc.showOpenDialog(mainScene.getWindow());
