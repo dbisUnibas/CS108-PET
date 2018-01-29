@@ -4,6 +4,7 @@ import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
 import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
+import ch.unibas.dmi.dbis.reqman.templating.ExportHelper;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
@@ -19,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -184,25 +186,28 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleExportCat(ActionEvent event) {
-    Utils.showFeatureDisabled("Export Catalogue", EXPORT_DISABLED_REASON);
-    return;
-    // TODO Re-Implement export catalogue / course
-    /*
-    if (!EntityManager.getInstance().isCatalogueLoaded()) {
+    if (!EntityController.getInstance().hasCatalogue() && EntityController.getInstance().hasCourse()) {
       return;
     }
+    FileChooser exportConfigFC = new FileChooser();
+    exportConfigFC.setTitle("Templating Config");
+    File exportConfig = exportConfigFC.showOpenDialog(mainScene.getWindow());
+    if(exportConfig == null){
+      // Userabort
+      return;
+    }
+    LOGGER.debug("Templating Config: {}", exportConfig);
     FileChooser fc = new FileChooser();
     fc.setTitle("Export Catalogue");
-    if (EntityManager.getInstance().hasLastExportLocation()) {
-      fc.setInitialDirectory(EntityManager.getInstance().getLastExportLocation());
-    }
     File f = fc.showSaveDialog(mainScene.getWindow());
     if (f != null) {
-      mainScene.indicateWaiting(true);
-      EntityManager.getInstance().exportCatalogue(f);
-      mainScene.indicateWaiting(false);
+      LOGGER.debug("Exporting to {}", f);
+      try {
+        ExportHelper.exportCatalogue(exportConfig, f);
+      } catch (FileNotFoundException e) {
+        LOGGER.catching(Level.FATAL, e);
+      }
     }
-    */
   }
   
   @Override

@@ -68,4 +68,10 @@ public class CourseManager implements Comparator<Milestone> {
     milestones.sort(this);
     return milestones.get(0);
   }
+  
+  public int getMilestoneOrdinal(Milestone ms) {
+    List<Milestone> milestones = catalogue.getMilestones();
+    milestones.sort(this);
+    return milestones.indexOf(ms);
+  }
 }

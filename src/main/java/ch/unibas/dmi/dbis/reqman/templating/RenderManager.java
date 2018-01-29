@@ -134,8 +134,12 @@ public class RenderManager {
    * .sumTotal
    * .sumMS[<ordinal>]
    * .milestoneName[<ordinal>]
+   * .bonusTotal
+   * .malusTotal
+   * .bonusMS[<ordinal>]
+   * .malusMS[<ordinal>]
+   * <p>
    *
-   * // TODO bonus/malus sums
    */
   private final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
       new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
@@ -156,6 +160,8 @@ public class RenderManager {
         return sb.toString();
       }),
       new Field<Catalogue, Double>("sumTotal", Field.Type.NORMAL, c -> EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum()),
+      new Field<Catalogue, Double>("bonusTotal", Field.Type.NORMAL, c-> EntityController.getInstance().getCatalogueAnalyser().getMaximalBonusSum()),
+      new Field<Catalogue,Double>("malusTotal", Field.Type.NORMAL,c->EntityController.getInstance().getCatalogueAnalyser().getMaximalMalusSum()),
       new ParametrizedField<Catalogue, Double>("sumMS", _unused -> 0d) {
         @Override
         public String renderCarefully(Catalogue instance, String parameter) {
@@ -164,6 +170,28 @@ public class RenderManager {
             return "[ERROR: No such Milestone " + parameter + "]";
           } else {
             return StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(ms));
+          }
+        }
+      },
+      new ParametrizedField<Catalogue, Double>("bonusMS", _unused -> 0d) {
+        @Override
+        public String renderCarefully(Catalogue instance, String parameter) {
+          Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneByPosition(Integer.valueOf(parameter));
+          if (ms == null) {
+            return "[ERROR: No such Milestone " + parameter + "]";
+          } else {
+            return StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getMaximalBonusSumFor(ms));
+          }
+        }
+      },
+      new ParametrizedField<Catalogue, Double>("malusMS", _unused -> 0d) {
+        @Override
+        public String renderCarefully(Catalogue instance, String parameter) {
+          Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneByPosition(Integer.valueOf(parameter));
+          if (ms == null) {
+            return "[ERROR: No such Milestone " + parameter + "]";
+          } else {
+            return StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getMaximalMalusSumFor(ms));
           }
         }
       },
@@ -179,8 +207,6 @@ public class RenderManager {
         }
       }
   );
-  private Group group = null;
-  private Catalogue catalogue = null;
   /**
    * Existing:
    * milestone
@@ -189,6 +215,9 @@ public class RenderManager {
    * .ordinal
    * .sumMax
    * .dateFormatted[<SimpleDateFormat>]
+   * .requirements
+   * .bonusMax
+   * .malusMax
    */
   public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
       new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
@@ -210,42 +239,18 @@ public class RenderManager {
           return "";
         }
       },
-      new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal),
-      new Field<Milestone, Double>("sumMax", Field.Type.NORMAL, ms -> EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(ms))
-  );
-  /**
-   * Existing:
-   * progress
-   * .points
-   * .hasPoints
-   * .isUnlocked[][]
-   * .date
-   * .dateFormatted[]
-   * .milestone
-   */
-  public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
-      Field.createNormalField("points", p -> p.getPointsSensitive(catalogue)),
-      new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS"),
-      new ConditionalField<Progress>("isUnlocked", p -> group.isProgressUnlocked(catalogue, p), b -> "UNLOCEKD", b -> "LOCKED"),
-      new Field<Progress, Date>("date", Field.Type.OBJECT, Progress::getDate, date -> {
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
-        return format.format(date);
-      }),
-      new ParametrizedField<Progress, Date>("dateFormatted", Progress::getDate) {
-        private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
-        
-        @Override
-        public String renderCarefully(Progress instance, String parameter) {
-          try {
-            SimpleDateFormat format = new SimpleDateFormat(parameter);
-            return format.format(getGetter().apply(instance));
-          } catch (IllegalArgumentException iae) {
-            LOGGER.error("The specified pattern is not compliant with java.text.SimpleDateFormat.", iae);
-          }
-          return "";
-        }
-      },
-      new SubEntityField<Progress, Milestone>("milestone", (p -> catalogue.getMilestoneByOrdinal(p.getMilestoneOrdinal())), MILESTONE_ENTITY)
+      new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, ms -> EntityController.getInstance().getCourseManager().getMilestoneOrdinal(ms)),
+      new Field<Milestone, Double>("sumMax", Field.Type.NORMAL, ms -> EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(ms)),
+      new Field<Milestone, Double>("bonusMax", Field.Type.NORMAL, ms -> EntityController.getInstance().getCatalogueAnalyser().getMaximalBonusSumFor(ms)),
+      new Field<Milestone, Double>("malusMax", Field.Type.NORMAL, ms -> EntityController.getInstance().getCatalogueAnalyser().getMaximalMalusSumFor(ms)),
+      new Field<Milestone, List<Requirement>>("requirements", Field.Type.LIST, ms -> EntityController.getInstance().getCatalogueAnalyser().getRequirementsFor(ms), (list) -> {
+        StringBuilder sb = new StringBuilder();
+        list.sort(EntityController.getInstance().getCatalogueAnalyser().getRequirementComparator());
+        list.forEach(req -> {
+          sb.append(renderRequirement(req));
+        });
+        return sb.toString();
+      })
   );
   /**
    * Existing:
@@ -268,7 +273,7 @@ public class RenderManager {
       new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
       new Field<Requirement, String>("excerpt", Field.Type.NORMAL, Requirement::getExcerpt),
       new Field<Requirement, String>("type", Field.Type.NORMAL, r -> r.getType().toString()),
-      new Field<Requirement,String>("category", Field.Type.NORMAL, Requirement::getCategory),
+      new Field<Requirement, String>("category", Field.Type.NORMAL, Requirement::getCategory),
       new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPoints),
       new SubEntityField<Requirement, Milestone>("minMS", (requirement -> {
         return EntityController.getInstance().getCourseManager().getMinimalMilestone(requirement);
@@ -276,7 +281,7 @@ public class RenderManager {
       new SubEntityField<Requirement, Milestone>("maxMS", (requirement -> {
         return EntityController.getInstance().getCourseManager().getMaximalMilestone(requirement);
       }), MILESTONE_ENTITY),
-      new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, r->EntityController.getInstance().getCatalogueAnalyser().getPredecessors(r).stream().map(Requirement::getName).collect(Collectors.toList()), list -> {
+      new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, r -> EntityController.getInstance().getCatalogueAnalyser().getPredecessors(r).stream().map(Requirement::getName).collect(Collectors.toList()), list -> {
         StringBuilder sb = new StringBuilder();
         list.forEach(str -> {
           sb.append(str);
@@ -311,6 +316,42 @@ public class RenderManager {
         }
       },
       new ConditionalField<Requirement>("singularMS", r -> r.getMinimalMilestoneUUID().equals(r.getMaximalMilestoneUUID()), b -> "YES", b -> "NO")
+  );
+  private Group group = null;
+  private Catalogue catalogue = null;
+  /**
+   * Existing:
+   * progress
+   * .points
+   * .hasPoints
+   * .isUnlocked[][]
+   * .date
+   * .dateFormatted[]
+   * .milestone
+   */
+  public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
+      Field.createNormalField("points", p -> p.getPointsSensitive(catalogue)),
+      new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS"),
+      new ConditionalField<Progress>("isUnlocked", p -> group.isProgressUnlocked(catalogue, p), b -> "UNLOCEKD", b -> "LOCKED"),
+      new Field<Progress, Date>("date", Field.Type.OBJECT, Progress::getDate, date -> {
+        SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
+        return format.format(date);
+      }),
+      new ParametrizedField<Progress, Date>("dateFormatted", Progress::getDate) {
+        private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
+        
+        @Override
+        public String renderCarefully(Progress instance, String parameter) {
+          try {
+            SimpleDateFormat format = new SimpleDateFormat(parameter);
+            return format.format(getGetter().apply(instance));
+          } catch (IllegalArgumentException iae) {
+            LOGGER.error("The specified pattern is not compliant with java.text.SimpleDateFormat.", iae);
+          }
+          return "";
+        }
+      },
+      new SubEntityField<Progress, Milestone>("milestone", (p -> catalogue.getMilestoneByOrdinal(p.getMilestoneOrdinal())), MILESTONE_ENTITY)
   );
   /**
    * Existing:
