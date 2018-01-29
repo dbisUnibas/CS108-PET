@@ -224,6 +224,15 @@ public class CatalogueAnalyser {
     return courseManager;
   }
   
+  public Milestone getMilestoneByPosition(int pos) {
+    if(pos < 0 || pos >= catalogue.getMilestones().size()){
+      return null;
+    }
+    List<Milestone> milestones = catalogue.getMilestones();
+    milestones.sort(courseManager);
+    return milestones.get(pos);
+  }
+  
   boolean containsRequirementPattern(Requirement requirement, String pattern) {
     boolean inName = StringUtils.containsNullSafe(requirement.getName(), pattern);
     boolean inExcerpt = StringUtils.containsNullSafe(requirement.getExcerpt(), pattern);

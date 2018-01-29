@@ -159,7 +159,7 @@ public class RenderManager {
       new ParametrizedField<Catalogue, Double>("sumMS", _unused -> 0d) {
         @Override
         public String renderCarefully(Catalogue instance, String parameter) {
-          Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneByName(parameter);
+          Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneByPosition(Integer.valueOf(parameter));
           if (ms == null) {
             return "[ERROR: No such Milestone " + parameter + "]";
           } else {
@@ -170,8 +170,12 @@ public class RenderManager {
       new ParametrizedField<Catalogue, Milestone>("milestoneName", null) {
         @Override
         public String renderCarefully(Catalogue instance, String parameter) {
-          Milestone ms = instance.getMilestoneByOrdinal(Integer.valueOf(parameter));
-          return ms != null ? ms.getName() : "";
+          Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneByPosition(Integer.valueOf(parameter));
+          if (ms == null) {
+            return "[ERROR: No such Milestone " + parameter + "]";
+          } else {
+            return ms.getName();
+          }
         }
       }
   );
@@ -247,7 +251,7 @@ public class RenderManager {
    * Existing:
    * requirement
    * .name
-   * .description
+   * .excerpt
    * .maxPoints
    * .minMS
    * .predecessorNames
@@ -256,14 +260,15 @@ public class RenderManager {
    * .malus[][]
    * .meta[<key>]
    * .singularMS[][]
-   *
-   * // TODO
-   * type
-   * category
+   * .type
+   * .category
+   * .description
    */
   public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
       new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
-      new Field<Requirement, String>("description", Field.Type.NORMAL, Requirement::getExcerpt),
+      new Field<Requirement, String>("excerpt", Field.Type.NORMAL, Requirement::getExcerpt),
+      new Field<Requirement, String>("type", Field.Type.NORMAL, r -> r.getType().toString()),
+      new Field<Requirement,String>("category", Field.Type.NORMAL, Requirement::getCategory),
       new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPoints),
       new SubEntityField<Requirement, Milestone>("minMS", (requirement -> {
         return EntityController.getInstance().getCourseManager().getMinimalMilestone(requirement);
