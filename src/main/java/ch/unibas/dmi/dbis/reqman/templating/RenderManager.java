@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * TODO: write JavaDoc
@@ -133,6 +134,8 @@ public class RenderManager {
    * .sumTotal
    * .sumMS[<ordinal>]
    * .milestoneName[<ordinal>]
+   *
+   * // TODO bonus/malus sums
    */
   private final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
       new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
@@ -185,11 +188,11 @@ public class RenderManager {
    */
   public final Entity<Milestone> MILESTONE_ENTITY = new Entity<Milestone>("milestone",
       new Field<Milestone, String>("name", Field.Type.NORMAL, Milestone::getName),
-      new Field<Milestone, Date>("date", Field.Type.OBJECT, Milestone::getDate, date -> {
+      new Field<Milestone, Date>("date", Field.Type.OBJECT, ms -> EntityController.getInstance().getCourseManager().getMilestoneDate(ms), date -> {
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
         return format.format(date);
       }),
-      new ParametrizedField<Milestone, Date>("dateFormatted", Milestone::getDate) {
+      new ParametrizedField<Milestone, Date>("dateFormatted", ms -> EntityController.getInstance().getCourseManager().getMilestoneDate(ms)) {
         private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
         
         @Override
@@ -204,7 +207,7 @@ public class RenderManager {
         }
       },
       new Field<Milestone, Integer>("ordinal", Field.Type.NORMAL, Milestone::getOrdinal),
-      new Field<Milestone, Double>("sumMax", Field.Type.NORMAL, ms -> catalogue.getSum(ms.getOrdinal()))
+      new Field<Milestone, Double>("sumMax", Field.Type.NORMAL, ms -> EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(ms))
   );
   /**
    * Existing:
@@ -253,18 +256,22 @@ public class RenderManager {
    * .malus[][]
    * .meta[<key>]
    * .singularMS[][]
+   *
+   * // TODO
+   * type
+   * category
    */
   public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
       new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
-      new Field<Requirement, String>("description", Field.Type.NORMAL, Requirement::getDescription),
-      new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPointsSensitive),
+      new Field<Requirement, String>("description", Field.Type.NORMAL, Requirement::getExcerpt),
+      new Field<Requirement, Double>("maxPoints", Field.Type.NORMAL, Requirement::getMaxPoints),
       new SubEntityField<Requirement, Milestone>("minMS", (requirement -> {
-        return catalogue.getMilestoneByOrdinal(requirement.getMinMilestoneOrdinal());
+        return EntityController.getInstance().getCourseManager().getMinimalMilestone(requirement);
       }), MILESTONE_ENTITY),
       new SubEntityField<Requirement, Milestone>("maxMS", (requirement -> {
-        return catalogue.getMilestoneByOrdinal(requirement.getMaxMilestoneOrdinal());
+        return EntityController.getInstance().getCourseManager().getMaximalMilestone(requirement);
       }), MILESTONE_ENTITY),
-      new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, Requirement::getPredecessorNames, list -> {
+      new Field<Requirement, List<String>>("predecessorNames", Field.Type.OBJECT, r->EntityController.getInstance().getCatalogueAnalyser().getPredecessors(r).stream().map(Requirement::getName).collect(Collectors.toList()), list -> {
         StringBuilder sb = new StringBuilder();
         list.forEach(str -> {
           sb.append(str);
@@ -298,7 +305,7 @@ public class RenderManager {
           }
         }
       },
-      new ConditionalField<Requirement>("singularMS", r -> r.getMinMilestoneOrdinal() == r.getMaxMilestoneOrdinal(), b -> "YES", b -> "NO")
+      new ConditionalField<Requirement>("singularMS", r -> r.getMinimalMilestoneUUID().equals(r.getMaximalMilestoneUUID()), b -> "YES", b -> "NO")
   );
   /**
    * Existing:
