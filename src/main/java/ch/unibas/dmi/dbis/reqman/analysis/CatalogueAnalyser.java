@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  *
  * @author loris.sauter
  */
-public class CatalogueAnalyser{
+public class CatalogueAnalyser {
   
   private final Catalogue catalogue;
   private final Course course;
@@ -37,24 +37,24 @@ public class CatalogueAnalyser{
     return !catalogue.getMilestones().isEmpty();
   }
   
-  public Requirement getRequirementById(UUID requirementUuid){
-    if(requirementUuid == null){
+  public Requirement getRequirementById(UUID requirementUuid) {
+    if (requirementUuid == null) {
       throw new IllegalArgumentException("Cannot find requirement by id, if the id is null");
     }
-    for(Requirement r : catalogue.getRequirements()){
-      if(requirementUuid.equals(r.getUuid())){
+    for (Requirement r : catalogue.getRequirements()) {
+      if (requirementUuid.equals(r.getUuid())) {
         return r;
       }
     }
     return null;
   }
   
-  public Milestone getMilestoneById(UUID milestoneUuid){
-    if(milestoneUuid == null){
+  public Milestone getMilestoneById(UUID milestoneUuid) {
+    if (milestoneUuid == null) {
       throw new IllegalArgumentException("Cannot find milestone by id, if the id is null");
     }
-    for(Milestone ms : catalogue.getMilestones()){
-      if(milestoneUuid.equals(ms.getUuid())){
+    for (Milestone ms : catalogue.getMilestones()) {
+      if (milestoneUuid.equals(ms.getUuid())) {
         return ms;
       }
     }
@@ -91,23 +91,23 @@ public class CatalogueAnalyser{
     return getRequirementsFor(ms).stream().filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
-  public double getMaximalRegularSumFor(List<Requirement> list){
+  public double getMaximalRegularSumFor(List<Requirement> list) {
     return list.stream().filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
-  public double getMaximalBonusSumFor(List<Requirement> list){
+  public double getMaximalBonusSumFor(List<Requirement> list) {
     return list.stream().filter(Requirement::isBonus).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
-  public double getMaximalMalusSumFor(List<Requirement> list){
+  public double getMaximalMalusSumFor(List<Requirement> list) {
     return list.stream().filter(Requirement::isMalus).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
-  public double getMaximalRegularSumForProgressList(List<Progress> list){
+  public double getMaximalRegularSumForProgressList(List<Progress> list) {
     return list.stream().map(this::getRequirementOf).filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
-  public double getMaximalRegularSumFor(ProgressSummary ps){
+  public double getMaximalRegularSumFor(ProgressSummary ps) {
     return getMaximalRegularSumFor(getMilestoneOf(ps));
   }
   
@@ -129,40 +129,40 @@ public class CatalogueAnalyser{
     return catalogue.getRequirements().stream().filter(Requirement::isMalus).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
-  public double getMaximalMalusSumFor(Milestone ms){
+  public double getMaximalMalusSumFor(Milestone ms) {
     return getRequirementsFor(ms).stream().filter(Requirement::isMalus).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
-  public List<Requirement> getPredecessors(Requirement requirement){
+  public List<Requirement> getPredecessors(Requirement requirement) {
     List<Requirement> predecessors = new ArrayList<>();
-    for(UUID id : requirement.getPredecessors()){
+    for (UUID id : requirement.getPredecessors()) {
       predecessors.add(getRequirementById(id));
     }
     return predecessors;
   }
   
-  public boolean isPredecessor(Requirement requirement){
-    long nbOfDependents= catalogue.getRequirements().stream().filter(r -> getPredecessors(r).contains(requirement)).count();
+  public boolean isPredecessor(Requirement requirement) {
+    long nbOfDependents = catalogue.getRequirements().stream().filter(r -> getPredecessors(r).contains(requirement)).count();
     return nbOfDependents > 0;
   }
   
-  public List<Requirement> findRequirementsNameContains(String search){
+  public List<Requirement> findRequirementsNameContains(String search) {
     return catalogue.getRequirements().stream().filter(r -> r.getName().contains(search)).collect(Collectors.toList());
   }
   
-  public List<Requirement> findRequirementsContaining(String pattern){
-    return catalogue.getRequirements().stream().filter(r -> containsRequirementPattern(r,pattern)).collect(Collectors.toList());
+  public List<Requirement> findRequirementsContaining(String pattern) {
+    return catalogue.getRequirements().stream().filter(r -> containsRequirementPattern(r, pattern)).collect(Collectors.toList());
   }
   
-  public List<Requirement> findRequirementsForCategory(String category){
-    return catalogue.getRequirements().stream().filter(r->StringUtils.containsNullSafe(r.getCategory(), category)).collect(Collectors.toList());
+  public List<Requirement> findRequirementsForCategory(String category) {
+    return catalogue.getRequirements().stream().filter(r -> StringUtils.containsNullSafe(r.getCategory(), category)).collect(Collectors.toList());
   }
   
-  public List<Requirement> findRequirementsByType(Requirement.Type type){
+  public List<Requirement> findRequirementsByType(Requirement.Type type) {
     return catalogue.getRequirements().stream().filter(r -> r.getType().equals(type)).collect(Collectors.toList());
   }
   
-  public Set<String> getCategories(){
+  public Set<String> getCategories() {
     Set<String> set = new TreeSet<>();
     catalogue.getRequirements().stream().filter(r -> !StringUtils.isNullOrEmpty(r.getCategory())).forEach(r -> set.add(r.getCategory()));
     return set;
@@ -182,44 +182,25 @@ public class CatalogueAnalyser{
     requirement.setAllPredecessors(predecessorSet);
   }
   
-  
-  private Comparator<Requirement> getRequirementMinimalMilestoneComparator(){
-    return Comparator.comparing(courseManager::getMinimalMilestone, courseManager);
+  public Milestone getMilestoneByName(String parameter) {
+    for (Milestone ms : catalogue.getMilestones()) {
+      if (ms.getName().equals(parameter)) {
+        return ms;
+      }
+    }
+    return null;
   }
   
-  public Comparator<Requirement> getRequirementComparator(){
+  public Comparator<Requirement> getRequirementComparator() {
     return getRequirementMinimalMilestoneComparator().thenComparing(Requirement::getType, SortingUtils.REQUIREMENT_TYPE_COMPARATOR).thenComparing(Requirement::getName);
-  }
-  
-  boolean containsRequirementPattern(Requirement requirement, String pattern){
-    boolean inName = StringUtils.containsNullSafe(requirement.getName(), pattern);
-    boolean inExcerpt = StringUtils.containsNullSafe(requirement.getExcerpt(), pattern);
-    boolean inDescription = StringUtils.containsNullSafe(requirement.getDescription(), pattern);
-    return inName || inExcerpt || inDescription;
-  }
-  
-  boolean matchesMinimalMilestone(Requirement requirement, Milestone milestone) {
-    return requirement.getMinimalMilestoneUUID().equals(milestone.getUuid());
-  }
-  
-  boolean matchesMaximalMilestone(Requirement requirement, Milestone milestone) {
-    return requirement.getMaximalMilestoneUUID().equals(milestone.getUuid());
-  }
-  
-  boolean matchesMilestone(Requirement requirement, Milestone milestone) {
-    return getMilestoneDateComparator().compare(courseManager.getMinimalMilestone(requirement), milestone) <= 0 && getMilestoneDateComparator().compare(courseManager.getMaximalMilestone(requirement), milestone) >= 0;
-  }
-  
-  private Comparator<Milestone> getMilestoneDateComparator() {
-    return Comparator.comparing(courseManager::getMilestoneDate);
   }
   
   public double getActualPoints(@NotNull Progress progress) {
     Requirement r = getRequirementOf(progress);
-    if(r == null){
-      throw new IllegalArgumentException("No such requirement "+progress.getRequirementUUID());
-    }else{
-      switch(r.getType()){
+    if (r == null) {
+      throw new IllegalArgumentException("No such requirement " + progress.getRequirementUUID());
+    } else {
+      switch (r.getType()) {
         case REGULAR:
         case BONUS:
           return progress.getFraction() * r.getMaxPoints();
@@ -241,5 +222,32 @@ public class CatalogueAnalyser{
   
   public CourseManager getCourseManager() {
     return courseManager;
+  }
+  
+  boolean containsRequirementPattern(Requirement requirement, String pattern) {
+    boolean inName = StringUtils.containsNullSafe(requirement.getName(), pattern);
+    boolean inExcerpt = StringUtils.containsNullSafe(requirement.getExcerpt(), pattern);
+    boolean inDescription = StringUtils.containsNullSafe(requirement.getDescription(), pattern);
+    return inName || inExcerpt || inDescription;
+  }
+  
+  boolean matchesMinimalMilestone(Requirement requirement, Milestone milestone) {
+    return requirement.getMinimalMilestoneUUID().equals(milestone.getUuid());
+  }
+  
+  boolean matchesMaximalMilestone(Requirement requirement, Milestone milestone) {
+    return requirement.getMaximalMilestoneUUID().equals(milestone.getUuid());
+  }
+  
+  boolean matchesMilestone(Requirement requirement, Milestone milestone) {
+    return getMilestoneDateComparator().compare(courseManager.getMinimalMilestone(requirement), milestone) <= 0 && getMilestoneDateComparator().compare(courseManager.getMaximalMilestone(requirement), milestone) >= 0;
+  }
+  
+  private Comparator<Requirement> getRequirementMinimalMilestoneComparator() {
+    return Comparator.comparing(courseManager::getMinimalMilestone, courseManager);
+  }
+  
+  private Comparator<Milestone> getMilestoneDateComparator() {
+    return Comparator.comparing(courseManager::getMilestoneDate);
   }
 }
