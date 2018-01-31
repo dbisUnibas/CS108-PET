@@ -24,20 +24,8 @@ import java.util.*;
 public class Catalogue extends VersionedEntity{
   
   private final UUID uuid;
-  /**
-   * @deprecated Replaced by {@link Course#getName()}
-   */
-  @JsonIgnore
-  @Deprecated
-  private String lecture;
   private String name;
   private String description;
-  /**
-   * @deprecated Replaced by {@link Course#getSemester()}
-   */
-  @JsonIgnore
-  @Deprecated
-  private String semester;
   
   /**
    * The very list of milestones
@@ -62,46 +50,6 @@ public class Catalogue extends VersionedEntity{
     uuid = UUID.randomUUID();
   }
   
-  /**
-   * A constructor for creating a new catalogue with specified name, lecture and semester as well as a description
-   * provided.
-   *
-   * @param lecture     The name of the lecture
-   * @param name        The  name of the catalogue
-   * @param description A description of a catalogue
-   * @param semester    The semester for which this catalogue was designed
-   * @deprecated Replaced by {@link EntityFactory#createCatalogue(String)}
-   */
-  @Deprecated
-  public Catalogue(String lecture, String name, String description, String semester) {
-    this();
-    this.lecture = lecture;
-    this.name = name;
-    this.description = description;
-    this.semester = semester;
-  }
-  
-  /**
-   * Returns the lecture name this catalogue is associated with
-   *
-   * @return The lecture name this catalogue is associated with
-   * @deprecated Replaced by {@link Course#getName()}
-   */
-  @Deprecated
-  public String getLecture() {
-    return lecture;
-  }
-  
-  /**
-   * Sets the lecture name for which this catalogue is made
-   *
-   * @param lecture The lecture name
-   * @deprecated Replaced by {@link Course#setName(String)}
-   */
-  @Deprecated
-  public void setLecture(String lecture) {
-    this.lecture = lecture;
-  }
   
   /**
    * Returns this catalogue's name.
@@ -140,27 +88,6 @@ public class Catalogue extends VersionedEntity{
     this.description = description;
   }
   
-  /**
-   * Returns the semester of this catalogue
-   *
-   * @return The semester of this catalogue
-   * @deprecated Replaced by {@link Course#getSemester()}
-   */
-  @Deprecated
-  public String getSemester() {
-    return semester;
-  }
-  
-  /**
-   * Sets the semester of this catalogue
-   *
-   * @param semester The semester represented as a string
-   * @deprecated Replaced by {@link Course#setSemester(String)}
-   */
-  @Deprecated
-  public void setSemester(String semester) {
-    this.semester = semester;
-  }
   
   
   /**
