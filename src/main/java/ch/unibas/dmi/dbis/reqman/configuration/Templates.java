@@ -13,7 +13,7 @@ public class Templates {
     private String milestoneTemplate;
     private String catalogueTemplate;
     private String progressTemplate;
-    private String groupMilestoneTemplate;
+    private String progressSummaryTemplate;
     private String groupTemplate;
     private String overviewTemplate;
 
@@ -53,12 +53,12 @@ public class Templates {
         this.progressTemplate = progressTemplate;
     }
 
-    public String getGroupMilestoneTemplate() {
-        return groupMilestoneTemplate;
+    public String getProgressSummaryTemplate() {
+        return progressSummaryTemplate;
     }
 
-    public void setGroupMilestoneTemplate(String groupMilestoneTemplate) {
-        this.groupMilestoneTemplate = groupMilestoneTemplate;
+    public void setProgressSummaryTemplate(String progressSummaryTemplate) {
+        this.progressSummaryTemplate = progressSummaryTemplate;
     }
 
     public String getGroupTemplate() {

@@ -39,7 +39,7 @@ class TemplatingConfiguration {
      * The group-milestone (progress-summary) entity key
      */
     @JsonIgnore
-    public static final String GROUP_MILESTONE = "group-milestone";
+    public static final String PROGRESS_SUMMARY = "progress-summary";
     /**
      * The group entity key
      */
@@ -110,7 +110,7 @@ class TemplatingConfiguration {
         map.put(MILESTONE, StringUtils.concatWithPeriodDelimeter(MILESTONE, TEMPLATE));
         map.put(CATALOGUE, StringUtils.concatWithPeriodDelimeter(CATALOGUE, TEMPLATE));
         map.put(PROGRESS, StringUtils.concatWithPeriodDelimeter(PROGRESS, TEMPLATE));
-        map.put(GROUP_MILESTONE, StringUtils.concatWithPeriodDelimeter(GROUP_MILESTONE, TEMPLATE));
+        map.put(PROGRESS_SUMMARY, StringUtils.concatWithPeriodDelimeter(PROGRESS_SUMMARY, TEMPLATE));
         map.put(GROUP, StringUtils.concatWithPeriodDelimeter(GROUP, TEMPLATE));
         map.put(OVERVIEW, StringUtils.concatWithPeriodDelimeter(OVERVIEW, TEMPLATE));
 
@@ -151,8 +151,8 @@ class TemplatingConfiguration {
     }
 
     @JsonIgnore
-    public String getGroupMilestoneEntry() {
-        return getTemplatesEntry(GROUP_MILESTONE);
+    public String getProgressSummaryEntry() {
+        return getTemplatesEntry(PROGRESS_SUMMARY);
     }
 
     @JsonIgnore
@@ -185,7 +185,7 @@ class TemplatingConfiguration {
             nbFixes += validateAndFixEntry(MILESTONE);
             nbFixes += validateAndFixEntry(CATALOGUE);
             nbFixes += validateAndFixEntry(PROGRESS);
-            nbFixes += validateAndFixEntry(GROUP_MILESTONE);
+            nbFixes += validateAndFixEntry(PROGRESS_SUMMARY);
             nbFixes += validateAndFixEntry(GROUP);
             nbFixes += validateAndFixEntry(OVERVIEW);
         }

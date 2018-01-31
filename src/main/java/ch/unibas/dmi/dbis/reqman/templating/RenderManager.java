@@ -114,7 +114,7 @@ public class RenderManager {
   private Template<Requirement> templateReq = null;
   private Template<Milestone> templateMS = null;
   private Template<Catalogue> templateCat = null;
-  private Template<ProgressSummary> templateGroupMS = null;
+  private Template<ProgressSummary> templateProgressSummary = null;
   private Template<Group> templateGroup = null;
   private Template<Progress> templateProgress = null;
   private Template<OverviewSnapshot> templateOverview = null;
@@ -327,7 +327,7 @@ public class RenderManager {
    * .comment
    * .summary --> {Progress.name: Progress.comment\n}
    */
-  public final Entity<ProgressSummary> GROUP_MS_ENTITY = new Entity<ProgressSummary>("progressSummary",
+  public final Entity<ProgressSummary> PROGRESS_SUMMARY_ENTITY = new Entity<ProgressSummary>("progressSummary",
       new Field<ProgressSummary, String>("name", Field.Type.NORMAL, ps -> EntityController.getInstance().getCatalogueAnalyser().getMilestoneOf(ps).getName()),
       new Field<ProgressSummary, List<Progress>>("progressList", Field.Type.LIST, ps -> EntityController.getInstance().getGroup(group.getUuid()).getProgressList(), list -> {
         StringBuilder sb = new StringBuilder();
@@ -402,9 +402,9 @@ public class RenderManager {
         }
       },
       new SubEntityField<Progress, Milestone>("milestone", (p -> EntityController.getInstance().getGroupAnalyser(group).getMilestoneOf(p)), MILESTONE_ENTITY),
-      new SubEntityField<Progress, ProgressSummary>("progressSummary", (p-> EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryOf(p)), GROUP_MS_ENTITY)
+      new SubEntityField<Progress, ProgressSummary>("progressSummary", (p-> EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryOf(p)), PROGRESS_SUMMARY_ENTITY)
   );
-  private Template<ProgressSummary> templateGroupMSms = null;
+  private Template<ProgressSummary> templateProgressSummaryMilestone = null;
   /**
    * Existing:
    * group
@@ -421,7 +421,7 @@ public class RenderManager {
       Field.createNormalField("project", Group::getProjectName),
       new Field<Group, List<ProgressSummary>>("progressSummaries", Field.Type.LIST, g -> EntityController.getInstance().getGroup(g.getUuid()).getProgressSummaries(), list -> {
         StringBuilder sb = new StringBuilder();
-        list.forEach(ms -> sb.append(renderGroupMilestone(ms)));
+        list.forEach(ms -> sb.append(renderProgressSummary(ms)));
         return sb.toString();
       }),
       new Field<Group, Double>("sumTotal", Field.Type.NORMAL, g -> EntityController.getInstance().getGroupAnalyser(g).getSum()),
@@ -506,16 +506,16 @@ public class RenderManager {
     return renderCarefully(renderer, templateCat, catalogue);
   }
   
-  public String renderGroupMilestone(ProgressSummary ps) {
-    String renderedGroupMS = renderCarefully(renderer, templateGroupMS, ps);
+  public String renderProgressSummary(ProgressSummary ps) {
+    String renderedProgressSummary = renderCarefully(renderer, templateProgressSummary, ps);
     parser.setupFor(MILESTONE_ENTITY);
-    templateGroupMSms = parser.parseTemplate(renderedGroupMS);
-    return renderCarefully(renderer, templateGroupMSms, ps);
+    templateProgressSummaryMilestone = parser.parseTemplate(renderedProgressSummary);
+    return renderCarefully(renderer, templateProgressSummaryMilestone, ps);
   }
   
   public String renderProgress(Progress p) {
     String progressRendered = renderCarefully(renderer, templateProgress, p);
-    Requirement r = catalogue.getRequirementForProgress(p);
+    Requirement r = EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p);
     parser.setupFor(REQUIREMENT_ENTITY);
     Template<Requirement> templateProgressRequirement = parser.parseTemplate(progressRendered);
     return renderCarefully(renderer, templateProgressRequirement, r);
@@ -542,7 +542,7 @@ public class RenderManager {
   }
   
   public void parseGroupMilestoneTemplate(String groupMSTemplate) {
-    parseTemplateCarefully(GROUP_MS_ENTITY, groupMSTemplate);
+    parseTemplateCarefully(PROGRESS_SUMMARY_ENTITY, groupMSTemplate);
   }
   
   public void parseGroupTemplate(String groupTemplate) {
@@ -565,9 +565,6 @@ public class RenderManager {
     this.group = group;
   }
   
-  private void sortProgressList(List<Progress> list) {
-    list.sort(Comparator.comparing(catalogue::getRequirementForProgress, SortingUtils.REQUIREMENT_COMPARATOR));
-  }
   
   private <E> boolean parseTemplateCarefully(Entity<E> entity, String template) {
     parser.setupFor(entity);
@@ -580,8 +577,8 @@ public class RenderManager {
     } else if (CATALOGUE_ENTITY.getEntityName().equals(entity.getEntityName())) {
       // Template Cat
       templateCat = parser.parseTemplate(template);
-    } else if (GROUP_MS_ENTITY.getEntityName().equals(entity.getEntityName())) {
-      templateGroupMS = parser.parseTemplate(template);
+    } else if (PROGRESS_SUMMARY_ENTITY.getEntityName().equals(entity.getEntityName())) {
+      templateProgressSummary = parser.parseTemplate(template);
     } else if (GROUP_ENTITY.getEntityName().equals(entity.getEntityName())) {
       templateGroup = parser.parseTemplate(template);
     } else if (PROGRESS_ENTITY.getEntityName().equals(entity.getEntityName())) {

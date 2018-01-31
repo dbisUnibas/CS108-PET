@@ -40,7 +40,7 @@ public class ExportMultipleGroupTask extends ManagementTask<Boolean> {
         updateAll("Loaded templating config...", 0.05);
 
         manager.parseProgressTemplate(templates.getProgressTemplate());
-        manager.parseGroupMilestoneTemplate(templates.getGroupMilestoneTemplate());
+        manager.parseGroupMilestoneTemplate(templates.getProgressSummaryTemplate());
         manager.parseGroupTemplate(templates.getGroupTemplate());
 
         updateAll("Parsed templates...", 0.1);
