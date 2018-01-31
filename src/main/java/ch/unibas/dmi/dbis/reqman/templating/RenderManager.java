@@ -9,10 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -117,7 +114,7 @@ public class RenderManager {
   private Template<Requirement> templateReq = null;
   private Template<Milestone> templateMS = null;
   private Template<Catalogue> templateCat = null;
-  private Template<Milestone> templateGroupMS = null;
+  private Template<ProgressSummary> templateGroupMS = null;
   private Template<Group> templateGroup = null;
   private Template<Progress> templateProgress = null;
   private Template<OverviewSnapshot> templateOverview = null;
@@ -167,7 +164,7 @@ public class RenderManager {
         public String renderCarefully(Catalogue instance, String parameter) {
           Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneByPosition(Integer.valueOf(parameter));
           if (ms == null) {
-            return "[ERROR: No such Milestone " + parameter + "]";
+            return "[ERROR: No such Milestone " + parameter + "]"; // TODO Introduce --debug mode for template: if errors, print them, otherwise be quiet
           } else {
             return StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(ms));
           }
@@ -319,25 +316,78 @@ public class RenderManager {
   );
   private Group group = null;
   private Catalogue catalogue = null;
+  
+  /**
+   * Existing:
+   * progressSummary
+   * .name
+   * .progressList
+   * .sum
+   * .percentage
+   * .comment
+   * .summary --> {Progress.name: Progress.comment\n}
+   */
+  public final Entity<ProgressSummary> GROUP_MS_ENTITY = new Entity<ProgressSummary>("progressSummary",
+      new Field<ProgressSummary, String>("name", Field.Type.NORMAL, ps -> EntityController.getInstance().getCatalogueAnalyser().getMilestoneOf(ps).getName()),
+      new Field<ProgressSummary, List<Progress>>("progressList", Field.Type.LIST, ps -> EntityController.getInstance().getGroup(group.getUuid()).getProgressList(), list -> {
+        StringBuilder sb = new StringBuilder();
+        
+        list.sort((p1,p2)-> {
+          Requirement r1 = EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p1);
+          Requirement r2 = EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p2);
+          return EntityController.getInstance().getCatalogueAnalyser().getRequirementComparator().compare(r1,r2);
+        });
+        
+        list.forEach(p -> sb.append(renderProgress(p)));
+        
+        return sb.toString();
+      }),
+      new Field<ProgressSummary, Double>("sum", Field.Type.NORMAL, ps -> EntityController.getInstance().getGroupAnalyser(group).getSumFor(ps)),
+      new Field<ProgressSummary, Double>("percentage", Field.Type.NORMAL, ps -> (EntityController.getInstance().getGroupAnalyser(group).getSumFor(ps) / EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(ps)) * 100.0),
+      new Field<ProgressSummary, String>("comment", Field.Type.NORMAL, ps -> {
+        if (ps == null) {
+          return "";
+        } else {
+          return ps.getExternalComment();
+        }
+      }),
+      new Field<ProgressSummary, List<String>>("summary", Field.Type.LIST, ps -> {
+        List<String> list = new ArrayList<>();
+        EntityController.getInstance().getGroupAnalyser(group).getProgressFor(ps).forEach(p -> {
+          list.add(EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p).getName()+": "+p.getComment()+"\n"); // TODO Line spearator as parameter / config / ?
+        });
+        return list;
+      }, list -> {
+        StringBuilder sb = new StringBuilder();
+        list.forEach(str -> sb.append(str));
+        return sb.toString();
+      })
+  );
+  
   /**
    * Existing:
    * progress
    * .points
+   * .fraction
    * .hasPoints
    * .isUnlocked[][]
    * .date
    * .dateFormatted[]
    * .milestone
+   * .comment
+   * .progressSummary
    */
   public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
-      Field.createNormalField("points", p -> p.getPointsSensitive(catalogue)),
+      Field.createNormalField("points", p -> EntityController.getInstance().getCatalogueAnalyser().getActualPoints(p)),
+      Field.createNormalField("comment",Progress::getComment),
+      Field.createNormalField("fraction", Progress::getFraction),
       new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS"),
-      new ConditionalField<Progress>("isUnlocked", p -> group.isProgressUnlocked(catalogue, p), b -> "UNLOCEKD", b -> "LOCKED"),
-      new Field<Progress, Date>("date", Field.Type.OBJECT, Progress::getDate, date -> {
+      new ConditionalField<Progress>("isUnlocked", p -> EntityController.getInstance().getGroupAnalyser(group).isProgressUnlocked(p), b -> "UNLOCEKD", b -> "LOCKED"),
+      new Field<Progress, Date>("date", Field.Type.OBJECT, Progress::getAssessmentDate, date -> {
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.YYYY");
         return format.format(date);
       }),
-      new ParametrizedField<Progress, Date>("dateFormatted", Progress::getDate) {
+      new ParametrizedField<Progress, Date>("dateFormatted", Progress::getAssessmentDate) {
         private final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
         
         @Override
@@ -351,65 +401,37 @@ public class RenderManager {
           return "";
         }
       },
-      new SubEntityField<Progress, Milestone>("milestone", (p -> catalogue.getMilestoneByOrdinal(p.getMilestoneOrdinal())), MILESTONE_ENTITY)
+      new SubEntityField<Progress, Milestone>("milestone", (p -> EntityController.getInstance().getGroupAnalyser(group).getMilestoneOf(p)), MILESTONE_ENTITY),
+      new SubEntityField<Progress, ProgressSummary>("progressSummary", (p-> EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryOf(p)), GROUP_MS_ENTITY)
   );
-  /**
-   * Existing:
-   * groupMilestone
-   * .name
-   * .progressList
-   * .sum
-   * .percentage
-   * .comment
-   */
-  public final Entity<Milestone> GROUP_MS_ENTITY = new Entity<Milestone>("groupMilestone",
-      Field.createNormalField("name", Milestone::getName),
-      new Field<Milestone, List<Progress>>("progressList", Field.Type.LIST, ms -> this.group.getProgressByMilestoneOrdinal(ms.getOrdinal()), list -> {
-        StringBuilder sb = new StringBuilder();
-        
-        sortProgressList(list);
-        
-        
-        list.forEach(p -> sb.append(renderProgress(p)));
-        
-        return sb.toString();
-      }),
-      new Field<Milestone, Double>("sum", Field.Type.NORMAL, (ms) -> group.getSumForMilestone(ms, catalogue)),
-      new Field<Milestone, Double>("percentage", Field.Type.NORMAL, ms -> (group.getSumForMilestone(ms, catalogue) / catalogue.getSum(ms.getOrdinal())) * 100.0),
-      new Field<Milestone, String>("comment", Field.Type.NORMAL, ms -> {
-        ProgressSummary ps = group.getProgressSummaryForMilestone(ms);
-        if (ps == null) {
-          return "";
-        } else {
-          return ps.getExternalComment();
-        }
-      })
-  );
-  private Template<Milestone> templateGroupMSms = null;
+  private Template<ProgressSummary> templateGroupMSms = null;
   /**
    * Existing:
    * group
    * .name
    * .project
-   * .milestones
+   * .progressSummaries
+   * .progressList //TODO
    * .sumMS[]
    * .sumTotal
+   * // TODO print members?
    */
   public final Entity<Group> GROUP_ENTITY = new Entity<Group>("group",
       Field.createNormalField("name", Group::getName),
       Field.createNormalField("project", Group::getProjectName),
-      new Field<Group, List<Milestone>>("milestones", Field.Type.LIST, g -> g.getMilestonesForGroup(catalogue), list -> {
+      new Field<Group, List<ProgressSummary>>("progressSummaries", Field.Type.LIST, g -> EntityController.getInstance().getGroup(g.getUuid()).getProgressSummaries(), list -> {
         StringBuilder sb = new StringBuilder();
         list.forEach(ms -> sb.append(renderGroupMilestone(ms)));
         return sb.toString();
       }),
-      new Field<Group, Double>("sumTotal", Field.Type.NORMAL, (group1) -> group1.getTotalSum(catalogue)),
-      new ParametrizedField<Group, Double>("sumMS", (group1) -> group1.getTotalSum(catalogue)) {
+      new Field<Group, Double>("sumTotal", Field.Type.NORMAL, g -> EntityController.getInstance().getGroupAnalyser(g).getSum()),
+      new ParametrizedField<Group, Double>("sumMS", g -> 0d) {
         
         @Override
         public String renderCarefully(Group instance, String parameter) {
-          Milestone ms = catalogue.getMilestoneByOrdinal(Integer.valueOf(parameter));
-          return StringUtils.prettyPrint(group.getSumForMilestone(ms, catalogue));
+          Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneByPosition(Integer.parseInt(parameter));
+          ProgressSummary ps = EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(ms);
+          return StringUtils.prettyPrint(EntityController.getInstance().getGroupAnalyser(group).getSumFor(ps));
         }
       }
   
@@ -484,11 +506,11 @@ public class RenderManager {
     return renderCarefully(renderer, templateCat, catalogue);
   }
   
-  public String renderGroupMilestone(Milestone ms) {
-    String renderedGroupMS = renderCarefully(renderer, templateGroupMS, ms);
+  public String renderGroupMilestone(ProgressSummary ps) {
+    String renderedGroupMS = renderCarefully(renderer, templateGroupMS, ps);
     parser.setupFor(MILESTONE_ENTITY);
     templateGroupMSms = parser.parseTemplate(renderedGroupMS);
-    return renderCarefully(renderer, templateGroupMSms, ms);
+    return renderCarefully(renderer, templateGroupMSms, ps);
   }
   
   public String renderProgress(Progress p) {
