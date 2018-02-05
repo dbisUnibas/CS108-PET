@@ -51,11 +51,6 @@ class TemplatingConfiguration {
     @JsonIgnore
     public static final String TEMPLATE = "template";
     /**
-     * The overview entity key
-     */
-    @JsonIgnore
-    public static final String OVERVIEW = "overview";
-    /**
      * The default templating config
      */
     @JsonIgnore
@@ -112,7 +107,6 @@ class TemplatingConfiguration {
         map.put(PROGRESS, StringUtils.concatWithPeriodDelimeter(PROGRESS, TEMPLATE));
         map.put(PROGRESS_SUMMARY, StringUtils.concatWithPeriodDelimeter(PROGRESS_SUMMARY, TEMPLATE));
         map.put(GROUP, StringUtils.concatWithPeriodDelimeter(GROUP, TEMPLATE));
-        map.put(OVERVIEW, StringUtils.concatWithPeriodDelimeter(OVERVIEW, TEMPLATE));
 
         return map;
     }
@@ -155,10 +149,6 @@ class TemplatingConfiguration {
         return getTemplatesEntry(PROGRESS_SUMMARY);
     }
 
-    @JsonIgnore
-    public String getOverviewEntry() {
-        return getTemplatesEntry(OVERVIEW);
-    }
 
     @JsonIgnore
     public String getGroupEntry() {
@@ -187,7 +177,6 @@ class TemplatingConfiguration {
             nbFixes += validateAndFixEntry(PROGRESS);
             nbFixes += validateAndFixEntry(PROGRESS_SUMMARY);
             nbFixes += validateAndFixEntry(GROUP);
-            nbFixes += validateAndFixEntry(OVERVIEW);
         }
 
         return nbFixes != 0;

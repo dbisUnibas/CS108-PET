@@ -546,7 +546,7 @@ public class ProgressView extends VBox {
   }
   
   private void notifyPointsListener() {
-    listeners.forEach(l -> l.pointsChanged(progress.getPoints()));
+    listeners.forEach(l -> l.pointsChanged(0));
   }
   
   private void notifyDirtyListeners(boolean dirty) {

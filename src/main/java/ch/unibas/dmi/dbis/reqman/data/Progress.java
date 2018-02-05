@@ -31,16 +31,6 @@ public class Progress {
     uuid = UUID.randomUUID();
   }
   
-  @Deprecated
-  public Progress(String requirementName, int milestoneOrdinal, double points) {
-    this();
-  }
-  
-  @Deprecated
-  public Progress(Requirement req) {
-    this(req.getName(), req.getMinMilestoneOrdinal(), 0);
-  }
-  
   public Progress(Progress progress) {
     this();
     fraction = progress.getFraction();

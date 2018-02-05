@@ -250,7 +250,6 @@ public class TemplatingConfigurationManager {
         tc.setProgressSummaryTemplate(readTemplateFile(config.getProgressSummaryEntry()));
         tc.setGroupTemplate(readTemplateFile(config.getGroupEntry()));
 
-        tc.setOverviewTemplate(readTemplateFile(config.getOverviewEntry()));
         return tc;
     }
 

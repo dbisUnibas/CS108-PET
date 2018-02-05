@@ -33,7 +33,7 @@ public class OperationFactory {
     return operation;
   }
   
-  public static CheckedAsynchronousOperation<Course> createLoadCourseOperation(Consumer<Course> processor){
+  public static CheckedAsynchronousOperation<Course> createLoadCourseOperation(Consumer<Course> processor) {
     OpenCourseTask task = new OpenCourseTask();
     CheckedAsynchronousOperation<Course> operation = createOperationForTask(task, true);
     operation.addProcessor(processor);
@@ -45,7 +45,7 @@ public class OperationFactory {
     return createOperationForTask(task, true);
   }
   
-  public static CheckedAsynchronousOperation<Boolean> createSaveCourseOperation(Course course, File courseFile){
+  public static CheckedAsynchronousOperation<Boolean> createSaveCourseOperation(Course course, File courseFile) {
     SaveCourseTask task = new SaveCourseTask(course, courseFile);
     return createOperationForTask(task, true);
   }
@@ -85,10 +85,6 @@ public class OperationFactory {
     return createOperationForTask(task, true);
   }
   
-  public static CheckedAsynchronousOperation<Boolean> createExportOverviewOperation(OverviewSnapshot snapshot, File exportFile) {
-    ExportOverviewTask task = new ExportOverviewTask(snapshot, exportFile);
-    return createOperationForTask(task, true);
-  }
   
   private static <T> CheckedAsynchronousOperation<T> createOperationForTask(ManagementTask<T> task, boolean deamon) {
     CheckedAsynchronousOperation<T> op = new CheckedAsynchronousOperation<T>(task, deamon);
