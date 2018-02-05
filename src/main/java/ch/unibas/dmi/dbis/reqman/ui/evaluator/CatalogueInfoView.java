@@ -53,8 +53,6 @@ public class CatalogueInfoView extends HBox {
     public void displayData(Catalogue catalogue) {
         if (catalogue != null) {
             tfName.setText(catalogue.getName());
-            tfLecture.setText(catalogue.getLecture());
-            tfSemester.setText(catalogue.getSemester());
             taDesc.setText(catalogue.getDescription());
             tfSum.setText(StringUtils.prettyPrint(catalogue.getSum()));
         }
