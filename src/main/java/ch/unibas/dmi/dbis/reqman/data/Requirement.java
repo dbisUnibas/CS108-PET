@@ -58,11 +58,6 @@ public class Requirement {
    */
   private List<UUID> predecessors = new ArrayList<>();
   /**
-   * A list of predecessor requirement names this requirement depends on.
-   */
-  @Deprecated @JsonIgnore
-  private List<String> predecessorNames = new Vector<>();
-  /**
    * A map of key-value-pairs related to export this requirement
    */
   private Map<String, String> propertiesMap = new HashMap<>();
@@ -72,21 +67,6 @@ public class Requirement {
   private String category;
   
   /**
-   * The minimal milestone ordinal this requirement firstly occurs
-   *
-   * @deprecated Since SNAPSHOT-2.0.0: UUIDs were introduced for cross-references
-   */
-  @Deprecated @JsonIgnore
-  private int minMilestoneOrdinal;
-  /**
-   * The maximal milestone ordinal this requirement must be met
-   *
-   * @deprecated Since SNAPSHOT-2.0.0: UUIDs were introduced for cross-references
-   */
-  @Deprecated @JsonIgnore
-  private int maxMilestoneOrdinal;
-  
-  /**
    * The default constructor for a requirement.
    * All the properties of this requirement have to be set manually after this instance is created.
    */
@@ -94,87 +74,14 @@ public class Requirement {
     uuid = UUID.randomUUID();
   }
   
-  /**
-   * Creates a new {@link Requirement} with given properties.
-   *
-   * @param name                The name of the requirement which shall be short, descriptive and unique
-   * @param description         A description of this requirement.
-   * @param minMilestoneOrdinal The ordinal of the {@link Milestone} upon this requirement is active
-   * @param maxMilestoneOrdinal The ordinal of the {@link Milestone} this requirement is active up to
-   * @param maxPoints           The absolute, maximal amount of points this requirement can generate.
-   * @param binary              Whether this requirement is binary (achieved: yes/no or partial).
-   * @param mandatory           Whether this requirement is mandatory
-   * @param malus               Whether this requirement has to be considered as a malus.
-   */
-  @Deprecated
-  public Requirement(String name, String description, int minMilestoneOrdinal, int maxMilestoneOrdinal, double maxPoints, boolean binary, boolean mandatory, boolean malus) {
-    this();
-    
-    this.name = name;
-    this.description = description;
-    this.minMilestoneOrdinal = minMilestoneOrdinal;
-    this.maxMilestoneOrdinal = maxMilestoneOrdinal;
-    this.maxPoints = maxPoints;
-    this.binary = binary;
-  }
-  
-  @Deprecated
-  public void clearPredecessorNames() {
-    predecessorNames.clear();
-  }
-  
   
   @JsonIgnore
-  public boolean hasPredecessors(){
+  public boolean hasPredecessors() {
     return !predecessors.isEmpty();
   }
   
   public void clearPropertiesMap() {
     propertiesMap.clear();
-  }
-  
-  /**
-   * Adds the given name of a requirement to the list of requirements this requirement depends on.
-   * <p>
-   * The corresponding {@link Requirement} with the given name is then a predecessor of this requirement.
-   *
-   * @param name The name of the requirement this requirement depends on. Must be a valid requirement name.
-   * @return {@code true} As specified in {@link List#add(Object)}
-   * @see List#add(Object)
-   */
-  @Deprecated
-  public boolean addPredecessorName(String name) {
-    return predecessorNames.add(name);
-  }
-  
-  /**
-   * Removes the specified requirement name of the list of
-   *
-   * @param name The name of the requirement this requirement no longer depends on. Must be a valid requirement name.
-   * @return {@code true} If the specified name was in the list of predecessors (and is now not anymore).
-   */
-  @Deprecated
-  public boolean removePredecessorName(String name) {
-    return predecessorNames.remove(name);
-  }
-  
-  /**
-   * Returns a copy of the predecessor list.
-   * <p>
-   * The {@link List} returned is a copy and not referenced within this instance.
-   * Thus modifying the returning list <b>will not be synced</b> with the list of this instance.
-   * To modify the list of predecessors use the appropriate methods provided by {@link Requirement}
-   *
-   * @return A copy of the list of predecessor names.
-   */
-  @Deprecated
-  public List<String> getPredecessorNames() {
-    return new ArrayList<>(predecessorNames);
-  }
-  
-  @Deprecated
-  public void setPredecessorNames(List<String> predecessorNames) {
-    this.predecessorNames = predecessorNames;
   }
   
   
@@ -246,25 +153,6 @@ public class Requirement {
     this.description = description;
   }
   
-  @Deprecated @JsonIgnore
-  public int getMinMilestoneOrdinal() {
-    return minMilestoneOrdinal;
-  }
-  
-  @Deprecated @JsonIgnore
-  public void setMinMilestoneOrdinal(int minMilestoneOrdinal) {
-    this.minMilestoneOrdinal = minMilestoneOrdinal;
-  }
-  
-  @Deprecated @JsonIgnore
-  public int getMaxMilestoneOrdinal() {
-    return maxMilestoneOrdinal;
-  }
-  
-  @Deprecated @JsonIgnore
-  public void setMaxMilestoneOrdinal(int maxMilestoneOrdinal) {
-    this.maxMilestoneOrdinal = maxMilestoneOrdinal;
-  }
   
   public double getMaxPoints() {
     return maxPoints;
@@ -287,17 +175,9 @@ public class Requirement {
     return type.equals(Type.REGULAR);
   }
   
-  @Deprecated @JsonIgnore
-  public void setMandatory(boolean mandatory) {
-  }
-  
   @JsonIgnore
   public boolean isMalus() {
     return type.equals(Type.MALUS);
-  }
-  
-  @Deprecated @JsonIgnore
-  public void setMalus(boolean malus) {
   }
   
   public String removeProperty(String key) {
@@ -338,7 +218,7 @@ public class Requirement {
   }
   
   public boolean addPredecessor(Requirement requirement) {
-    if(!predecessors.contains(requirement.getUuid())){
+    if (!predecessors.contains(requirement.getUuid())) {
       return predecessors.add(requirement.getUuid());
     }
     return false;
@@ -352,7 +232,10 @@ public class Requirement {
     return predecessors.toArray(new UUID[0]);
   }
   
-  
+  public void setPredecessors(UUID[] predecessors) {
+    this.predecessors.clear();
+    this.predecessors.addAll(Arrays.asList(predecessors));
+  }
   
   public Type getType() {
     return type;
@@ -368,13 +251,6 @@ public class Requirement {
   
   public void setCategory(String category) {
     this.category = category;
-  }
-  
-  @JsonIgnore
-  @Deprecated
-  public double getMaxPointsSensitive() {
-    double factor = isMalus() ? -1.0 : 1.0;
-    return getMaxPoints() * factor;
   }
   
   /**
@@ -409,20 +285,15 @@ public class Requirement {
     this.predecessors.addAll(predecessors.stream().map(Requirement::getUuid).collect(Collectors.toSet()));
   }
   
-  public void setPredecessors(UUID[] predecessors){
-    this.predecessors.clear();
-    this.predecessors.addAll(Arrays.asList(predecessors));
-  }
-  
   public enum Type {
     
     REGULAR,
     MALUS,
     BONUS;
-  
+    
     @Override
     public String toString() {
-      return StringUtils.capitalize(name().toLowerCase() );
+      return StringUtils.capitalize(name().toLowerCase());
     }
   }
 }

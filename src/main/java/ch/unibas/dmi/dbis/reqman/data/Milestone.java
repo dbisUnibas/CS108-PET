@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Date;
@@ -18,18 +17,6 @@ public class Milestone {
   private String name;
   private UUID timeUUID;
   
-  /**
-   * @deprecated Since SNAPSHOT-2.0.0: Replaced by Time's natural ordering
-   */
-  @Deprecated
-  @JsonIgnore
-  private int ordinal = 0;
-  /**
-   * @deprecated Since SNAPSHOT-2.0.0: Repalced by reference to time
-   */
-  @Deprecated  @JsonIgnore
-  private Date date;
-  
   public Milestone() {
     uuid = UUID.randomUUID();
   }
@@ -37,8 +24,6 @@ public class Milestone {
   public Milestone(String name, int ordinal, Date date) {
     this();
     this.name = name;
-    this.ordinal = ordinal;
-    this.date = date;
   }
   
   public UUID getTimeUUID() {
@@ -49,16 +34,6 @@ public class Milestone {
     this.timeUUID = timeUUID;
   }
   
-  @Deprecated
-  public int getOrdinal() {
-    return ordinal;
-  }
-  
-  @Deprecated
-  public void setOrdinal(int ordinal) {
-    this.ordinal = ordinal;
-  }
-  
   public String getName() {
     return name;
   }
@@ -66,17 +41,6 @@ public class Milestone {
   public void setName(String name) {
     this.name = name;
   }
-  
-  @Deprecated
-  public Date getDate() {
-    return date;
-  }
-  
-  @Deprecated
-  public void setDate(Date date) {
-    this.date = date;
-  }
-  
   
   public UUID getUuid() {
     return uuid;

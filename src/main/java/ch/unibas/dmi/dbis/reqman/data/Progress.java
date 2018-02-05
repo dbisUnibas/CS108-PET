@@ -26,21 +26,6 @@ public class Progress {
   private UUID progressSummaryUUID;
   private String comment;
   
-  @Deprecated
-  @JsonIgnore
-  private String requirementName;
-  @Deprecated
-  @JsonIgnore
-  private int milestoneOrdinal;
-  @Deprecated
-  @JsonIgnore
-  private double points = 0;
-  @Deprecated
-  @JsonIgnore
-  private double percentage = -1d;
-  @Deprecated
-  @JsonIgnore
-  private Date date = null;
   
   public Progress() {
     uuid = UUID.randomUUID();
@@ -49,9 +34,6 @@ public class Progress {
   @Deprecated
   public Progress(String requirementName, int milestoneOrdinal, double points) {
     this();
-    this.requirementName = requirementName;
-    this.milestoneOrdinal = milestoneOrdinal;
-    this.points = points;
   }
   
   @Deprecated
@@ -108,76 +90,6 @@ public class Progress {
     this.comment = comment;
   }
   
-  @Deprecated
-  public Date getDate() {
-    return date;
-  }
-  
-  @Deprecated
-  public void setDate(Date date) {
-    this.date = date;
-  }
-  
-  @Deprecated
-  public double getPercentage() {
-    return percentage;
-  }
-  
-  /**
-   * @param percentage
-   * @deprecated Since the percentage / fraction is calculated while setting the points.
-   */
-  @Deprecated
-  public void setPercentage(double percentage) {
-    this.percentage = percentage;
-  }
-  
-  @Deprecated
-  public String getRequirementName() {
-    return requirementName;
-  }
-  
-  @Deprecated
-  public void setRequirementName(String requirementName) {
-    this.requirementName = requirementName;
-  }
-  
-  @Deprecated
-  public int getMilestoneOrdinal() {
-    return milestoneOrdinal;
-  }
-  
-  @Deprecated
-  public void setMilestoneOrdinal(int milestoneOrdinal) {
-    this.milestoneOrdinal = milestoneOrdinal;
-  }
-  
-  @Deprecated
-  public double getPoints() {
-    return points;
-  }
-  
-  @Deprecated
-  public void setPoints(double points) {
-    this.points = points;
-  }
-  
-  @Deprecated
-  public void setPoints(double points, double max) {
-    if (points == NO_POINTS) {
-      percentage = 0d;
-      this.points = -1;
-      return;
-    }
-    
-    this.points = points;
-    if (Double.compare(0d, max) == 0 && Double.compare(0d, points) == 0) {
-      // if max points == points == 0 -> progress 100%
-      percentage = 1d;
-    } else {
-      percentage = points / max;
-    }
-  }
   
   /**
    * Returns whether this progress was freshly created.
@@ -192,23 +104,9 @@ public class Progress {
   }
   
   
-  @Deprecated
-  @JsonIgnore
-  public double getPointsSensitive(Catalogue catalogue) {
-    Requirement r = catalogue.getRequirementByName(requirementName);
-    double factor = (r.isMalus() ? -1d : 1d) * percentage;
-    return factor * r.getMaxPoints();
-  }
-  
   @JsonIgnore
   public boolean hasProgress() {
     return fraction > 0;
-  }
-  
-  @Deprecated
-  @JsonIgnore
-  public boolean hasDefaultPercentage() {
-    return Double.compare(-1d, percentage) == 0;
   }
   
   
@@ -255,7 +153,7 @@ public class Progress {
   
   @JsonIgnore
   public void reset() {
-    fraction=NO_PROGRESS;
+    fraction = NO_PROGRESS;
     assessmentDate = null;
   }
 }

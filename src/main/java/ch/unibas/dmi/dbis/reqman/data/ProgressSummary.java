@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.UUID;
@@ -16,45 +15,22 @@ public class ProgressSummary {
   private final UUID uuid;
   private UUID milestoneUUID;
   
-  @Deprecated
-  @JsonIgnore
-  private int milestoneOrdinal;
   
   private String internalComment;
   private String externalComment;
-  
-  @Deprecated
-  public ProgressSummary(int milestoneOrdinal, String internalComment, String externalComment) {
-    this();
-    this.milestoneOrdinal = milestoneOrdinal;
-    this.internalComment = internalComment;
-    this.externalComment = externalComment;
-  }
-  
   
   
   public ProgressSummary() {
     this.uuid = UUID.randomUUID();
   }
   
-  public ProgressSummary(ProgressSummary ps){
+  public ProgressSummary(ProgressSummary ps) {
     this();
     milestoneUUID = ps.getMilestoneUUID();
     internalComment = ps.getInternalComment();
     externalComment = ps.getExternalComment();
   }
   
-  
-  @Deprecated
-  public int getMilestoneOrdinal() {
-    
-    return milestoneOrdinal;
-  }
-  
-  @Deprecated
-  public void setMilestoneOrdinal(int milestoneOrdinal) {
-    this.milestoneOrdinal = milestoneOrdinal;
-  }
   
   public UUID getMilestoneUUID() {
     return milestoneUUID;
