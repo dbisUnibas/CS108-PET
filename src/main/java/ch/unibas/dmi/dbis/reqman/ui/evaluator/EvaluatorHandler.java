@@ -214,6 +214,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     evaluator.closeAll();
   }
   
+  public Group getActiveGroup() {
+    return EntityController.getInstance().getGroup(evaluator.getActiveGroupUUID());
+  }
+  
   private void reset() {
     this.assessmentViewMap.clear();
   }

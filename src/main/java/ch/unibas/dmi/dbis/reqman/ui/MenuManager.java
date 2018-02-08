@@ -140,7 +140,7 @@ public class MenuManager {
     
     registerEditorItem(ITEM_EXPORT_CAT, itemExportCat = new MenuItem("Export Catalogue..."), true);
     registerEvaluatorItem(ITEM_EXPORT_GROUPS, itemExportGroups = new MenuItem("Export Groups..."), true);
-    //registerEvaluatorItem(ITEM_EXPORT_GROUP, itemExportGroup = new MenuItem("Export Group..."), true); // TODO implement
+    registerEvaluatorItem(ITEM_EXPORT_GROUP, itemExportGroup = new MenuItem("Export Active Group..."), true);
     
     registerMenuItem(ITEM_QUIT, itemQuit = new MenuItem("Quit"));
     
@@ -414,7 +414,7 @@ public class MenuManager {
         new SeparatorMenuItem(),
         itemSaveCourse, itemSaveCourseAs, itemSaveCat, itemSaveCatAs, itemSaveGroup, itemSaveGroupAs,
         new SeparatorMenuItem(),
-        itemExportCat, itemExportGroups/*,itemExportGroup /*TODO implement*/,
+        itemExportCat, itemExportGroups,itemExportGroup,
         new SeparatorMenuItem(),
         itemImport,
         new SeparatorMenuItem(),

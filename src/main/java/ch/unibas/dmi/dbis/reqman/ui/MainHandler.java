@@ -15,11 +15,9 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.control.RadioMenuItem;
 import javafx.stage.FileChooser;
-import javafx.util.Duration;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -208,7 +206,7 @@ public class MainHandler implements MenuHandler {
         ExportHelper.exportCatalogue(exportConfig, f);
         mainScene.showNotification("Export finished to " + f.getAbsolutePath());
         
-        Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Catalogue exported to:\\"+f.getAbsolutePath()).showInformation();
+        //Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Catalogue exported to:\\"+f.getAbsolutePath()).showInformation();
       } catch (FileNotFoundException e) {
         LOGGER.catching(Level.FATAL, e);
       }
@@ -230,8 +228,31 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleExportGroup(ActionEvent event) {
-    Utils.showFeatureDisabled("Export single Group", EXPORT_DISABLED_REASON);
-    // TODO Re-Implement export group
+    if (!EntityController.getInstance().hasCatalogue() && EntityController.getInstance().hasCourse() && EntityController.getInstance().hasGroups()) {
+      return;
+    }
+    FileChooser exportConfigFC = new FileChooser();
+    exportConfigFC.setTitle("Templating Config");
+    File exportConfig = exportConfigFC.showOpenDialog(mainScene.getWindow());
+    if (exportConfig == null) {
+      // Userabort
+      return;
+    }
+    LOGGER.debug("Templating Config: {}", exportConfig);
+    FileChooser fc = new FileChooser();
+    fc.setTitle("Export Group");
+    File f = fc.showSaveDialog(mainScene.getWindow());
+    if (f != null) {
+      LOGGER.debug("Exporting to {}", f);
+      try {
+        ExportHelper.exportGroup(exportConfig, f, evaluatorHandler.getActiveGroup());
+        mainScene.showNotification("Export finished to " + f.getAbsolutePath());
+      
+        //Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Group exported to:\\"+f.getAbsolutePath()).showInformation();
+      } catch (FileNotFoundException e) {
+        LOGGER.catching(Level.FATAL, e);
+      }
+    }
   }
   
   @Override

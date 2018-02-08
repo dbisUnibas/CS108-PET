@@ -339,6 +339,9 @@ public class RenderManager {
         @Override
         public String renderCarefully(Group instance, String parameter) {
           Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneByPosition(Integer.parseInt(parameter));
+          if(ms == null){
+            return "[ERROR] Milestone ("+parameter+") not found.";
+          }
           ProgressSummary ps = EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(ms);
           return StringUtils.prettyPrint(EntityController.getInstance().getGroupAnalyser(group).getSumFor(ps));
         }
@@ -414,7 +417,7 @@ public class RenderManager {
   
   public String renderProgressSummary(ProgressSummary ps) {
     String renderedProgressSummary = renderCarefully(renderer, templateProgressSummary, ps);
-    parser.setupFor(MILESTONE_ENTITY);
+    parser.setupFor(PROGRESS_SUMMARY_ENTITY);
     templateProgressSummaryMilestone = parser.parseTemplate(renderedProgressSummary);
     return renderCarefully(renderer, templateProgressSummaryMilestone, ps);
   }
@@ -444,8 +447,8 @@ public class RenderManager {
     parseTemplateCarefully(REQUIREMENT_ENTITY, reqTemplate);
   }
   
-  public void parseGroupMilestoneTemplate(String groupMSTemplate) {
-    parseTemplateCarefully(PROGRESS_SUMMARY_ENTITY, groupMSTemplate);
+  public void parseProgressSummaryTemplate(String progressSummaryTemplate) {
+    parseTemplateCarefully(PROGRESS_SUMMARY_ENTITY, progressSummaryTemplate);
   }
   
   public void parseGroupTemplate(String groupTemplate) {
