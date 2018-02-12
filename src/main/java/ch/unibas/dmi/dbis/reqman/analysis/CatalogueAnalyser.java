@@ -147,7 +147,7 @@ public class CatalogueAnalyser {
   }
   
   public List<Requirement> findRequirementsNameContains(String search) {
-    return catalogue.getRequirements().stream().filter(r -> r.getName().contains(search)).collect(Collectors.toList());
+    return catalogue.getRequirements().stream().filter(r -> r.getName().toLowerCase().contains(search.toLowerCase())).collect(Collectors.toList());
   }
   
   public List<Requirement> findRequirementsContaining(String pattern) {

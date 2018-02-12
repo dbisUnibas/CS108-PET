@@ -132,6 +132,6 @@ public class StringUtils {
     if (str == null) {
       return false;
     }
-    return str.contains(pattern);
+    return str.toLowerCase().contains(pattern.toString().toLowerCase());
   }
 }
