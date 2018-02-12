@@ -310,7 +310,10 @@ public class RenderManager {
           return "";
         }
       },
-      new SubEntityField<Progress, Milestone>("milestone", (p -> EntityController.getInstance().getGroupAnalyser(group).getMilestoneOf(p)), MILESTONE_ENTITY),
+      new SubEntityField<Progress, Milestone>("milestone", (p -> {
+        // Issue: No milestone associated, due to not assessed?--> check this!
+        return EntityController.getInstance().getGroupAnalyser(group).getMilestoneOf(p);
+      }), MILESTONE_ENTITY),
       new SubEntityField<Progress, ProgressSummary>("progressSummary", (p-> EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryOf(p)), PROGRESS_SUMMARY_ENTITY)
   );
   private Template<ProgressSummary> templateProgressSummaryMilestone = null;
