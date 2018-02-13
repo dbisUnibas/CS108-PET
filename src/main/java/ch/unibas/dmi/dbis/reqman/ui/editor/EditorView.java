@@ -141,7 +141,11 @@ public class EditorView extends BorderPane implements TitleProvider {
   
   public void showFilterBar(){
     filterBar.clear();
-    topBox.getChildren().add(0,filterBar);
+    if(!topBox.getChildren().contains(filterBar)){
+      topBox.getChildren().add(0,filterBar);
+    }else{
+      topBox.getChildren().remove(filterBar);
+    }
   }
   
   private void layoutComponents() {

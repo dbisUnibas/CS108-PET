@@ -37,7 +37,7 @@ public class FilterBar extends HBox {
   }
   
   public void clear() {
-    searchInput.clear();
+    handleReset(null);
   }
   
   public void show() {

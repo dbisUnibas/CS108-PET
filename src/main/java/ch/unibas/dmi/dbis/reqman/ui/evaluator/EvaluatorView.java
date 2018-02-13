@@ -139,7 +139,12 @@ public class EvaluatorView extends VBox implements TitleProvider {
   }
   
   public void showFilterBar() {
-    getChildren().add(0, filterBar);
+    filterBar.clear();
+    if(!getChildren().contains(filterBar)){
+      getChildren().add(0, filterBar);
+    }else{
+      getChildren().remove(filterBar);
+    }
   }
   
   public void closeAll() {
