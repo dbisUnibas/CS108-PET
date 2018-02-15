@@ -10,6 +10,7 @@ import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -18,7 +19,6 @@ import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -26,6 +26,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
+import javafx.util.Callback;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +40,8 @@ import java.util.Map;
  * @author loris.sauter
  */
 public class RequirementPropertiesScene extends AbstractVisualCreator<Requirement> {
+  
+  private final static Logger LOGGER = LogManager.getLogger();
   
   private final static MetaKeyValuePair PLACEHOLDER = new MetaKeyValuePair("key", "value");
   private TextField tfName = new TextField();
@@ -72,6 +77,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   
   
   public void handleSaving(ActionEvent event) {
+    LOGGER.debug("Saving requirement");
     String name = tfName.getText();
     String excerpt = tfShort.getText();
     String desc = taDesc.getText();
@@ -355,6 +361,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   }
   
   private void saveProperties() {
+    LOGGER.debug("Save Requirement properties");
+    LOGGER.debug("Req.props.size={}, ui.prop.size={}",requirement.getPropertiesMap().size(), tableData.size());
+    LOGGER.debug("Requirement porps: {}",requirement.getPropertiesMap());
+    LOGGER.debug("UI props: {}",tableData);
     if (!isMetaListOnlyEmpty()) {
       requirement.setPropertiesMap(convertFromMetaKeyValuePairList(tableData));
     }
@@ -450,12 +460,16 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   private TableView<MetaKeyValuePair> createPropertiesTable() {
     TableView<MetaKeyValuePair> table = new TableView<>();
     table.setEditable(true);
+  
+    Callback<TableColumn<MetaKeyValuePair, String>,
+            TableCell<MetaKeyValuePair, String>> cellFactory
+        = (TableColumn<MetaKeyValuePair, String> p) -> new EditingCell();
     
     TableColumn<MetaKeyValuePair, String> firstCol = new TableColumn<>("Key");
     firstCol.setCellValueFactory(
         new PropertyValueFactory<>("key")
     );
-    firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    firstCol.setCellFactory(cellFactory);
     firstCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
       t.getTableView().getItems().get(t.getTablePosition().getRow()).setKey(t.getNewValue());
     });
@@ -463,10 +477,14 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     secondCol.setCellValueFactory(
         new PropertyValueFactory<>("value")
     );
-    secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
+    secondCol.setCellFactory(cellFactory);
     secondCol.setOnEditCommit((TableColumn.CellEditEvent<MetaKeyValuePair, String> t) -> {
       t.getTableView().getItems().get(t.getTablePosition().getRow()).setValue(t.getNewValue());
     });
+    
+    /* === Make each change update the value*/
+    
+    
     
     table.getColumns().addAll(firstCol, secondCol);
     
@@ -558,6 +576,74 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     
     public SimpleStringProperty valueProperty() {
       return value;
+    }
+  }
+  
+  /**
+   * Solution by
+   * https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/table-view.htm
+   */
+  public static class EditingCell extends TableCell<MetaKeyValuePair, String> {
+    
+    private TextField textField;
+  
+    public EditingCell() {
+    }
+  
+    @Override
+    public void startEdit() {
+      if (!isEmpty()) {
+        super.startEdit();
+        createTextField();
+        setText(null);
+        setGraphic(textField);
+        textField.selectAll();
+      }
+    }
+  
+    @Override
+    public void cancelEdit() {
+      super.cancelEdit();
+    
+      setText(getItem());
+      setGraphic(null);
+    }
+  
+    @Override
+    public void updateItem(String item, boolean empty) {
+      super.updateItem(item, empty);
+    
+      if (empty) {
+        setText(null);
+        setGraphic(null);
+      } else {
+        if (isEditing()) {
+          if (textField != null) {
+            textField.setText(getString());
+          }
+          setText(null);
+          setGraphic(textField);
+        } else {
+          setText(getString());
+          setGraphic(null);
+        }
+      }
+    }
+  
+    private void createTextField() {
+      textField = new TextField(getString());
+      textField.setMinWidth(this.getWidth() - this.getGraphicTextGap()* 2);
+      textField.focusedProperty().addListener(
+          (ObservableValue<? extends Boolean> arg0,
+           Boolean arg1, Boolean arg2) -> {
+            if (!arg2) {
+              commitEdit(textField.getText());
+            }
+          });
+    }
+  
+    private String getString() {
+      return getItem() == null ? "" : getItem().toString();
     }
   }
   
