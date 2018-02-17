@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.data;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -39,7 +41,7 @@ public class CourseManager implements Comparator<Milestone> {
     return null;
   }
   
-  public Milestone getMinimalMilestone(Requirement requirement) {
+  public Milestone getMinimalMilestone(@NotNull Requirement requirement) {
     for (Milestone ms : catalogue.getMilestones()) {
       if (ms.getUuid().equals(requirement.getMinimalMilestoneUUID())) {
         return ms;

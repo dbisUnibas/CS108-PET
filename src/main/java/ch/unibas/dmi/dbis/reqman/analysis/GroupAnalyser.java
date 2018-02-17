@@ -140,13 +140,19 @@ public class GroupAnalyser {
     return list.stream().filter(Progress::hasProgress).mapToDouble(this::getActualPoints).sum();
   }
   
-  boolean matchesProgressMilestone(Progress p, ProgressSummary ps) {
+  boolean matchesProgressMilestone(@NotNull Progress p, @NotNull ProgressSummary ps) {
     Requirement req = getRequirementOf(p);
+    if(req == null){
+      //throw new RuntimeException("Progress "+p.toString()+" has no requirement.");
+      // TODO Log deprecated progress ?
+      // Most probable reason for this case is, the requirement got removed.
+      return false;
+    }
     Milestone ms = catalogueAnalyser.getMilestoneOf(ps);
     return catalogueAnalyser.matchesMilestone(req, ms);
   }
   
-  boolean matchesProgressSummary(Progress p, ProgressSummary ps){
+  boolean matchesProgressSummary(@NotNull Progress p, @NotNull ProgressSummary ps){
     if(p.getProgressSummaryUUID() == null){
       return false; // Then the case, if the progress was not yet assessed
     }

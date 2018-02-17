@@ -248,7 +248,7 @@ public class CatalogueAnalyser {
     return requirement.getMaximalMilestoneUUID().equals(milestone.getUuid());
   }
   
-  boolean matchesMilestone(Requirement requirement, Milestone milestone) {
+  boolean matchesMilestone(@NotNull Requirement requirement,@NotNull Milestone milestone) {
     return getMilestoneDateComparator().compare(courseManager.getMinimalMilestone(requirement), milestone) <= 0 && getMilestoneDateComparator().compare(courseManager.getMaximalMilestone(requirement), milestone) >= 0;
   }
   
