@@ -30,9 +30,8 @@ import javafx.util.Callback;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * TODO: write JavaDoc
@@ -131,13 +130,22 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     requirement.setCategory(cat);
     
     
-    if (!predecessors.isEmpty()) {
-      predecessors.stream().forEach(requirement::addPredecessor);
-    }
+    savePredecessors();
     
     saveProperties();
     
     getWindow().hide();
+  }
+  
+  private void savePredecessors() {
+    Set<UUID> reqPred = Arrays.stream(requirement.getPredecessors()).collect(Collectors.toSet());
+    Set<UUID> pred = predecessors.stream().map(Requirement::getUuid).collect(Collectors.toSet());
+    
+    if(pred.equals(reqPred)){
+      LOGGER.debug("Predecessors unchanged");
+    }else{
+      requirement.setPredecessors(pred.toArray(new UUID[0]));
+    }
   }
   
   @Override
