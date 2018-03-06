@@ -232,13 +232,14 @@ public class RenderManager {
    * .name
    * .progressList
    * .sum
+   * .sumMax
    * .percentage
    * .comment
    * .summary --> {Progress.name: Progress.comment\n}
    */
   public final Entity<ProgressSummary> PROGRESS_SUMMARY_ENTITY = new Entity<ProgressSummary>("progressSummary",
       new Field<ProgressSummary, String>("name", Field.Type.NORMAL, ps -> EntityController.getInstance().getCatalogueAnalyser().getMilestoneOf(ps).getName()),
-      new Field<ProgressSummary, List<Progress>>("progressList", Field.Type.LIST, ps -> EntityController.getInstance().getGroup(group.getUuid()).getProgressList(), list -> {
+      new Field<ProgressSummary, List<Progress>>("progressList", Field.Type.LIST, ps -> EntityController.getInstance().getGroupAnalyser(group).getProgressFor(ps), list -> {
         StringBuilder sb = new StringBuilder();
         
         list.sort((p1,p2)-> {
@@ -252,23 +253,26 @@ public class RenderManager {
         return sb.toString();
       }),
       new Field<ProgressSummary, Double>("sum", Field.Type.NORMAL, ps -> EntityController.getInstance().getGroupAnalyser(group).getSumFor(ps)),
+      new Field<ProgressSummary, Double>("sumMax", Field.Type.NORMAL, ps -> EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(ps)),
       new Field<ProgressSummary, Double>("percentage", Field.Type.NORMAL, ps -> (EntityController.getInstance().getGroupAnalyser(group).getSumFor(ps) / EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(ps)) * 100.0),
       new Field<ProgressSummary, String>("comment", Field.Type.NORMAL, ps -> {
         if (ps == null) {
           return "";
         } else {
-          return ps.getExternalComment();
+          return ps.getExternalComment() == null ? "" : ps.getExternalComment();
         }
       }),
       new Field<ProgressSummary, List<String>>("summary", Field.Type.LIST, ps -> {
         List<String> list = new ArrayList<>();
         EntityController.getInstance().getGroupAnalyser(group).getProgressFor(ps).forEach(p -> {
-          list.add(EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p).getName()+": "+p.getComment()+"\n"); // TODO Line spearator as parameter / config / ?
+          if(org.apache.commons.lang.StringUtils.isNotBlank(p.getComment())){
+            list.add(EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p).getName()+": "+p.getComment()+"<br />\n"); // TODO Line spearator as parameter / config / ?
+          }
         });
         return list;
       }, list -> {
         StringBuilder sb = new StringBuilder();
-        list.forEach(str -> sb.append(str));
+        list.forEach(sb::append);
         return sb.toString();
       })
   );
@@ -331,10 +335,12 @@ public class RenderManager {
   public final Entity<Group> GROUP_ENTITY = new Entity<Group>("group",
       Field.createNormalField("name", Group::getName),
       Field.createNormalField("project", Group::getProjectName),
-      new Field<Group, List<ProgressSummary>>("progressSummaries", Field.Type.LIST, g -> EntityController.getInstance().getGroup(g.getUuid()).getProgressSummaries(), list -> {
-        StringBuilder sb = new StringBuilder();
-        list.forEach(ms -> sb.append(renderProgressSummary(ms)));
-        return sb.toString();
+      new Field<Group, List<ProgressSummary>>("progressSummaries", Field.Type.LIST,
+          g -> EntityController.getInstance().getGroup(g.getUuid()).getProgressSummaries(),
+          list -> {
+            StringBuilder sb = new StringBuilder();
+            list.forEach(ps -> sb.append(renderProgressSummary(ps)));
+            return sb.toString();
       }),
       new Field<Group, Double>("sumTotal", Field.Type.NORMAL, g -> EntityController.getInstance().getGroupAnalyser(g).getSum()),
       new ParametrizedField<Group, Double>("sumMS", g -> 0d) {

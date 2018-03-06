@@ -79,6 +79,11 @@ public class SubEntityField<E, T> extends Field<E, T> {
     @Override
     public String render(E instance) {
         Field subField = subEntity.getFieldForName(subFieldName);
-        return subField.render(getter.apply(instance));
+        // Try-catch block to catch subfield is null
+        try{
+            return subField.render(getter.apply(instance));
+        }catch(IllegalArgumentException ex){
+            return "";
+        }
     }
 }
