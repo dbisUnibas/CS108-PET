@@ -203,9 +203,9 @@ public class CatalogueAnalyser {
       switch (r.getType()) {
         case REGULAR:
         case BONUS:
-          return progress.getFraction() * r.getMaxPoints();
+          return progress.hasProgress() ? progress.getFraction() * r.getMaxPoints() : 0;
         case MALUS:
-          return -1 * progress.getFraction() * r.getMaxPoints();
+          return progress.hasProgress() ? -1 * progress.getFraction() * r.getMaxPoints() : 0;
       }
     }
     return Double.NaN; // unreachable?
