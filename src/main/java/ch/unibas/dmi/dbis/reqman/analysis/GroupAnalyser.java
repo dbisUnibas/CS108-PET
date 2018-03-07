@@ -3,9 +3,7 @@ package ch.unibas.dmi.dbis.reqman.analysis;
 import ch.unibas.dmi.dbis.reqman.data.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +29,33 @@ public class GroupAnalyser {
   
   public List<Progress> getProgressFor(ProgressSummary summary) {
     return group.getProgressList().stream().filter(p -> matchesProgressMilestone(p, summary)).collect(Collectors.toList());
+  }
+  
+  
+  /**
+   * Returns all {@link Progress} whose assessment was made until the specified {@link ProgressSummary}.
+   * Until means, the given progress was assessed at the given progress summary.
+   * @param ps
+   * @return
+   */
+  public List<Progress> getProgressMadeUntilOrOpen(ProgressSummary ps){
+    Set<Progress> progressMade = new HashSet<>(getProgressFor(ps));
+    Milestone ms = catalogueAnalyser.getMilestoneOf(ps);
+    if(catalogueAnalyser.hasPredecessor(ms)){
+      Milestone predecessor = catalogueAnalyser.getPredecessorOf(ms);
+      ProgressSummary predPS = getProgressSummaryFor(predecessor);
+      progressMade.addAll(getOpenProgressAt(predPS));
+    }
+    return new ArrayList<>(progressMade);
+  }
+  
+  /**
+   * Returns a list of {@link Progress} objects that are associated with the given {@link ProgressSummary}, but are unassessed.
+   * @param ps
+   * @return
+   */
+  public List<Progress> getOpenProgressAt(ProgressSummary ps){
+    return getProgressFor(ps).stream().filter(Progress::isFresh).collect(Collectors.toList());
   }
   
   public double getActualPoints(Progress progress) {
@@ -148,6 +173,19 @@ public class GroupAnalyser {
     return equals(ms, ps);
   }
   
+  /**
+   * Checks if the given {@link Progress} matches the given {@link ProgressSummary}.
+   *
+   * Matching is defined as follows:
+   * Either the {@link Progress} has already progress associated with (e.g. {@link Progress#hasProgress()} returns true),
+   * then the {@link ProgressSummary}'s Uuid must be equal to the one returned by {@link Progress#getProgressSummaryUUID()}.
+   * Or the {@link Progress} is <i>fresh</i>, then it is checked if the progress' {@link Requirement}'s {@link Milestone}
+   * equals the milestone, represented by the progress summary.
+   *
+   * @param p
+   * @param ps
+   * @return
+   */
   boolean matchesProgressMilestone(@NotNull Progress p, @NotNull ProgressSummary ps) {
     Requirement req = getRequirementOf(p);
     if(req == null){

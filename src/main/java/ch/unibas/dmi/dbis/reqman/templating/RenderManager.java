@@ -239,7 +239,7 @@ public class RenderManager {
    */
   public final Entity<ProgressSummary> PROGRESS_SUMMARY_ENTITY = new Entity<ProgressSummary>("progressSummary",
       new Field<ProgressSummary, String>("name", Field.Type.NORMAL, ps -> EntityController.getInstance().getCatalogueAnalyser().getMilestoneOf(ps).getName()),
-      new Field<ProgressSummary, List<Progress>>("progressList", Field.Type.LIST, ps -> EntityController.getInstance().getGroupAnalyser(group).getProgressFor(ps), list -> {
+      new Field<ProgressSummary, List<Progress>>("progressList", Field.Type.LIST, ps -> EntityController.getInstance().getGroupAnalyser(group).getProgressMadeUntilOrOpen(ps), list -> {
         StringBuilder sb = new StringBuilder();
         
         list.sort((p1,p2)-> {

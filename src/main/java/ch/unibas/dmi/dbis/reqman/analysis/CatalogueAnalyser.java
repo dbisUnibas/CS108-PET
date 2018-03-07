@@ -61,6 +61,16 @@ public class CatalogueAnalyser {
     return null;
   }
   
+  public Milestone getPredecessorOf(@NotNull Milestone ms){
+    int theOrdinal = courseManager.getMilestoneOrdinal(ms);
+    return getMilestoneByPosition(theOrdinal-1);
+  }
+  
+  public Milestone getSuccessorOf(@NotNull Milestone ms){
+    int ordinal = courseManager.getMilestoneOrdinal(ms);
+    return getMilestoneByPosition(ordinal+1);
+  }
+  
   /**
    * Returns only those requirements, which firstly occur on the specified milestone.
    *
@@ -231,6 +241,11 @@ public class CatalogueAnalyser {
     List<Milestone> milestones = catalogue.getMilestones();
     milestones.sort(courseManager);
     return milestones.get(pos);
+  }
+  
+  public boolean hasPredecessor(@NotNull Milestone ms) {
+    int ordinal = courseManager.getMilestoneOrdinal(ms);
+    return 0 < ordinal && ordinal < catalogue.getMilestones().size();
   }
   
   boolean containsRequirementPattern(Requirement requirement, String pattern) {
