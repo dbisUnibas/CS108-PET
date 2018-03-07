@@ -33,7 +33,7 @@ public class ReqmanApplication extends Application {
   }
   
   public static void main(String[] args) {
-    //Log4J2Fix.applyHotFix();
+    System.setProperty("line.separator","\n"); // To enforce UN*X line endings
     version = Version.getInstance();
     LOGGER = LogManager.getLogger(ReqmanApplication.class);
     LOGGER.info(LoggingUtils.REQMAN_MARKER, "Starting reqman @ v" + version.getFullVersion());
