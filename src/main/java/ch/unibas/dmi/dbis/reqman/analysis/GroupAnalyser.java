@@ -140,6 +140,14 @@ public class GroupAnalyser {
     return list.stream().filter(Progress::hasProgress).mapToDouble(this::getActualPoints).sum();
   }
   
+  public boolean equals(Milestone ms, ProgressSummary ps){
+    return ps.getMilestoneUUID().equals(ms.getUuid());
+  }
+  
+  public boolean equals(ProgressSummary ps, Milestone ms){
+    return equals(ms, ps);
+  }
+  
   boolean matchesProgressMilestone(@NotNull Progress p, @NotNull ProgressSummary ps) {
     Requirement req = getRequirementOf(p);
     if(req == null){
@@ -149,6 +157,10 @@ public class GroupAnalyser {
       return false;
     }
     Milestone ms = catalogueAnalyser.getMilestoneOf(ps);
+    if(p.hasProgress()){
+      ProgressSummary assessmentMilestone = getProgressSummaryById(p.getProgressSummaryUUID());
+      return equals(assessmentMilestone, ms);
+    }
     return catalogueAnalyser.matchesMilestone(req, ms);
   }
   
