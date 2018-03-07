@@ -347,8 +347,9 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleExportOverview(ActionEvent event) {
-    throw new UnsupportedOperationException("Not implemented yet");
-    // TODO Re-Implement export Overview
+    Utils.showFeatureDisabled("Export Points Overview", EXPORT_DISABLED_REASON);
+    return;
+    // TODO Decide: Re-implement / discard?
     /*
     LOGGER.traceEntry();
     if (mainScene.isEvaluatorActive()) {
