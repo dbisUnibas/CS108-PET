@@ -4,10 +4,14 @@ import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.ui.common.CourseInfoView;
 import ch.unibas.dmi.dbis.reqman.ui.common.FilterBar;
+import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorView;
+import ch.unibas.dmi.dbis.reqman.ui.overview.CatalogueStatisticsView;
+import ch.unibas.dmi.dbis.reqman.ui.overview.GroupStatisticsView;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Scene;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
@@ -18,6 +22,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.UUID;
+import java.util.function.Function;
 
 /**
  * TODO: Write JavaDoc
@@ -211,5 +216,39 @@ public class EvaluatorView extends VBox implements TitleProvider {
     groupView.setDisable(true);
     courseView.setDisable(true);
     tabPane.setDisable(true);
+  }
+  
+  private Function<Void,Void> statisticsCloser;
+  
+  public void showStatistics() {
+    GroupStatisticsView view = new GroupStatisticsView();
+    Scene scene = new Scene(view);
+    PopupStage stage = new PopupStage("Groups Point Overview", scene,false);
+    // Following code hides the stage asap the focus is lost
+    /*stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
+      if(!stage.isFocused()){
+        stage.hide();
+      }
+    });*/
+    stage.show();
+    
+    /*
+    // TODO add listener to each assessmentview
+    .setOnPointsChanged(pts -> {
+      if(stage.isShowing()){
+        view.update();
+      }
+    });
+    */
+    statisticsCloser = (unused) -> {
+      stage.close();
+      return null;
+    };
+  }
+  
+  public void stop() {
+    if(statisticsCloser != null){
+      statisticsCloser.apply(null);
+    }
   }
 }

@@ -516,6 +516,11 @@ public class MainHandler implements MenuHandler {
     
   }
   
+  @Override
+  public void handleGroupStatistics(ActionEvent event) {
+    evaluatorHandler.showStatistics();
+  }
+  
   public void setMainScene(MainScene mainScene) {
     this.mainScene = mainScene;
   }
@@ -529,12 +534,7 @@ public class MainHandler implements MenuHandler {
   
   void stop() {
     evaluatorHandler.stop();
-    try {
-      EntityController.getInstance().saveSession();
-    } catch (IOException e) {
-      LOGGER.warn("Couldn't store session for reason, {}", e);
-      LOGGER.catching(Level.WARN, e);
-    }
+    EntityController.getInstance().saveSession();
   }
   
   void checkGroupsPresent() {

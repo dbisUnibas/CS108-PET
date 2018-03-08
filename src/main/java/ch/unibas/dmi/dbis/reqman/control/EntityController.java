@@ -486,7 +486,7 @@ public class EntityController {
     }
   }
   
-  public void saveSession() throws IOException {
+  public void saveSession() {
     if (storageManager != null) {
       LOGGER.info("Storing session...");
       SessionStorage session = new SessionStorage();

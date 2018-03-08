@@ -497,6 +497,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     evaluator.removeTab(g);
   }
   
+  public void showStatistics(){
+    evaluator.showStatistics();
+  }
+  
   private void addTabAndRefresh(Group group){
     AssessmentView av = getAssessmentView(group);
     av.recalculatePoints();

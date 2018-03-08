@@ -11,12 +11,12 @@ import java.util.stream.Collectors;
  *
  * @author loris.sauter
  */
-public class StatisticsHelper {
+public class CatalogueOverviewHelper {
   
   private final CatalogueAnalyser analyser;
   
   
-  public StatisticsHelper(CatalogueAnalyser analyser) {
+  public CatalogueOverviewHelper(CatalogueAnalyser analyser) {
     this.analyser = analyser;
   }
   

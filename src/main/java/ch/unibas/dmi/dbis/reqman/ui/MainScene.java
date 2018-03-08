@@ -61,6 +61,7 @@ public class MainScene extends TitledScene {
   void stop() {
     mainHandler.stop();
     editor.stop();
+    evaluator.stop();
   }
   
   Mode getActiveMode() {

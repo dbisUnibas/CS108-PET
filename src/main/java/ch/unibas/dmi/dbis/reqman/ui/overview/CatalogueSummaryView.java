@@ -18,7 +18,7 @@ import java.util.List;
 public class CatalogueSummaryView extends GridPane {
   
   private final CatalogueAnalyser analyser;
-  private final StatisticsHelper helper;
+  private final CatalogueOverviewHelper helper;
   private Label lblTitle;
   private Label lblSelectedPoints;
   private Label lblMaximalPoints;
@@ -34,7 +34,7 @@ public class CatalogueSummaryView extends GridPane {
   
   public CatalogueSummaryView(CatalogueAnalyser analyser) {
     this.analyser = analyser;
-    helper = new StatisticsHelper(analyser);
+    helper = new CatalogueOverviewHelper(analyser);
     Utils.applyDefaultGridSetup(this);
     initComponents();
     layoutComponents();

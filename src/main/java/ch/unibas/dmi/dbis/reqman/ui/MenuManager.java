@@ -52,6 +52,7 @@ public class MenuManager {
   public static final String ITEM_SHOW_FILTER_BAR_EDIOR = "itemEditorFilterShow";
   public static final String ITEM_CLEAR_FILTER_EDITOR = "itemEditorFilterClear";
   public static final String ITEM_SHOW_CATALOGUE_STATISTICS = "itemShowCatalogueStatistics";
+  public static final String ITEM_SHOW_GROUP_STATISTICS = "itemShowGroupStatistics";
   public static final String ITEM_PRESENTATION_MODE = "itemPresentation";
   public static final String CLEAR_GLOBAL_MS_KEY = "clear";
   public static final String ITEM_IMPORT = "itemImport";
@@ -96,6 +97,7 @@ public class MenuManager {
   private MenuItem itemEditorFilterShow;
   private MenuItem itemEditorFilterClear;
   private MenuItem itemShowCatalogueStatistics;
+  private MenuItem itemShowGroupStatistics;
   private MenuItem itemPresentation;
   private MenuItem itemImport;
   private MenuBar menuBar = new MenuBar();
@@ -162,7 +164,9 @@ public class MenuManager {
     registerMenuItem(ITEM_SHOW_FILTER_BAR_EDIOR, itemEditorFilterShow = new MenuItem("Show Filter Bar"));
     registerMenuItem(ITEM_CLEAR_FILTER_EDITOR, itemEditorFilterClear = new MenuItem("Clear Filter"));
     registerMenuItem(ITEM_SHOW_CATALOGUE_STATISTICS, itemShowCatalogueStatistics = new MenuItem("Catalogue Overview..."));
+    registerMenuItem(ITEM_SHOW_GROUP_STATISTICS, itemShowGroupStatistics = new MenuItem("Groups Overview..."));
     catNeeded.addAll(Arrays.asList(ITEM_CLEAR_FILTER_EDITOR, ITEM_SHOW_FILTER_BAR_EDIOR, ITEM_SHOW_CATALOGUE_STATISTICS));
+    groupNeeded.add(ITEM_SHOW_GROUP_STATISTICS);
     
     registerMenuItem(ITEM_PRESENTATION_MODE, itemPresentation = new RadioMenuItem("Presentation Mode"));
     
@@ -395,6 +399,9 @@ public class MenuManager {
             case ITEM_IMPORT:
               handler.handleImport(event);
               break;
+            case ITEM_SHOW_GROUP_STATISTICS:
+              handler.handleGroupStatistics(event);
+              break;
             default:
               // Silently ignoring -> may log issue?
           }
@@ -491,6 +498,7 @@ public class MenuManager {
         itemEditorFilterClear,
         new SeparatorMenuItem(),
         itemShowCatalogueStatistics,
+        itemShowGroupStatistics,
         new SeparatorMenuItem(),
         itemPresentation);
   }

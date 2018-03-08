@@ -77,4 +77,6 @@ public interface MenuHandler {
   void handleCatalogueStatistics(ActionEvent event);
   
   void handleImport(ActionEvent event);
+  
+  void handleGroupStatistics(ActionEvent event);
 }
