@@ -107,20 +107,6 @@ tasks.withType(Javadoc) {
 }
 
 
-task deployUpdater(type: Jar, dependsOn: classes) {
-    appendix = 'updater'
-    from sourceSets.main.output
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    manifest {
-        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.updating.FileUpdater'
-    }
-    doLast {
-        println('Deployed updater: ' + jar.getArchiveName())
-    }
-}
-
 /**
  * Increments the specified versionPart in the version.properties file.
  * This increments the specified versionPart in the version.properties file by 1
