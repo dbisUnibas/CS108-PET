@@ -20,6 +20,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * TODO: write JavaDoc
@@ -81,6 +82,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
       updateSumDisplay();
     }
     checkDependencies();
+    if(pointsChangedConsumer != null){
+      pointsChangedConsumer.accept(1d);
+    }
   }
   
   public void bindToParentSize(Region parent) {
@@ -140,6 +144,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   @Override
   public void clearFilter() {
     displayAll();
+  }
+  
+  private Consumer<Double> pointsChangedConsumer = null;
+  
+  public void setOnPointsChanged(Consumer<Double> consumer) {
+    pointsChangedConsumer= consumer;
   }
   
   void checkDependencies(){

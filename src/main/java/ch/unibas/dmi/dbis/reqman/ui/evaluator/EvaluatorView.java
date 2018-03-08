@@ -220,7 +220,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
   
   private Function<Void,Void> statisticsCloser;
   
-  public void showStatistics() {
+  public void showStatistics(HashMap<UUID, AssessmentView> assessmentViewMap) {
     GroupStatisticsView view = new GroupStatisticsView();
     Scene scene = new Scene(view);
     PopupStage stage = new PopupStage("Groups Point Overview", scene,false);
@@ -231,6 +231,14 @@ public class EvaluatorView extends VBox implements TitleProvider {
       }
     });*/
     stage.show();
+    
+    assessmentViewMap.values().forEach(av ->{
+      av.setOnPointsChanged(pts -> {
+        if(stage.isShowing() ){
+          view.update();
+        }
+      });
+    });
     
     /*
     // TODO add listener to each assessmentview

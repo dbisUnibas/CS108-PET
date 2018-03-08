@@ -56,11 +56,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   private HashMap<UUID, Boolean> unsavedGroupsMap = new HashMap<>();
   
   @Deprecated
-  private HashMap<String, AssessmentView> groupViewMap = new HashMap<>();
-  @Deprecated
   private HashMap<String, Boolean> dirtyMap = new HashMap<>();
-  
-  private Milestone activeMS = null;
   
   private StatusBar statusBar;
   
@@ -467,38 +463,8 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     
   }
   
-  private void addGroupToMap(Group group, AssessmentView view) {
-    if (view != null) {
-      LOGGER.trace(":addGroupToMap - Adding pre-existing AV");
-      groupViewMap.put(group.getName(), view);
-      if (activeMS != null) {
-        LOGGER.trace(":addGroupToInternalStorage - Selecting activeMS: " + activeMS.getName());
-        
-      }
-    } else {
-      if (activeMS != null) {
-        LOGGER.trace(":addGroupToMap - Creating AV with pre-set MS: " + activeMS.getName());
-        
-      } else {
-        LOGGER.trace(":addGroupToMap - Creating AV without pre-set MS");
-        
-      }
-    }
-    addTab(group, false);
-  }
-  
-  private void removeGroupFromMap(Group group) {
-    groupViewMap.remove(group.getName());
-    removeTab(group);
-    dirtyMap.remove(group.getName());
-  }
-  
-  private void removeTab(Group g) {
-    evaluator.removeTab(g);
-  }
-  
   public void showStatistics(){
-    evaluator.showStatistics();
+    evaluator.showStatistics(assessmentViewMap);
   }
   
   private void addTabAndRefresh(Group group){
