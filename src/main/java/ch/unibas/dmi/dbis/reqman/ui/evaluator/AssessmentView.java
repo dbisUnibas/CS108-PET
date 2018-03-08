@@ -66,7 +66,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     //Milestone firstMS = EntityController.getInstance().getCourseManager().getFirstMilestone();
     //displayProgressViews(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(firstMS));
-    summaryCb.getSelectionModel().selectFirst();
+    if(!AssessmentManager.getInstance().hasActiveProgressSummary()){
+      summaryCb.getSelectionModel().selectFirst();
+    }else{
+      applyProgressSummary(AssessmentManager.getInstance().getActiveProgressSummary());
+    }
+    
     checkDependencies();
   }
   
