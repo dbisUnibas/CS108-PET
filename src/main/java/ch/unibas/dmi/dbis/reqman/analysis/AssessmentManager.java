@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.analysis;
 
-import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
 
 import java.util.ArrayList;
 
@@ -25,7 +25,7 @@ public class AssessmentManager {
   }
   
   private ArrayList<Filterable> listeners = new ArrayList<>();
-  private ProgressSummary active = null;
+  private Milestone activeMilestone = null;
   private Filter activeFilter = null;
   
   public void addFilterable(Filterable filterable){
@@ -37,16 +37,16 @@ public class AssessmentManager {
   }
   
   public boolean hasActiveProgressSummary(){
-    return active != null;
+    return activeMilestone != null;
   }
   
-  public ProgressSummary getActiveProgressSummary() {
-    return active;
+  public Milestone getActiveMilestone() {
+    return activeMilestone;
   }
   
-  public void setActiveProgressSummary(ProgressSummary active) {
-    this.active = active;
-    listeners.forEach(f -> f.applyProgressSummary(active));
+  public void setActiveMilestone(Milestone active) {
+    this.activeMilestone = active;
+    listeners.forEach(f -> f.applyActiveMilestone(active));
   }
   
   public void clearFilter(){

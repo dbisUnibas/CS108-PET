@@ -3,10 +3,7 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 import ch.unibas.dmi.dbis.reqman.analysis.*;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
-import ch.unibas.dmi.dbis.reqman.data.Group;
-import ch.unibas.dmi.dbis.reqman.data.Progress;
-import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
-import ch.unibas.dmi.dbis.reqman.data.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -69,7 +66,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     if(!AssessmentManager.getInstance().hasActiveProgressSummary()){
       summaryCb.getSelectionModel().selectFirst();
     }else{
-      applyProgressSummary(AssessmentManager.getInstance().getActiveProgressSummary());
+      applyActiveMilestone(AssessmentManager.getInstance().getActiveMilestone());
     }
     
     checkDependencies();
@@ -127,7 +124,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   }
   
   @Override
-  public void applyProgressSummary(ProgressSummary ps) {
+  public void applyActiveMilestone(Milestone ms) {
+    ProgressSummary ps = EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(ms);
     displayProgressViews(ps);
     ProgressSummary active = summaryCb.getSelectionModel().getSelectedItem();
     if(active != null && active.equals(ps)){
@@ -271,7 +269,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         }
         LOGGER.debug("Selected ProgressSummary: {}", newValue);
         CatalogueAnalyser analyiser = EntityController.getInstance().getCatalogueAnalyser();
-        AssessmentManager.getInstance().setActiveProgressSummary(newValue);
+        Milestone ms = analyiser.getMilestoneOf(newValue);
+        AssessmentManager.getInstance().setActiveMilestone(ms);
       });
     }
     

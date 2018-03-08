@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.analysis;
 
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
 
 /**
@@ -11,7 +12,7 @@ public interface Filterable {
   
   void applyFilter(Filter filter);
   
-  void applyProgressSummary(ProgressSummary ps);
+  void applyActiveMilestone(Milestone ps);
   
   void clearFilter();
 }
