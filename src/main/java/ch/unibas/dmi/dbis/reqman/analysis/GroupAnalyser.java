@@ -165,11 +165,11 @@ public class GroupAnalyser {
     return list.stream().filter(Progress::hasProgress).mapToDouble(this::getActualPoints).sum();
   }
   
-  public boolean equals(Milestone ms, ProgressSummary ps){
+  public boolean equals(@NotNull Milestone ms, @NotNull ProgressSummary ps){
     return ps.getMilestoneUUID().equals(ms.getUuid());
   }
   
-  public boolean equals(ProgressSummary ps, Milestone ms){
+  public boolean equals(@NotNull ProgressSummary ps, @NotNull Milestone ms){
     return equals(ms, ps);
   }
   
@@ -195,8 +195,11 @@ public class GroupAnalyser {
       return false;
     }
     Milestone ms = catalogueAnalyser.getMilestoneOf(ps);
-    if(p.hasProgress()){
+    if(!p.isFresh()){
       ProgressSummary assessmentMilestone = getProgressSummaryById(p.getProgressSummaryUUID());
+      if(assessmentMilestone == null){
+        throw new RuntimeException(String.format("Progress (%s) is not fresh, but there is no ProgressSummary with this uuid", p.toString()));
+      }
       return equals(assessmentMilestone, ms);
     }
     return catalogueAnalyser.matchesMilestone(req, ms);

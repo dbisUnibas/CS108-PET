@@ -2,6 +2,8 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.Callback;
+import ch.unibas.dmi.dbis.reqman.common.EntityAlreadyOpenException;
+import ch.unibas.dmi.dbis.reqman.common.MissingEntityException;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Group;
@@ -253,10 +255,16 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
       List<Group> groups = null;
       try {
         groups = EntityController.getInstance().openGroups(files);
+      }catch(EntityAlreadyOpenException ex){
+        Utils.showErrorDialog(ex.getEntityType()+" already open", ex.getEntityType()+" already open", "Cannot open the entity of type "+ex.getEntityType()+" and uuid="+ex.getUuid().toString()+" more than once.");
       } catch (UuidMismatchException | IOException e) {
         LOGGER.catching(e);
         Utils.showErrorDialog("Exception while opening groups", "The following exception was caught:\n\t"+e.getMessage());
         return;
+      } catch (MissingEntityException e) {
+        Utils.showErrorDialog("Corrupt group file", "The group file of group ("+e.getEntity().getName()+") is corrupt.\n" +
+            "The entity has no or an empty field '"+e.getMissing()+"'.\n" +
+            "Please restart ReqMan to avoid further corrupt files.");
       }
       groups.forEach(this::loadGroupUIAndRefresh);
     }

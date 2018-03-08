@@ -2,6 +2,8 @@ package ch.unibas.dmi.dbis.reqman.control;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
+import ch.unibas.dmi.dbis.reqman.common.EntityAlreadyOpenException;
+import ch.unibas.dmi.dbis.reqman.common.MissingEntityException;
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.session.SessionManager;
@@ -201,11 +203,21 @@ public class EntityController {
     }
   }
   
-  public List<Group> openGroups(List<File> files) throws UuidMismatchException, IOException {
+  public List<Group> openGroups(List<File> files) throws UuidMismatchException, IOException, MissingEntityException, EntityAlreadyOpenException {
     LOGGER.debug("Opening group files {}", files);
     List<Group> groupList = new ArrayList<>();
     for (File g : files) {
       Group group = storageManager.openGroup(g);
+      if(groupList.stream().map(Group::getUuid).collect(Collectors.toList()).contains(group.getUuid())){
+        throw new EntityAlreadyOpenException(group.getUuid(), "Group");
+      }
+      // TODO fix so that only the faulty / already opened ones are not opened, but the others are
+      if(group.getProgressList().isEmpty()){
+        throw new MissingEntityException("The group ("+group.getName()+") was loaded without any progress", group, "progressList");
+      }
+      if(group.getProgressSummaries().isEmpty()){
+        throw new MissingEntityException("The group ("+group.getName()+") was loaded without any progress summaries", group, "progressSummaries");
+      }
       addGroup(group);
       groupList.add(group);
     }
