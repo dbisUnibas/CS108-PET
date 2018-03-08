@@ -173,8 +173,8 @@ public class MenuManager {
     assembleMenus();
     menuBar.getMenus().addAll(menuFile, menuEdit, menuEvaluate, menuView, menuHelp);
     
-    // TEMP
-    menuHelp.setDisable(true);
+    // TEMP // TODO fix menu / implement stuff
+    disableUnused();
     
     loadDefaultKeyBindings();
     
@@ -182,6 +182,12 @@ public class MenuManager {
     setKeyBindings();
     
     disableAllButInitial();
+  }
+  
+  private void disableUnused(){
+    menuHelp.setDisable(true);
+    menuEvaluate.setDisable(true);
+    itemExportGroups.setDisable(true);
   }
   
   public static MenuManager getInstance() {
@@ -233,6 +239,8 @@ public class MenuManager {
   
   public void enableEditorItems() {
     setDisableForItems(editorItems, false);
+    // TODO
+    disableUnused();
   }
   
   public void disableEvaluatorItems() {
@@ -241,6 +249,8 @@ public class MenuManager {
   
   public void enableEvaluaotrItems() {
     setDisableForItems(evaluatorItems, false);
+    // TODO
+    disableUnused();
   }
   
   public void disableCatalogueNeeded() {
@@ -249,6 +259,8 @@ public class MenuManager {
   
   public void enableCatalogueNeeded() {
     setDisableForItems(catNeeded, false);
+    // TODO
+    disableUnused();
   }
   
   public void disableGroupNeeded() {
@@ -258,6 +270,9 @@ public class MenuManager {
   public void enableGroupNeeded() {
     LOGGER.traceEntry();
     setDisableForItems(groupNeeded, false);
+    
+    // TODO
+    disableUnused();
   }
   
   public void disableAllButInitial() {
@@ -269,6 +284,9 @@ public class MenuManager {
   
   public void enableOpenItems() {
     setDisableForItems(openItems, false);
+    
+    // TODO
+    disableUnused();
   }
   
   private void loadDefaultKeyBindings() {
