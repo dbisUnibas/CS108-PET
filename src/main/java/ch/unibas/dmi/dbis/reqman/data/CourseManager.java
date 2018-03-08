@@ -76,4 +76,5 @@ public class CourseManager implements Comparator<Milestone> {
     milestones.sort(this);
     return milestones.indexOf(ms);
   }
+  
 }

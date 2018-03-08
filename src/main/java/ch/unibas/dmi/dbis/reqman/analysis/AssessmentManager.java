@@ -2,6 +2,8 @@ package ch.unibas.dmi.dbis.reqman.analysis;
 
 import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
 
+import java.util.ArrayList;
+
 /**
  * TODO: Write JavaDoc
  *
@@ -22,8 +24,17 @@ public class AssessmentManager {
   
   }
   
+  private ArrayList<Filterable> listeners = new ArrayList<>();
   private ProgressSummary active = null;
   private Filter activeFilter = null;
+  
+  public void addFilterable(Filterable filterable){
+    listeners.add(filterable);
+  }
+  
+  public void removeFilterable(Filterable filterable){
+    listeners.remove(filterable);
+  }
   
   public boolean hasActiveProgressSummary(){
     return active != null;
@@ -35,12 +46,12 @@ public class AssessmentManager {
   
   public void setActiveProgressSummary(ProgressSummary active) {
     this.active = active;
-    // TODO fire event to things to only show this milestone related stuff
+    listeners.forEach(f -> f.applyProgressSummary(active));
   }
   
   public void clearFilter(){
     activeFilter = null;
-    // TODO Clear filter in all active assessment views
+    listeners.forEach(Filterable::clearFilter);
   }
   
   public boolean hasActiveFilter(){
@@ -53,7 +64,7 @@ public class AssessmentManager {
   
   public void setActiveFilter(Filter activeFilter) {
     this.activeFilter = activeFilter;
-    // TODO fire event to filtered things, to show only filtered stuff
+    listeners.forEach(f -> f.applyFilter(activeFilter));
   }
   
 }

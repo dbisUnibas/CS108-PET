@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
-import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
+import ch.unibas.dmi.dbis.reqman.analysis.*;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Group;
@@ -30,7 +29,7 @@ import java.util.List;
  *
  * @author loris.sauter
  */
-public class AssessmentView extends BorderPane implements PointsChangeListener, DirtyListener {
+public class AssessmentView extends BorderPane implements PointsChangeListener, DirtyListener, Filterable {
   
   public static final String POINTS_MAX_POINTS_SEPARATOR = "/";
   private final Logger LOGGER = LogManager.getLogger(getClass());
@@ -62,6 +61,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     initComponents();
     layoutComponents();
+    
+    AssessmentManager.getInstance().addFilterable(this);
     
     //Milestone firstMS = EntityController.getInstance().getCourseManager().getFirstMilestone();
     //displayProgressViews(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(firstMS));
@@ -113,6 +114,29 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   public void unmarkDirty() {
     LOGGER.trace("Undirty");
     
+  }
+  
+  @Override
+  public void applyFilter(Filter filter) {
+    LOGGER.debug("apply filter: "+filter);
+  }
+  
+  @Override
+  public void applyProgressSummary(ProgressSummary ps) {
+    displayProgressViews(ps);
+    ProgressSummary active = summaryCb.getSelectionModel().getSelectedItem();
+    if(active != null && active.equals(ps)){
+      // nothing
+    }else{
+      int ordinal = EntityController.getInstance().getCatalogueAnalyser().getProgressSummaryOrdinal(ps);
+      summaryCb.getSelectionModel().select(ordinal);
+      //summaryCb.getSelectionModel().select(ps);// Doesn't render properly
+    }
+  }
+  
+  @Override
+  public void clearFilter() {
+    displayAll();
   }
   
   void checkDependencies(){
@@ -237,9 +261,12 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
       }
 //      summaryCb.setItems(FXCollections.observableArrayList(EntityController.getInstance().createProgressSummaries() ));
       summaryCb.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        if(oldValue != null && oldValue.equals(newValue)){
+          return; // don't fire the event chain if its already the same ps
+        }
         LOGGER.debug("Selected ProgressSummary: {}", newValue);
         CatalogueAnalyser analyiser = EntityController.getInstance().getCatalogueAnalyser();
-        displayProgressViews(newValue);
+        AssessmentManager.getInstance().setActiveProgressSummary(newValue);
       });
     }
     

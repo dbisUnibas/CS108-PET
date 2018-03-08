@@ -248,6 +248,11 @@ public class CatalogueAnalyser {
     return 0 < ordinal && ordinal < catalogue.getMilestones().size();
   }
   
+  public int getProgressSummaryOrdinal(ProgressSummary ps) {
+    Milestone ms = getMilestoneOf(ps);
+    return courseManager.getMilestoneOrdinal(ms);
+  }
+  
   boolean containsRequirementPattern(Requirement requirement, String pattern) {
     boolean inName = StringUtils.containsNullSafe(requirement.getName(), pattern);
     boolean inExcerpt = StringUtils.containsNullSafe(requirement.getExcerpt(), pattern);
