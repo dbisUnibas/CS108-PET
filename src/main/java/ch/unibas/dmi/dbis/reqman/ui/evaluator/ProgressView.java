@@ -475,11 +475,8 @@ public class ProgressView extends VBox {
   
   private void setupCommentHandling() {
     taComment.textProperty().addListener((observable, oldValue, newValue) -> {
-      if (newValue == null || newValue.isEmpty()) {
-        LOGGER.debug("Null or empty comment");
-      } else {
-        progress.setComment(newValue);
-      }
+      progress.setComment(newValue);
+      LOGGER.debug("Handled comment: {}", newValue);
     });
   }
   
