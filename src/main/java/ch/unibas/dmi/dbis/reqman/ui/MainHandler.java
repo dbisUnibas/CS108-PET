@@ -14,14 +14,18 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.scene.control.RadioMenuItem;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.Notifications;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 /**
  * TODO: Write JavaDoc
@@ -215,15 +219,40 @@ public class MainHandler implements MenuHandler {
   
   @Override
   public void handleExportGroups(ActionEvent event) {
-    Utils.showFeatureDisabled("Export multiple Groups", EXPORT_DISABLED_REASON);
-    return;
-    // TODO Re-Implement export groups
-    /*
-    if (!evaluatorHandler.isGroupLoaded()) {
+    // TODO Temporary solution, until pretty ui is made
+    Utils.showInfoDialog("Export All Groups", "Export All Groups", "You are about the export all opened groups.\n" +
+        "Please be aware, that this operation may take a while and during the export, the application may not respond.\n" +
+        "\n" +
+        "Please make also sure, that you have saved your assessment so far.");
+    if (!EntityController.getInstance().hasCatalogue() && EntityController.getInstance().hasCourse() && EntityController.getInstance().hasGroups()) {
       return;
     }
-    evaluatorHandler.exportAllGroups();
-    */
+    FileChooser exportConfigFC = new FileChooser();
+    exportConfigFC.setTitle("Open Templating Config");
+    File exportConfig = exportConfigFC.showOpenDialog(mainScene.getWindow());
+    if (exportConfig == null) {
+      // Userabort
+      return;
+    }
+    LOGGER.debug("Templating Config: {}", exportConfig);
+    DirectoryChooser dc = new DirectoryChooser();
+    dc.setTitle("Export Destination");
+    File destDir = dc.showDialog(mainScene.getWindow());
+    if (destDir == null) {
+      // Userabort
+      return;
+    }
+    LOGGER.debug("Exporting groups to {}", destDir);
+    EntityController.getInstance().groupList().forEach(group -> {
+      try {
+        File f = Paths.get(destDir.getPath(), group.getExportFileName()).toFile();
+        ExportHelper.exportGroup(exportConfig, f, group);
+        Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Export of group "+group.getName()+" finished!").showInformation();
+      } catch (FileNotFoundException e) {
+        LOGGER.catching(Level.FATAL, e);
+      }
+    });
+    Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Exported all groups").showInformation();
   }
   
   @Override
@@ -247,7 +276,7 @@ public class MainHandler implements MenuHandler {
       try {
         ExportHelper.exportGroup(exportConfig, f, evaluatorHandler.getActiveGroup());
         mainScene.showNotification("Export finished to " + f.getAbsolutePath());
-      
+        
         //Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Group exported to:\\"+f.getAbsolutePath()).showInformation();
       } catch (FileNotFoundException e) {
         LOGGER.catching(Level.FATAL, e);

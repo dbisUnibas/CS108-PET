@@ -187,7 +187,6 @@ public class MenuManager {
   private void disableUnused(){
     menuHelp.setDisable(true);
     menuEvaluate.setDisable(true);
-    itemExportGroups.setDisable(true);
   }
   
   public static MenuManager getInstance() {

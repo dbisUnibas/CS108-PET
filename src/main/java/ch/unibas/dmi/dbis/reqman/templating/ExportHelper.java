@@ -89,7 +89,7 @@ public class ExportHelper {
   
     String export = renderManager.renderGroup(group);
   
-    logger.debug("Successfully rendered catalogue");
+    logger.debug("Successfully rendered group");
   
     // Appends the configured extension if none is present
     String exportFile = target.getPath();
