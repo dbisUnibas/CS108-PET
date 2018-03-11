@@ -17,6 +17,7 @@ import javafx.scene.control.RadioMenuItem;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -245,7 +246,8 @@ public class MainHandler implements MenuHandler {
     LOGGER.debug("Exporting groups to {}", destDir);
     EntityController.getInstance().groupList().forEach(group -> {
       try {
-        File f = Paths.get(destDir.getPath(), group.getExportFileName()).toFile();
+        String name = StringUtils.isNotBlank(group.getExportFileName()) ? group.getExportFileName() : group.getName();
+        File f = Paths.get(destDir.getPath(), name).toFile();
         ExportHelper.exportGroup(exportConfig, f, group);
         Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Export of group "+group.getName()+" finished!").showInformation();
       } catch (FileNotFoundException e) {
