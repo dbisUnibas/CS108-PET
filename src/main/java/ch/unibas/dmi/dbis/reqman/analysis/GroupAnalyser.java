@@ -55,7 +55,16 @@ public class GroupAnalyser {
    * @return
    */
   public List<Progress> getOpenProgressAt(ProgressSummary ps){
-    return getProgressFor(ps).stream().filter(Progress::isFresh).collect(Collectors.toList());
+    return getProgressFor(ps).stream().filter(p -> !isSingularProgress(p)).filter(Progress::isFresh).collect(Collectors.toList());
+  }
+  
+  public boolean isSingularProgress(Progress progress){
+    Requirement r = getRequirementOf(progress);
+    if(r != null){
+      return r.getMinimalMilestoneUUID().equals(r.getMaximalMilestoneUUID());
+    }else{
+      throw new RuntimeException("Couldn't find requirement for p="+progress.toString());
+    }
   }
   
   public double getActualPoints(Progress progress) {

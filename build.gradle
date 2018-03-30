@@ -85,11 +85,11 @@ jar {
 
 processResources {
     // Pass version to reqman by adding it to reqman.properties
-    exclude('log4j2-test.xml')
     from(sourceSets.main.resources.srcDirs) {
         include 'reqman.properties'
         expand projectVersion: project.version
     }
+    exclude 'log4j2-test.xml'
     // Do not copy the original file, since it would not have the version in it
     /*from(sourceSets.main.resources.srcDirs) {
         exclude 'reqman.properties'
