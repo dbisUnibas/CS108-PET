@@ -7,7 +7,6 @@ import ch.unibas.dmi.dbis.reqman.ui.common.FilterBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitleProvider;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorView;
-import ch.unibas.dmi.dbis.reqman.ui.overview.CatalogueStatisticsView;
 import ch.unibas.dmi.dbis.reqman.ui.overview.GroupStatisticsView;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;

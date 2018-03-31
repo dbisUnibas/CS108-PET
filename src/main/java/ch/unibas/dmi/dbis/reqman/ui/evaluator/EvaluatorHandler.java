@@ -21,8 +21,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.Notifications;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -277,6 +279,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
       Group g = EntityController.getInstance().getGroup(groupID);
       EntityController.getInstance().saveGroupAs(g);
       LOGGER.info("Group {} saved.", g.getName());
+      Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text(String.format("Group '%s' saved", g.getName())).showInformation();
     }
     
   }

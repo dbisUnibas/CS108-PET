@@ -255,9 +255,11 @@ public class ProgressView extends VBox {
     Milestone miMS = EntityController.getInstance().getCourseManager().getMinimalMilestone(requirement);
     Milestone maMS = EntityController.getInstance().getCourseManager().getMaximalMilestone(requirement);
     SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
-    minMS = new Label(sdf.format(EntityController.getInstance().getCourseManager().getMilestoneDate(miMS)));
+    minMS = new Label(miMS.getName());
+    minMS.setTooltip(new Tooltip(sdf.format(EntityController.getInstance().getCourseManager().getMilestoneDate(miMS))));
     maxMSLbl = new Label("up to");
-    maxMS = new Label(sdf.format(EntityController.getInstance().getCourseManager().getMilestoneDate(maMS)));
+    maxMS = new Label(maMS.getName());
+    maxMS.setTooltip(new Tooltip(sdf.format(EntityController.getInstance().getCourseManager().getMilestoneDate(maMS))));
     descLbl = new Label("Description");
     taDesc = new TextArea(requirement.getDescription());
     taDesc.setEditable(false);
