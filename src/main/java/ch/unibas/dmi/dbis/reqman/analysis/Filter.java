@@ -11,4 +11,8 @@ import java.util.function.Predicate;
  */
 @FunctionalInterface
 public interface Filter extends Predicate<Requirement> {
+  
+  default String getDisplayRepresentation(){
+    return getClass().getSimpleName();
+  }
 }
