@@ -1,5 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.analysis.Filter;
+import ch.unibas.dmi.dbis.reqman.analysis.Filterable;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Course;
@@ -18,6 +20,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Window;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.List;
@@ -27,9 +30,7 @@ import java.util.List;
  *
  * @author loris.sauter
  */
-public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandler {
-  
-  // TODO: catalogue open, create new course
+public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandler, Filterable {
   
   private static final Logger LOGGER = LogManager.getLogger(EditorHandler.class);
   
@@ -334,6 +335,22 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
     LOGGER.info("Close All");
     reset();
     editor.closeAll();
+  }
+  
+  @Override
+  public void applyFilter(@NotNull Filter filter) {
+    List<Requirement> filtered = EntityController.getInstance().getObservableRequirements().filtered(filter);
+    displayOnly(filtered);
+  }
+  
+  @Override
+  public void applyActiveMilestone(@NotNull Milestone ps) {
+    // TODO implement this
+  }
+  
+  @Override
+  public void clearFilter() {
+    displayAllRequirements();
   }
   
   private void reset() {

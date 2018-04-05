@@ -7,6 +7,7 @@ import ch.unibas.dmi.dbis.reqman.data.Requirement;
  *
  * @author loris.sauter
  */
+@Deprecated
 public interface FilterActionHandler {
   
   /**
@@ -14,9 +15,12 @@ public interface FilterActionHandler {
    * @param pattern
    * @return
    */
+  @Deprecated
   int applyFilter(String pattern, FilterBar.Mode mode);
   
+  @Deprecated
   int applyFilter(Requirement.Type type);
   
+  @Deprecated
   void resetFilter();
 }

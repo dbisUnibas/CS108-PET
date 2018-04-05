@@ -172,6 +172,10 @@ public class CatalogueAnalyser {
     return catalogue.getRequirements().stream().filter(r -> r.getType().equals(type)).collect(Collectors.toList());
   }
   
+  public List<Requirement> getFilteredRequirements(Filter filter){
+    return catalogue.getRequirements().stream().filter(filter).collect(Collectors.toList());
+  }
+  
   public Set<String> getCategories() {
     Set<String> set = new TreeSet<>();
     catalogue.getRequirements().stream().filter(r -> !StringUtils.isNullOrEmpty(r.getCategory())).forEach(r -> set.add(r.getCategory()));
