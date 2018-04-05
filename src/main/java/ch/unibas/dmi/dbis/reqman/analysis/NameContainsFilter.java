@@ -18,13 +18,13 @@ public class NameContainsFilter implements Filter {
     if(name == null){
       throw new IllegalArgumentException("Cannot create a NameContainsFilter for name NULL");
     }
-    this.name = name;
+    this.name = name.toLowerCase();
   }
   
   @Override
   public boolean test(Requirement requirement) {
     try{
-      return requirement.getName().toLowerCase().contains(name.toLowerCase());
+      return requirement.getName().toLowerCase().contains(name);
     }catch(NullPointerException ex){
       return false;
     }
