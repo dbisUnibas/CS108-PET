@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Configuration name="ReqManConfig" status="WARN">
+<Configuration name="ReqManConfig" status="DEBUG">
     <Properties>
         <Property name="loggingPattern">[%d{dd.MM.yyyy HH:mm:ss.SSS}][%-5level][%t] %C{1} - %msg%n</Property>
     </Properties>

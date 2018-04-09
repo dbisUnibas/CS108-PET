@@ -27,10 +27,10 @@ import javafx.scene.layout.*;
 import javafx.util.StringConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * TODO: write JavaDoc
@@ -85,7 +85,7 @@ public class RequirementTableView extends BorderPane {
     });
   }
   
-  public void setRequirements(ObservableList<Requirement> requirements, Catalogue catalogue) {
+  public void setRequirements(@NotNull ObservableList<Requirement> requirements,@NotNull Catalogue catalogue) {
     cat = catalogue;
     // Ensures that this view is really simply view - and nothing more!
     LOGGER.traceEntry();

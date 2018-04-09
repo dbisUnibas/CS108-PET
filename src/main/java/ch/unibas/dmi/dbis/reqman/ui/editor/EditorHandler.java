@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
+import ch.unibas.dmi.dbis.reqman.analysis.AssessmentManager;
 import ch.unibas.dmi.dbis.reqman.analysis.Filter;
 import ch.unibas.dmi.dbis.reqman.analysis.Filterable;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
@@ -43,6 +44,10 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   
   public void setStatusBar(StatusBar statusBar) {
     this.statusBar = statusBar;
+  }
+  
+  public EditorHandler(){
+    AssessmentManager.getInstance().addFilterable(this);
   }
   
   @Override
@@ -339,13 +344,17 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   
   @Override
   public void applyFilter(@NotNull Filter filter) {
-    List<Requirement> filtered = EntityController.getInstance().getObservableRequirements().filtered(filter);
+    LOGGER.debug("Applying filter {}", filter.getDisplayRepresentation());
+    List<Requirement> filtered = EntityController.getInstance().getCatalogueAnalyser().getFilteredRequirements(filter);
+    LOGGER.debug("Filtered {} items.", filtered.size());
     displayOnly(filtered);
   }
   
   @Override
   public void applyActiveMilestone(@NotNull Milestone ps) {
-    // TODO implement this
+    // Technically not really needed
+    List<Requirement> list = EntityController.getInstance().getCatalogueAnalyser().getRequirementsFor(ps);
+    displayOnly(list);
   }
   
   @Override

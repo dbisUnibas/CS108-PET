@@ -28,6 +28,6 @@ public class TextContainsFilter implements Filter {
   
   @Override
   public String getDisplayRepresentation() {
-    return "Text contains ";
+    return "Text contains "+pattern;
   }
 }

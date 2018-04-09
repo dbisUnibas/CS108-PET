@@ -98,6 +98,6 @@
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- ROOT -->
-        <Root level="debug" />
+        <Root level="DEBUG" />
     </Loggers>
 </Configuration>

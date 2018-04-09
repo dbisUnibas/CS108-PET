@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.common;
 
+import ch.unibas.dmi.dbis.reqman.analysis.*;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -19,7 +20,9 @@ import org.apache.commons.lang.StringUtils;
  */
 public class FilterBar extends HBox {
   
-  private final FilterActionHandler handler;
+  @Deprecated
+  private FilterActionHandler handler;
+  private final AssessmentManager manager = AssessmentManager.getInstance();
   private Label nameLbl;
   private Label containsLbl;
   private Label infoLbl;
@@ -30,6 +33,12 @@ public class FilterBar extends HBox {
   private Button resetBtn;
   private Button closeBtn;
   
+  public FilterBar(){
+    initComponents();
+    layoutComponents();
+  }
+  
+  @Deprecated
   public FilterBar(FilterActionHandler handler) {
     this.handler = handler;
     initComponents();
@@ -93,25 +102,41 @@ public class FilterBar extends HBox {
   }
   
   private void handleReset(ActionEvent actionEvent) {
-    handler.resetFilter();
+    manager.clearFilter();
     infoLbl.setText("");
     searchInput.clear();
   }
   
-  private void handleFilter(ActionEvent actionEvent) {
-    int amount = -1;
-    String pattern = searchInput.getText();
-    if (StringUtils.isNotBlank(pattern)) {
-      amount = handler.applyFilter(pattern, modeCB.getSelectionModel().getSelectedItem());
-    } else if (typeCB.getSelectionModel().getSelectedItem() != null) {
-      amount = handler.applyFilter(typeCB.getSelectionModel().getSelectedItem());
+  /**
+   *
+   * @return
+   * @throws IllegalArgumentException if no filter could be created
+   */
+  private Filter createFilterFromUI() throws IllegalArgumentException{
+    if(StringUtils.isNotBlank(searchInput.getText())){
+      switch(modeCB.getSelectionModel().getSelectedItem()){
+        case NAME:
+          return new NameContainsFilter(searchInput.getText());
+        case TEXT:
+          return new TextContainsFilter(searchInput.getText());
+        case CATEGORY:
+          return new CategoryContainsFilter(searchInput.getText());
+        case TYPE:
+          return new TypeFilter(typeCB.getSelectionModel().getSelectedItem());
+      }
+    }else if(modeCB.getSelectionModel().getSelectedItem() == Mode.TYPE){
+      return new TypeFilter(typeCB.getSelectionModel().getSelectedItem());
     }
-    if (amount == 0) {
-      infoLbl.setText("No matches found!");
-    } else if (amount == -1) {
-      // do nothing
-    } else {
-      infoLbl.setText(String.format("Showing %d matche(s)", amount));
+    throw new IllegalArgumentException("Couldn't create a filter.");
+  }
+  
+  private void handleFilter(ActionEvent actionEvent) {
+    try{
+      Filter filter = createFilterFromUI();
+      manager.setFilter(filter);
+      infoLbl.setText("Showing "+filter.getDisplayRepresentation());
+    }catch (IllegalArgumentException ex){
+      // Ignore the exception as the user probably unintentionally clicked
     }
   }
   
