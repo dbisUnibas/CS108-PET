@@ -240,6 +240,7 @@ public class ProgressView extends VBox {
     type = new Label(requirement.getType().toString());
     heading.setStyle("-fx-font-size: 1.5em;-fx-font-weight: bold;");
     excerpt = new Label(requirement.getExcerpt());
+    excerpt.setWrapText(true);
     assessmentContainer = Utils.generateDefaultGridPane();
     Utils.applyDefaultFineGridSpacing(assessmentContainer);
     assessmentWrapper = new HBox();
