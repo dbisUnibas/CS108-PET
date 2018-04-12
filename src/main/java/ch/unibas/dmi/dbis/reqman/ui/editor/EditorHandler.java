@@ -295,6 +295,17 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   }
   
   @Override
+  public int applyFilter(Requirement.Type type) {
+    List<Requirement> filtered = EntityController.getInstance().getCatalogueAnalyser().findRequirementsByType(type);
+    if(filtered.isEmpty()){
+      return 0;
+    }
+    displayOnly(filtered);
+    return filtered.size();
+  }
+  
+  
+  @Override
   public int applyFilter(String pattern, FilterBar.Mode mode) {
     List<Requirement> filtered = null;
     
@@ -315,17 +326,6 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
     displayOnly(filtered);
     return filtered.size();
   }
-  
-  @Override
-  public int applyFilter(Requirement.Type type) {
-    List<Requirement> filtered = EntityController.getInstance().getCatalogueAnalyser().findRequirementsByType(type);
-    if(filtered.isEmpty()){
-      return 0;
-    }
-    displayOnly(filtered);
-    return filtered.size();
-  }
-  
   
   @Override
   public void resetFilter() {
