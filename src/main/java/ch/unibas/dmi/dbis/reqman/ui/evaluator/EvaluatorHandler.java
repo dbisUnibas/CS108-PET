@@ -218,6 +218,12 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     return EntityController.getInstance().getGroup(evaluator.getActiveGroupUUID());
   }
   
+  private boolean active;
+  
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+  
   private void reset() {
     this.assessmentViewMap.clear();
   }

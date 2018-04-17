@@ -42,6 +42,7 @@ public class MainScene extends TitledScene {
     initComponents();
     layoutComponents();
     getRoot().getStylesheets().add("style.css");
+    setActive(Mode.EDITOR);
   }
   
   @Override
@@ -69,6 +70,9 @@ public class MainScene extends TitledScene {
   }
   
   void setActive(Mode mode) {
+    boolean lever = mode == Mode.EDITOR;
+    editorHandler.setActive(lever);
+    evaluatorHandler.setActive(!lever);
     switch (mode) {
       case EDITOR:
         root.setCenter(editor);
@@ -80,7 +84,7 @@ public class MainScene extends TitledScene {
         root.setCenter(evaluator);
         evaluatorHandler.enableEvaluator();
         evaluatorHandler.refreshCourseInfoView();
-        // Should reload catalogue also since may Reqs have changed
+        // TODO Should reload catalogue also since may Reqs have changed
         menuManager.disableEditorItems();
         menuManager.enableEvaluaotrItems();
         break;

@@ -344,6 +344,9 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   
   @Override
   public void applyFilter(@NotNull Filter filter) {
+    if(!active){
+      return;
+    }
     LOGGER.debug("Applying filter {}", filter.getDisplayRepresentation());
     List<Requirement> filtered = EntityController.getInstance().getCatalogueAnalyser().getFilteredRequirements(filter);
     LOGGER.debug("Filtered {} items.", filtered.size());
@@ -352,6 +355,9 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   
   @Override
   public void applyActiveMilestone(@NotNull Milestone ps) {
+    if(!active){
+      return;
+    }
     // Technically not really needed
     List<Requirement> list = EntityController.getInstance().getCatalogueAnalyser().getRequirementsFor(ps);
     displayOnly(list);
@@ -360,6 +366,12 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   @Override
   public void clearFilter() {
     displayAllRequirements();
+  }
+  
+  private boolean active = false;
+  
+  public void setActive(boolean active) {
+    this.active = active;
   }
   
   private void reset() {
