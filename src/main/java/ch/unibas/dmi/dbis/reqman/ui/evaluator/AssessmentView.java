@@ -175,6 +175,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   private void activateFilterableBehaviour(boolean active){
     if(active){
       AssessmentManager.getInstance().addFilterable(this);
+      if(AssessmentManager.getInstance().hasActiveProgressSummary()){
+        LOGGER.debug("ProgressSummary present: "+AssessmentManager.getInstance().getActiveMilestone().getName());
+        summaryCb.getSelectionModel().select(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(AssessmentManager.getInstance().getActiveMilestone()));
+      }
       if(AssessmentManager.getInstance().hasActiveFilter() ){
         LOGGER.debug("Filter present: "+AssessmentManager.getInstance().getActiveFilter().getDisplayRepresentation());
         applyFilter(AssessmentManager.getInstance().getActiveFilter());
@@ -291,7 +295,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   }
   
   private ProgressSummary getActiveProgressSummary() {
-    return summaryCb.getSelectionModel().getSelectedItem();
+    return EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(AssessmentManager.getInstance().getActiveMilestone());
   }
   
   private void layoutComponents() {
@@ -310,8 +314,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
           return; // don't fire the event chain if its already the same ps
         }
         LOGGER.debug("Selected ProgressSummary: {}", newValue);
-        CatalogueAnalyser analyiser = EntityController.getInstance().getCatalogueAnalyser();
-        Milestone ms = analyiser.getMilestoneOf(newValue);
+        CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
+        Milestone ms = analyser.getMilestoneOf(newValue);
         AssessmentManager.getInstance().setActiveMilestone(ms);
       });
     }
@@ -332,6 +336,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   }
   
   private void displayProgressViews(ProgressSummary progressSummary) {
+    if(AssessmentManager.getInstance().hasActiveFilter()){
+      applyFilter(AssessmentManager.getInstance().getActiveFilter());
+      return;
+    }
     detachProgressViews();
     ObservableList<Progress> progressList = EntityController.getInstance().getObservableProgressOf(group, progressSummary);
     
