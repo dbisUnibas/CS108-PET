@@ -81,7 +81,7 @@ public class CatalogueAnalyser {
     return catalogue.getRequirements().stream().filter(r -> matchesMinimalMilestone(r, milestone)).sorted(getRequirementComparator()).collect(Collectors.toList());
   }
   
-  public double getCumultativeMaximalRegularSumFor(Milestone ms){
+  public double getCumulativeMaximalRegularSumFor(Milestone ms){
     int pos = courseManager.getMilestoneOrdinal(ms);
     double sum = 0;
     

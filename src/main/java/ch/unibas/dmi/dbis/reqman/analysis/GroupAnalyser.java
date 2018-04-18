@@ -158,7 +158,7 @@ public class GroupAnalyser {
     return sum;
   }
   
-  public double getCumultativeSumFor(ProgressSummary ps){
+  public double getCumulativeSumFor(ProgressSummary ps){
     double sum = 0;
     
     int pos = catalogueAnalyser.getCourseManager().getMilestoneOrdinal(catalogueAnalyser.getMilestoneOf(ps));
@@ -167,6 +167,22 @@ public class GroupAnalyser {
     }
     
     return sum;
+  }
+  
+  public double getBonusSumFor(ProgressSummary ps){
+    return getSumFor(ps, Requirement.Type.BONUS);
+  }
+  
+  public double getRegularSumFor(ProgressSummary ps){
+    return getSumFor(ps,Requirement.Type.REGULAR);
+  }
+  
+  public double getMalusSumFor(ProgressSummary ps){
+    return getSumFor(ps, Requirement.Type.MALUS);
+  }
+  
+  public double getSumFor(ProgressSummary ps, Requirement.Type type){
+    return getProgressForProgressSummary(ps).stream().filter(p -> getRequirementOf(p).getType().equals(type)).mapToDouble(this::getActualPoints).sum();
   }
   
   public List<Progress> getProgressForProgressSummary(ProgressSummary ps){

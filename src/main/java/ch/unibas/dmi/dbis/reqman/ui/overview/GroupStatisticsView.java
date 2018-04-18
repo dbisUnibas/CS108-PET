@@ -9,16 +9,15 @@ import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.collections.FXCollections;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * TODO: write JavaDoc
@@ -39,6 +38,7 @@ public class GroupStatisticsView extends VBox {
   public GroupStatisticsView() {
     initComps();
     layoutComps();
+    addDetailCharts();
   }
   
   public void update() {
@@ -46,6 +46,7 @@ public class GroupStatisticsView extends VBox {
     treeTableView = null;
     setupTreeTable();
     container.getChildren().add(0, treeTableView);
+    chart = createOverviewChart();
   }
   
   private void initComps() {
@@ -63,6 +64,12 @@ public class GroupStatisticsView extends VBox {
     container.getChildren().addAll(treeTableView, chart);
     getChildren().add(scrollPane);
 //    VBox.setVgrow(treeTableView, Priority.SOMETIMES);
+  }
+  
+  private void addDetailCharts() {
+    for (Group g : EntityController.getInstance().groupList()) {
+      container.getChildren().add(createDetailChart(g));
+    }
   }
   
   private void setupTreeTable() {
@@ -123,7 +130,7 @@ public class GroupStatisticsView extends VBox {
     XYChart.Series<String, Number> catSeries = new XYChart.Series<>();
     catSeries.setName("Maximal Points");
     for (Milestone ms : cat.getMilestones()) {
-      catSeries.getData().add(new XYChart.Data<>(ms.getName(), analyser.getCumultativeMaximalRegularSumFor(ms)));
+      catSeries.getData().add(new XYChart.Data<>(ms.getName(), analyser.getCumulativeMaximalRegularSumFor(ms)));
     }
     
     ArrayList<XYChart.Series<String, Number>> series = new ArrayList<>();
@@ -134,7 +141,7 @@ public class GroupStatisticsView extends VBox {
       XYChart.Series<String, Number> serie = new XYChart.Series<>();
       serie.setName(g.getName());
       for (Milestone ms : cat.getMilestones()) {
-        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getCumultativeSumFor(groupAnalyser.getProgressSummaryFor(ms))));
+        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getCumulativeSumFor(groupAnalyser.getProgressSummaryFor(ms))));
       }
       series.add(serie);
     }
@@ -143,5 +150,37 @@ public class GroupStatisticsView extends VBox {
     lineChart.getData().addAll(series);
     
     return lineChart;
+  }
+  
+  private StackedBarChart<String, Number> createDetailChart(Group g) {
+    ctrl = EntityController.getInstance();
+    analyser = ctrl.getCatalogueAnalyser();
+    Catalogue cat = ctrl.getCatalogue();
+    GroupAnalyser groupAnalyser = ctrl.getGroupAnalyser(g);
+    
+    final CategoryAxis xAxis = new CategoryAxis();
+    xAxis.setLabel("Milestones");
+    final NumberAxis yAxis = new NumberAxis();
+    yAxis.setLabel("Points");
+    final StackedBarChart<String, Number> sbc = new StackedBarChart<>(xAxis, yAxis);
+    xAxis.setCategories(FXCollections.observableArrayList(cat.getMilestones().stream().map(Milestone::getName).collect(Collectors.toList())));
+    
+    XYChart.Series<String, Number> malusSeries = new XYChart.Series<>();
+    malusSeries.setName("Malus Points");
+    XYChart.Series<String, Number> regularSeries = new XYChart.Series<>();
+    regularSeries.setName("Regular Points");
+    XYChart.Series<String, Number> bonusSeries = new XYChart.Series<>();
+    bonusSeries.setName("Bonus Points");
+    
+    for (Milestone ms : cat.getMilestones()) {
+      malusSeries.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getMalusSumFor(groupAnalyser.getProgressSummaryFor(ms))));
+      regularSeries.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getRegularSumFor(groupAnalyser.getProgressSummaryFor(ms))));
+      bonusSeries.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getBonusSumFor(groupAnalyser.getProgressSummaryFor(ms))));
+    }
+    sbc.setTitle("Details Per Milestone of " + g.getName());
+    
+    sbc.getData().addAll(malusSeries, regularSeries, bonusSeries);
+    
+    return sbc;
   }
 }
