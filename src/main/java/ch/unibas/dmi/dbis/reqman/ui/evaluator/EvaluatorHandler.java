@@ -285,9 +285,9 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
       Group g = EntityController.getInstance().getGroup(groupID);
       EntityController.getInstance().saveGroupAs(g);
       LOGGER.info("Group {} saved.", g.getName());
-      Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text(String.format("Group '%s' saved", g.getName())).showInformation();
+      
     }
-    
+    Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text(String.format("Group '%s' saved", EntityController.getInstance().getGroup(groupID).getName())).showInformation();
   }
   
   public void handleSaveGroupAs(ActionEvent event) {
@@ -302,6 +302,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
       LOGGER.debug("Chosen dir={}", dir);
       EntityController.getInstance().setupSaveDirectory(dir);
       EntityController.getInstance().saveGroupAs(g);
+      Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text(String.format("Group '%s' saved", g.getName())).showInformation();
     }
   }
   
