@@ -51,9 +51,9 @@ public class GroupStatisticsView extends VBox {
   private void initComps() {
     setupTreeTable();
     chart = createOverviewChart();
-    chart.setPrefSize(800,600);
+    chart.setPrefSize(800, 600);
     scrollPane = new ScrollPane();
-    scrollPane.setPrefSize(850,650);
+    scrollPane.setPrefSize(850, 650);
     container = new VBox();
   }
   
@@ -82,7 +82,7 @@ public class GroupStatisticsView extends VBox {
         new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
     
     TreeTableColumn<GroupOverviewItem, String> maxCol = new TreeTableColumn<>("Maximal Available");
-    maxCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String>param) -> new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getPoints(cat.getUuid()))));
+    maxCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String> param) -> new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getPoints(cat.getUuid()))));
     
     
     treeTableView = new TreeTableView<>(root);
@@ -90,14 +90,13 @@ public class GroupStatisticsView extends VBox {
     treeTableView.getColumns().add(nameCol);
     treeTableView.getColumns().add(maxCol);
     
-    ctrl.groupList().forEach(g ->{
+    ctrl.groupList().forEach(g -> {
       TreeTableColumn<GroupOverviewItem, String> groupCol = new TreeTableColumn<>(g.getName());
       
-      groupCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String>param) -> new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getPoints(g.getUuid()))));
+      groupCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String> param) -> new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getPoints(g.getUuid()))));
       
       treeTableView.getColumns().add(groupCol);
     });
-    
     
     
     nameCol.setPrefWidth(150);
@@ -109,7 +108,7 @@ public class GroupStatisticsView extends VBox {
     
   }
   
-  private LineChart<String, Number> createOverviewChart(){
+  private LineChart<String, Number> createOverviewChart() {
     ctrl = EntityController.getInstance();
     analyser = ctrl.getCatalogueAnalyser();
     Catalogue cat = ctrl.getCatalogue();
@@ -118,23 +117,23 @@ public class GroupStatisticsView extends VBox {
     final NumberAxis yAxis = new NumberAxis();
     yAxis.setLabel("Points");
     xAxis.setLabel("Milestones");
-    final LineChart<String, Number> lineChart = new LineChart<>(xAxis,yAxis);
+    final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
     lineChart.setTitle("Milestone Points Overview");
-  
+    
     XYChart.Series<String, Number> catSeries = new XYChart.Series<>();
     catSeries.setName("Maximal Points");
-    for(Milestone ms : cat.getMilestones()){
+    for (Milestone ms : cat.getMilestones()) {
       catSeries.getData().add(new XYChart.Data<>(ms.getName(), analyser.getCumultativeMaximalRegularSumFor(ms)));
     }
-  
-    ArrayList<XYChart.Series<String,Number>> series = new ArrayList<>();
     
-    for(Group g : ctrl.groupList()){
+    ArrayList<XYChart.Series<String, Number>> series = new ArrayList<>();
+    
+    for (Group g : ctrl.groupList()) {
       GroupAnalyser groupAnalyser = ctrl.getGroupAnalyser(g);
       
-      XYChart.Series<String,Number> serie = new XYChart.Series<>();
+      XYChart.Series<String, Number> serie = new XYChart.Series<>();
       serie.setName(g.getName());
-      for(Milestone ms : cat.getMilestones()){
+      for (Milestone ms : cat.getMilestones()) {
         serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getCumultativeSumFor(groupAnalyser.getProgressSummaryFor(ms))));
       }
       series.add(serie);

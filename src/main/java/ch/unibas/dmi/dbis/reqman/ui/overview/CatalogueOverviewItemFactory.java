@@ -5,9 +5,7 @@ import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 
-import static ch.unibas.dmi.dbis.reqman.ui.overview.CatalogueOverviewItem.EntityType.CATALOGUE;
-import static ch.unibas.dmi.dbis.reqman.ui.overview.CatalogueOverviewItem.EntityType.MILESTONE;
-import static ch.unibas.dmi.dbis.reqman.ui.overview.CatalogueOverviewItem.EntityType.REQUIREMENT;
+import static ch.unibas.dmi.dbis.reqman.ui.overview.CatalogueOverviewItem.EntityType.*;
 
 /**
  * TODO: write JavaDoc
@@ -18,11 +16,11 @@ public class CatalogueOverviewItemFactory {
   
   private CatalogueAnalyser analyser;
   
-  public CatalogueOverviewItemFactory(CatalogueAnalyser analyser){
+  public CatalogueOverviewItemFactory(CatalogueAnalyser analyser) {
     this.analyser = analyser;
   }
   
-  public CatalogueOverviewItem createFor(Catalogue catalogue){
+  public CatalogueOverviewItem createFor(Catalogue catalogue) {
     CatalogueOverviewItem item = new CatalogueOverviewItem(CATALOGUE, catalogue.getUuid());
     
     item.setName(catalogue.getName());
@@ -31,10 +29,10 @@ public class CatalogueOverviewItemFactory {
     item.setRegularPoints(analyser.getMaximalRegularSum());
     item.setBonusPoints(analyser.getMaximalBonusSum());
     item.setMalusPoints(analyser.getMaximalMalusSum());
-    return  item;
+    return item;
   }
   
-  public CatalogueOverviewItem createFor(Milestone ms){
+  public CatalogueOverviewItem createFor(Milestone ms) {
     CatalogueOverviewItem item = new CatalogueOverviewItem(MILESTONE, ms.getUuid());
     
     item.setName(ms.getName());
@@ -46,14 +44,14 @@ public class CatalogueOverviewItemFactory {
     return item;
   }
   
-  public CatalogueOverviewItem createFor(Requirement requirement){
+  public CatalogueOverviewItem createFor(Requirement requirement) {
     CatalogueOverviewItem item = new CatalogueOverviewItem(REQUIREMENT, requirement.getUuid());
     
     item.setName(requirement.getName());
     item.setType(requirement.getType().toString());
     item.setActualPoints((requirement.isMalus() ? -1d : 1d) * requirement.getMaxPoints());
     item.setCategory(requirement.getCategory());
-    switch(requirement.getType()){
+    switch (requirement.getType()) {
       case REGULAR:
         item.setRegularPoints(requirement.getMaxPoints());
         break;

@@ -49,7 +49,7 @@ public class CatalogueSummaryView extends GridPane {
     }
   }
   
-  public void clearSelected(){
+  public void clearSelected() {
     tfSelectedRegular.setText("");
     tfSelectedBonus.setText("");
     tfSelectedMalus.setText("");
