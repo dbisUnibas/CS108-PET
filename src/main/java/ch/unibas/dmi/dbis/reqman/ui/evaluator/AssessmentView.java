@@ -5,6 +5,8 @@ import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -50,6 +52,8 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   private Label totalPoints;
   private List<ProgressView> activeProgressViews = new ArrayList<>();
   private ObservableList<Progress> currentlyFilteredProgress;
+  
+  private SimpleBooleanProperty activeProperty = new SimpleBooleanProperty(false);
   
   AssessmentView(Group group) {
     super();
@@ -125,6 +129,10 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   @Override
   public void applyFilter(Filter filter) {
     LOGGER.debug("apply filter: "+filter);
+    Milestone ms = AssessmentManager.getInstance().getActiveMilestone();
+    LOGGER.debug("Active MS: "+ms.getName());
+    List<Requirement> reqs = EntityController.getInstance().getCatalogueAnalyser().getFilteredRequirements(filter);
+    displayProgressViews(reqs);
   }
   
   @Override
@@ -150,6 +158,30 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   
   public void setOnPointsChanged(Consumer<Double> consumer) {
     pointsChangedConsumer= consumer;
+  }
+  
+  public void bindActiveIndicator(ReadOnlyBooleanProperty activeIndicator) {
+    activeProperty.bind(activeIndicator);
+    activeProperty.addListener((observable, oldValue, newValue) -> {
+      if(newValue){
+        LOGGER.debug("Going ACTIVE - "+group.getName());
+      }else{
+        LOGGER.debug("Going INACTIVE - "+group.getName());
+      }
+      activateFilterableBehaviour(newValue);
+    });
+  }
+  
+  private void activateFilterableBehaviour(boolean active){
+    if(active){
+      AssessmentManager.getInstance().addFilterable(this);
+      if(AssessmentManager.getInstance().hasActiveFilter() ){
+        LOGGER.debug("Filter present: "+AssessmentManager.getInstance().getActiveFilter().getDisplayRepresentation());
+        applyFilter(AssessmentManager.getInstance().getActiveFilter());
+      }
+    }else{
+      AssessmentManager.getInstance().removeFilterable(this);
+    }
   }
   
   void checkDependencies(){

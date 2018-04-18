@@ -4,13 +4,12 @@ import ch.unibas.dmi.dbis.reqman.analysis.*;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -20,20 +19,24 @@ import org.apache.commons.lang.StringUtils;
  */
 public class FilterBar extends HBox {
   
+  private final AssessmentManager manager = AssessmentManager.getInstance();
   @Deprecated
   private FilterActionHandler handler;
-  private final AssessmentManager manager = AssessmentManager.getInstance();
   private Label nameLbl;
   private Label containsLbl;
   private Label infoLbl;
   private ComboBox<Mode> modeCB;
   private ComboBox<Requirement.Type> typeCB;
   private TextField searchInput;
-  private Button filterBtn;
-  private Button resetBtn;
-  private Button closeBtn;
+  private Button andBtn;
+  private Button orBtn;
+  private ToggleButton negBtn;
+  private Button disposeBtn;
   
-  public FilterBar(){
+  private HBox horizontal;
+  private VBox vertical;
+  
+  public FilterBar() {
     initComponents();
     layoutComponents();
   }
@@ -54,16 +57,22 @@ public class FilterBar extends HBox {
   }
   
   private void layoutComponents() {
-    getChildren().addAll(nameLbl, modeCB, containsLbl, searchInput, filterBtn, resetBtn, Utils.createHFill(), infoLbl, closeBtn);
-    
+    getChildren().add(vertical);
+    vertical.getChildren().add(horizontal);
+    horizontal.getChildren().addAll(nameLbl, modeCB, containsLbl, searchInput, andBtn, orBtn, negBtn, Utils.createHFill(), disposeBtn);
+    vertical.getChildren().add(infoLbl);
     Utils.applyDefaultSpacing(this);
+    Utils.applyDefaultSpacing(horizontal);
     getStyleClass().add("darkened");
   }
   
   private void initComponents() {
-    nameLbl = new Label("Filter requirement");
-    containsLbl = new Label("containing");
-    infoLbl = new Label();
+    horizontal = new HBox();
+    vertical = new VBox();
+    
+    nameLbl = new Label("Filter: ");
+    containsLbl = new Label("contains");
+    infoLbl = new Label("Active: n/a");
     modeCB = new ComboBox<>();
     modeCB.setItems(FXCollections.observableArrayList(Mode.values()));
     modeCB.getSelectionModel().select(Mode.TEXT);
@@ -71,28 +80,88 @@ public class FilterBar extends HBox {
     typeCB = new ComboBox<>();
     typeCB.setItems(FXCollections.observableArrayList(Requirement.Type.values()));
     searchInput = new TextField();
-    filterBtn = new Button("Filter");
-    filterBtn.setOnAction(this::handleFilter);
-    resetBtn = new Button("Reset");
-    resetBtn.setOnAction(this::handleReset);
-    closeBtn = new Button("Close");
-    closeBtn.setOnAction(this::handleClose);
+    andBtn = new Button("and");
+    andBtn.setOnAction(this::handleAnd);
+    orBtn = new Button("or");
+    orBtn.setOnAction(this::handleOr);
+    negBtn = new ToggleButton("negate");
+    negBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
+      handleFilter();
+    });
+    disposeBtn = new Button("Dispose");
+    disposeBtn.setOnAction(this::handleClose);
     
     modeCB.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
       if (newValue.equals(Mode.TYPE)) {
-        getChildren().remove(3);
-        getChildren().add(3, typeCB);
+        horizontal.getChildren().remove(3);
+        horizontal.getChildren().add(3, typeCB);
         typeCB.getSelectionModel().selectFirst();
+        containsLbl.setText("is");
+        handleFilter();
       } else {
-        getChildren().remove(3);
-        getChildren().add(3, searchInput);
+        horizontal.getChildren().remove(3);
+        horizontal.getChildren().add(3, searchInput);
+        containsLbl.setText("contains");
+        handleFilter();
       }
     }));
+    
+    searchInput.textProperty().addListener((observable, oldValue, newValue) -> {
+      if (!oldValue.equals(newValue)) {
+        handleFilter();
+      }
+      if (StringUtils.isBlank(newValue)) {
+        handleReset(new ActionEvent());
+      }
+    });
+    
+    horizontal.setAlignment(Pos.BASELINE_LEFT);
+    vertical.setAlignment(Pos.CENTER_LEFT);
+  }
+  
+  private void displayFilter(Filter filter) {
+    infoLbl.setText("Active: " + filter.getDisplayRepresentation());
+  }
+  
+  private Filter current = null;
+  
+  private Filter concat(Filter f, boolean and){
+    if(current == null){
+      return f;
+    }
+    if(f == null){
+      return current; // could still be null
+    }
+    if(and){
+      return new AndFilter(current, f);
+    }else{
+      return new OrFilter(current, f);
+    }
+  }
+  
+  private void handleAnd(ActionEvent evt) {
+    current = manager.getActiveFilter();
+    try {
+      Filter filter = createFilterFromUI();
+      manager.setFilter(concat(filter, true));
+      displayFilter(filter);
+    } catch (IllegalArgumentException ex) {
+      // Ignore the exception as the user probably unintentionally clicked
+    }
+  }
+  
+  private void handleOr(ActionEvent evt) {
+    try {
+      Filter filter = createFilterFromUI();
+      filter = manager.addFilterOr(filter);
+      displayFilter(filter);
+    } catch (IllegalArgumentException ex) {
+      // Ignore the exception as the user probably unintentionally clicked
+    }
   }
   
   private void handleClose(ActionEvent actionEvent) {
-//    handler.closeFilterBar();
-    // TODO Solution with parent passed and reference is stored.
+    handleReset(actionEvent);
     Parent p = getParent();
     if (p instanceof Pane) {
       ((Pane) p).getChildren().remove(this);
@@ -108,34 +177,45 @@ public class FilterBar extends HBox {
   }
   
   /**
-   *
    * @return
    * @throws IllegalArgumentException if no filter could be created
    */
-  private Filter createFilterFromUI() throws IllegalArgumentException{
-    if(StringUtils.isNotBlank(searchInput.getText())){
-      switch(modeCB.getSelectionModel().getSelectedItem()){
+  private Filter createFilterFromUI() throws IllegalArgumentException {
+    Filter f = null;
+    if (StringUtils.isNotBlank(searchInput.getText())) {
+      switch (modeCB.getSelectionModel().getSelectedItem()) {
         case NAME:
-          return new NameContainsFilter(searchInput.getText());
+          f = new NameContainsFilter(searchInput.getText());
+          break;
         case TEXT:
-          return new TextContainsFilter(searchInput.getText());
+          f = new TextContainsFilter(searchInput.getText());
+          break;
         case CATEGORY:
-          return new CategoryContainsFilter(searchInput.getText());
+          f = new CategoryContainsFilter(searchInput.getText());
+          break;
         case TYPE:
-          return new TypeFilter(typeCB.getSelectionModel().getSelectedItem());
+          f = new TypeFilter(typeCB.getSelectionModel().getSelectedItem());
+          break;
       }
-    }else if(modeCB.getSelectionModel().getSelectedItem() == Mode.TYPE){
-      return new TypeFilter(typeCB.getSelectionModel().getSelectedItem());
+    }else if (modeCB.getSelectionModel().getSelectedItem() == Mode.TYPE) {
+      f = new TypeFilter(typeCB.getSelectionModel().getSelectedItem());
     }
-    throw new IllegalArgumentException("Couldn't create a filter.");
+    
+    if (f != null && negBtn.isSelected()) {
+      return new NotFilter(f);
+    } else if (f != null) {
+      return f;
+    } else {
+      throw new IllegalArgumentException("Couldn't create a filter.");
+    }
   }
   
-  private void handleFilter(ActionEvent actionEvent) {
-    try{
+  private void handleFilter() {
+    try {
       Filter filter = createFilterFromUI();
       manager.setFilter(filter);
-      infoLbl.setText("Showing "+filter.getDisplayRepresentation());
-    }catch (IllegalArgumentException ex){
+      displayFilter(filter);
+    } catch (IllegalArgumentException ex) {
       // Ignore the exception as the user probably unintentionally clicked
     }
   }

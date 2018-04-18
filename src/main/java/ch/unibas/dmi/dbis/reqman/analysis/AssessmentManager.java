@@ -3,7 +3,7 @@ package ch.unibas.dmi.dbis.reqman.analysis;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * TODO: Write JavaDoc
@@ -25,7 +25,7 @@ public class AssessmentManager {
   
   }
   
-  private ArrayList<Filterable> listeners = new ArrayList<>();
+  private HashSet<Filterable> listeners = new HashSet<>();
   private Milestone activeMilestone = null;
   private Filter activeFilter = null;
   
@@ -82,11 +82,14 @@ public class AssessmentManager {
    * between the active filter and the new one
    * @param filter
    */
-  public void addFilterAnd(@NotNull Filter filter){
+  public Filter addFilterAnd(@NotNull Filter filter){
     if(hasActiveFilter() ){
-      setActiveFilter(new AndFilter(getActiveFilter(), filter));
+      Filter f = new AndFilter(getActiveFilter(), filter);
+      setActiveFilter(f);
+      return f;
     }else{
       setActiveFilter(filter);
+      return filter;
     }
   }
   
@@ -95,11 +98,14 @@ public class AssessmentManager {
    *    * between the active filter and the new one
    * @param filter
    */
-  public void addFilterOr(@NotNull Filter filter){
+  public Filter addFilterOr(@NotNull Filter filter){
     if(hasActiveFilter() ){
-      setActiveFilter(new OrFilter(getActiveFilter(), filter));
+      Filter f = new OrFilter(getActiveFilter(), filter);
+      setActiveFilter(f);
+      return f;
     }else{
       setActiveFilter(filter);
+      return filter;
     }
   }
 }

@@ -73,6 +73,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
     tab.setText(view.getActiveGroup().getName());
     view.bindToParentSize(rightContent);
     tab.setContent(view);
+    view.bindActiveIndicator(tab.selectedProperty());
     tabPane.getTabs().addAll(tab);
     tab.setUserData(view.getActiveGroup().getUuid());
     groupTapMap.put(view.getActiveGroup().getUuid(), tab);
@@ -208,7 +209,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
     courseView = new CourseInfoView();
     groupView = new GroupListView(handler);
     
-    filterBar = new FilterBar(handler);
+    filterBar = new FilterBar();
   }
   
   public void disableAll() {
