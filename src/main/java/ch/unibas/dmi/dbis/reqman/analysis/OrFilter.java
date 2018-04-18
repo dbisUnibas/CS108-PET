@@ -13,11 +13,19 @@ public class OrFilter implements Filter {
   private final Filter one;
   private final Filter two;
   
-  public OrFilter(@NotNull Filter one,@NotNull Filter two) {
+  public OrFilter(@NotNull Filter one, @NotNull Filter two) {
     this.one = one;
     this.two = two;
   }
   
+  @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("OrFilter{");
+    sb.append("one=").append(one);
+    sb.append(", two=").append(two);
+    sb.append('}');
+    return sb.toString();
+  }
   
   @Override
   public boolean test(Requirement requirement) {

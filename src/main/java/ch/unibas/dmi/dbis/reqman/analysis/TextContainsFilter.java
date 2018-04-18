@@ -28,6 +28,14 @@ public class TextContainsFilter implements Filter {
   
   @Override
   public String getDisplayRepresentation() {
-    return "Text contains "+pattern;
+    return "Text contains " + pattern;
+  }
+  
+  @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("TextContainsFilter{");
+    sb.append("pattern='").append(pattern).append('\'');
+    sb.append('}');
+    return sb.toString();
   }
 }

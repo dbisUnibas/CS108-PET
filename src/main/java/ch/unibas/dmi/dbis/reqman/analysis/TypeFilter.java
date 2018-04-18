@@ -11,7 +11,7 @@ public class TypeFilter implements Filter {
   
   private final Requirement.Type type;
   
-  public TypeFilter(Requirement.Type type){
+  public TypeFilter(Requirement.Type type) {
     this.type = type;
   }
   
@@ -23,5 +23,13 @@ public class TypeFilter implements Filter {
   @Override
   public String getDisplayRepresentation() {
     return String.format("Type is '%s'", type);
+  }
+  
+  @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("TypeFilter{");
+    sb.append("type=").append(type);
+    sb.append('}');
+    return sb.toString();
   }
 }

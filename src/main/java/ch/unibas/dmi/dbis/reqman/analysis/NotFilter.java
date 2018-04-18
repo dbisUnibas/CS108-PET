@@ -17,12 +17,20 @@ public class NotFilter implements Filter {
   }
   
   @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("NotFilter{");
+    sb.append("filter=").append(filter);
+    sb.append('}');
+    return sb.toString();
+  }
+  
+  @Override
   public boolean test(Requirement requirement) {
     return filter.negate().test(requirement);
   }
   
   @Override
   public String getDisplayRepresentation() {
-    return "Must not "+filter.getDisplayRepresentation();
+    return "Must not " + filter.getDisplayRepresentation();
   }
 }
