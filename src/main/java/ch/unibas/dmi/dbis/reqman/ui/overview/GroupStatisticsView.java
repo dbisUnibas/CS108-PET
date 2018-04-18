@@ -1,19 +1,24 @@
 package ch.unibas.dmi.dbis.reqman.ui.overview;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
+import ch.unibas.dmi.dbis.reqman.analysis.GroupAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
-import ch.unibas.dmi.dbis.reqman.data.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.Group;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableColumn;
-import javafx.scene.control.TreeTableView;
-import javafx.scene.layout.Priority;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.ArrayList;
 
 /**
  * TODO: write JavaDoc
@@ -27,6 +32,9 @@ public class GroupStatisticsView extends VBox {
   private TreeTableView<GroupOverviewItem> treeTableView;
   private EntityController ctrl;
   private CatalogueAnalyser analyser;
+  private LineChart<String, Number> chart;
+  private ScrollPane scrollPane;
+  private VBox container;
   
   public GroupStatisticsView() {
     initComps();
@@ -34,19 +42,27 @@ public class GroupStatisticsView extends VBox {
   }
   
   public void update() {
-    getChildren().remove(treeTableView);
+    container.getChildren().remove(treeTableView);
     treeTableView = null;
     setupTreeTable();
-    getChildren().add(0, treeTableView);
+    container.getChildren().add(0, treeTableView);
   }
   
   private void initComps() {
     setupTreeTable();
+    chart = createOverviewChart();
+    chart.setPrefSize(800,600);
+    scrollPane = new ScrollPane();
+    scrollPane.setPrefSize(850,650);
+    container = new VBox();
   }
   
   private void layoutComps() {
-    getChildren().addAll(treeTableView);
-    VBox.setVgrow(treeTableView, Priority.SOMETIMES);
+    scrollPane.setContent(container);
+    Utils.applyDefaultSpacing(container);
+    container.getChildren().addAll(treeTableView, chart);
+    getChildren().add(scrollPane);
+//    VBox.setVgrow(treeTableView, Priority.SOMETIMES);
   }
   
   private void setupTreeTable() {
@@ -91,5 +107,42 @@ public class GroupStatisticsView extends VBox {
     treeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     treeTableView.getSelectionModel().setCellSelectionEnabled(false);
     
+  }
+  
+  private LineChart<String, Number> createOverviewChart(){
+    ctrl = EntityController.getInstance();
+    analyser = ctrl.getCatalogueAnalyser();
+    Catalogue cat = ctrl.getCatalogue();
+    
+    final CategoryAxis xAxis = new CategoryAxis();
+    final NumberAxis yAxis = new NumberAxis();
+    yAxis.setLabel("Points");
+    xAxis.setLabel("Milestones");
+    final LineChart<String, Number> lineChart = new LineChart<>(xAxis,yAxis);
+    lineChart.setTitle("Milestone Points Overview");
+  
+    XYChart.Series<String, Number> catSeries = new XYChart.Series<>();
+    catSeries.setName("Maximal Points");
+    for(Milestone ms : cat.getMilestones()){
+      catSeries.getData().add(new XYChart.Data<>(ms.getName(), analyser.getCumultativeMaximalRegularSumFor(ms)));
+    }
+  
+    ArrayList<XYChart.Series<String,Number>> series = new ArrayList<>();
+    
+    for(Group g : ctrl.groupList()){
+      GroupAnalyser groupAnalyser = ctrl.getGroupAnalyser(g);
+      
+      XYChart.Series<String,Number> serie = new XYChart.Series<>();
+      serie.setName(g.getName());
+      for(Milestone ms : cat.getMilestones()){
+        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getCumultativeSumFor(groupAnalyser.getProgressSummaryFor(ms))));
+      }
+      series.add(serie);
+    }
+    
+    lineChart.getData().add(catSeries);
+    lineChart.getData().addAll(series);
+    
+    return lineChart;
   }
 }

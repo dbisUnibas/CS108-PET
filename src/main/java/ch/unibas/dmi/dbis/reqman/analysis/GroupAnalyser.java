@@ -158,6 +158,17 @@ public class GroupAnalyser {
     return sum;
   }
   
+  public double getCumultativeSumFor(ProgressSummary ps){
+    double sum = 0;
+    
+    int pos = catalogueAnalyser.getCourseManager().getMilestoneOrdinal(catalogueAnalyser.getMilestoneOf(ps));
+    for(int i=0; i<=pos;i++){
+      sum += getSumFor(getProgressSummaryFor(catalogueAnalyser.getMilestoneByPosition(i)));
+    }
+    
+    return sum;
+  }
+  
   public List<Progress> getProgressForProgressSummary(ProgressSummary ps){
     return group.getProgressList().stream().filter( p -> matchesProgressSummary(p, ps)).collect(Collectors.toList());
   }
