@@ -268,6 +268,8 @@ public class ProgressView extends VBox {
     commentLbl = new Label("Comment");
     taComment = new TextArea();
     taComment.setPrefRowCount(4);
+    taComment.setWrapText(true);
+    
     
     lastModifiedLbl = new Label("Assessment on");
     lastModifiedDisplay = new Label();
