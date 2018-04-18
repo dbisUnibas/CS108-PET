@@ -11,6 +11,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import org.apache.commons.lang.StringUtils;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Stack;
 
 /**
  * TODO: Write JavaDoc
@@ -31,10 +34,13 @@ public class FilterBar extends HBox {
   private Button andBtn;
   private Button orBtn;
   private ToggleButton negBtn;
+  private Button rmBtn;
   private Button disposeBtn;
   
   private HBox horizontal;
   private VBox vertical;
+  private Stack<Filter> filterStack = new Stack<>();
+  private boolean andMode = true;
   
   public FilterBar() {
     initComponents();
@@ -59,7 +65,7 @@ public class FilterBar extends HBox {
   private void layoutComponents() {
     getChildren().add(vertical);
     vertical.getChildren().add(horizontal);
-    horizontal.getChildren().addAll(nameLbl, modeCB, containsLbl, searchInput, andBtn, orBtn, negBtn, Utils.createHFill(), disposeBtn);
+    horizontal.getChildren().addAll(nameLbl, modeCB, containsLbl, searchInput, andBtn, orBtn, negBtn, Utils.createHFill(), rmBtn,disposeBtn);
     vertical.getChildren().add(infoLbl);
     Utils.applyDefaultSpacing(this);
     Utils.applyDefaultSpacing(horizontal);
@@ -84,6 +90,8 @@ public class FilterBar extends HBox {
     andBtn.setOnAction(this::handleAnd);
     orBtn = new Button("or");
     orBtn.setOnAction(this::handleOr);
+    rmBtn = new Button("Remove last");
+    rmBtn.setOnAction(this::handleRemoveLast);
     negBtn = new ToggleButton("negate");
     negBtn.selectedProperty().addListener((observable, oldValue, newValue) -> {
       handleFilter();
@@ -110,7 +118,7 @@ public class FilterBar extends HBox {
       if (!oldValue.equals(newValue)) {
         handleFilter();
       }
-      if (StringUtils.isBlank(newValue)) {
+      if (StringUtils.isBlank(newValue) && filterStack.isEmpty()) {
         handleReset(new ActionEvent());
       }
     });
@@ -119,45 +127,30 @@ public class FilterBar extends HBox {
     vertical.setAlignment(Pos.CENTER_LEFT);
   }
   
+  private void handleRemoveLast(ActionEvent actionEvent) {
+    searchInput.setText("");
+    infoLbl.setText("");
+    if(filterStack.size() >= 1){
+      setFilter(filterStack.pop());
+    }else{
+      clear();
+    }
+  }
+  
   private void displayFilter(Filter filter) {
     infoLbl.setText("Active: " + filter.getDisplayRepresentation());
   }
   
-  private Filter current = null;
-  
-  private Filter concat(Filter f, boolean and){
-    if(current == null){
-      return f;
-    }
-    if(f == null){
-      return current; // could still be null
-    }
-    if(and){
-      return new AndFilter(current, f);
-    }else{
-      return new OrFilter(current, f);
-    }
-  }
-  
   private void handleAnd(ActionEvent evt) {
-    current = manager.getActiveFilter();
-    try {
-      Filter filter = createFilterFromUI();
-      manager.setFilter(concat(filter, true));
-      displayFilter(filter);
-    } catch (IllegalArgumentException ex) {
-      // Ignore the exception as the user probably unintentionally clicked
-    }
+    filterStack.push(manager.getActiveFilter());
+    andMode = true;
+    searchInput.setText("");
   }
   
   private void handleOr(ActionEvent evt) {
-    try {
-      Filter filter = createFilterFromUI();
-      filter = manager.addFilterOr(filter);
-      displayFilter(filter);
-    } catch (IllegalArgumentException ex) {
-      // Ignore the exception as the user probably unintentionally clicked
-    }
+    filterStack.push(manager.getActiveFilter());
+    andMode = false;
+    searchInput.setText("");
   }
   
   private void handleClose(ActionEvent actionEvent) {
@@ -197,7 +190,7 @@ public class FilterBar extends HBox {
           f = new TypeFilter(typeCB.getSelectionModel().getSelectedItem());
           break;
       }
-    }else if (modeCB.getSelectionModel().getSelectedItem() == Mode.TYPE) {
+    } else if (modeCB.getSelectionModel().getSelectedItem() == Mode.TYPE) {
       f = new TypeFilter(typeCB.getSelectionModel().getSelectedItem());
     }
     
@@ -213,11 +206,24 @@ public class FilterBar extends HBox {
   private void handleFilter() {
     try {
       Filter filter = createFilterFromUI();
-      manager.setFilter(filter);
-      displayFilter(filter);
+      if (filterStack.isEmpty()) {
+        manager.setFilter(filter);
+      } else if (andMode) {
+        // AND
+        filter = new AndFilter(filterStack.peek(), filter);
+      } else {
+        // OR
+        filter = new OrFilter(filterStack.peek(), filter);
+      }
+      setFilter(filter);
     } catch (IllegalArgumentException ex) {
       // Ignore the exception as the user probably unintentionally clicked
     }
+  }
+  
+  private void setFilter(@NotNull Filter filter) {
+    manager.setFilter(filter);
+    displayFilter(filter);
   }
   
   public enum Mode {
