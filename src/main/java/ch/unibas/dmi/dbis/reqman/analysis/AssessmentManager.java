@@ -13,31 +13,29 @@ import java.util.HashSet;
 public class AssessmentManager {
   
   private static AssessmentManager instance = null;
+  private HashSet<Filterable> listeners = new HashSet<>();
+  private Milestone activeMilestone = null;
+  private Filter activeFilter = null;
+  private AssessmentManager() {
   
+  }
+
   public static AssessmentManager getInstance() {
-    if(instance == null){
+    if (instance == null) {
       instance = new AssessmentManager();
     }
     return instance;
   }
   
-  private AssessmentManager() {
-  
-  }
-  
-  private HashSet<Filterable> listeners = new HashSet<>();
-  private Milestone activeMilestone = null;
-  private Filter activeFilter = null;
-  
-  public void addFilterable(Filterable filterable){
+  public void addFilterable(Filterable filterable) {
     listeners.add(filterable);
   }
   
-  public void removeFilterable(Filterable filterable){
+  public void removeFilterable(Filterable filterable) {
     listeners.remove(filterable);
   }
   
-  public boolean hasActiveProgressSummary(){
+  public boolean hasActiveProgressSummary() {
     return activeMilestone != null;
   }
   
@@ -50,12 +48,12 @@ public class AssessmentManager {
     listeners.forEach(f -> f.applyActiveMilestone(active));
   }
   
-  public void clearFilter(){
+  public void clearFilter() {
     activeFilter = null;
     listeners.forEach(Filterable::clearFilter);
   }
   
-  public boolean hasActiveFilter(){
+  public boolean hasActiveFilter() {
     return activeFilter != null;
   }
   
@@ -70,9 +68,10 @@ public class AssessmentManager {
   
   /**
    * Sets (and thus overrides) any existing filter.
+   *
    * @param filter
    */
-  public void setFilter(@NotNull Filter filter){
+  public void setFilter(@NotNull Filter filter) {
     clearFilter();
     setActiveFilter(filter);
   }
@@ -80,14 +79,15 @@ public class AssessmentManager {
   /**
    * Creates a concatenated filter with the concatenation AND
    * between the active filter and the new one
+   *
    * @param filter
    */
-  public Filter addFilterAnd(@NotNull Filter filter){
-    if(hasActiveFilter() ){
+  public Filter addFilterAnd(@NotNull Filter filter) {
+    if (hasActiveFilter()) {
       Filter f = new AndFilter(getActiveFilter(), filter);
       setActiveFilter(f);
       return f;
-    }else{
+    } else {
       setActiveFilter(filter);
       return filter;
     }
@@ -95,15 +95,16 @@ public class AssessmentManager {
   
   /**
    * Creates a concatenated filter with the concatenation OR
-   *    * between the active filter and the new one
+   * * between the active filter and the new one
+   *
    * @param filter
    */
-  public Filter addFilterOr(@NotNull Filter filter){
-    if(hasActiveFilter() ){
+  public Filter addFilterOr(@NotNull Filter filter) {
+    if (hasActiveFilter()) {
       Filter f = new OrFilter(getActiveFilter(), filter);
       setActiveFilter(f);
       return f;
-    }else{
+    } else {
       setActiveFilter(filter);
       return filter;
     }

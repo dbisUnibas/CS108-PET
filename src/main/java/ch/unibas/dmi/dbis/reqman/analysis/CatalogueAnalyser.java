@@ -61,14 +61,14 @@ public class CatalogueAnalyser {
     return null;
   }
   
-  public Milestone getPredecessorOf(@NotNull Milestone ms){
+  public Milestone getPredecessorOf(@NotNull Milestone ms) {
     int theOrdinal = courseManager.getMilestoneOrdinal(ms);
-    return getMilestoneByPosition(theOrdinal-1);
+    return getMilestoneByPosition(theOrdinal - 1);
   }
   
-  public Milestone getSuccessorOf(@NotNull Milestone ms){
+  public Milestone getSuccessorOf(@NotNull Milestone ms) {
     int ordinal = courseManager.getMilestoneOrdinal(ms);
-    return getMilestoneByPosition(ordinal+1);
+    return getMilestoneByPosition(ordinal + 1);
   }
   
   /**
@@ -81,11 +81,11 @@ public class CatalogueAnalyser {
     return catalogue.getRequirements().stream().filter(r -> matchesMinimalMilestone(r, milestone)).sorted(getRequirementComparator()).collect(Collectors.toList());
   }
   
-  public double getCumulativeMaximalRegularSumFor(Milestone ms){
+  public double getCumulativeMaximalRegularSumFor(Milestone ms) {
     int pos = courseManager.getMilestoneOrdinal(ms);
     double sum = 0;
     
-    for(int i=0; i<=pos; i++){
+    for (int i = 0; i <= pos; i++) {
       sum += getMaximalRegularSumFor(getMilestoneByPosition(i));
     }
     
@@ -183,7 +183,7 @@ public class CatalogueAnalyser {
     return catalogue.getRequirements().stream().filter(r -> r.getType().equals(type)).collect(Collectors.toList());
   }
   
-  public List<Requirement> getFilteredRequirements(Filter filter){
+  public List<Requirement> getFilteredRequirements(Filter filter) {
     return catalogue.getRequirements().stream().filter(filter).collect(Collectors.toList());
   }
   
@@ -250,7 +250,7 @@ public class CatalogueAnalyser {
   }
   
   public Milestone getMilestoneByPosition(int pos) {
-    if(pos < 0 || pos >= catalogue.getMilestones().size()){
+    if (pos < 0 || pos >= catalogue.getMilestones().size()) {
       return null;
     }
     List<Milestone> milestones = catalogue.getMilestones();
@@ -283,7 +283,7 @@ public class CatalogueAnalyser {
     return requirement.getMaximalMilestoneUUID().equals(milestone.getUuid());
   }
   
-  boolean matchesMilestone(@NotNull Requirement requirement,@NotNull Milestone milestone) {
+  boolean matchesMilestone(@NotNull Requirement requirement, @NotNull Milestone milestone) {
     return getMilestoneDateComparator().compare(courseManager.getMinimalMilestone(requirement), milestone) <= 0 && getMilestoneDateComparator().compare(courseManager.getMaximalMilestone(requirement), milestone) >= 0;
   }
   

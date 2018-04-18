@@ -13,7 +13,7 @@ public class AndFilter implements Filter {
   private final Filter one;
   private final Filter two;
   
-  public AndFilter(@NotNull Filter one,@NotNull Filter two) {
+  public AndFilter(@NotNull Filter one, @NotNull Filter two) {
     this.one = one;
     this.two = two;
   }
