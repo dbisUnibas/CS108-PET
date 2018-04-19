@@ -172,10 +172,18 @@ public class GroupStatisticsView extends VBox {
     XYChart.Series<String, Number> bonusSeries = new XYChart.Series<>();
     bonusSeries.setName("Bonus Points");
     
+    double malus,regular,bonus, offset;
+    
     for (Milestone ms : cat.getMilestones()) {
-      malusSeries.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getMalusSumFor(groupAnalyser.getProgressSummaryFor(ms))));
-      regularSeries.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getRegularSumFor(groupAnalyser.getProgressSummaryFor(ms))));
-      bonusSeries.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getBonusSumFor(groupAnalyser.getProgressSummaryFor(ms))));
+      malus = groupAnalyser.getMalusSumFor(groupAnalyser.getProgressSummaryFor(ms));
+      offset = malus < 0 ? malus : 0;
+      regular = offset + groupAnalyser.getRegularSumFor(groupAnalyser.getProgressSummaryFor(ms));
+      offset = regular < 0 ? regular : 0;
+      bonus = offset + groupAnalyser.getBonusSumFor(groupAnalyser.getProgressSummaryFor(ms));
+      
+      malusSeries.getData().add(new XYChart.Data<>(ms.getName(), malus));
+      regularSeries.getData().add(new XYChart.Data<>(ms.getName(), regular));
+      bonusSeries.getData().add(new XYChart.Data<>(ms.getName(), bonus));
     }
     sbc.setTitle("Details Per Milestone of " + g.getName());
     
