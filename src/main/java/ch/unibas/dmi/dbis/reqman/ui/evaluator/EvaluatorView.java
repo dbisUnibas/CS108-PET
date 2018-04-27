@@ -248,7 +248,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
       }
     });
     */
-    statisticsCloser = (unused) -> {
+    statisticsCloser = (__) -> {
       stage.close();
       return null;
     };

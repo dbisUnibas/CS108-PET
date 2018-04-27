@@ -64,6 +64,16 @@ public class GroupStatisticsView extends VBox {
     container.getChildren().addAll(treeTableView, chart);
     getChildren().add(scrollPane);
 //    VBox.setVgrow(treeTableView, Priority.SOMETIMES);
+    
+    // sizing
+    container.prefWidthProperty().bind(scrollPane.widthProperty());
+    container.prefHeightProperty().bind(scrollPane.heightProperty());
+    
+    scrollPane.prefWidthProperty().bind(widthProperty());
+    scrollPane.prefHeightProperty().bind(heightProperty());
+    
+    scrollPane.setMinHeight(200);
+    scrollPane.setMinWidth(300);
   }
   
   private void addDetailCharts() {
@@ -113,6 +123,8 @@ public class GroupStatisticsView extends VBox {
     treeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     treeTableView.getSelectionModel().setCellSelectionEnabled(false);
     
+    
+    treeTableView.setMinHeight(treeTableView.getPrefHeight());
   }
   
   private LineChart<String, Number> createOverviewChart() {
@@ -188,6 +200,8 @@ public class GroupStatisticsView extends VBox {
     sbc.setTitle("Details Per Milestone of " + g.getName());
     
     sbc.getData().addAll(malusSeries, regularSeries, bonusSeries);
+    
+    sbc.setMinHeight(100);
     
     return sbc;
   }
