@@ -16,46 +16,68 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * TODO: Write JavaDoc
+ * Main menu management unit.
+ *
+ * This class manages all of the menu handles, it also builds the menu and loads shortcuts.
+ *
+ * Each menu item has a userdata string which is in the form of <code>menu[.submenu].name.item</code>.
+ * E.g. the menu item <i>Quit</i> under the menu <i>File</i> has the key <code>file.quit.item</code>
  *
  * @author loris.sauter
  */
 public class MenuManager {
   
-  public static final String ITEM_NEW_COURSE = "itemNewCourse";
-  public static final String ITEM_NEW_CAT = "itemNewCat";
-  public static final String ITEM_NEW_GROUP = "itemNewGroup";
-  public static final String ITEM_OPEN_COURSE = "itemOpenCourse";
-  public static final String ITEM_OPEN_CAT = "itemOpenCat";
-  public static final String ITEM_OPEN_GROUPS = "itemOpenGroups";
-  public static final String ITEM_SAVE_COURSE = "itemSaveCourse";
-  public static final String ITEM_SAVE_COURSE_AS = "itemSaveCourseAs";
-  public static final String ITEM_SAVE_CAT = "itemSaveCat";
-  public static final String ITEM_SAVE_CAT_AS = "itemSaveCatAs";
-  public static final String ITEM_SAVE_GROUP = "itemSaveGroup";
-  public static final String ITEM_SAVE_GROUP_AS = ITEM_SAVE_GROUP + "As";
-  public static final String ITEM_EXPORT_CAT = "itemExportCat";
-  public static final String ITEM_EXPORT_GROUPS = "itemExportGroups";
-  public static final String ITEM_EXPORT_GROUP = "itemExportGroup";
-  public static final String ITEM_QUIT = "itemQuit";
-  public static final String ITEM_NEW_REQ = "itemNewReq";
-  public static final String ITEM_NEW_MS = "itemNewMS";
-  public static final String ITEM_MOD_CAT = "itemModCat";
-  public static final String ITEM_MOD_REQ = "itemModReq";
-  public static final String ITEM_MOD_MS = "itemModMS";
-  public static final String ITEM_MOD_GROUP = "itemModGroup";
-  public static final String ITEM_SPLIT_GROUP = "itemSplitGroup";
-  public static final String ITEM_SHOW_OVERVIEW = "itemShowOverview";
-  public static final String ITEM_EXPORT_OVERVIEW = "itemExportOverview";
-  public static final String ITEM_EDITOR = "itemEditor";
-  public static final String ITEM_EVALUATOR = "itemEvaluator";
-  public static final String ITEM_SHOW_FILTER_BAR_EDIOR = "itemEditorFilterShow";
-  public static final String ITEM_CLEAR_FILTER_EDITOR = "itemEditorFilterClear";
-  public static final String ITEM_SHOW_CATALOGUE_STATISTICS = "itemShowCatalogueStatistics";
-  public static final String ITEM_SHOW_GROUP_STATISTICS = "itemShowGroupStatistics";
-  public static final String ITEM_PRESENTATION_MODE = "itemPresentation";
-  public static final String CLEAR_GLOBAL_MS_KEY = "clear";
-  public static final String ITEM_IMPORT = "itemImport";
+  public static final String MENU_SUFFIX = "menu";
+  public static final String ITEM_SUFFIX = "item";
+  public static final String KEY_SEPARATOR = ".";
+  public static final String MENU_FILE_PREFIX = "file";
+  public static final String MENU_NEW_PREFIX = MENU_FILE_PREFIX +KEY_SEPARATOR+"new";
+  public static final String MENU_OPEN_PREFIX = MENU_FILE_PREFIX +KEY_SEPARATOR+"open";
+  public static final String MENU_SAVE_PREFIX = MENU_FILE_PREFIX +KEY_SEPARATOR+"save";
+  public static final String MENU_EXPORT_PREFIX = MENU_FILE_PREFIX + KEY_SEPARATOR+"export";
+  public static final String MENU_EDIT_PREFIX = "edit";
+  public static final String MENU_MODIFY_PREFIX ="modify";
+  public static final String MENU_VIEW_PREFIX ="view";
+  public static final String MENU_MODE_PREFIX = "mode";
+  public static final String MENU_HELP_PREFIX = "help";
+  
+  
+  public static final String ITEM_NEW_COURSE = MENU_NEW_PREFIX+KEY_SEPARATOR+"course"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_NEW_CAT = MENU_NEW_PREFIX+KEY_SEPARATOR+"catalogue"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_NEW_GROUP = MENU_NEW_PREFIX+KEY_SEPARATOR+"group"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_OPEN_COURSE = MENU_OPEN_PREFIX+KEY_SEPARATOR+"course"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_OPEN_CAT = MENU_OPEN_PREFIX+KEY_SEPARATOR+"catalogue"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_OPEN_GROUPS = MENU_OPEN_PREFIX+KEY_SEPARATOR+"groups"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SAVE_ALL = MENU_SAVE_PREFIX+KEY_SEPARATOR+"all"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SAVE_COURSE = MENU_SAVE_PREFIX+KEY_SEPARATOR+"course"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SAVE_COURSE_AS = MENU_SAVE_PREFIX+KEY_SEPARATOR+"course-as"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SAVE_CAT = MENU_SAVE_PREFIX+KEY_SEPARATOR+"catalogue"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SAVE_CAT_AS = MENU_SAVE_PREFIX+KEY_SEPARATOR+"catalogue-as"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SAVE_GROUP = MENU_SAVE_PREFIX+KEY_SEPARATOR+"group"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SAVE_GROUP_AS = MENU_SAVE_PREFIX+KEY_SEPARATOR+"group-as"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_EXPORT_CAT = MENU_EXPORT_PREFIX+KEY_SEPARATOR+"catalogue"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_EXPORT_GROUPS = MENU_EXPORT_PREFIX+KEY_SEPARATOR+"groups"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_EXPORT_GROUP = MENU_EXPORT_PREFIX+KEY_SEPARATOR+"group-single"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_QUIT = MENU_FILE_PREFIX+KEY_SEPARATOR+"quit"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_NEW_REQ = MENU_NEW_PREFIX+KEY_SEPARATOR+"requirement"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_NEW_MS = MENU_NEW_PREFIX+KEY_SEPARATOR+"milestone"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_MOD_CAT = MENU_MODIFY_PREFIX+KEY_SEPARATOR+"catalogue"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_MOD_REQ = MENU_MODIFY_PREFIX+KEY_SEPARATOR+"requirement"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_MOD_MS = MENU_MODIFY_PREFIX+KEY_SEPARATOR+"milestone"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_MOD_GROUP = MENU_MODIFY_PREFIX+KEY_SEPARATOR+"group"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SPLIT_GROUP = MENU_EDIT_PREFIX+KEY_SEPARATOR+"split"+KEY_SEPARATOR+ITEM_SUFFIX;
+  @Deprecated public static final String ITEM_SHOW_OVERVIEW = MENU_VIEW_PREFIX+KEY_SEPARATOR+"catalogue-overview"+KEY_SEPARATOR+ITEM_SUFFIX;
+  @Deprecated public static final String ITEM_EXPORT_OVERVIEW = MENU_VIEW_PREFIX+KEY_SEPARATOR+"export-overview"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_EDITOR = MENU_MODE_PREFIX+KEY_SEPARATOR+"editor"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_EVALUATOR = MENU_MODE_PREFIX+KEY_SEPARATOR+"evaluator"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SHOW_FILTER_BAR_EDIOR = MENU_VIEW_PREFIX+KEY_SEPARATOR+"filterbar"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_CLEAR_FILTER_EDITOR = MENU_VIEW_PREFIX+KEY_SEPARATOR+"clearfilter"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SHOW_CATALOGUE_STATISTICS = MENU_VIEW_PREFIX+KEY_SEPARATOR+"catalogue-stats"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_SHOW_GROUP_STATISTICS = MENU_VIEW_PREFIX+KEY_SEPARATOR+"group-stats"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_PRESENTATION_MODE = MENU_VIEW_PREFIX+KEY_SEPARATOR+"presentation"+KEY_SEPARATOR+ITEM_SUFFIX;
+  @Deprecated public static final String CLEAR_GLOBAL_MS_KEY = "clear";
+  public static final String ITEM_IMPORT = MENU_FILE_PREFIX+KEY_SEPARATOR+"import"+KEY_SEPARATOR+ITEM_SUFFIX;
+  
   private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
   private static MenuManager instance = null;
   private final ToggleGroup toggleMilestone = new ToggleGroup();
