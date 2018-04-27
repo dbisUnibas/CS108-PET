@@ -163,10 +163,15 @@ public class FilterBar extends HBox {
     }
   }
   
+  public void close(){
+    handleClose(new ActionEvent());
+  }
+  
   private void handleReset(ActionEvent actionEvent) {
     manager.clearFilter();
     infoLbl.setText("");
     searchInput.clear();
+    filterStack.setSize(0); // Empties the current stack
   }
   
   /**

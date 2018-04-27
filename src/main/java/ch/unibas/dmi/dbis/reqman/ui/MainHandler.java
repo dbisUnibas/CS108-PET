@@ -467,12 +467,12 @@ public class MainHandler implements MenuHandler {
     switch (mainScene.getActiveMode()) {
       case EDITOR:
         if (EntityController.getInstance().hasCatalogue()) {
-          editorHandler.displayAllRequirements();
+          editorHandler.closeFilterBar();
         }
         break;
       case EVALUATOR:
         if (EntityController.getInstance().hasGroups()) {
-          evaluatorHandler.resetFilterForAll();
+          evaluatorHandler.closeFilterBar();
         }
         break;
     }

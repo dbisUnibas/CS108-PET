@@ -62,7 +62,10 @@ public class EditorView extends BorderPane implements TitleProvider {
   }
   
   public void closeFilterBar() {
-    topBox.getChildren().remove(filterBar);
+    if(filterBar != null){
+      filterBar.close();
+    }
+    //topBox.getChildren().remove(filterBar);
   }
   
   private Function<Void,Void> statisticsCloser;

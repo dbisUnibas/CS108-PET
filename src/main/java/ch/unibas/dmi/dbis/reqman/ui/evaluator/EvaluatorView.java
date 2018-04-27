@@ -158,6 +158,12 @@ public class EvaluatorView extends VBox implements TitleProvider {
     this.groupView.getItems().clear();
   }
   
+  public void closeFilterBar() {
+    if(filterBar != null){
+      filterBar.close();
+    }
+  }
+  
   void enableAll() {
     LOGGER.traceEntry();
     groupView.setDisable(false);

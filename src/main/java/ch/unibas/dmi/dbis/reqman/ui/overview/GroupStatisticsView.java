@@ -36,6 +36,8 @@ public class GroupStatisticsView extends VBox {
   private VBox container;
   
   public GroupStatisticsView() {
+    // TODO Change layout entirely: Use tabs instead of VBox, make all responsive
+    
     initComps();
     layoutComps();
     addDetailCharts();

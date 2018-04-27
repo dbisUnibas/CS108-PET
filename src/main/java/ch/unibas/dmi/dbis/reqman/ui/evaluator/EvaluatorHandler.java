@@ -224,6 +224,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     this.active = active;
   }
   
+  public void closeFilterBar() {
+    evaluator.closeFilterBar();
+  }
+  
   private void reset() {
     this.assessmentViewMap.clear();
   }
