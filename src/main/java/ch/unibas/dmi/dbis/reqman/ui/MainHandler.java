@@ -552,6 +552,17 @@ public class MainHandler implements MenuHandler {
     evaluatorHandler.showStatistics();
   }
   
+  @Override
+  public void handleShowAbout(ActionEvent event) {
+    LOGGER.debug("ABOUT");
+    
+  }
+  
+  @Override
+  public void handleShowHelp(ActionEvent event) {
+    LOGGER.debug("HELP");
+  }
+  
   public void setMainScene(MainScene mainScene) {
     this.mainScene = mainScene;
   }

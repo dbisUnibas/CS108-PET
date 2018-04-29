@@ -79,4 +79,8 @@ public interface MenuHandler {
   void handleImport(ActionEvent event);
   
   void handleGroupStatistics(ActionEvent event);
+  
+  void handleShowAbout(ActionEvent event);
+  
+  void handleShowHelp(ActionEvent event);
 }
