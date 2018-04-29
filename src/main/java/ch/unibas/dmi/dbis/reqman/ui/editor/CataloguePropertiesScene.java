@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import ch.unibas.dmi.dbis.reqman.ui.common.SaveCancelPane;
 import javafx.event.ActionEvent;
@@ -16,100 +17,96 @@ import javafx.scene.control.TextField;
  * @author loris.sauter
  */
 public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
-
-    private Catalogue catalogue = null;
-    private TextField tfLecture = new TextField();
-    private TextField tfName = new TextField();
-    private TextArea taDesc = new TextArea();
-    private TextField tfSemester = new TextField();
-
-    public CataloguePropertiesScene() {
-        super();
-        populateScene();
+  
+  private Catalogue catalogue = null;
+  private TextField tfName = new TextField();
+  private TextArea taDesc = new TextArea();
+  
+  public CataloguePropertiesScene() {
+    super();
+    populateScene();
+  }
+  
+  public CataloguePropertiesScene(Catalogue catalogue) {
+    this();
+    this.catalogue = catalogue;
+    loadCatalogue();
+  }
+  
+  @Override
+  public Catalogue create() {
+    if (!isCreatorReady()) {
+      throw new IllegalStateException("Creation failed: Was not ready");
     }
-
-    public CataloguePropertiesScene(Catalogue catalogue) {
-        this();
-        this.catalogue = catalogue;
-        loadCatalogue();
+    
+    return catalogue;
+  }
+  
+  @Override
+  public boolean isCreatorReady() {
+    return catalogue != null;
+  }
+  
+  @Override
+  public String getPromptTitle() {
+    return "Catalogue Properties";
+  }
+  
+  public void handleSaving(ActionEvent event) {
+    String name = tfName.getText();
+    String desc = taDesc.getText();
+    
+    log.debug("CatName={}, CatDesc={}", name, desc);
+    
+    if (name == null) {
+      throw new IllegalArgumentException("[Catalogue] Name MUST not be null");
     }
-
-    @Override
-    public Catalogue create() {
-        if (!isCreatorReady()) {
-            throw new IllegalStateException("Creation failed: Was not ready");
-        }
-
-        return catalogue;
+    if(catalogue == null){
+      catalogue = EntityController.getInstance().createCatalogue(name);
+    }else {
+      catalogue.setName(name);
     }
-
-    @Override
-    public boolean isCreatorReady() {
-        return catalogue != null;
+    
+    if (desc != null && !desc.isEmpty()) {
+      catalogue.setDescription(desc);
+      log.debug("CatDesc set, after creation");
     }
-
-    @Override
-    public String getPromptTitle() {
-        return "Catalogue Properties";
+    
+    getWindow().hide();
+    
+  }
+  
+  @Override
+  protected void populateScene() {
+    Label lblName = new Label("Name*");
+    Label lblDescription = new Label("Description");
+    
+    // Milestones and Labels added via different scene
+    
+    SaveCancelPane buttonWrapper = new SaveCancelPane();
+    
+    buttonWrapper.setOnCancel(event -> {
+      getWindow().hide();
+    });
+    
+    buttonWrapper.setOnSave(this::handleSaving);
+    
+    int rowIndex = 0;
+    
+    grid.add(lblName, 0, rowIndex);
+    grid.add(tfName, 1, rowIndex++);
+    grid.add(lblDescription, 0, rowIndex);
+    grid.add(taDesc, 1, rowIndex, 1, 3);
+    rowIndex += 3;
+    grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
+  }
+  
+  private void loadCatalogue() {
+    if (catalogue != null) {
+      tfName.setText(catalogue.getName());
+      taDesc.setText(catalogue.getDescription());
     }
-
-    public void handleSaving(ActionEvent event) {
-        String name = tfName.getText();
-        String lecture = tfLecture.getText();
-
-        if (name == null) {
-            throw new IllegalArgumentException("[Catalogue] Name MUST not be null");
-        }
-
-        catalogue = new Catalogue(
-                name,
-                lecture,
-                taDesc.getText(),
-                tfSemester.getText()
-        );
-        getWindow().hide();
-
-    }
-
-    @Override
-    protected void populateScene() {
-        Label lblLecture = new Label("Lecture");
-        Label lblName = new Label("Name*");
-        Label lblDescription = new Label("Description");
-
-        // Milestones and Labels added via different scene
-        Label lblSemester = new Label("Semester");
-
-        SaveCancelPane buttonWrapper = new SaveCancelPane();
-
-        buttonWrapper.setOnCancel(event -> {
-            getWindow().hide();
-        });
-
-        buttonWrapper.setOnSave(this::handleSaving);
-
-        int rowIndex = 0;
-
-        grid.add(lblLecture, 0, rowIndex);
-        grid.add(tfLecture, 1, rowIndex++);
-        grid.add(lblSemester, 0, rowIndex);
-        grid.add(tfSemester, 1, rowIndex++);
-        grid.add(lblName, 0, rowIndex);
-        grid.add(tfName, 1, rowIndex++);
-        grid.add(lblDescription, 0, rowIndex);
-        grid.add(taDesc, 1, rowIndex, 1, 3);
-        rowIndex += 3;
-        grid.add(buttonWrapper, 0, ++rowIndex, 2, 1);
-    }
-
-    private void loadCatalogue() {
-        if (catalogue != null) {
-            tfLecture.setText(catalogue.getLecture());
-            tfName.setText(catalogue.getName());
-            taDesc.setText(catalogue.getDescription());
-            tfSemester.setText(catalogue.getSemester());
-        }
-
-    }
-
+    
+  }
+  
 }

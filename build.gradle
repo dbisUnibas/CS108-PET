@@ -31,14 +31,27 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.6'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.3'
+
 
     compile group: 'com.j2html', name: 'j2html', version: '0.88'
     // https://mvnrepository.com/artifact/commons-lang/commons-lang
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.8.1'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.8.1'
+    compile 'com.intellij:annotations:12.0'
+
+    compile 'org.kordamp.ikonli:ikonli-javafx:2.1.1'
+    //compile 'org.kordamp.ikonli:ikonli-dashicons-pack:2.1.1' // Maven central invalid --> not found on maven central (currently ?)
+    compile 'org.kordamp.ikonli:ikonli-openiconic-pack:2.1.1'
+
+
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
+
+    compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.14'
+
+    compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.11.0'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
@@ -67,6 +80,9 @@ jar {
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
+    manifest{
+        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication'
+    }
 }
 
 processResources {
@@ -75,10 +91,11 @@ processResources {
         include 'reqman.properties'
         expand projectVersion: project.version
     }
+    exclude 'log4j2-test.xml'
     // Do not copy the original file, since it would not have the version in it
-    from(sourceSets.main.resources.srcDirs) {
+    /*from(sourceSets.main.resources.srcDirs) {
         exclude 'reqman.properties'
-    }
+    }*/
     outputs.upToDateWhen{false}
 }
 
@@ -92,47 +109,6 @@ tasks.withType(Javadoc) {
     options.addStringOption('Xdoclint:none', '-quiet')
 }
 
-task incrementTest {
-    doLast {
-        Properties p = new Properties()
-        File pF = new File('version.properties')
-        p.load(pF.newDataInputStream())
-        Integer fix = (p.getProperty('artifactFixVersion') as Integer)
-        logger.debug('fix version: ' + fix.toString())
-        Integer nextFix = fix + 1
-        logger.debug('next fix version: ' + nextFix.toString())
-        p.setProperty('artifactFixVersion', nextFix.toString())
-        p.store(pF.newWriter(), null)
-        p.load(pF.newDataInputStream())
-    }
-}
-
-
-task deployUpdater(type: Jar, dependsOn: classes) {
-    appendix = 'updater'
-    from sourceSets.main.output
-    from {
-        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
-    }
-    manifest {
-        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.updating.FileUpdater'
-    }
-    doLast {
-        println('Deployed updater: ' + jar.getArchiveName())
-    }
-}
-
-/*
- * Goal: filter in Version.java @v@ and replace with actual version. Then comiple with it.
- * by : http://stackoverflow.com/a/33475075
- */
-
-
-gradle.taskGraph.whenReady {
-    taskGraph ->
-        jar.appendix = ''
-        jar.manifest.attributes.put('Main-Class', 'ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication')
-}
 
 /**
  * Increments the specified versionPart in the version.properties file.
@@ -225,15 +201,17 @@ static String readVersion() {
     File f = new File('version.properties')
     p.load(f.newDataInputStream())
     //Integer build = (p.getProperty('artifactBuildNumber') as Integer)
+    String suffix = p.getProperty('artifactVersionSuffix')
+    suffix = suffix == null ? '' : suffix
     Integer fix = (p.getProperty('artifactFixVersion') as Integer)
     Integer minor = (p.getProperty('artifactMinorVersion') as Integer)
     Integer major = (p.getProperty('artifactMajorVersion') as Integer)
-    return major.toString() + '.' + minor + '.' + fix /*+ '-b' + build.toString()*/
+    return major.toString() + '.' + minor + '.' + fix +"-"+suffix/*+ '-b' + build.toString()*/
 }
 
 void printVersion() {
     setVersion(readVersion())
-    println(project.version)
+    println('v'+project.version)
 }
 
 /**
@@ -246,6 +224,7 @@ task setupVersion {
     doFirst {
         String v = readVersion()
         setVersion(v)
+        printVersion()
     }
 }
 

@@ -247,10 +247,9 @@ public class TemplatingConfigurationManager {
         tc.setCatalogueTemplate(readTemplateFile(config.getCatalogueEntry()));
 
         tc.setProgressTemplate(readTemplateFile(config.getProgressEntry()));
-        tc.setGroupMilestoneTemplate(readTemplateFile(config.getGroupMilestoneEntry()));
+        tc.setProgressSummaryTemplate(readTemplateFile(config.getProgressSummaryEntry()));
         tc.setGroupTemplate(readTemplateFile(config.getGroupEntry()));
 
-        tc.setOverviewTemplate(readTemplateFile(config.getOverviewEntry()));
         return tc;
     }
 

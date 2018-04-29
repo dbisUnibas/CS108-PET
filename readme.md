@@ -1,5 +1,9 @@
 # ReqMan
 
+*Development version, do not use in production*
+
+---
+
 ReqMan (Requirements Manager) is a JavaFX application to manage requirements.
 
 **Requirement**s are grouped in **milestone**s and the collection of **requirement**s
@@ -60,3 +64,5 @@ See LICENSE.txt for the complete license text.
 ## Versioning
 
 `ReqMan` uses semantic versioning as defined by http://semver.org/
+
+

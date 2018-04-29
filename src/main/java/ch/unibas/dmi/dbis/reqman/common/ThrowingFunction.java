@@ -3,7 +3,7 @@ package ch.unibas.dmi.dbis.reqman.common;
 import java.util.function.Function;
 
 /**
- * TODO: Write JavaDoc
+ * A function that may throws an exception.
  *
  * @author loris.sauter
  */

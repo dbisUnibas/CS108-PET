@@ -1,508 +1,413 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.common.SortingUtils;
+import ch.unibas.dmi.dbis.reqman.analysis.*;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
-import ch.unibas.dmi.dbis.reqman.core.*;
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
+import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * TODO: write JavaDoc
  *
  * @author loris.sauter
  */
-public class AssessmentView extends BorderPane implements PointsChangeListener, DirtyListener {
-
-    private final Logger LOGGER = LogManager.getLogger(getClass());
-    private final EvaluatorHandler handler;
-    private HBox titleBar;
-    private AnchorPane titleAnchor;
-    private Label lblChoice;
-    private ComboBox<Milestone> cbMilestones;
-    private Button btnSummary;
-    private HBox statusWrapper;
-    private AnchorPane statusBar;
-    private Label lblSum;
-    private TextField tfSum;
-    private VBox content;
-    private ScrollPane scrollPane;
-    private Group group;
-    private Milestone activeMS = null;
-    /**
-     * Maps MS ordinal to a map of Req.name <-> Progress (obj)
-     */
-    private Map<Integer, Map<String, Progress>> progressMap;
-    private List<ProgressSummary> summaries = new ArrayList<>();
-    private List<ProgressView> activeProgressViews = new ArrayList<>();
-    private Set<Milestone> visitedMilestones = new HashSet<>();
-
-    AssessmentView(EvaluatorHandler handler, Group activeGroup) {
-        this(handler, activeGroup, null);
+public class AssessmentView extends BorderPane implements PointsChangeListener, DirtyListener, Filterable {
+  
+  public static final String POINTS_MAX_POINTS_SEPARATOR = "/";
+  private final Logger LOGGER = LogManager.getLogger(getClass());
+  
+  private HBox headerContainer;
+  private Label choiceLbl;
+  private Button summaryBtn;
+  private ComboBox<ProgressSummary> summaryCb;
+  private VBox content;
+  private ScrollPane scrollPane;
+  private Group group;
+  private HBox footerContainer;
+  private Label sumLbl;
+  private Label maxVisibleLbl;
+  private Label visiblePoints;
+  private Label maxTotalLbl;
+  private Label totalPoints;
+  private List<ProgressView> activeProgressViews = new ArrayList<>();
+  private ObservableList<Progress> currentlyFilteredProgress;
+  
+  private SimpleBooleanProperty activeProperty = new SimpleBooleanProperty(false);
+  
+  private List<DirtyListener> dirtyListeners = new ArrayList<>();
+  
+  public void addDirtyListener(DirtyListener listener){
+    dirtyListeners.add(listener);
+  }
+  
+  public void removeDirtyListener(DirtyListener listener){
+    dirtyListeners.remove(listener);
+  }
+  
+  private void notifyDirtyListeners(boolean dirty){
+    if(dirty){
+      dirtyListeners.forEach(DirtyListener::markDirty);
+    }else{
+      dirtyListeners.forEach(DirtyListener::unmarkDirty);
     }
-
-    AssessmentView(EvaluatorHandler handler, Group activeGroup, Milestone activeMS) {
-        super();
-        LOGGER.debug("Initializing for group " + activeGroup.getName());
-
-        this.handler = handler;
-        this.group = activeGroup;
-        this.activeMS = activeMS;
-
-        LOGGER.debug("Active MS: " + (this.activeMS != null ? this.activeMS.getName() : "null"));
-
-        initComponents();
-        layoutComponents();
-        loadGroup();
-
-        updateProgressViews(this.activeMS);
+  }
+  
+  AssessmentView(Group group) {
+    super();
+    LOGGER.debug("Initializing for group {}", group);
+    
+    this.group = group;
+    
+    initComponents();
+    layoutComponents();
+    
+    AssessmentManager.getInstance().addFilterable(this);
+    
+    if(!AssessmentManager.getInstance().hasActiveProgressSummary()){
+      summaryCb.getSelectionModel().selectFirst();
+    }else{
+      applyActiveMilestone(AssessmentManager.getInstance().getActiveMilestone());
     }
-
-    private static Map<Integer, Map<String, Progress>> generateOriginMap(List<Requirement> requirements) {
-        Map<Integer, Map<String, Progress>> map = new HashMap<>();
-        for (Requirement r : requirements) {
-            if (!map.containsKey(r.getMinMilestoneOrdinal())) {
-                // case 1 r's ms nonexistent:
-                Map<String, Progress> msMap = new HashMap<>();
-                msMap.put(r.getName(), new Progress(r));
-                map.put(r.getMinMilestoneOrdinal(), msMap);
-            } else {
-                map.get(r.getMinMilestoneOrdinal()).put(r.getName(), new Progress(r));
-            }
+    
+    checkDependencies();
+  }
+  
+  @Override
+  public void pointsChanged(double newValue) {
+    LOGGER.trace("Points changed");
+    if(currentlyFilteredProgress != null && !currentlyFilteredProgress.isEmpty()){
+      updateSumDisplay(true);
+    }else{
+      updateSumDisplay();
+    }
+    checkDependencies();
+    if(pointsChangedConsumer != null){
+      pointsChangedConsumer.accept(1d);
+    }
+  }
+  
+  public void bindToParentSize(Region parent) {
+    prefWidthProperty().bind(parent.widthProperty());
+    prefHeightProperty().bind(parent.heightProperty());
+    scrollPane.prefWidthProperty().bind(widthProperty());
+    scrollPane.prefHeightProperty().bind(heightProperty());
+    //bindContent();
+    scrollPane.setFitToWidth(true);
+  }
+  
+  public void recalculatePoints() {
+    updateSumDisplay();
+  }
+  
+  public void displayAll() {
+    displayProgressViews(summaryCb.getSelectionModel().getSelectedItem());
+    updateSumDisplay();
+    checkDependencies();
+  }
+  
+  public Group getActiveGroup() {
+    return group;
+  }
+  
+  @Override
+  public void markDirty() {
+    LOGGER.trace("Dirty");
+    notifyDirtyListeners(true);
+  }
+  
+  @Override
+  public void unmarkDirty() {
+    LOGGER.trace("Undirty");
+    notifyDirtyListeners(false);
+  }
+  
+  @Override
+  public void applyFilter(Filter filter) {
+    LOGGER.debug("apply filter: "+filter);
+    Milestone ms = AssessmentManager.getInstance().getActiveMilestone();
+    LOGGER.debug("Active MS: "+ms.getName());
+    List<Requirement> reqs = EntityController.getInstance().getCatalogueAnalyser().getFilteredRequirements(filter);
+    displayProgressViews(reqs);
+  }
+  
+  @Override
+  public void applyActiveMilestone(Milestone ms) {
+    ProgressSummary ps = EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(ms);
+    displayProgressViews(ps);
+    ProgressSummary active = summaryCb.getSelectionModel().getSelectedItem();
+    if(active != null && active.equals(ps)){
+      // nothing
+    }else{
+      int ordinal = EntityController.getInstance().getCatalogueAnalyser().getProgressSummaryOrdinal(ps);
+      summaryCb.getSelectionModel().select(ordinal);
+      //summaryCb.getSelectionModel().select(ps);// Doesn't render properly
+    }
+  }
+  
+  @Override
+  public void clearFilter() {
+    displayAll();
+  }
+  
+  private Consumer<Double> pointsChangedConsumer = null;
+  
+  public void setOnPointsChanged(Consumer<Double> consumer) {
+    pointsChangedConsumer= consumer;
+  }
+  
+  public void bindActiveIndicator(ReadOnlyBooleanProperty activeIndicator) {
+    activeProperty.bind(activeIndicator);
+    activeProperty.addListener((observable, oldValue, newValue) -> {
+      if(newValue){
+        LOGGER.debug("Going ACTIVE - "+group.getName());
+      }else{
+        LOGGER.debug("Going INACTIVE - "+group.getName());
+      }
+      activateFilterableBehaviour(newValue);
+    });
+  }
+  
+  private void activateFilterableBehaviour(boolean active){
+    if(active){
+      AssessmentManager.getInstance().addFilterable(this);
+      if(AssessmentManager.getInstance().hasActiveProgressSummary()){
+        LOGGER.debug("ProgressSummary present: "+AssessmentManager.getInstance().getActiveMilestone().getName());
+        summaryCb.getSelectionModel().select(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(AssessmentManager.getInstance().getActiveMilestone()));
+      }
+      if(AssessmentManager.getInstance().hasActiveFilter() ){
+        LOGGER.debug("Filter present: "+AssessmentManager.getInstance().getActiveFilter().getDisplayRepresentation());
+        applyFilter(AssessmentManager.getInstance().getActiveFilter());
+      }
+    }else{
+      AssessmentManager.getInstance().removeFilterable(this);
+    }
+  }
+  
+  void checkDependencies(){
+    for(ProgressView pv : activeProgressViews){
+      Progress p = pv.getProgress();
+      if(EntityController.getInstance().getGroupAnalyser(group).isProgressUnlocked(p)){
+        // Everything fine: Progress unlocked
+        pv.setLocked(false);
+        LOGGER.trace("Unlocking pv of {}", pv.getRequirement().getName());
+      }else{
+        pv.setLocked(true);
+        LOGGER.trace("Locking pv of {}", pv.getRequirement().getName());
+      }
+      pv.updatePredecessorDisplay();
+    }
+  }
+  
+  void displayProgressViews(List<Requirement> toDisplay) {
+    detachProgressViews();
+    if (currentlyFilteredProgress != null) {
+      currentlyFilteredProgress.clear();
+    }
+    GroupAnalyser analyser = EntityController.getInstance().getGroupAnalyser(group);
+    toDisplay.sort(EntityController.getInstance().getCatalogueAnalyser().getRequirementComparator());
+    currentlyFilteredProgress = FXCollections.observableList(analyser.getProgressFor(toDisplay, getActiveProgressSummary()));
+    
+    double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
+    setupMaxPointsDisplay(sum);
+    
+    activeProgressViews.clear();
+    for (Progress p : currentlyFilteredProgress) {
+      activeProgressViews.add(new ProgressView(group,p, getActiveProgressSummary()));
+    }
+    
+    for (ProgressView pv : activeProgressViews) {
+      pv.addPointsChangeListener(this);
+      pv.addDirtyListener(this);
+    }
+    
+    attachProgressViews();
+    updateSumDisplay(true);
+    checkDependencies();
+  }
+  
+  private void updateSumDisplay() {
+    if(summaryCb.getSelectionModel().getSelectedItem() == null){
+      return;
+    }
+    double visible = EntityController.getInstance().getGroupAnalyser(group).getSumFor(summaryCb.getSelectionModel().getSelectedItem());
+    double visibleMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(summaryCb.getSelectionModel().getSelectedItem());
+    double total = EntityController.getInstance().getGroupAnalyser(group).getSum();
+    double totalMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum();
+    updatePointsSummary(visible,visibleMax,total,totalMax);
+  }
+  
+  private void updatePointsSummary(double visible, double visibleMax, double total, double totalMax){
+    displaySensitivelyPoints(visiblePoints,visible,false);
+    displaySensitivelyPoints(maxVisibleLbl,visibleMax,true);
+    displaySensitivelyPoints(totalPoints,total,false);
+    displaySensitivelyPoints(maxTotalLbl, totalMax, true);
+  }
+  
+  private void displaySensitivelyPoints(Label lbl, double points, boolean paranthesis){
+    if(points < 0){
+      lbl.setTextFill(Color.RED);
+    }else{
+      lbl.setTextFill(Color.BLACK);
+    }
+    if(paranthesis){
+      lbl.setText("("+StringUtils.prettyPrint(points)+")");
+    }else{
+      lbl.setText(StringUtils.prettyPrint(points));
+    }
+  }
+  
+  private void updateSumDisplay(boolean onlyVisible) {
+    if (onlyVisible) {
+      double visible = EntityController.getInstance().getGroupAnalyser(group).getSumFor(currentlyFilteredProgress);
+      double visibleMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
+      double total = EntityController.getInstance().getGroupAnalyser(group).getSum();
+      double totalMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum();
+      updatePointsSummary(visible,visibleMax,total,totalMax);
+    } else {
+      updateSumDisplay();
+    }
+  }
+  
+  private void initComponents() {
+    headerContainer = new HBox();
+    choiceLbl = new Label("Current Milestone: ");
+    summaryCb = new ComboBox<>();
+    summaryCb.setCellFactory(param -> new ProgressSummaryCell());
+    summaryCb.setButtonCell(new ProgressSummaryCell());
+    summaryBtn = new Button("Comments");
+    content = new VBox();
+    scrollPane = new ScrollPane();
+    footerContainer = new HBox();
+    sumLbl = new Label("Visible Points (Total Points): ");
+    sumLbl.setTooltip(new Tooltip("Summarizes the currently displayed points."));
+    totalPoints = new Label("0");
+    totalPoints.setTooltip(new Tooltip("The total amount of points this group has made."));
+    visiblePoints = new Label("0");
+    visiblePoints.setTooltip(new Tooltip("The amount of currently visible this group has made."));
+    maxTotalLbl = new Label("0");
+    maxTotalLbl.setTooltip(new Tooltip("The maximal amount of regular points to get."));
+    maxVisibleLbl = new Label("0");
+    maxVisibleLbl.setTooltip(new Tooltip("The maximal amount of regular points currently visible."));
+  }
+  
+  private ProgressSummary getActiveProgressSummary() {
+    return EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(AssessmentManager.getInstance().getActiveMilestone());
+  }
+  
+  private void layoutComponents() {
+    // Forge top aka title bar:
+    headerContainer.setAlignment(Pos.CENTER_LEFT);
+    headerContainer.getChildren().addAll(choiceLbl, summaryCb, Utils.createHFill(), summaryBtn);
+    Utils.applyDefaultSpacing(headerContainer);
+    
+    if (EntityController.getInstance().hasCatalogue()) {
+      if (group != null) {
+        summaryCb.setItems(EntityController.getInstance().getObservableProgressSummaries(group));
+      }
+//      summaryCb.setItems(FXCollections.observableArrayList(EntityController.getInstance().createProgressSummaries() ));
+      summaryCb.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+        if(oldValue != null && oldValue.equals(newValue)){
+          return; // don't fire the event chain if its already the same ps
         }
-        return map;
+        LOGGER.debug("Selected ProgressSummary: {}", newValue);
+        CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
+        Milestone ms = analyser.getMilestoneOf(newValue);
+        AssessmentManager.getInstance().setActiveMilestone(ms);
+      });
     }
-
-    private static Map<Integer, Map<String, Progress>> generateMap(List<Progress> progressList, Catalogue cat) {
-        Map<Integer, Map<String, Progress>> map = new HashMap<>();
-
-        for (Progress p : progressList) {
-            Requirement r = cat.getRequirementByName(p.getRequirementName());
-            if (r == null) {
-                // Group has progress of a req that is not existent anymore. just ignore it (progress still tracked in file)
-                continue;
-            }
-            if (!map.containsKey(r.getMinMilestoneOrdinal())) {
-                Map<String, Progress> msMap = new HashMap<>();
-                msMap.put(r.getName(), p);
-                map.put(r.getMinMilestoneOrdinal(), msMap);
-            } else {
-                map.get(r.getMinMilestoneOrdinal()).put(r.getName(), p);
-            }
-        }
-
-        return map;
+    
+    summaryBtn.setOnAction(this::handleComments);
+    
+    setTop(headerContainer);
+    
+    
+    scrollPane.setContent(content);
+    setCenter(scrollPane);
+    Utils.applyDefaultSpacing(footerContainer);
+    footerContainer.setAlignment(Pos.CENTER_RIGHT);
+    footerContainer.getChildren().addAll(sumLbl, Utils.createHFill(),visiblePoints,maxVisibleLbl, new Label(POINTS_MAX_POINTS_SEPARATOR),totalPoints, maxTotalLbl);
+    setBottom(footerContainer);
+    
+    updateSumDisplay();
+  }
+  
+  private void displayProgressViews(ProgressSummary progressSummary) {
+    if(AssessmentManager.getInstance().hasActiveFilter()){
+      applyFilter(AssessmentManager.getInstance().getActiveFilter());
+      return;
     }
-
-    private static Map<Integer, Map<String, Progress>> mergeMaps(Map<Integer, Map<String, Progress>> origin, Map<Integer, Map<String, Progress>> loaded) {
-        Map<Integer, Map<String, Progress>> map = new HashMap<>();
-        for (int ordinal : origin.keySet()) {
-            Map<String, Progress> oMS = origin.get(ordinal);
-            Map<String, Progress> lMS = loaded.get(ordinal);
-            if (lMS == null || lMS.isEmpty()) {
-                // CASE 0: Iff group has no progress entries for that milestone: add generated reqname-progress-map
-                map.put(ordinal, oMS);
-                continue;
-            }
-
-            Map<String, Progress> working = new HashMap<>();
-
-            for (String reqName : oMS.keySet()) {
-                /*
-                If loaded does not contain entry to requirement -> catalogue has new requirement which
-                probably needs to be assessed. Thus->
-                 */
-                if (!lMS.containsKey(reqName)) {
-                    working.put(reqName, oMS.get(reqName));
-                } else {
-                    working.put(reqName, lMS.get(reqName));
-                }
-            }
-            map.put(ordinal, working);
-        }
-        return map;
+    detachProgressViews();
+    ObservableList<Progress> progressList = EntityController.getInstance().getObservableProgressOf(group, progressSummary);
+    
+    double sum = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(progressSummary);
+    setupMaxPointsDisplay(sum);
+    progressList.sort(EntityController.getInstance().getGroupAnalyser(group).getProgressComparator());
+    activeProgressViews.clear();
+    for (Progress p : progressList) {
+      activeProgressViews.add(new ProgressView(group,p, progressSummary));
     }
-
-    public List<ProgressSummary> getSummaries() {
-        return summaries;
+    
+    for (ProgressView pv : activeProgressViews) {
+      pv.addPointsChangeListener(this);
+      pv.addDirtyListener(this);
     }
-
-    public void bindToParentSize(Region parent) {
-        prefWidthProperty().bind(parent.widthProperty());
-        prefHeightProperty().bind(parent.heightProperty());
-        scrollPane.prefWidthProperty().bind(widthProperty());
-        scrollPane.prefHeightProperty().bind(heightProperty());
-        bindContent();
-    }
-
-    @Override
-    public void pointsChanged(double newValue) {
-        LOGGER.trace("Points changed");
-        calcActiveSum();
-        handler.markDirty(getActiveGroup());
-    }
-
-    public Group getActiveGroup() {
-        return group;
-    }
-
-    /**
-     * Grabs all progress' objects and returns the list of them.
-     *
-     * @param trim It true, only those progresses with !hasDefaultPercentage are grabbed
-     * @return
-     */
-    public List<Progress> getProgressListForSaving(boolean trim) {
-        List<Progress> list = new ArrayList<>();
-        if (trim) {
-            progressMap.values().forEach(consumer -> consumer.values().forEach(p -> {
-                if (!p.hasDefaultPercentage()) {
-                    list.add(p);
-                }
-            }));
-        } else {
-            progressMap.values().forEach(consumer -> consumer.values().forEach(list::add));
-        }
-        activeProgressViews.forEach(pv -> pv.markSaved());
-        handler.unmarkDirty(group);
-        return list;
-    }
-
-    public void setActiveMilestone(Milestone activeMilestone) {
-        this.activeMS = activeMilestone;
-    }
-
-    /**
-     * Also updates the view
-     *
-     * @param ms
-     */
-    public void selectMilestone(Milestone ms) {
-        this.activeMS = ms;
-        cbMilestones.getSelectionModel().select(ms);
-    }
-
-    @Override
-    public void markDirty() {
-        LOGGER.trace("Dirty");
-        calcActiveSum();
-        handler.markDirty(getActiveGroup());
-    }
-
-    @Override
-    public void unmarkDirty() {
-        LOGGER.trace("Undirty");
-        calcActiveSum();
-        handler.unmarkDirty(getActiveGroup());
-    }
-
-    public void reloadRequirements(boolean refreshAll) {
-        List<Progress> progressList = group.getProgressList();
-        Map<Integer, Map<String, Progress>> origin = generateOriginMap(handler.getCatalogue().getRequirements());
-        if (progressList == null || progressList.isEmpty()) {
-            progressMap = origin;
-        } else {
-            Map<Integer, Map<String, Progress>> loaded = generateMap(progressList, handler.getCatalogue());
-            progressMap = mergeMaps(origin, loaded);
-        }
-        if (refreshAll) {
-            LOGGER.debug(":reloadReqs:refreshAll");
-            updateProgressViews(activeMS);
-        }
-    }
-
-    void replaceGroup(Group newGroup) {
-        this.group = newGroup;
-    }
-
-    private void loadGroup() {
-        if (summaries != null) {
-            summaries.addAll(group.getProgressSummaries());
-        }
-
-        reloadRequirements(false);
-        syncProgressList();
-    }
-
-    private void syncProgressList() {
-        LOGGER.trace(":syncProgressList");
-        handler.progressList(group).clear(); // Ensure empty list
-        progressMap.values().forEach(map -> {
-            map.values().forEach(p -> handler.progressList(group).add(p));
-        });
-        LOGGER.debug("Presenting the progress list: " + handler.progressList(getActiveGroup()));
-    }
-
-    private void initComponents() {
-        titleBar = new HBox();
-        titleAnchor = new AnchorPane();
-        lblChoice = new Label("Current Milestone: ");
-        cbMilestones = new ComboBox<>();
-        //btnRefresh = new Button("Update");
-        btnSummary = new Button("Comments");
-        statusWrapper = new HBox();
-        statusBar = new AnchorPane();
-        lblSum = new Label("Sum:");
-        tfSum = new TextField();
-        tfSum.setEditable(false);
-        content = new VBox();
-        scrollPane = new ScrollPane();
-    }
-
-    private void layoutComponents() {
-        // Forge top aka title bar:
-        titleBar.setAlignment(Pos.CENTER_LEFT);
-        titleBar.getChildren().addAll(lblChoice, cbMilestones, btnSummary);
-        titleBar.setStyle(titleBar.getStyle() + "-fx-spacing: 10px; -fx-padding: 10px;");
-
-        if (handler != null) {
-            cbMilestones.setItems(FXCollections.observableList(handler.getMilestones()));
-            cbMilestones.setCellFactory(param -> new Utils.MilestoneCell());
-            cbMilestones.setButtonCell(new Utils.MilestoneCell());
-
-            cbMilestones.getSelectionModel().selectedIndexProperty().addListener((observable, oldValue, newValue) -> {
-                LOGGER.trace("Handling milestone choice");
-                this.activeMS = cbMilestones.getSelectionModel().getSelectedItem();
-                updateProgressViews(cbMilestones.getSelectionModel().getSelectedItem());
-            });
-        }
-
-        if (handler != null) {
-            btnSummary.setOnAction(this::handleComments);
-        }
-
-        VBox titleWrapper = new VBox();
-        Separator sep = new Separator();
-        titleWrapper.getChildren().addAll(titleBar, sep);
-        setTop(titleWrapper);
-
-        // Forge center aka ProgressView list
-        scrollPane.setContent(content);
-        setCenter(scrollPane);
-
-        // Forge bottom aka status bar:
-        statusWrapper.setAlignment(Pos.CENTER_LEFT);
-        statusWrapper.getChildren().addAll(lblSum, tfSum);
-        statusWrapper.setStyle("-fx-padding: 10px; -fx-spacing: 10px;");
-        Separator sep2 = new Separator();
-        statusBar.getChildren().add(statusWrapper);
-        statusBar.getChildren().add(sep2);
-        AnchorPane.setTopAnchor(sep2, 0d);
-        AnchorPane.setRightAnchor(statusWrapper, 10d);
-        setBottom(statusBar);
-
-    }
-
-    private void handleComments(ActionEvent event) {
-        Milestone ms = cbMilestones.getSelectionModel().getSelectedItem();
-        if (ms != null) {
-            ProgressSummary ps = null;
-            boolean replace = false;
-            if (hasSummaryForMilestone(ms)) {
-                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getCatalogueName(), getSummaryForMilestone(ms));
-                EvaluatorPromptFactory.showSummary(ms, group.getName(), summary -> {
-                    handleSummaryReceiving(summary, true);
-                }, getSummaryForMilestone(ms));
-                replace = true;
-            } else {
-                //ps = EvaluatorPromptFactory.promptSummary(ms, group.getCatalogueName());
-                EvaluatorPromptFactory.showSummary(ms, group.getName(), progressSummary -> handleSummaryReceiving(progressSummary, false));
-            }
-            if (ps != null) {
-                if (replace) {
-                    summaries.remove(getSummaryForMilestone(ms));
-                }
-                summaries.add(ps);
-            }
-        }
-    }
-
-    private void handleSummaryReceiving(ProgressSummary ps, boolean replace) {
-        LOGGER.debug(String.format(":handleSummaryReceiving - Received summary: %s", ps));
-        if (ps != null) {
-            // Case receiving non-null summary
-            ProgressSummary sent = getSummaryForMilestone(handler.getMilestoneByOrdinal(ps.getMilestoneOrdinal()));
-            if (replace) {
-                // Case have to replace summary
-                summaries.remove(getSummaryForMilestone(handler.getMilestoneByOrdinal(ps.getMilestoneOrdinal())));
-            }
-            summaries.add(ps);
-            if (sent == ps) { // if it is *the same object*
-                // No changes, since exactly the same as before
-                LOGGER.debug(":handleSummaryReceiving - Received is same as sent");
-                boolean equalExternal = ps.getExternalComment().equals(sent.getExternalComment());
-                boolean equalInternal = ps.getInternalComment().equals(sent.getInternalComment());
-                LOGGER.debug(":handleSummaryReceiving - " + String.format("Equal external=%s and internal=%s", equalExternal, equalInternal));
-                if (equalExternal && equalInternal) {
-                    // no changes
-                    LOGGER.debug(":handleSummaryReceiving - No changes");
-                } else {
-                    // changes
-                    LOGGER.debug(":handleSummaryReceiving - Changes detected");
-                    markDirty();
-                }
-            } else {
-                // first time recevining summary for this ms
-                LOGGER.debug(":handleSummaryReceiving - Received differs form sent");
-                markDirty();
-            }
-
-        }
-    }
-
-    private boolean hasSummaryForMilestone(Milestone ms) {
-        if (summaries.isEmpty()) {
-            return false;
-        } else {
-            for (ProgressSummary ps : summaries) {
-                if (ps.getMilestoneOrdinal() == ms.getOrdinal()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private ProgressSummary getSummaryForMilestone(Milestone ms) {
-        if (summaries.isEmpty()) {
-            return null;
-        } else {
-            for (ProgressSummary ps : summaries) {
-                if (ps.getMilestoneOrdinal() == ms.getOrdinal()) {
-                    return ps;
-                }
-            }
-        }
-        return null;
-    }
-
-    private void loadActiveProgressViews(Milestone activeMS) {
-        LOGGER.trace(":loadActiveProgressViews - MS: " + activeMS.getName());
-        LOGGER.trace(":loadActiveProgressViews - this.activeMS: " + this.activeMS.getName());
-        visitedMilestones.add(this.activeMS);
-        activeProgressViews.clear();
-        List<Progress> actives = getActiveProgresses(activeMS);
-        LOGGER.debug("Active Progresses: " + actives.toString());
-        for (Progress p : actives) {
-            activeProgressViews.add(new ProgressView(p, handler.getCatalogue().getRequirementForProgress(p), handler.getCatalogue()));
-            LOGGER.debug("Added PV for " + p.getRequirementName());
-        }
-        activeProgressViews.forEach(pv -> {
-            pv.setActiveMilestone(activeMS);
-            verifyPredecessorsAchieved(pv);
-            pv.addPointsChangeListener(this);
-            pv.addDirtyListener(this);
-        });
-
-    }
-
-    private void verifyPredecessorsAchieved(ProgressView pv) {
-        pv.setDisable(!group.isProgressUnlocked(handler.getCatalogue(), pv.getProgress()));
-    }
-
-    /**
-     * @param activeMS If {@code == null}, the first entry in the choice is set.
-     */
-    private void updateProgressViews(Milestone activeMS) {
-        LOGGER.trace(":updateProgressViews - MS: " + (activeMS != null ? activeMS.getName() : "null"));
-        detachProgressViews();
-        tfSum.setText("0");
-        if (activeMS == null) {
-            LOGGER.trace(":updateProgressViews - Setting default active ms");
-            this.activeMS = cbMilestones.getItems().get(0);
-        }
-        loadActiveProgressViews(this.activeMS);
-
-        attachProgressViews();
-        calcActiveSum();
-        if (cbMilestones.getSelectionModel().getSelectedItem() == null) {
-            cbMilestones.getSelectionModel().select(this.activeMS);
-        }
-    }
-
-    private void calcActiveSum() {
-        double sum = group.getSumForMilestone(activeMS, handler.getCatalogue());
-        tfSum.setText(StringUtils.prettyPrint(sum));
-        activeProgressViews.forEach(this::verifyPredecessorsAchieved);
-    }
-
-    private void attachProgressViews() {
-        activeProgressViews.forEach(pv -> {
-            addProgressView(pv);
-        });
-    }
-
-    private void detachProgressViews() {
-        activeProgressViews.forEach(pv -> removeProgressView(pv));
-    }
-
-    private void addProgressView(ProgressView pv) {
-        content.getChildren().add(pv);
-        pv.prefWidthProperty().bind(scrollPane.widthProperty());
-    }
-
-    private void removeProgressView(ProgressView pv) {
-        content.getChildren().remove(pv);
-    }
-
-    private void bindContent() {
-        content.prefWidthProperty().bind(widthProperty());
-        content.prefHeightProperty().bind(heightProperty());
-    }
-
-    private boolean isProgressActive(Progress p) {
-        if (p.hasDefaultPercentage() || p.getDate() == null) {
-            return true;
-        } else if (p.getDate().before(activeMS.getDate())) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    private List<Progress> getActiveProgresses(Milestone activeMS) {
-        LOGGER.trace(":getActiveProgresses - MS: " + activeMS.toString());
-        List<Progress> active = new ArrayList<>();
-
-        List<Requirement> activeReqs = handler.getCatalogue().getRequirementsByMilestone(activeMS.getOrdinal());
-        LOGGER.trace(String.format("Active reqs: %s", activeReqs));
-        Map<String, Progress> map = progressMap.get(activeMS.getOrdinal());
-        LOGGER.trace(String.format("Found progresses: %s", map));
-        for (Requirement r : activeReqs) {
-            boolean progressExistent = map.containsKey(r.getName());
-            LOGGER.debug(String.format("Scanning for %s", r));
-            if (progressExistent) {
-                Progress p = map.get(r.getName());
-                boolean activeProgress = isProgressActive(p);
-                LOGGER.debug(String.format("Checking: %s 's date: %b", p, activeProgress));
-                if (activeProgress) {
-                    active.add(p);
-                }
-            } else {
-                Progress p = group.getProgressForRequirement(r);
-                if (p == null) {
-                    LOGGER.error(String.format("Could not find a progress for %s", r.getName()));
-                    LOGGER.error(String.format("Dumping all known progress:\n%s", group.progressList().toString()));
-                } else {
-                    boolean activeProgress = isProgressActive(p);
-                    LOGGER.debug(String.format("Checking: %s 's date: %b", p, activeProgress));
-                    if (activeProgress) {
-                        active.add(p);
-                    }
-                }
-
-
-            }
-        }
-        active.sort(SortingUtils.getProgressComparator(handler.getCatalogue()));
-        return active;
-    }
-
+    
+    attachProgressViews();
+    checkDependencies();
+    updateSumDisplay();
+  }
+  
+  private void setupMaxPointsDisplay(double sum) {
+    maxTotalLbl.setText(POINTS_MAX_POINTS_SEPARATOR + StringUtils.prettyPrint(sum));
+  }
+  
+  private void handleComments(ActionEvent event) {
+    LOGGER.debug("Handling commenting");
+    EvaluatorPromptFactory.showProgressSummary(group, summaryCb.getSelectionModel().getSelectedItem());
+  }
+  
+  
+  private void attachProgressViews() {
+    activeProgressViews.forEach(pv -> {
+      addProgressView(pv);
+    });
+  }
+  
+  private void detachProgressViews() {
+    activeProgressViews.forEach(pv -> removeProgressView(pv));
+  }
+  
+  private void addProgressView(ProgressView pv) {
+    content.getChildren().add(pv);
+    pv.prefWidthProperty().bind(scrollPane.widthProperty());
+  }
+  
+  private void removeProgressView(ProgressView pv) {
+    content.getChildren().remove(pv);
+  }
+  
+  private void bindContent() {
+    content.prefWidthProperty().bind(widthProperty());
+    content.prefHeightProperty().bind(heightProperty());
+  }
+  
+  
 }

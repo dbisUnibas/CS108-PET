@@ -1,7 +1,8 @@
 package ch.unibas.dmi.dbis.reqman.ui.event;
 
 /**
- * TODO: write JavaDoc
+ * An enum over all modifiable available entities.
+ * 
  *
  * @author loris.sauter
  */
@@ -13,5 +14,6 @@ public enum TargetEntity {
 
     PROGRESS,
     PROGRESS_SUMMARY,
-    GROUP;
+    GROUP,
+    COURSE;
 }

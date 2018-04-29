@@ -1,482 +1,500 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
 import ch.unibas.dmi.dbis.reqman.common.Callback;
-import ch.unibas.dmi.dbis.reqman.common.Version;
-import ch.unibas.dmi.dbis.reqman.core.*;
-import ch.unibas.dmi.dbis.reqman.management.CatalogueNameMismatchException;
-import ch.unibas.dmi.dbis.reqman.management.EntityManager;
-import ch.unibas.dmi.dbis.reqman.management.NonUniqueGroupNameException;
-import ch.unibas.dmi.dbis.reqman.ui.MenuManager;
+import ch.unibas.dmi.dbis.reqman.common.EntityAlreadyOpenException;
+import ch.unibas.dmi.dbis.reqman.common.MissingEntityException;
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Group;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
+import ch.unibas.dmi.dbis.reqman.storage.ReqmanFile;
+import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import ch.unibas.dmi.dbis.reqman.ui.StatusBar;
-import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
+import ch.unibas.dmi.dbis.reqman.ui.common.FilterActionHandler;
+import ch.unibas.dmi.dbis.reqman.ui.common.FilterBar;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
-import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Scene;
-import javafx.scene.layout.HBox;
-import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
+import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.controlsfx.control.Notifications;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * TODO: Write JavaDoc
  *
  * @author loris.sauter
  */
-public class EvaluatorHandler implements EventHandler<CUDEvent> {
-
-    private final static Logger LOGGER = LogManager.getLogger(EvaluatorHandler.class);
-
-    private final EntityManager manager = EntityManager.getInstance();
-
-
-    private EvaluatorView evaluator;
-
-    private HashMap<String, AssessmentView> groupViewMap = new HashMap<>();
-    private HashMap<String, Boolean> dirtyMap = new HashMap<>();
-    private Milestone activeMS = null;
-    private StatusBar statusBar;
-    private Callback firstGroupCallback = null;
-
-    public EvaluatorHandler() {
-        LOGGER.traceEntry();
-        openBackups();
+public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHandler{
+  
+  private final static Logger LOGGER = LogManager.getLogger(EvaluatorHandler.class);
+  
+  /**
+   * A reference to the actual UI this class controls
+   */
+  private EvaluatorView evaluator;
+  
+  /**
+   * A map of group ids - assessment UI
+   */
+  private HashMap<UUID, AssessmentView> assessmentViewMap = new HashMap<>();
+  
+  /**
+   * A map of group ids - booleans to indicate if it was saved or not
+   */
+  private HashMap<UUID, Boolean> unsavedGroupsMap = new HashMap<>();
+  
+  @Deprecated
+  private HashMap<String, Boolean> dirtyMap = new HashMap<>();
+  
+  private StatusBar statusBar;
+  
+  private Callback firstGroupCallback = null;
+  
+  public EvaluatorHandler() {
+  
+  }
+  
+  public void setStatusBar(StatusBar statusBar) {
+    this.statusBar = statusBar;
+  }
+  
+  
+  public boolean isCatalogueLoaded() {
+    return EntityController.getInstance().hasCatalogue();
+  }
+  
+  public Catalogue getCatalogue() {
+    return EntityController.getInstance().getCatalogue();
+  }
+  
+  @Override
+  public void handle(CUDEvent event) {
+    if (event != null) {
+      if (CUDEvent.CREATION.equals(event.getEventType())) {
+        // CREATION
+        handleCreation(event);
+      } else if (CUDEvent.DELETION.equals(event.getEventType())) {
+        // DELETION
+        handleDeletion(event);
+      } else if (CUDEvent.MODIFICATION.equals(event.getEventType())) {
+        handleModification(event);
+      } else {
+        throw new IllegalArgumentException("Cannot handle event type: " + event.getEventType().toString());
+      }
     }
-
-    public void setStatusBar(StatusBar statusBar) {
-        this.statusBar = statusBar;
+    // silently ignoring null events
+    
+  }
+  
+  public void handleModification(CUDEvent event) {
+    LOGGER.traceEntry();
+    switch (event.getTargetEntity()) {
+      case GROUP:
+        LOGGER.trace(":handleModificaiton");
+        Group gr = EntityController.getInstance().getGroup(evaluator.getActiveGroupUUID());
+        EvaluatorPromptFactory.promptGroup(gr);
+        evaluator.updateDisplayOf(gr);
+        LOGGER.trace(":handleModification - Done");
+        break;
+      default:
+        // Ignoring
     }
-
-    public List<Milestone> getMilestones() {
-        return new ArrayList<>(manager.getObservableMilestones());
-    }
-
-    public String getName() {
-        return manager.getCatalogueName();
-    }
-
-    public String getDescription() {
-        return manager.getDescription();
-    }
-
-    public boolean isCatalogueLoaded() {
-        return manager.isCatalogueLoaded();
-    }
-
-    public Catalogue getCatalogue() {
-        return manager.getCatalogue();
-    }
-
-    @Override
-    public void handle(CUDEvent event) {
-        if (event != null) {
-            if (CUDEvent.CREATION.equals(event.getEventType())) {
-                // CREATION
-                handleCreation(event);
-            } else if (CUDEvent.DELETION.equals(event.getEventType())) {
-                // DELETION
-                handleDeletion(event);
-            } else if (CUDEvent.MODIFICATION.equals(event.getEventType())) {
-                handleModification(event);
-            } else {
-                throw new IllegalArgumentException("Cannot handle event type: " + event.getEventType().toString());
-            }
+  }
+  
+  public void handleDeletion(CUDEvent event) {
+    return;
+    // TODO Re-Implemet closing of group
+    /*
+    switch (event.getTargetEntity()) {
+      case GROUP:
+        // DELETE GROUP
+        LOGGER.trace(":handleDeletion");
+        if (event.getDelivery() != null && event.getDelivery() instanceof Group) {
+          Group del = (Group) event.getDelivery();
+          if (manager.removeGroup(del)) {
+            removeGroupFromMap(del);
+          }
+          LOGGER.debug(":handleDeletion - Remaining: " + manager.groupList().toString());
         }
-        // silently ignoring null events
-
-    }
-
-    public void handleModification(CUDEvent event) {
-        LOGGER.traceEntry();
-        switch (event.getTargetEntity()) {
-            case GROUP:
-                LOGGER.trace(":handleModificaiton");
-                Group gr = evaluator.getActiveGroup();
-                assemble(gr);
-                // DONT FORGET TO UPDATE ALL NAME REFERNECES, IF NAME CHANGED!
-                Group mod = EvaluatorPromptFactory.promptGroup(gr, this);
-                mod.setProgressList(gr.getProgressList());
-                mod.setVersion(gr.getVersion());
-                mod.setProgressSummaryList(gr.getProgressSummaries());
-                //manager.replaceGroup(gr, mod);
-                CUDEvent del = CUDEvent.generateDeletionEvent(event, TargetEntity.GROUP, -1, gr);
-                handleDeletion(del);
-                CUDEvent add = CUDEvent.generateCreationEvent(event, TargetEntity.GROUP, mod);
-                handleCreation(add);
-                LOGGER.trace(":handleModification - Done");
-                break;
-            default:
-                // Ignoring
-        }
-    }
-
-    public void handleDeletion(CUDEvent event) {
-        switch (event.getTargetEntity()) {
-            case GROUP:
-                // DELETE GROUP
-                LOGGER.trace(":handleDeletion");
-                if (event.getDelivery() != null && event.getDelivery() instanceof Group) {
-                    Group del = (Group) event.getDelivery();
-                    if (manager.removeGroup(del)) {
-                        removeGroupFromMap(del);
-                    }
-                    LOGGER.debug(":handleDeletion - Remaining: " + manager.groupList().toString());
-                }
-                break;
-            default:
-                // Ignoring
-        }
-    }
-
-    public void setOnFirstGroup(Callback callback) {
-        this.firstGroupCallback = callback;
-    }
-
-    public void handleCreation(CUDEvent event) {
-        switch (event.getTargetEntity()) {
-            case GROUP:
-                Group gr;
-                LOGGER.trace(":handleCreation");
-                if (event.getDelivery() instanceof Group) {
-                    LOGGER.trace(":handleCreation - re-create");
-                    gr = (Group) event.getDelivery();
-                } else {
-                    LOGGER.trace(":handleCreation - new create");
-                    gr = EvaluatorPromptFactory.promptGroup(this);
-                }
-                handleAddGroup(gr);
-                break;
-            default:
-                // Ignoring
-        }
-    }
-
-    public void handleOpenGroups(ActionEvent actionEvent) {
-        if (!manager.isCatalogueLoaded()) {
+        break;
+      default:
+        // Ignoring
+    }*/
+  }
+  
+  public void setOnFirstGroup(Callback callback) {
+    this.firstGroupCallback = callback;
+  }
+  
+  public void handleCreation(CUDEvent event) {
+    switch (event.getTargetEntity()) {
+      case GROUP:
+        Group gr;
+        LOGGER.trace(":handleCreation");
+        if (event.getDelivery() instanceof Group) {
+          LOGGER.warn(":handleCreation - re-create. THIS SHOULD NOT BE CALLED");
+          return;
+        } else {
+          LOGGER.debug(":handleCreation - new create");
+          gr = EvaluatorPromptFactory.promptGroup();
+          if(gr == null){
+            LOGGER.debug("User aborted creation of group");
             return;
+          }
         }
-        FileChooser fc = Utils.createGroupFileChooser("Open");
-        if (manager.hasLastOpenLocation()) {
-            fc.setInitialDirectory(manager.getLastOpenLocation());
-        }
-        List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow());
-        if (files == null) {
-            return; // USER ABORT
-        }
-        if (files.size() == 1) {
-            if (!manager.isAnyGroupFilePresent(files).isEmpty()) {
-                Utils.showErrorDialog("Duplicate group files", "Cannot open a group twice");
-                return;
-            }
-            manager.openGroup(files.get(0), (g) -> {
-                handleFirstGroupPresent();
-                loadGroupUI(g);
-            }, this::handleOpenGroupException);
-
-        } else if (files.size() >= 2) {
-            List<File> dupes = manager.isAnyGroupFilePresent(files);
-            List<File> noDupes = new ArrayList<>(files);
-            noDupes.removeAll(dupes);
-            manager.openGroups(noDupes, (list) -> {
-                loadGroupUI(list);
-                handleFirstGroupPresent();
-            }, this::handleOpenGroupException);
-        }
-        // USER ABORT
+        handleAddGroup(gr);
+        break;
+      default:
+        // Ignoring
     }
-
-    public void handleSaveGroup(ActionEvent actionEvent) {
-        Group active = evaluator.getActiveGroup();
-        if (manager.hasGroupFile(active)) {
-            assemble(active);
-            manager.saveGroup(active);
-        } else {
-            handleSaveGroupAs(actionEvent);
-        }
+  }
+  
+  public void showFilterBar() {
+    evaluator.showFilterBar();
+  }
+  
+  @Override
+  public int applyFilter(String pattern, FilterBar.Mode mode) {
+    CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
+    List<Requirement> requirements = null;
+    
+    switch(mode){
+      case NAME:
+        requirements = analyser.findRequirementsNameContains(pattern);
+        break;
+      case TEXT:
+        requirements = analyser.findRequirementsContaining(pattern);
+        break;
+      case CATEGORY:
+        requirements = analyser.findRequirementsForCategory(pattern);
+        break;
+      case TYPE:
+        // Should not happen
+        break;
     }
-
-    public void handleSaveGroupAs(ActionEvent event) {
-        FileChooser fc = Utils.createGroupFileChooser("Save As");
-        if (manager.hasLastSaveLocation()) {
-            fc.setInitialDirectory(manager.getLastSaveLocation());
-        }
-        File f = fc.showSaveDialog(evaluator.getScene().getWindow());
-        if (f != null) {
-            assemble(evaluator.getActiveGroup());
-            manager.saveGroupAs(evaluator.getActiveGroup(), f);
-        }
+    
+    assessmentViewMap.get(evaluator.getActiveGroupUUID()).displayProgressViews(requirements);
+    return requirements.size();
+  }
+  
+  @Override
+  public int applyFilter(Requirement.Type type) {
+    CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
+    List<Requirement> requirements = analyser.findRequirementsByType(type);
+    assessmentViewMap.get(evaluator.getActiveGroupUUID()).displayProgressViews(requirements);
+    return requirements.size();
+  }
+  
+  @Override
+  public void resetFilter() {
+    assessmentViewMap.get(evaluator.getActiveGroupUUID()).displayAll();
+  }
+  
+  public void resetFilterForAll(){
+    assessmentViewMap.values().forEach(AssessmentView::displayAll);
+  }
+  
+  public void closeAll() {
+    LOGGER.info("Close All");
+    reset();
+    evaluator.closeAll();
+  }
+  
+  public Group getActiveGroup() {
+    return EntityController.getInstance().getGroup(evaluator.getActiveGroupUUID());
+  }
+  
+  private boolean active;
+  
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+  
+  public void closeFilterBar() {
+    evaluator.closeFilterBar();
+  }
+  
+  private void reset() {
+    this.assessmentViewMap.clear();
+  }
+  
+  private void handleAddGroup(Group group){
+    handleAddGroup(group, false);
+  }
+  
+  public void handleSplit(ActionEvent event){
+    LOGGER.debug("Handling splitting");
+    Group split = EvaluatorPromptFactory.promptSplit();
+    if(split == null){
+      // User abort?!
+      LOGGER.debug("User abort");
+      return;
     }
-
-    public void reloadRequirements() {
-        groupViewMap.values().forEach(av -> {
-            av.reloadRequirements(true);
-        });
+    handleAddGroup(split, true);
+  }
+  
+  public void handleOpenGroups(ActionEvent actionEvent) {
+    if (!EntityController.getInstance().hasCatalogue()) {
+      return;
     }
-
-    public void processCatalogueOpened(Catalogue cat) {
-        LOGGER.traceEntry("Param: {}", cat);
-        LOGGER.info("Opened catalogue " + manager.getCatalogueFile().getPath());
-        evaluator.enableAll();
-        MenuManager.getInstance().setupGlobalMilestoneMenu(this.getMilestones());
-        MenuManager.getInstance().enableCatalogueNeeded();
-        evaluator.displayCatalogueInfo(manager.getCatalogue());
+    FileChooser fc = Utils.createFileChooser("Open Groups");
+    if(EntityController.getInstance().getStorageManager() != null && EntityController.getInstance().getStorageManager().getSaveDir() != null){
+      fc.setInitialDirectory(EntityController.getInstance().getStorageManager().getSaveDir());
     }
-
-    public void setGlobalMilestoneChoice(Milestone ms) {
-        LOGGER.traceEntry("Ms: {}", ms);
-        this.activeMS = ms;
-        for (AssessmentView av : groupViewMap.values()) {
-            LOGGER.trace("Setting milestone " + ms.getName() + " for AV: " + av.getActiveGroup().getName());
-            av.selectMilestone(ms);
-        }
+    fc.getExtensionFilters().add(ReqmanFile.Type.GROUP.getExtensionFilter());
+    List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow() );
+    if(files == null){
+      return; // user abort
+    }else{
+      List<Group> groups = null;
+      try {
+        groups = EntityController.getInstance().openGroups(files);
+      }catch(EntityAlreadyOpenException ex){
+        Utils.showErrorDialog(ex.getEntityType()+" already open", ex.getEntityType()+" already open", "Cannot open the entity of type "+ex.getEntityType()+" and uuid="+ex.getUuid().toString()+" more than once.");
+      } catch (UuidMismatchException | IOException e) {
+        LOGGER.catching(e);
+        Utils.showErrorDialog("Exception while opening groups", "The following exception was caught:\n\t"+e.getMessage());
+        return;
+      } catch (MissingEntityException e) {
+        Utils.showErrorDialog("Corrupt group file", "The group file of group ("+e.getEntity().getName()+") is corrupt.\n" +
+            "The entity has no or an empty field '"+e.getMissing()+"'.\n" +
+            "Please restart ReqMan to avoid further corrupt files.");
+      }
+      groups.forEach(this::loadGroupUIAndRefresh);
     }
-
-    public void resetGlobalMilestoneChoice() {
-        LOGGER.debug("Resetting global milestone choice");
-        this.activeMS = null;
+  }
+  
+  public void handleSaveGroup(ActionEvent actionEvent) {
+    UUID groupID = evaluator.getActiveGroupUUID();
+    LOGGER.debug("Saving group with id {}", groupID);
+    if(EntityController.getInstance().getStorageManager().hasGroupSaveFile(groupID)){
+      EntityController.getInstance().saveGroup(groupID);
+      LOGGER.info("Saved group {}", groupID);
+    }else{
+      LOGGER.debug("No save file for group {} found. Using current save dir");
+      Group g = EntityController.getInstance().getGroup(groupID);
+      EntityController.getInstance().saveGroupAs(g);
+      LOGGER.info("Group {} saved.", g.getName());
+      
     }
-
-    public ObservableList<Progress> progressList(Group g) {
-        return manager.getObservableProgress(g);
+    Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text(String.format("Group '%s' saved", EntityController.getInstance().getGroup(groupID).getName())).showInformation();
+  }
+  
+  public void handleSaveGroupAs(ActionEvent event) {
+    UUID groupID = evaluator.getActiveGroupUUID();
+    Group g = EntityController.getInstance().getGroup(groupID);
+    if(g == null){
+      LOGGER.error("Cannot save a null-group. Ignoring.");
+    }else{
+      LOGGER.debug("Saving group ({}) as...", g.getName());
+      DirectoryChooser dc = Utils.createDirectoryChooser("Save as");
+      File dir = dc.showDialog(evaluator.getScene().getWindow());
+      LOGGER.debug("Chosen dir={}", dir);
+      EntityController.getInstance().setupSaveDirectory(dir);
+      EntityController.getInstance().saveGroupAs(g);
+      Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text(String.format("Group '%s' saved", g.getName())).showInformation();
     }
-
-    public Progress getProgressForRequirement(Group group, Requirement requirement) {
-        return manager.getProgressForRequirement(group, requirement);
+  }
+  
+  
+  public void exportAllGroups() {
+    throw new UnsupportedOperationException("Not implemented yet");
+    /*
+    LOGGER.traceEntry();
+    if (!isCatalogueLoaded()) {
+      LOGGER.debug(":exportAllGroups - No catalogue set. Returning");
+      return;
     }
-
-    public Group getGroupByName(String name) {
-        for (Group g : manager.groupList()) {
-            if (g.getName().equals(name)) {
-                return g;
-            }
-        }
-        return null;
+    DirectoryChooser dc = new DirectoryChooser();
+    if (manager.hasLastExportLocation()) {
+      dc.setInitialDirectory(manager.getLastExportLocation());
     }
-
-    public void exportAllGroups() {
-        LOGGER.traceEntry();
-        if (!isCatalogueLoaded()) {
-            LOGGER.debug(":exportAllGroups - No catalogue set. Returning");
-            return;
-        }
-        DirectoryChooser dc = new DirectoryChooser();
-        if (manager.hasLastExportLocation()) {
-            dc.setInitialDirectory(manager.getLastExportLocation());
-        }
-        dc.setTitle("Choose an export folder");
-        File dir = dc.showDialog(evaluator.getScene().getWindow());
-
-        for (Group g : manager.groupList()) {
-            assemble(g);
-        }
-
-        manager.exportAllGroups(dir);
+    dc.setTitle("Choose an export folder");
+    File dir = dc.showDialog(evaluator.getScene().getWindow());
+    
+    for (Group g : manager.groupList()) {
+      assemble(g);
     }
-
-    public void showOverview() {
-        if (!manager.isCatalogueLoaded() || (manager.groupList() == null || manager.groupList().isEmpty())) {
-            return;
-        }
-        SimpleOverviewBuilder overview = new SimpleOverviewBuilder(manager.getCatalogue(), manager.groupList());
-        String export = overview.exportOverviewHTML();
-        WebView view = new WebView();
-        WebEngine engine = view.getEngine();
-        engine.loadContent(export);
-        HBox box = new HBox();
-        view.prefWidthProperty().bind(box.widthProperty());
-        view.prefHeightProperty().bind(box.heightProperty());
-        Scene webScene = new Scene(box, evaluator.getWidth(), evaluator.getHeight());
-        box.prefWidthProperty().bind(webScene.widthProperty());
-        box.prefHeightProperty().bind(webScene.heightProperty());
-        box.getChildren().add(view);
-        PopupStage popupStage = new PopupStage("Overview", webScene);
-        popupStage.showAndWait();
+    
+    manager.exportAllGroups(dir);
+    */
+  }
+  
+  public void stop() {
+    return;
+    // Silently ignoring
+    // TODO Re-Implement backups
+    /*
+    LOGGER.traceEntry();
+    manager.groupList().forEach(g -> {
+      if (isDirty(g)) {
+        manager.saveAsBackup(g);
+      }
+    });*/
+  }
+  
+  public boolean isDirty(Group group) {
+    return dirtyMap.containsKey(group.getName()) && dirtyMap.get(group.getName());
+  }
+  
+  public boolean isGroupLoaded() {
+    return EntityController.getInstance().hasGroups();
+  }
+  
+  public void enableEvaluator() {
+    evaluator.enableAll();
+  }
+  
+  public void refreshCourseInfoView() {
+    evaluator.refreshCourseInfoView();
+  }
+  
+  @Deprecated
+  boolean isGroupNameUnique(String name) {
+    return true;
+  }
+  
+  @Deprecated
+  Milestone getMilestoneByOrdinal(int ordinal) {
+    return null;
+  }
+  
+  void setEvaluatorView(EvaluatorView view) {
+    this.evaluator = view;
+  }
+  
+  ObservableList<Group> groupList() {
+    return EntityController.getInstance().groupList();
+  }
+  
+  void markDirty(Group activeGroup) {
+    dirtyMap.put(activeGroup.getName(), true);
+    evaluator.markDirty(activeGroup);
+  }
+  
+  void unmarkDirty(Group activeGroup) {
+    if (dirtyMap.containsKey(activeGroup.getName())) {
+      dirtyMap.put(activeGroup.getName(), false);
     }
-
-    public void stop() {
-        LOGGER.traceEntry();
-        manager.groupList().forEach(g -> {
-            if (isDirty(g)) {
-                manager.saveAsBackup(g);
-            }
-        });
+    evaluator.unmarkDirty(activeGroup);
+  }
+  
+  void openGroupTab(Group group) {
+    if(evaluator.isGroupTabbed(group)){
+      LOGGER.debug("Not re-adding groupt tab if group {} already open", group.getName());
+    }else{
+      addTab(group, false);
     }
-
-    public boolean isDirty(Group group) {
-        return dirtyMap.containsKey(group.getName()) && dirtyMap.get(group.getName());
+  }
+  
+  private void handleAddGroup(Group gr, boolean recalulate) {
+    LOGGER.traceEntry();
+    if (gr == null) {
+      LOGGER.trace(":handleAddGroup - new create");
+      gr = EvaluatorPromptFactory.promptGroup();
+    } else {
+      LOGGER.trace(":handleAddGroup - re-create");
     }
-
-    public void openBackups() {
-        manager.openBackupsIfExistent(list -> {
-            if (!list.isEmpty()) {
-                MenuManager.getInstance().enableGroupNeeded();
-                evaluator.enableAll();
-            }
-            list.forEach(obj -> {
-                LOGGER.trace(":openBackups - Aftermath: Processing: " + obj.toString());
-                if (!obj.isCatalogue()) {
-                    loadGroupUI(obj.getGroup());
-                    markDirty(obj.getGroup());
-                }
-            });
-        });
+    LOGGER.entry(gr);
+    // ADD GROUP
+    loadGroupUI(gr, recalulate);
+    
+    handleFirstGroupPresent();
+  }
+  
+  private void handleFirstGroupPresent() {
+    LOGGER.traceEntry();
+    if (EntityController.getInstance().groupList().size() >= 1) {
+      LOGGER.trace(":handleFirstGroupPresent" + " - First group");
+      if (firstGroupCallback != null) {
+        firstGroupCallback.call();
+      } else {
+        LOGGER.debug(":handleFirstGroupPresent - No callback set");
+      }
     }
-
-    public boolean isGroupLoaded() {
-        return !manager.groupList().isEmpty();
+  }
+  
+  private void handleOpenGroupException(Exception ex) {
+    Utils.showErrorDialog("Open group(s) failed", "Could not open group due to: \n" + ex.getMessage());
+  }
+  
+  private void loadGroupUI(List<Group> groups) {
+    groups.forEach(this::loadGroupUIAndRefresh);
+  }
+  
+  private void loadGroupUI(Group g){
+    loadGroupUI(g, false);
+  }
+  
+  private void loadGroupUIAndRefresh(Group g){
+    loadGroupUI(g, true);
+  }
+  
+  private void loadGroupUI(Group g, boolean recalculate) {
+    LOGGER.traceEntry("Group: {}", g);
+    if(recalculate){
+      addTabAndRefresh(g);
+    }else{
+      addTab(g, false);
     }
-
-    public void enableEvalautor() {
-        evaluator.enableAll();
+    
+  }
+  
+  public void showStatistics(){
+    evaluator.showStatistics(assessmentViewMap);
+  }
+  
+  private void addTabAndRefresh(Group group){
+    AssessmentView av = getAssessmentView(group);
+    av.recalculatePoints();
+    if(evaluator.isGroupTabbed(group)){
+      // Do not open another tab for alraedy tabbed group
+      av.recalculatePoints();
+    }else{
+      evaluator.addGroupTab(av, false);
     }
-
-    boolean isGroupNameUnique(String name) {
-        return manager.isGroupNameUnique(name);
+    evaluator.setActiveTab(group);
+  }
+  
+  @NotNull
+  private AssessmentView getAssessmentView(Group group) {
+    AssessmentView av = assessmentViewMap.get(group.getUuid());
+    if(av == null){
+      av = createAssessmentView(group);
+      assessmentViewMap.put(group.getUuid(), av);
     }
-
-    Milestone getMilestoneByOrdinal(int ordinal) {
-        return manager.getMilestoneByOrdinal(ordinal);
+    return av;
+  }
+  
+  
+  private void addTab(Group active, boolean fresh) {
+    AssessmentView av = getAssessmentView(active);
+    if (evaluator.isGroupTabbed(active)) {
+      // Do not open another tab for already tabbed group.
+      av.recalculatePoints();
+    } else {
+      
+      evaluator.addGroupTab(av, fresh);
     }
-
-    void setEvaluatorView(EvaluatorView view) {
-        this.evaluator = view;
-    }
-
-    ObservableList<Group> groupList() {
-        return manager.groupList();
-    }
-
-    void markDirty(Group activeGroup) {
-        dirtyMap.put(activeGroup.getName(), true);
-        evaluator.markDirty(activeGroup);
-    }
-
-    void unmarkDirty(Group activeGroup) {
-        if (dirtyMap.containsKey(activeGroup.getName())) {
-            dirtyMap.put(activeGroup.getName(), false);
-        }
-        evaluator.unmarkDirty(activeGroup);
-    }
-
-    void openGroupTab(Group group) {
-        addTab(group, false);
-    }
-
-    private void handleAddGroup(Group gr) {
-        LOGGER.traceEntry();
-        if (gr == null) {
-            LOGGER.trace(":handleAddGroup - new create");
-            gr = EvaluatorPromptFactory.promptGroup(this);
-        } else {
-            LOGGER.trace(":handleAddGroup - re-create");
-        }
-        LOGGER.entry(gr);
-        // ADD GROUP
-        manager.addGroup(gr);
-        loadGroupUI(gr);
-
-        handleFirstGroupPresent();
-    }
-
-    private void handleFirstGroupPresent() {
-        LOGGER.traceEntry();
-        if (manager.groupList().size() >= 1) {
-            LOGGER.trace(":handleFirstGroupPresent" + " - First group");
-            if (firstGroupCallback != null) {
-                firstGroupCallback.call();
-            } else {
-                LOGGER.debug(":handleFirstGroupPresent - No callback set");
-            }
-        }
-    }
-
-    private void handleOpenGroupException(Exception ex) {
-        Utils.showErrorDialog("Open group(s) failed", "Could not open group due to: \n" + ex.getMessage());
-    }
-
-    private void loadGroupUI(List<Group> groups) {
-        groups.forEach(this::loadGroupUI);
-    }
-
-    private void loadGroupUI(Group g) {
-        LOGGER.traceEntry("Group: {}", g);
-        if (manager.getLastOpenException() != null) {
-            LOGGER.warn("Caught Exception");
-            Exception e = manager.getLastOpenException();
-            if (e instanceof CatalogueNameMismatchException) {
-                CatalogueNameMismatchException cnme = (CatalogueNameMismatchException) e;
-                String message = String.format("Could not finish opening group from file %s.\n" +
-                        "The specified group (name: %s)'s catalogue signature is: %s\n" +
-                        "Current catalogue name: %s", cnme.getGroupFile().getPath(), cnme.getGroupName(), cnme.getGroupCatName(), cnme.getCatName());
-                Utils.showErrorDialog("Catalogue signature mismatch", message);
-            } else if (e instanceof NonUniqueGroupNameException) {
-                NonUniqueGroupNameException nugne = (NonUniqueGroupNameException) e;
-                String message = String.format("Cannot finish opening of group %s, there exists alread a group with that name.", nugne.getName());
-                Utils.showErrorDialog("Duplication error", message);
-            }
-        }
-
-        addGroupToMap(g, null);
-    }
-
-    private void addGroupToMap(Group group, AssessmentView view) {
-        if (view != null) {
-            LOGGER.trace(":addGroupToMap - Adding pre-existing AV");
-            groupViewMap.put(group.getName(), view);
-            if (activeMS != null) {
-                LOGGER.trace(":addGroupToInternalStorage - Selecting activeMS: " + activeMS.getName());
-                view.selectMilestone(activeMS);
-            }
-        } else {
-            if (activeMS != null) {
-                LOGGER.trace(":addGroupToMap - Creating AV with pre-set MS: " + activeMS.getName());
-                groupViewMap.put(group.getName(), new AssessmentView(this, group, activeMS));
-            } else {
-                LOGGER.trace(":addGroupToMap - Creating AV without pre-set MS");
-                groupViewMap.put(group.getName(), new AssessmentView(this, group));
-            }
-        }
-        addTab(group, false);
-    }
-
-    private void removeGroupFromMap(Group group) {
-        groupViewMap.remove(group.getName());
-        removeTab(group);
-        dirtyMap.remove(group.getName());
-    }
-
-    private void removeTab(Group g) {
-        evaluator.removeTab(g);
-    }
-
-    private void addTab(Group active, boolean fresh) {
-        if (evaluator.isGroupTabbed(active)) {
-            // Do not open another tab for already tabbed group.
-        } else {
-            evaluator.addGroupTab(groupViewMap.get(active.getName()), fresh);
-        }
-        evaluator.setActiveTab(active.getName());
-    }
-
-    private void assemble(Group g) {
-        AssessmentView v = groupViewMap.get(g.getName());
-        LOGGER.trace(":assemble");
-        LOGGER.entry(g);
-        g.setProgressList(v.getProgressListForSaving(true)); // TODO not trimming on export?
-        LOGGER.debug("Set progress list");
-        g.setProgressSummaryList(v.getSummaries());
-        LOGGER.debug("Set summaries");
-        g.setVersion(Version.getInstance().getVersion());
-    }
+    evaluator.setActiveTab(active);
+  }
+  
+  private AssessmentView createAssessmentView(Group group) {
+    return new AssessmentView(group);
+  }
+  
 }

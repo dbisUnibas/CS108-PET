@@ -7,10 +7,11 @@
 ###################
 
 # Ignores logs
-dev/logs/
+logs/
 
 # Ignores manual tests (Mostly simple tests which consist of visual and manual checking of something.
 **Tester.java
+**Playground.java
 
 # Various temporary file endings
 **Thumbs.db

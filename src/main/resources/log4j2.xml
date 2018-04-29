@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Configuration name="ReqManConfig" status="WARN">
+    <Properties>
+        <Property name="loggingPattern">[%d{dd.MM.yyyy HH:mm:ss.SSS}][%-5level][%t] %C{1} - %msg%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${loggingPattern}"/>
+        </Console>
+        <RollingFile name="rollingFile" fileName="logs/reqman.log" filePattern="logs/$${date:yyyy-MM}/reqman-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout pattern="${loggingPattern}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="10 MB" />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <!-- GENERAL org packages -->
+        <Logger name="org" level="ERROR">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- TEMPLATING -->
+        <Logger name="ch.unibas.dmi.dbis.reqman.templating" level="WARN" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- CONFIGURATION -->
+        <Logger name="ch.unibas.dmi.dbis.reqman.configuration" level="WARN" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- EDITOR -->
+        <Logger name="ch.unibas.dmi.dbis.reqman.ui.editor" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- EVALUATOR -->
+        <Logger name="ch.unibas.dmi.dbis.reqman.ui.evaluator" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- DATA -->
+        <Logger name="ch.unibas.dmi.dbis.reqman.data" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- CONTROL -->
+        <Logger name="ch.unibas.dmi.dbis.reqman.control" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- APPLICATION -->
+        <Logger name="ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- GENERAL UI -->
+        <Logger name="ch.unibas.dmi.dbis.reqman.ui" level="ERROR" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- GENERAL REQMAN -->
+        <Logger name="ch.unibas.dmi.dbis.reqman" level="WARN" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile"/>
+        </Logger>
+        <!-- ROOT -->
+        <Root level="ERROR" />
+    </Loggers>
+</Configuration>

@@ -3,8 +3,8 @@ package ch.unibas.dmi.dbis.reqman.management;
 import ch.unibas.dmi.dbis.reqman.configuration.ConfigUtils;
 import ch.unibas.dmi.dbis.reqman.configuration.Templates;
 import ch.unibas.dmi.dbis.reqman.configuration.TemplatingConfigurationManager;
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Group;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.templating.RenderManager;
 
 import java.io.File;
@@ -40,7 +40,7 @@ public class ExportMultipleGroupTask extends ManagementTask<Boolean> {
         updateAll("Loaded templating config...", 0.05);
 
         manager.parseProgressTemplate(templates.getProgressTemplate());
-        manager.parseGroupMilestoneTemplate(templates.getGroupMilestoneTemplate());
+        manager.parseProgressSummaryTemplate(templates.getProgressSummaryTemplate());
         manager.parseGroupTemplate(templates.getGroupTemplate());
 
         updateAll("Parsed templates...", 0.1);

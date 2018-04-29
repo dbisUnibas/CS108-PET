@@ -1,20 +1,21 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
-import ch.unibas.dmi.dbis.reqman.common.LoggingUtils;
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-import ch.unibas.dmi.dbis.reqman.core.Milestone;
-import ch.unibas.dmi.dbis.reqman.core.Progress;
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.common.StringUtils;
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
+import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.event.ActionEvent;
+import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.MouseButton;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,314 +26,534 @@ import java.util.List;
  * @author loris.sauter
  */
 public class ProgressView extends VBox {
-
-    private final static Logger LOG = LogManager.getLogger(ProgressView.class);
-
-    // TODO Extract code for collapsible pane. Adjust collapsible's size.
-
-    private final Requirement requirement;
-    private Progress progress;
-    private Label lblTitle = new Label();
-    private ToggleButton collapseButton = new ToggleButton(Utils.ARROW_DOWN);
-    private TextArea taDesc = new TextArea();
-
-    private HBox controlWrapper;
-
-    private Spinner<Double> spinnerPoints;
-    private CheckBox check;
-
-    private ToggleGroup toggleGroup = new ToggleGroup();
-    private RadioButton yesBtn;
-    private RadioButton noBtn;
-
-    private VBox collapsible = new VBox();
-    private AnchorPane content;
-    private List<PointsChangeListener> listeners = new ArrayList<>();
-
-    private List<DirtyListener> dirtyListeners = new ArrayList<>();
-    @Deprecated // replaced by previousSavedYesNoConfig
-    private double previousPoints = -1d;
-
-    /**
-     * To track, if the user has reverted its change.
-     */
-    private volatile boolean[] previousSavedYesNoConfig = new boolean[]{false, false};
-    private volatile boolean first = true;
-    private volatile double previousSavedFraction = -1d;
-
-    private Milestone active = null;
-
-    private Catalogue catalogue = null;
-
-    public ProgressView(Progress progress, Requirement requirement, Catalogue catalogue) {
-        super();
-        this.progress = progress == null ? new Progress() : progress;
-        this.requirement = requirement;
-        this.catalogue = catalogue;
-        initComponents();
-        initCollapsible();
-        loadProgress();
+  
+  private final static Logger LOGGER = LogManager.getLogger(ProgressView.class);
+  
+  /* === CollapsibleView === */
+  /**
+   * Container for the top of the view.
+   * Is divided into control - header - side
+   * Where control is the only container that is set by default with the button to collapse.
+   */
+  private BorderPane top;
+  /**
+   * The node containing the control button to collapse the collapsible element
+   */
+  private Node control;
+  /**
+   * The header of the always visible part
+   */
+  private Node header;
+  /**
+   * An optional sidebar
+   */
+  private Node side;
+  /**
+   * The actual collapsible element which may not be visible.
+   */
+  private Node collapsible;
+  
+  
+  /**
+   * The actual button to collapse (or un-collapse)
+   */
+  private ToggleButton collapseButton;
+  
+  
+  /* === ProgressView === */
+  private GridPane headerContainer;
+  private Label heading;
+  @Nullable
+  private Label type; // May be null
+  private Label excerpt;
+  
+  private GridPane assessmentContainer;
+  private HBox assessmentWrapper;
+  private Label categoryLbl;
+  private Label category;
+  private Label maxPoints;
+  
+  
+  private Spinner<Double> spinnerPoints;
+  
+  private CheckBox check;
+  private Label points;
+  private ToggleGroup toggleGroup = new ToggleGroup();
+  private RadioButton yesBtn;
+  private RadioButton noBtn;
+  
+  private GridPane collapsibleContainer;
+  private Label descLbl;
+  private TextArea taDesc;
+  private Label minMSLbl;
+  private Label minMS;
+  private Label maxMSLbl;
+  private Label maxMS;
+  private Label commentLbl;
+  private TextArea taComment;
+  
+  private Label lastModifiedLbl;
+  private Label lastModifiedDisplay;
+  private Label predecessorLbl;
+  private ScrollPane predecessorScroll;
+  
+  
+  /* === Model / Controller === */
+  private Progress progress;
+  private Requirement requirement;
+  private ProgressSummary progressSummary;
+  private Group group;
+  
+  private List<PointsChangeListener> listeners = new ArrayList<>();
+  private List<DirtyListener> dirtyListeners = new ArrayList<>();
+  
+  
+  /**
+   * Creates a new ProgressView and ints all
+   *
+   * @param progress
+   */
+  public ProgressView(Group group, Progress progress, ProgressSummary progressSummary) {
+    this();
+    this.progress = progress;
+    this.progressSummary = progressSummary;
+    this.requirement = EntityController.getInstance().getCatalogueAnalyser().getRequirementById(progress.getRequirementUUID());
+    this.group = group;
+    initComponents();
+    layoutComponents();
+    setupControlHandlers();
+    loadProgress();
+  }
+  
+  /**
+   * Creates a new ProgressView and inits and layouts all Collapsilbe stuff
+   */
+  private ProgressView() {
+    super();
+    initCollapsibleView();
+    layoutCollapsibleView();
+  }
+  
+  public Requirement getRequirement() {
+    return requirement;
+  }
+  
+  public Progress getProgress() {
+    return progress;
+  }
+  
+  
+  public void addPointsChangeListener(PointsChangeListener listener) {
+    listeners.add(listener);
+  }
+  
+  public void removePointsChangeListener(PointsChangeListener listener) {
+    listeners.remove(listener);
+  }
+  
+  public void setSide(Node side) {
+    this.side = side;
+    if (this.side != null) {
+      top.setRight(this.side);
     }
-
-    public Milestone getActiveMilestone() {
-        return active;
+  }
+  
+  public void setHeader(Node header) {
+    this.header = header;
+    if (this.header != null) {
+      top.setCenter(header);
     }
-
-    public void setActiveMilestone(Milestone active) {
-        this.active = active;
-    }
-
-    public Requirement getRequirement() {
-        return requirement;
-    }
-
-    public Progress getProgress() {
-        return progress;
-    }
-
-    public void setProgress(Progress progress) {
-        this.progress = progress;
-    }
-
-    public void addPointsChangeListener(PointsChangeListener listener) {
-        listeners.add(listener);
-    }
-
-    public void removePointsChangeListener(PointsChangeListener listener) {
-        listeners.remove(listener);
-    }
-
-    void addDirtyListener(DirtyListener listener) {
-        dirtyListeners.add(listener);
-    }
-
-    void removeDirtyList(DirtyListener listener) {
-        dirtyListeners.remove(listener);
-    }
-
-    void markSaved() {
-        // TODO: Implement for spinner
-        LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: selected: %b/%b -> last: %b/%b", progress.getRequirementName(), yesBtn.isSelected(), noBtn.isSelected(), previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
-        if (yesBtn != null && noBtn != null) {
-            previousSavedYesNoConfig[0] = yesBtn.isSelected();
-            previousSavedYesNoConfig[1] = noBtn.isSelected();
-            LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: -> last: %b/%b", progress.getRequirementName(), previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
-        } else if (spinnerPoints != null) {
-            previousSavedFraction = progress.getPercentage();
-        }
-    }
-
-    private boolean hasPercentageChanged() {
-        return Double.compare(previousSavedFraction, progress.getPercentage()) != 0;
-    }
-
-    private boolean hasYesNoConfigChaned(boolean yesSelected, boolean noSelected) {
-        LOG.debug(LoggingUtils.DIRTY_MARKER, String.format("%s: selected: %b/%b (%b) - last: %b/%b", progress.getRequirementName(), yesSelected, noSelected, first, previousSavedYesNoConfig[0], previousSavedYesNoConfig[1]));
-        /*if(first){
-            first = false;
-            return true;
-        }*/
-        return previousSavedYesNoConfig[0] != yesSelected || previousSavedYesNoConfig[1] != noSelected;
-    }
-
-    private void initYesNoButtons() {
-        if (!requirement.isBinary()) {
-            return;
-        }
-        controlWrapper.getChildren().clear();
-
-        controlWrapper.getChildren().addAll(yesBtn, noBtn);
-        controlWrapper.setStyle("-fx-spacing: 10px;");
-
-        yesBtn.setOnAction(action -> {
-            progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
-            progress.setDate(active != null ? active.getDate() : new Date());
-            notifyPointsListener();
-            handleToggling(action);
-        });
-
-        noBtn.setOnAction(action -> {
-            progress.setPoints(Progress.NO_POINTS, requirement.getMaxPoints());
-            progress.setDate(active != null ? active.getDate() : new Date());
-            notifyPointsListener();
-            handleToggling(action);
-        });
-    }
-
-    private void handleToggling(ActionEvent event) {
-        double points = -1d;
-        boolean changes = false;
-        if (yesBtn.equals(event.getSource())) {
-            LOG.trace(":handleYes");
-            points = requirement.getMaxPoints();
-            changes = true;
-        } else if (noBtn.equals(event.getSource())) {
-            LOG.trace(":handleNo");
-            points = Progress.NO_POINTS;
-            changes = true;
-        }
-
-        if (hasYesNoConfigChaned(yesBtn.isSelected(), noBtn.isSelected())) {
-            LOG.trace(":configChanged");
-            progress.setPoints(points, requirement.getMaxPoints());
-
-            progress.setDate(active.getDate());
-            progress.setMilestoneOrdinal(active.getOrdinal());
-            notifyDirtyListeners(true);
-            notifyPointsListener();
-        } else {
-            notifyDirtyListeners(false);
-        }
-
-    }
-
-    private void loadProgress() {
-        if (progress != null) {
-            if (progress.hasDefaultPercentage()) {
-                return; // Do nothing, if default percentage.
-            }
-            if (requirement.isBinary()) {
-                if (progress.hasProgress()) {
-                    yesBtn.setSelected(true);
-                } else {
-                    noBtn.setSelected(true);
-                }
-                previousSavedYesNoConfig[0] = yesBtn.isSelected();
-                previousSavedYesNoConfig[1] = noBtn.isSelected();
-            } else {
-                spinnerPoints.getValueFactory().setValue(progress.getPointsSensitive(catalogue));
-                previousSavedFraction = progress.getPercentage();
-            }
-        }
-    }
-
-    private void initCollapsible() {
-        collapseButton.setOnAction(this::handleCollapse);
-        //collapsible.setVisible(false);
-        collapsible.setStyle("-fx-background-color: white;-fx-padding: 10px; -fx-spacing: 10px;-fx-border-width: 1px;-fx-border-color: silver");
-
-    }
-
-    private void handleCollapse(ActionEvent event) {
-        if (collapseButton.isSelected()) {
-            collapseButton.setText(Utils.ARROW_UP);
-            getChildren().add(collapsible);
-            //collapsible.setVisible(true);
-        } else {
-            collapseButton.setText(Utils.ARROW_DOWN);
-
-            getChildren().remove(collapsible);
-            //collapsible.setVisible(false);
-        }
-        event.consume();
-    }
-
-    private void initComponents() {
-
-        lblTitle.setText(requirement.getName() + "\t(" + ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(requirement.getMaxPointsSensitive()) + ")" + (!requirement.isMandatory() ? "\t[BONUS]" : ""));
-
-        taDesc.setEditable(false);
-
-        content = new AnchorPane();
-
-        HBox title = new HBox();
-
-        title.setStyle("-fx-spacing: 15px");
-
-        title.getChildren().addAll(collapseButton, lblTitle);
-
-        content.getChildren().add(title);
-
-        yesBtn = new RadioButton("Yes");
-        yesBtn.setToggleGroup(toggleGroup);
-        noBtn = new RadioButton("No");
-        noBtn.setToggleGroup(toggleGroup);
-
-        controlWrapper = new HBox();
+  }
+  
+  public void setCollapsible(Node node) {
+    this.collapsible = node;
+  }
+  
+  public void setLocked(boolean locked) {
+    assessmentContainer.setDisable(locked);
+    taComment.setDisable(locked);
+  }
+  
+  public void updatePredecessorDisplay() {
+    HBox box = new HBox();
+    Utils.applyDefaultSpacing(box);
+    EntityController.getInstance().getCatalogueAnalyser().getPredecessors(requirement).forEach(r -> {
+      Progress predProg = EntityController.getInstance().getGroupAnalyser(group).getProgressFor(r);
+      if (predProg.hasProgress()) {
+        box.getChildren().add(new Label(r.getName()));
+      } else {
+        Label lbl = new Label(r.getName());
+        lbl.setTextFill(Color.RED);
+        box.getChildren().add(lbl);
+      }
+    });
+    predecessorScroll.setContent(box);
+  }
+  
+  void addDirtyListener(DirtyListener listener) {
+    dirtyListeners.add(listener);
+  }
+  
+  void removeDirtyList(DirtyListener listener) {
+    dirtyListeners.remove(listener);
+  }
+  
+  void markSaved() {
+  
+  }
+  
+  private void initAssessmentComponents() {
+    switch (requirement.getType()) {
+      case REGULAR:
         if (requirement.isBinary()) {
-            initYesNoButtons();
+          // Binary:
+          yesBtn = new RadioButton("Yes");
+          yesBtn.setToggleGroup(toggleGroup);
+          noBtn = new RadioButton("No");
+          noBtn.setToggleGroup(toggleGroup);
+          points = new Label("0");
         } else {
-            spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1d);
-            spinnerPoints.setEditable(true);
-            controlWrapper.getChildren().add(spinnerPoints);
-            // Solution by: http://stackoverflow.com/a/39380146
-            spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                if (!newValue) {
-                    spinnerPoints.increment(0);
-                }
-            });
-            spinnerPoints.valueProperty().addListener((observable, oldValue, newValue) -> {
-                if (Double.compare(oldValue, newValue) != 0) { // Only if really new value
-                    progress.setPoints(newValue, requirement.getMaxPoints());
-                    notifyPointsListener();
-                    notifyDirtyListeners(hasPercentageChanged());
-                }
-            });
+          spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1d);
+          spinnerPoints.getEditor().setPrefColumnCount(StringUtils.prettyPrint(requirement.getMaxPoints()).length() + 4);
+          spinnerPoints.setEditable(true);
         }
-
-        content.getChildren().add(controlWrapper);
-
-        content.prefWidthProperty().bind(prefWidthProperty());
-
-
-        AnchorPane.setRightAnchor(controlWrapper, 10d); // not affected by padding?
-        AnchorPane.setTopAnchor(controlWrapper, 10d); // not affected by padding?
-
-        AnchorPane.setLeftAnchor(title, 0d); // affected by padding?
-        AnchorPane.setTopAnchor(title, 10d);// not affected by padding=
-
-        getChildren().add(content);
-        taDesc.setText(requirement.getDescription());
-
-        // Builds the collapsible
-        GridPane grid = Utils.generateDefaultGridPane();
-        Label lblBinary = new Label("Binary:");
-        Label lblMandatory = new Label("Mandatory:");
-        Label lblMalus = new Label("Malus");
-        Label lblDesc = new Label("Description");
-
-        CheckBox cbBinary = new CheckBox();
-        cbBinary.setSelected(requirement.isBinary());
-        cbBinary.setDisable(true);
-        CheckBox cbMandatory = new CheckBox();
-        cbMandatory.setSelected(requirement.isMandatory());
-        cbMandatory.setDisable(true);
-        CheckBox cbMalus = new CheckBox();
-        cbMalus.setSelected(requirement.isMalus());
-        cbMalus.setDisable(true);
-
-        grid.add(lblBinary, 0, 0);
-        grid.add(cbBinary, 1, 0);
-        grid.add(lblMandatory, 3, 0);
-        grid.add(cbMandatory, 4, 0);
-        grid.add(lblMalus, 6, 0);
-        grid.add(cbMalus, 7, 0);
-
-        grid.add(lblDesc, 0, 1);
-        grid.add(taDesc, 1, 1, 6, 1);
-
-        collapsible.getChildren().add(grid);
-        //getChildren().add(collapsible);
-        content.setStyle("-fx-spacing: 10px;-fx-padding: 10px;-fx-border-color: silver;-fx-border-width: 1px;");
-        //content.setStyle("-fx-background-color: lime;"+ content.getStyle() );
-        //setStyle("-fx-background-color: crimson;");
-    }
-
-    private void handleAssessmentAction(ActionEvent event) {
-        if (check.isSelected()) {
-            progress.setPoints(requirement.getMaxPoints(), requirement.getMaxPoints());
+        break;
+      case BONUS:
+      case MALUS:
+        if (requirement.isBinary()) {
+          type = new Label(requirement.getType().toString());
+          check = new CheckBox();
+          points = new Label("0");
         } else {
-            progress.setPoints(0, requirement.getMaxPoints());
+          spinnerPoints = new Spinner<>(0d, requirement.getMaxPoints(), -1d);
+          spinnerPoints.getEditor().setPrefColumnCount(StringUtils.prettyPrint(requirement.getMaxPoints()).length() + 4); // 4 is totally a magic number
+          spinnerPoints.setEditable(true);
         }
-        progress.setDate(new Date());
-        notifyPointsListener();
+        
+        break;
     }
-
-    private void notifyPointsListener() {
-        listeners.forEach(l -> l.pointsChanged(progress.getPoints()));
+  }
+  
+  private void initComponents() {
+    headerContainer = Utils.generateDefaultGridPane();
+    heading = new Label(requirement.getName());
+    type = new Label(requirement.getType().toString());
+    heading.setStyle("-fx-font-size: 1.5em;-fx-font-weight: bold;");
+    excerpt = new Label(requirement.getExcerpt());
+    excerpt.setWrapText(true);
+    assessmentContainer = Utils.generateDefaultGridPane();
+    Utils.applyDefaultFineGridSpacing(assessmentContainer);
+    assessmentWrapper = new HBox();
+    
+    String sign = requirement.isMalus() ? "-" : "";
+    maxPoints = new Label("/ " + sign + StringUtils.prettyPrint(requirement.getMaxPoints()));
+    
+    categoryLbl = new Label("Category:");
+    category = new Label(requirement.getCategory());
+    
+    collapsibleContainer = Utils.generateDefaultGridPane();
+    minMSLbl = new Label("Available from");
+    Milestone miMS = EntityController.getInstance().getCourseManager().getMinimalMilestone(requirement);
+    Milestone maMS = EntityController.getInstance().getCourseManager().getMaximalMilestone(requirement);
+    SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.YYYY");
+    minMS = new Label(miMS.getName());
+    minMS.setTooltip(new Tooltip(sdf.format(EntityController.getInstance().getCourseManager().getMilestoneDate(miMS))));
+    maxMSLbl = new Label("up to");
+    maxMS = new Label(maMS.getName());
+    maxMS.setTooltip(new Tooltip(sdf.format(EntityController.getInstance().getCourseManager().getMilestoneDate(maMS))));
+    descLbl = new Label("Description");
+    taDesc = new TextArea(requirement.getDescription());
+    taDesc.setEditable(false);
+    taDesc.setPrefRowCount(4); // is totally a magic number
+    commentLbl = new Label("Comment");
+    taComment = new TextArea();
+    taComment.setPrefRowCount(4);
+    taComment.setWrapText(true);
+    
+    
+    lastModifiedLbl = new Label("Assessment on");
+    lastModifiedDisplay = new Label();
+    predecessorLbl = new Label("Predecessors");
+    predecessorScroll = new ScrollPane();
+    predecessorScroll.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+    predecessorScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+    initAssessmentComponents();
+  }
+  
+  private void layoutComponents() {
+    headerContainer.addRow(0, heading);
+    headerContainer.addRow(1, excerpt);
+    layoutAssessmentComponents();
+    setHeader(headerContainer);
+    setSide(assessmentContainer);
+    
+    collapsibleContainer.addRow(0, minMSLbl, minMS, maxMSLbl, maxMS);
+    collapsibleContainer.add(descLbl, 0, 1);
+    collapsibleContainer.add(taDesc, 1, 1, 3, 1);
+    collapsibleContainer.add(commentLbl, 0, 2);
+    collapsibleContainer.add(taComment, 1, 2, 3, 1);
+    collapsibleContainer.add(lastModifiedLbl, 0, 3);
+    collapsibleContainer.add(lastModifiedDisplay, 1, 3, 3, 1);
+    collapsibleContainer.add(predecessorLbl, 0, 4);
+    collapsibleContainer.add(predecessorScroll, 1, 4, 3, 1);
+    setCollapsible(collapsibleContainer);
+    setBorder(new Border(new BorderStroke(Color.SILVER, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+  }
+  
+  private void layoutAssessmentComponents() {
+    Utils.applyDefaultSpacing(assessmentWrapper);
+    assessmentContainer.setAlignment(Pos.CENTER_RIGHT);
+    switch (requirement.getType()) {
+      case REGULAR:
+        if (requirement.isBinary()) {
+          assessmentWrapper.getChildren().addAll(yesBtn, noBtn, points, maxPoints);
+        } else {
+          assessmentWrapper.getChildren().addAll(spinnerPoints, maxPoints);
+        }
+        break;
+      case BONUS:
+      case MALUS:
+        if (requirement.isBinary()) {
+          assessmentWrapper.getChildren().addAll(check, points, maxPoints);
+        } else {
+          assessmentWrapper.getChildren().addAll(spinnerPoints, maxPoints);
+        }
+        
+        break;
     }
-
-    private void notifyDirtyListeners(boolean dirty) {
-        dirtyListeners.forEach(listener -> listener.mark(dirty));
+    HBox categoryWrapper = new HBox();
+    HBox typeWrapper = new HBox();
+    Utils.applyDefaultSpacing(typeWrapper);
+    Utils.applyDefaultSpacing(categoryWrapper);
+    typeWrapper.setAlignment(Pos.CENTER_RIGHT);
+    categoryWrapper.setAlignment(Pos.CENTER_RIGHT);
+    categoryWrapper.getChildren().addAll(categoryLbl, category);
+    typeWrapper.getChildren().addAll(new Label("Type:"), type);
+    assessmentContainer.add(assessmentWrapper, 0, 0, 2, 1);
+    assessmentContainer.add(typeWrapper, 0, 1, 2, 1);
+    assessmentContainer.add(categoryWrapper, 0, 2, 2, 1);
+//    assessmentContainer.addRow(1, categoryLbl, category);
+    assessmentContainer.prefWidthProperty().bind(widthProperty().multiply(0.35));
+    assessmentContainer.setMinWidth(Math.max(assessmentWrapper.getWidth(), categoryWrapper.getWidth()) + 5); // 5 Totally a magic number
+    
+  }
+  
+  private void initCollapsibleView() {
+    // Containers
+    top = new BorderPane();
+    collapseButton = new ToggleButton("", Utils.createArrowDownNode());
+    control = new HBox();
+    Utils.applyDefaultSpacing(control);
+    collapseButton.setOnAction(this::handleCollapse);
+    //collapsible.setStyle("-fx-background-color: white;-fx-padding: 10px; -fx-spacing: 10px;-fx-border-width: 1px;-fx-border-color: silver"); // collapsible is null
+  }
+  
+  private void layoutCollapsibleView() {
+    // Cast easy, since always HBox (could actually be typed as HBox)
+    ((HBox) control).getChildren().add(collapseButton);
+    top.setLeft(control);
+    if (header != null) {
+      top.setCenter(header);
     }
+    if (side != null) {
+      top.setRight(side);
+    }
+    // Set the top part.
+    getChildren().add(top);
+    setFillWidth(true);
+    top.prefWidthProperty().bind(widthProperty());
+  }
+  
+  private void setupControlHandlers() {
+    setupCommentHandling();
+    setupAssessmentHandling();
+    
+  }
+  
+  private void setupAssessmentHandling() {
+    switch (requirement.getType()) {
+      case REGULAR:
+        if (requirement.isBinary()) {
+          yesBtn.setOnAction(this::handleYesNo);
+          noBtn.setOnAction(this::handleYesNo);
+        } else {
+          setupSpinner();
+        }
+        break;
+      case BONUS:
+      case MALUS:
+        if (requirement.isBinary()) {
+          check.setOnAction(this::handleCheck);
+        } else {
+          setupSpinner();
+        }
+        break;
+    }
+    setupResetHandling();
+  }
+  
+  private void setupResetHandling() {
+    assessmentWrapper.setOnMouseClicked(event -> {
+      if (event.getButton().equals(MouseButton.SECONDARY)) {
+        LOGGER.debug("Resetting due to RClick {} ({})", requirement.getName(), progress.getUuid());
+        
+        handleReset();
+      }
+    });
+  }
+  
+  private void handleReset() {
+    progress.reset();
+    switch (requirement.getType()) {
+      case REGULAR:
+        if (requirement.isBinary()) {
+          yesBtn.setSelected(false);
+          noBtn.setSelected(false);
+        } else {
+          spinnerPoints.getValueFactory().setValue(0d);
+        }
+        break;
+      case MALUS:
+      case BONUS:
+        if (requirement.isBinary()) {
+          check.setSelected(false);
+        } else {
+          spinnerPoints.getValueFactory().setValue(0d);
+        }
+        break;
+    }
+    processAssessment();
+  }
+  
+  private void setupSpinner() {
+    // Solution by: http://stackoverflow.com/a/39380146
+    spinnerPoints.focusedProperty().addListener((observable, oldValue, newValue) -> {
+      if (!newValue) {
+        spinnerPoints.increment(0);
+      }
+    });
+    spinnerPoints.valueProperty().addListener((observable, oldValue, newValue) -> {
+      if (Double.compare(oldValue, newValue) != 0) { // Only if really new value
+        progress.setFraction(newValue / requirement.getMaxPoints());
+        processAssessment();
+      }
+    });
+  }
+  
+  private void updatePointsDisplay() {
+    // Only update point display, if in non-spinner environment
+    if(!progress.isFresh()){
+      if (points != null) {
+        points.setText(StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getActualPoints(progress)));
+      }
+    }else{
+      if(points != null){
+        points.setText("0");
+      }
+    }
+  }
+  
+  private void handleYesNo(ActionEvent event) {
+    if (yesBtn.equals(event.getSource())) {
+      LOGGER.debug("Handling Yes!");
+      progress.setFraction(1);
+    } else if (noBtn.equals(event.getSource())) {
+      LOGGER.debug("Handling No!");
+      progress.setFraction(0);
+    } else {
+      LOGGER.debug("Ignoring unknown event source: {}", event);
+      return;
+    }
+    processAssessment();
+  }
+  
+  private void handleCheck(ActionEvent event) {
+    if (check.isSelected()) {
+      LOGGER.debug("Handling check");
+      progress.setFraction(1);
+    } else {
+      LOGGER.debug("Handling uncheck");
+      progress.setFraction(0);
+    }
+    processAssessment();
+  }
+  
+  private void setupCommentHandling() {
+    taComment.textProperty().addListener((observable, oldValue, newValue) -> {
+      progress.setComment(newValue);
+      LOGGER.debug("Handled comment: {}", newValue);
+    });
+  }
+  
+  private void handleCollapse(ActionEvent event) {
+    if (collapseButton.isSelected()) {
+      collapseButton.setGraphic(Utils.createArrowUpNode());
+      if (collapsible != null) {
+        getChildren().add(collapsible);
+      }
+    } else {
+      collapseButton.setGraphic(Utils.createArrowDownNode());
+      if (collapsible != null) {
+        getChildren().remove(collapsible);
+      }
+    }
+    event.consume();
+  }
+  
+  private void processAssessment() {
+    progress.setAssessmentDate(new Date());
+    progress.setProgressSummaryUUID(progressSummary.getUuid());
+    LOGGER.debug("Processing assessment: {}", progress);
+    updatePointsDisplay();
+    displayAssessmentDate();
+    notifyPointsListener();
+    notifyDirtyListeners(true);
+  }
+  
+  
+  private void loadProgress() {
+    if (progress != null && !progress.isFresh()) {
+      switch (requirement.getType()) {
+        case REGULAR:
+          if (requirement.isBinary()) {
+            boolean prog = progress.hasProgress();
+            yesBtn.setSelected(prog);
+            noBtn.setSelected(!prog);
+          } else {
+            spinnerPoints.getValueFactory().setValue(progress.getFraction() * requirement.getMaxPoints());
+          }
+          break;
+        case BONUS:
+        case MALUS:
+          if (requirement.isBinary()) {
+            check.setSelected(progress.hasProgress());
+          } else {
+            spinnerPoints.getValueFactory().setValue(progress.getFraction() * requirement.getMaxPoints());
+          }
+          
+          break;
+      }
+      updatePointsDisplay();
+      taComment.setText(progress.getComment());
+      displayAssessmentDate();
+      updatePredecessorDisplay();
+    }
+  }
+  
+  private void displayAssessmentDate() {
+    SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy 'at' HH:mm");
+    if (progress.getAssessmentDate() != null) {
+      lastModifiedDisplay.setText(df.format(progress.getAssessmentDate()));
+    }else{
+      lastModifiedDisplay.setText("");
+    }
+  }
+  
+  private void notifyPointsListener() {
+    listeners.forEach(l -> l.pointsChanged(0));
+  }
+  
+  private void notifyDirtyListeners(boolean dirty) {
+    dirtyListeners.forEach(listener -> listener.mark(dirty));
+  }
 }

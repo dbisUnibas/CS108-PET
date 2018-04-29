@@ -1,9 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.management;
 
-import ch.unibas.dmi.dbis.reqman.common.JSONUtils;
-import ch.unibas.dmi.dbis.reqman.core.Catalogue;
-
-import java.io.File;
+import ch.unibas.dmi.dbis.reqman.data.Catalogue;
+import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
 
 /**
  * TODO: Write JavaDoc
@@ -11,23 +9,21 @@ import java.io.File;
  * @author loris.sauter
  */
 class OpenCatalogueTask extends ManagementTask<Catalogue> {
-
-    private final File openFile;
-
-    OpenCatalogueTask(File openFile) {
-        LOGGER.entry(openFile);
-        this.openFile = openFile;
-    }
-
-
-    @Override
-    protected Catalogue call() throws Exception {
-        LOGGER.trace(":call");
-        updateAll("Started to read... (" + openFile.getPath() + ")", 0.2);
-        Catalogue cat = JSONUtils.readCatalogueJSONFile(openFile);
-        LOGGER.info("Successfully read catalogue file " + openFile.getPath());
-        updateAll("Successfully read catalogue from (" + openFile.getPath() + ")", 1.0);
-        return LOGGER.traceExit(cat);
-    }
-
+  
+  
+  OpenCatalogueTask() {
+  
+  }
+  
+  
+  @Override
+  protected Catalogue call() throws Exception {
+    LOGGER.trace(":call");
+    updateAll("Opening Catalogue in (" + StorageManager.getInstance().getSaveDir().getAbsolutePath() + ")", 0.2);
+    Catalogue cat = StorageManager.getInstance().openCatalogue();
+    LOGGER.info("Successfully read catalogue file " + StorageManager.getInstance().getCataloguePath() );
+    updateAll("Successfully read catalogue from (" + StorageManager.getInstance().getCataloguePath() + ")", 1.0);
+    return LOGGER.traceExit(cat);
+  }
+  
 }

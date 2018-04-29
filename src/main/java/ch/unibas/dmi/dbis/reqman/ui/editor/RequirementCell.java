@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.editor;
 
-import ch.unibas.dmi.dbis.reqman.core.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import javafx.scene.control.ListCell;
 
 /**
@@ -9,14 +9,17 @@ import javafx.scene.control.ListCell;
  * @author loris.sauter
  */
 public class RequirementCell extends ListCell<Requirement> {
-
-    @Override
-    public void updateItem(Requirement item, boolean empty) {
-        super.updateItem(item, empty);
-        if (!empty) {
-            setText(item.getName());
-        } else {
-            setText("");
-        }
+  
+  @Override
+  public void updateItem(Requirement item, boolean empty) {
+    super.updateItem(item, empty);
+    if (item == null) {
+      return;
     }
+    if (!empty) {
+      setText(item.getName());
+    } else {
+      setText("");
+    }
+  }
 }
