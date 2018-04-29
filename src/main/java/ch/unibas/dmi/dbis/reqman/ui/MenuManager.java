@@ -166,9 +166,6 @@ public class MenuManager {
     registerComponents();
     assembleMenus();
     
-    // TEMP // TODO fix menu / implement stuff
-    disableUnused();
-    
     loadDefaultKeyBindings();
     
     setOnActionAll();
@@ -207,8 +204,6 @@ public class MenuManager {
   
   public void enableEditorItems() {
     setDisableForItems(editorItems, false);
-    // TODO
-    disableUnused();
   }
   
   public void disableEvaluatorItems() {
@@ -217,8 +212,6 @@ public class MenuManager {
   
   public void enableEvaluaotrItems() {
     setDisableForItems(evaluatorItems, false);
-    // TODO
-    disableUnused();
   }
   
   public void disableCatalogueNeeded() {
@@ -227,8 +220,6 @@ public class MenuManager {
   
   public void enableCatalogueNeeded() {
     setDisableForItems(catNeeded, false);
-    // TODO
-    disableUnused();
   }
   
   public void disableGroupNeeded() {
@@ -238,9 +229,6 @@ public class MenuManager {
   public void enableGroupNeeded() {
     LOGGER.traceEntry();
     setDisableForItems(groupNeeded, false);
-    
-    // TODO
-    disableUnused();
   }
   
   public void disableAllButInitial() {
@@ -253,8 +241,6 @@ public class MenuManager {
   public void enableOpenItems() {
     setDisableForItems(openItems, false);
     
-    // TODO
-    disableUnused();
   }
   
   private void registerComponents() {
@@ -363,10 +349,6 @@ public class MenuManager {
     openItems.add(ITEM_IMPORT);
     openItems.add(ITEM_OPEN_GROUPS);
     catNeeded.add(ITEM_OPEN_GROUPS);
-  }
-  
-  private void disableUnused() {
-    menuHelp.setDisable(true);
   }
   
   private void loadDefaultKeyBindings() {

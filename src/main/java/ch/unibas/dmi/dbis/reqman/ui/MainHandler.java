@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
+import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
@@ -10,6 +11,7 @@ import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
+import ch.unibas.dmi.dbis.reqman.ui.help.HelpDisplay;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -555,12 +557,15 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleShowAbout(ActionEvent event) {
     LOGGER.debug("ABOUT");
-    
+    Utils.showInfoDialog("About", "ReqMan "+Version.getInstance().getFullVersion(),"Requirements Manager.\n" +
+        "Tool do define a schema for requirements (known as the catalogue in the editor mode) and use this schema to assess progress on it (in the evaluator mode)");
   }
   
   @Override
   public void handleShowHelp(ActionEvent event) {
     LOGGER.debug("HELP");
+    HelpDisplay helpDisplay = new HelpDisplay();
+    helpDisplay.show();
   }
   
   public void setMainScene(MainScene mainScene) {
