@@ -52,6 +52,24 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   
   private SimpleBooleanProperty activeProperty = new SimpleBooleanProperty(false);
   
+  private List<DirtyListener> dirtyListeners = new ArrayList<>();
+  
+  public void addDirtyListener(DirtyListener listener){
+    dirtyListeners.add(listener);
+  }
+  
+  public void removeDirtyListener(DirtyListener listener){
+    dirtyListeners.remove(listener);
+  }
+  
+  private void notifyDirtyListeners(boolean dirty){
+    if(dirty){
+      dirtyListeners.forEach(DirtyListener::markDirty);
+    }else{
+      dirtyListeners.forEach(DirtyListener::unmarkDirty);
+    }
+  }
+  
   AssessmentView(Group group) {
     super();
     LOGGER.debug("Initializing for group {}", group);
@@ -112,13 +130,13 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   @Override
   public void markDirty() {
     LOGGER.trace("Dirty");
-    
+    notifyDirtyListeners(true);
   }
   
   @Override
   public void unmarkDirty() {
     LOGGER.trace("Undirty");
-    
+    notifyDirtyListeners(false);
   }
   
   @Override
@@ -217,6 +235,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     for (ProgressView pv : activeProgressViews) {
       pv.addPointsChangeListener(this);
+      pv.addDirtyListener(this);
     }
     
     attachProgressViews();
@@ -348,6 +367,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     for (ProgressView pv : activeProgressViews) {
       pv.addPointsChangeListener(this);
+      pv.addDirtyListener(this);
     }
     
     attachProgressViews();

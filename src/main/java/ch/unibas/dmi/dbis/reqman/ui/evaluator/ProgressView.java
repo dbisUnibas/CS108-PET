@@ -507,7 +507,9 @@ public class ProgressView extends VBox {
     updatePointsDisplay();
     displayAssessmentDate();
     notifyPointsListener();
+    notifyDirtyListeners(true);
   }
+  
   
   private void loadProgress() {
     if (progress != null && !progress.isFresh()) {
