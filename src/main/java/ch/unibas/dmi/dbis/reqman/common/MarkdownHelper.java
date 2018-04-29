@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
- * TODO: Write JavaDoc
+ * Small helper class to read markdown from a resource and render it to HTML using commonmark
  *
  * @author loris.sauter
  */

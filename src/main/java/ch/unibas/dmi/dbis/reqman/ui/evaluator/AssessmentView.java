@@ -33,9 +33,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   
   public static final String POINTS_MAX_POINTS_SEPARATOR = "/";
   private final Logger LOGGER = LogManager.getLogger(getClass());
-  @Deprecated
-  private EvaluatorHandler handler;
-  
   
   private HBox headerContainer;
   private Label choiceLbl;
@@ -66,8 +63,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     AssessmentManager.getInstance().addFilterable(this);
     
-    //Milestone firstMS = EntityController.getInstance().getCourseManager().getFirstMilestone();
-    //displayProgressViews(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(firstMS));
     if(!AssessmentManager.getInstance().hasActiveProgressSummary()){
       summaryCb.getSelectionModel().selectFirst();
     }else{

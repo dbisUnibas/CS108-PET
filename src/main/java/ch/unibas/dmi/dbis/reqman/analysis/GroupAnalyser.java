@@ -7,7 +7,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * TODO: write JavaDoc
+ * Analysing and managing unit for group.
+ * This class is responsible of fully resolve relationships of the entities related to the requirement assessment / progress tracking (evaluator).
  *
  * @author loris.sauter
  */
@@ -232,7 +233,6 @@ public class GroupAnalyser {
     Requirement req = getRequirementOf(p);
     if (req == null) {
       //throw new RuntimeException("Progress "+p.toString()+" has no requirement.");
-      // TODO Log deprecated progress ?
       // Most probable reason for this case is, the requirement got removed.
       return false;
     }

@@ -4,7 +4,7 @@ import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * TODO: write JavaDoc
+ * Combination filter for two filters using logical OR.
  *
  * @author loris.sauter
  */

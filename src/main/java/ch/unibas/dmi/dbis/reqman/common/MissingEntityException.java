@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
 /**
- * TODO: write JavaDoc
+ * Raised whenever an entity is missing.
  *
  * @author loris.sauter
  */

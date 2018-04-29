@@ -9,7 +9,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * TODO: write JavaDoc
+ * Analysing and managing unit for catalogues.
+ * This class is responsible of fully resolve relationships of the entities related to the requirements definition (editor).
  *
  * @author loris.sauter
  */

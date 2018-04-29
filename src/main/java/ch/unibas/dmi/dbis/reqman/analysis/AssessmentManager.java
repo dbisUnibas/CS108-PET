@@ -6,7 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashSet;
 
 /**
- * TODO: Write JavaDoc
+ * Managing singleton for filters and milestones.
+ * Used in evaluator mode to keep track of current active milestone as well as currently active filter
  *
  * @author loris.sauter
  */

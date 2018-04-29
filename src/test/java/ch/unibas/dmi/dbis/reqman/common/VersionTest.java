@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * TODO: Write JavaDoc
+ * Unit test for versioning
  *
  * @author loris.sauter
  */

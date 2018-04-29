@@ -4,7 +4,7 @@ import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * TODO: write JavaDoc
+ * A filter for requirement's category containing.
  *
  * @author loris.sauter
  */

@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.common;
 
 /**
- * TODO: write JavaDoc
+ * Interface for entities with a name
  *
  * @author loris.sauter
  */

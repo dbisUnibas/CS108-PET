@@ -5,7 +5,8 @@ import org.apache.logging.log4j.core.util.FileUtils;
 import java.io.File;
 
 /**
- * TODO: write JavaDoc
+ * General I/O related utilities.
+ * Mostly file-extension related
  *
  * @author loris.sauter
  */

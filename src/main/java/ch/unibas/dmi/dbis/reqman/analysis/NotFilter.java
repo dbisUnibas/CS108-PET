@@ -4,7 +4,7 @@ import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * TODO: write JavaDoc
+ * Negates the filter it was built for. Logical not.
  *
  * @author loris.sauter
  */

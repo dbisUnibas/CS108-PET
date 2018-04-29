@@ -3,7 +3,7 @@ package ch.unibas.dmi.dbis.reqman.common;
 import java.util.UUID;
 
 /**
- * TODO: write JavaDoc
+ * Caused when an entity is tried to be opened again.
  *
  * @author loris.sauter
  */
