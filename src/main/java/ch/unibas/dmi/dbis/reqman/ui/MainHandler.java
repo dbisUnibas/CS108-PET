@@ -2,7 +2,6 @@ package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
-import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
 import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import ch.unibas.dmi.dbis.reqman.templating.ExportHelper;
@@ -350,20 +349,6 @@ public class MainHandler implements MenuHandler {
   }
   
   @Override
-  public void handleShowOverview(ActionEvent event) {
-    Utils.showFeatureDisabled("Points Overview", "The old overview is being replaced by a new one");
-    return;
-    // TODO Re-Implement show overview
-    /*
-    if (mainScene.isEvaluatorActive()) {
-      if (evaluatorHandler.isGroupLoaded()) {
-        evaluatorHandler.showOverview();
-      }
-    }
-    */
-  }
-  
-  @Override
   public void handleShowEditor(ActionEvent event) {
     if (mainScene.isEvaluatorActive()) {
       mainScene.setActive(MainScene.Mode.EDITOR);
@@ -374,51 +359,6 @@ public class MainHandler implements MenuHandler {
   public void handleShowEvaluator(ActionEvent event) {
     if (mainScene.isEditorActive()) {
       mainScene.setActive(MainScene.Mode.EVALUATOR);
-    }
-    
-  }
-  
-  @Override
-  public void handleExportOverview(ActionEvent event) {
-    Utils.showFeatureDisabled("Export Points Overview", EXPORT_DISABLED_REASON);
-    return;
-    // TODO Decide: Re-implement / discard?
-    /*
-    LOGGER.traceEntry();
-    if (mainScene.isEvaluatorActive()) {
-      if (evaluatorHandler.isGroupLoaded()) {
-        FileChooser fc = new FileChooser();
-        fc.setTitle("Export Overview");
-        if (EntityManager.getInstance().hasLastExportLocation()) {
-          fc.setInitialDirectory(EntityManager.getInstance().getLastExportLocation());
-        }
-        File f = fc.showSaveDialog(mainScene.getWindow());
-        if (f != null) {
-          mainScene.indicateWaiting(true);
-          EntityManager.getInstance().exportOverview(f);
-          mainScene.indicateWaiting(false);
-        }
-      } else {
-        Utils.showErrorDialog("Export Failed", "Cannot export an overview if no groups are loaded");
-      }
-    }
-    */
-  }
-  
-  @Override
-  public void resetGlobalMilestoneChoice() {
-    if (mainScene.isEvaluatorActive()) {
-      if (evaluatorHandler.isGroupLoaded()) {
-        LOGGER.debug("Resetting global milestone choice");
-      }
-    }
-  }
-  
-  @Override
-  public void setGlobalMilestoneChoice(Milestone ms) {
-    LOGGER.traceEntry();
-    if (mainScene.isEvaluatorActive()) {
-      LOGGER.debug("Setting global milestone to {}", ms);
     }
     
   }
@@ -566,6 +506,15 @@ public class MainHandler implements MenuHandler {
     LOGGER.debug("HELP");
     HelpDisplay helpDisplay = new HelpDisplay();
     helpDisplay.show();
+  }
+  
+  @Override
+  public void handleModCourse(ActionEvent event) {
+    if (mainScene.isEditorActive()) {
+      if (editorHandler.isCatalogueLoaded()) {
+        editorHandler.handle(CUDEvent.generateModificationEvent(event, TargetEntity.COURSE, null));// By design, can be null
+      }
+    }
   }
   
   public void setMainScene(MainScene mainScene) {

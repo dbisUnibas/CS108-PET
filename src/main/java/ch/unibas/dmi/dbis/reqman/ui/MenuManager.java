@@ -70,15 +70,12 @@ public class MenuManager {
   public static final String ITEM_QUIT = MENU_FILE_PREFIX + KEY_SEPARATOR + "quit" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_NEW_REQ = MENU_NEW_PREFIX + KEY_SEPARATOR + "requirement" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_NEW_MS = MENU_NEW_PREFIX + KEY_SEPARATOR + "milestone" + KEY_SEPARATOR + ITEM_SUFFIX;
+  public static final String ITEM_MOD_COURSE = MENU_MODIFY_PREFIX+KEY_SEPARATOR+"course"+KEY_SEPARATOR+ITEM_SUFFIX;
   public static final String ITEM_MOD_CAT = MENU_MODIFY_PREFIX + KEY_SEPARATOR + "catalogue" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_MOD_REQ = MENU_MODIFY_PREFIX + KEY_SEPARATOR + "requirement" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_MOD_MS = MENU_MODIFY_PREFIX + KEY_SEPARATOR + "milestone" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_MOD_GROUP = MENU_MODIFY_PREFIX + KEY_SEPARATOR + "group" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_SPLIT_GROUP = MENU_EDIT_PREFIX + KEY_SEPARATOR + "split" + KEY_SEPARATOR + ITEM_SUFFIX;
-  @Deprecated
-  public static final String ITEM_SHOW_OVERVIEW = MENU_VIEW_PREFIX + KEY_SEPARATOR + "catalogue-overview" + KEY_SEPARATOR + ITEM_SUFFIX;
-  @Deprecated
-  public static final String ITEM_EXPORT_OVERVIEW = MENU_VIEW_PREFIX + KEY_SEPARATOR + "export-overview" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_EDITOR = MENU_MODE_PREFIX + KEY_SEPARATOR + "editor" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_EVALUATOR = MENU_MODE_PREFIX + KEY_SEPARATOR + "evaluator" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_SHOW_FILTERBAR = MENU_VIEW_PREFIX + KEY_SEPARATOR + "filterbar" + KEY_SEPARATOR + ITEM_SUFFIX;
@@ -132,6 +129,7 @@ public class MenuManager {
   private MenuItem itemQuit;
   private MenuItem itemNewReq;
   private MenuItem itemNewMS;
+  private MenuItem itemModCourse;
   private MenuItem itemModCat;
   private MenuItem itemModReq;
   private MenuItem itemModMS;
@@ -299,6 +297,7 @@ public class MenuManager {
     registerMenu(MENU_MODIFY, menuModify = new Menu("Modify"));
     // Items
     // MODIFY
+    registerEditorItem(ITEM_MOD_COURSE, itemModCourse = new MenuItem("Modify Course..."), true);
     registerEditorItem(ITEM_MOD_CAT, itemModCat = new MenuItem("Modify Catalogue..."), true);
     registerEvaluatorItem(ITEM_MOD_GROUP, itemModGroup = new MenuItem("Modify Group"), true);
     registerEditorItem(ITEM_MOD_REQ, itemModReq = new MenuItem("Modify Requirement..."), true);
@@ -483,6 +482,9 @@ public class MenuManager {
             case ITEM_HELP:
               handler.handleShowHelp(event);
               break;
+            case ITEM_MOD_COURSE:
+              handler.handleModCourse(event);
+              break;
             default:
               LOGGER.warn("Unknown menu key: {}, ignoring" + key);
           }
@@ -536,6 +538,7 @@ public class MenuManager {
   private void assembleMenuEdit() {
     // Submenu
     menuModify.getItems().addAll(
+        itemModCourse,
         itemModCat,
         itemModGroup,
         itemModReq,

@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
-import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import javafx.event.ActionEvent;
 
 /**
@@ -46,17 +45,9 @@ public interface MenuHandler {
   
   void handleModGroup(ActionEvent event);
   
-  void handleShowOverview(ActionEvent event);
-  
   void handleShowEditor(ActionEvent event);
   
   void handleShowEvaluator(ActionEvent event);
-  
-  void handleExportOverview(ActionEvent event);
-  
-  void resetGlobalMilestoneChoice();
-  
-  void setGlobalMilestoneChoice(Milestone ms);
   
   void handlePresentationMode(ActionEvent event);
   
@@ -83,4 +74,7 @@ public interface MenuHandler {
   void handleShowAbout(ActionEvent event);
   
   void handleShowHelp(ActionEvent event);
+  
+  void handleModCourse(ActionEvent event);
+  
 }

@@ -117,7 +117,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   
   public void handleDeletion(CUDEvent event) {
     return;
-    // TODO Re-Implemet deletion of group
+    // TODO Re-Implemet closing of group
     /*
     switch (event.getTargetEntity()) {
       case GROUP:
@@ -331,29 +331,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     }
     
     manager.exportAllGroups(dir);
-    */
-  }
-  
-  public void showOverview() {
-    throw new UnsupportedOperationException("Not implemented yet");
-    /*
-    if (!manager.isCatalogueLoaded() || (manager.groupList() == null || manager.groupList().isEmpty())) {
-      return;
-    }
-    SimpleOverviewBuilder overview = new SimpleOverviewBuilder(manager.getCatalogue(), manager.groupList());
-    String export = overview.exportOverviewHTML();
-    WebView view = new WebView();
-    WebEngine engine = view.getEngine();
-    engine.loadContent(export);
-    HBox box = new HBox();
-    view.prefWidthProperty().bind(box.widthProperty());
-    view.prefHeightProperty().bind(box.heightProperty());
-    Scene webScene = new Scene(box, evaluator.getWidth(), evaluator.getHeight());
-    box.prefWidthProperty().bind(webScene.widthProperty());
-    box.prefHeightProperty().bind(webScene.heightProperty());
-    box.getChildren().add(view);
-    PopupStage popupStage = new PopupStage("Overview", webScene);
-    popupStage.showAndWait();
     */
   }
   
