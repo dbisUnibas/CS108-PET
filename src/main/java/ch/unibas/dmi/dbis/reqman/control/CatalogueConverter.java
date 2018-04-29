@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * TODO: Write JavaDoc
+ * Converts a pre 2.0.0 catalogue into a 2.0.0 catalogue/course pair
  *
  * @author loris.sauter
  */

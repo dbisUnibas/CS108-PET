@@ -168,6 +168,14 @@ public class CatalogueAnalyser {
     return nbOfDependents > 0;
   }
   
+  public List<Requirement> getDependants(Requirement requirement){
+    List<Requirement> list = new ArrayList<>();
+    if(isPredecessor(requirement)){
+      list.addAll(catalogue.getRequirements().stream().filter(r->getPredecessors(r).contains(requirement)).collect(Collectors.toList()) );
+    }
+    return list;
+  }
+  
   public List<Requirement> findRequirementsNameContains(String search) {
     return catalogue.getRequirements().stream().filter(r -> r.getName().toLowerCase().contains(search.toLowerCase())).collect(Collectors.toList());
   }

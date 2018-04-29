@@ -60,23 +60,6 @@ public class EntityController {
   private ObservableList<Milestone> observableMilestones;
   
   
-  public void reset(){
-    catalogueAnalyser = null;
-    entityFactory = null;
-    storageManager = null;
-    sessionManager = null;
-    groupAnalyserMap.clear();
-    observableGroups.clear();
-    progressGroupMap.clear();
-    summaryGroupMap.clear();
-    if(observableMilestones != null){
-      observableMilestones.clear();
-    }
-    if(observableRequirements != null){
-      observableRequirements.clear();
-    }
-  }
-  
   private EntityController() {
     sessionManager = new SessionManager();
     loadSession();
@@ -87,6 +70,23 @@ public class EntityController {
       instance = new EntityController();
     }
     return instance;
+  }
+  
+  public void reset() {
+    catalogueAnalyser = null;
+    entityFactory = null;
+    storageManager = null;
+    sessionManager = null;
+    groupAnalyserMap.clear();
+    observableGroups.clear();
+    progressGroupMap.clear();
+    summaryGroupMap.clear();
+    if (observableMilestones != null) {
+      observableMilestones.clear();
+    }
+    if (observableRequirements != null) {
+      observableRequirements.clear();
+    }
   }
   
   public Course createCourse(String courseName, String semester) {
@@ -135,7 +135,7 @@ public class EntityController {
      this redundancy is not very beautiful, but the first way I thought about to still get the UI notified.
      This leads to the contract, that the EditorHandler needs to add the req/ms on its own, to the obs.list
      
-     TODO Another way would be to add the entity while creating it. So that this keeps track of the redundant lists
+     Another way would be to add the entity while creating it. So that this keeps track of the redundant lists
       */
     setupObservableCatalogueLists();
     loadedCatalogue();
@@ -178,7 +178,7 @@ public class EntityController {
           storageManager.saveGroup(groupUuid);
         } catch (IOException e) {
           LOGGER.catching(e);
-          // TODO WHat to do
+          // Couldn't save the group to where it should have been saved.
         }
       } else {
         throw LOGGER.throwing(new IllegalStateException("Cannot save group if no StorageManager is available"));
@@ -195,7 +195,7 @@ public class EntityController {
           
         } catch (IOException e) {
           LOGGER.catching(e);
-          // TODO What to do
+          // Couldn't save the group to where it should have gone
         }
       } else {
         throw LOGGER.throwing(new IllegalStateException("Cannot save group as if no StorageManager is available"));
@@ -208,15 +208,15 @@ public class EntityController {
     List<Group> groupList = new ArrayList<>();
     for (File g : files) {
       Group group = storageManager.openGroup(g);
-      if(groupList.stream().map(Group::getUuid).collect(Collectors.toList()).contains(group.getUuid())){
+      if (groupList.stream().map(Group::getUuid).collect(Collectors.toList()).contains(group.getUuid())) {
         throw new EntityAlreadyOpenException(group.getUuid(), "Group");
       }
       // TODO fix so that only the faulty / already opened ones are not opened, but the others are
-      if(group.getProgressList().isEmpty()){
-        throw new MissingEntityException("The group ("+group.getName()+") was loaded without any progress", group, "progressList");
+      if (group.getProgressList().isEmpty()) {
+        throw new MissingEntityException("The group (" + group.getName() + ") was loaded without any progress", group, "progressList");
       }
-      if(group.getProgressSummaries().isEmpty()){
-        throw new MissingEntityException("The group ("+group.getName()+") was loaded without any progress summaries", group, "progressSummaries");
+      if (group.getProgressSummaries().isEmpty()) {
+        throw new MissingEntityException("The group (" + group.getName() + ") was loaded without any progress summaries", group, "progressSummaries");
       }
       addGroup(group);
       groupList.add(group);
@@ -247,11 +247,6 @@ public class EntityController {
   
   public CourseManager getCourseManager() {
     return courseManager;
-  }
-  
-  // TODO make private
-  public EntityFactory getEntityFactory() {
-    return entityFactory;
   }
   
   public void setupSaveDirectory(File dir) {
@@ -329,7 +324,9 @@ public class EntityController {
   }
   
   public boolean removeRequirement(Requirement requirement) {
-    // TODO Check dependecies
+    if(catalogueAnalyser.isPredecessor(requirement)){
+      catalogueAnalyser.getDependants(requirement).forEach(r -> r.removePredecessor(requirement));
+    }
     boolean result = entityFactory.getCatalogue().removeRequirement(requirement);
     LOGGER.debug("Removing req={}", requirement);
     LOGGER.debug("After deletion: {}", entityFactory.getCatalogue().getRequirements());
@@ -338,12 +335,15 @@ public class EntityController {
   }
   
   public boolean removeMilestone(Milestone milestone) {
-    // TODO Check dependencies
+    LOGGER.error("Currently not supported");
+    /*
+    // TODO Check if ms is used, if not remove - otherways block
     boolean result = entityFactory.getCatalogue().removeMilestone(milestone);
     LOGGER.debug("Removing ms={}", milestone);
     LOGGER.debug("After deletion: {}", entityFactory.getCatalogue().getMilestones());
     observableMilestones.remove(milestone);
-    return result;
+    return result;*/
+    return false;
   }
   
   public boolean hasCatalogue() {
@@ -378,7 +378,7 @@ public class EntityController {
           storageManager.saveCourse(getCourse());
         } catch (IOException e) {
           LOGGER.catching(e);
-          // TODO what to do
+          // Couldn't save entity as desired
         }
       } else {
         throw LOGGER.throwing(new IllegalStateException("Cannot save the course if no StorageManager is available"));
@@ -396,7 +396,7 @@ public class EntityController {
           storageManager.saveCourse(getCourse()); // because times could have been added
         } catch (IOException e) {
           LOGGER.catching(e);
-          // TODO What to do
+          // couldn't save entity as desired
         }
       } else {
         throw LOGGER.throwing(new IllegalStateException("Canno save catalogue if no StorageManager is available"));
@@ -419,7 +419,7 @@ public class EntityController {
       entityFactory = EntityFactory.createFactoryFor(c);
     } catch (IOException e) {
       LOGGER.catching(e);
-      //TODO what to do
+      // Coudln't open entity as desired
     }
   }
   
@@ -438,34 +438,34 @@ public class EntityController {
     LOGGER.debug("Found {} categories: {}", categories.size(), categories);
   }
   
-  public boolean convertOld(File file) throws RuntimeException{
+  public boolean convertOld(File file) throws RuntimeException {
     CatalogueConverter converter = new CatalogueConverter();
     
-    try{
+    try {
       converter.convert(Version.forString("2.0.0"), file);
       
-      if(converter.getLastException() == null){
+      if (converter.getLastException() == null) {
         // seemingly all good
         
         Catalogue cat = converter.getCatalogue();
         Course c = converter.getCourse();
         
-        if(cat == null){
+        if (cat == null) {
           throw new RuntimeException("Converted to null catalogue");
         }
-        if(c == null){
+        if (c == null) {
           throw new RuntimeException("Converted to null course");
         }
         
-        entityFactory = EntityFactory.createFactoryFor(c,cat);
+        entityFactory = EntityFactory.createFactoryFor(c, cat);
         setupObservableCatalogueLists();
         loadedCatalogue();
         LOGGER.info("Conversion finished");
         return true;
-      }else{
+      } else {
         throw new RuntimeException("Exception during conversion.", converter.getLastException());
       }
-    }catch (Throwable t){
+    } catch (Throwable t) {
       LOGGER.fatal("Exception during conversion {}", t);
       throw new RuntimeException("Exception during conversion.", t);
     }
@@ -500,6 +500,10 @@ public class EntityController {
     }
   }
   
+  public EntityFactory getEntityFactory() {
+    return entityFactory;
+  }
+  
   private void setupObservableCatalogueLists() {
     observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
     observableMilestones = FXCollections.observableArrayList();
@@ -519,7 +523,7 @@ public class EntityController {
     List<Requirement> list = getCatalogue().getRequirements().stream().filter(r -> r.getPredecessors().length > 0).collect(Collectors.toList());
     LOGGER.debug("Fixing {} times predecessors", list.size());
     list.forEach(requirement -> {
-      LOGGER.debug("Potential predecessor-dupes: {}",requirement);
+      LOGGER.debug("Potential predecessor-dupes: {}", requirement);
       catalogueAnalyser.cleanPredecessors(requirement);
     });
   }
