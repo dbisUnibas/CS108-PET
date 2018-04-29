@@ -1,6 +1,5 @@
-# ReqMan
+# ReqMan v2.0.0
 
-*Development version, do not use in production*
 
 ---
 
