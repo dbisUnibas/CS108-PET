@@ -504,6 +504,10 @@ public class EntityController {
     return entityFactory;
   }
   
+  public void openGroup(Group g) {
+    addGroup(g);
+  }
+  
   private void setupObservableCatalogueLists() {
     observableRequirements = FXCollections.observableArrayList(); // Actually not very beautiful, but since the catalogue.getRequirements returns a copy / changes to it catalgoue.requirements are not reported, this is the only way.
     observableMilestones = FXCollections.observableArrayList();

@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
+import ch.unibas.dmi.dbis.reqman.backup.BackupManager;
 import ch.unibas.dmi.dbis.reqman.common.Callback;
 import ch.unibas.dmi.dbis.reqman.common.EntityAlreadyOpenException;
 import ch.unibas.dmi.dbis.reqman.common.MissingEntityException;
@@ -56,9 +57,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
    * A map of group ids - booleans to indicate if it was saved or not
    */
   private HashMap<UUID, Boolean> unsavedGroupsMap = new HashMap<>();
-  
-  @Deprecated
-  private HashMap<String, Boolean> dirtyMap = new HashMap<>();
   
   private StatusBar statusBar;
   
@@ -228,6 +226,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     evaluator.closeFilterBar();
   }
   
+  public void loadBackups() {
+  
+  }
+  
   private void reset() {
     this.assessmentViewMap.clear();
   }
@@ -349,10 +351,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     });*/
   }
   
-  public boolean isDirty(Group group) {
-    return dirtyMap.containsKey(group.getName()) && dirtyMap.get(group.getName());
-  }
-  
   public boolean isGroupLoaded() {
     return EntityController.getInstance().hasGroups();
   }
@@ -381,18 +379,6 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   
   ObservableList<Group> groupList() {
     return EntityController.getInstance().groupList();
-  }
-  
-  void markDirty(Group activeGroup) {
-    dirtyMap.put(activeGroup.getName(), true);
-    evaluator.markDirty(activeGroup);
-  }
-  
-  void unmarkDirty(Group activeGroup) {
-    if (dirtyMap.containsKey(activeGroup.getName())) {
-      dirtyMap.put(activeGroup.getName(), false);
-    }
-    evaluator.unmarkDirty(activeGroup);
   }
   
   void openGroupTab(Group group) {
@@ -460,7 +446,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     evaluator.showStatistics(assessmentViewMap);
   }
   
-  private void addTabAndRefresh(Group group){
+  public void addTabAndRefresh(Group group){
     AssessmentView av = getAssessmentView(group);
     av.recalculatePoints();
     if(evaluator.isGroupTabbed(group)){

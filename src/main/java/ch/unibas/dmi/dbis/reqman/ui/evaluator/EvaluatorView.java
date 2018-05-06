@@ -1,5 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
+import ch.unibas.dmi.dbis.reqman.backup.BackupManager;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.ui.common.CourseInfoView;
@@ -275,5 +276,6 @@ public class EvaluatorView extends VBox implements TitleProvider {
     if(statisticsCloser != null){
       statisticsCloser.apply(null);
     }
+    BackupManager.getInstance().storeBackups();
   }
 }

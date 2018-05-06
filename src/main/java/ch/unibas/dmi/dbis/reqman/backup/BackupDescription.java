@@ -15,6 +15,10 @@ class BackupDescription {
   private UUID uuid;
   private String path;
   
+  public BackupDescription(){
+  
+  }
+  
   public BackupDescription(UUID uuid, String path) {
     this.uuid = uuid;
     this.path = path;

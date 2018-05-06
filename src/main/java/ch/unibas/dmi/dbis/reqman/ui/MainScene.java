@@ -1,16 +1,24 @@
 package ch.unibas.dmi.dbis.reqman.ui;
 
+import ch.unibas.dmi.dbis.reqman.backup.BackupManager;
 import ch.unibas.dmi.dbis.reqman.common.Version;
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
+import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.ui.common.TitledScene;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorView;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorView;
+import javafx.event.ActionEvent;
 import javafx.scene.Cursor;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.controlsfx.control.NotificationPane;
+
+import java.util.List;
 
 /**
  * TODO: Write JavaDoc
@@ -51,6 +59,25 @@ public class MainScene extends TitledScene {
     return String.format("ReqMan %s (%s)", mode, Version.getInstance().getVersion());
   }
   
+  private static final Logger LOGGER = LogManager.getLogger();
+  
+  public void loadBackups() {
+    LOGGER.debug("Loading backups");
+    List<Group> groups = BackupManager.getInstance().load();
+    LOGGER.debug("Backups to load: {}",groups.size());
+    if(groups.size() >= 1){
+      mainHandler.handleOpenCat(new ActionEvent());
+    }
+    groups.forEach(g ->{
+      LOGGER.debug("Loading backup of {}", g.getName());
+      EntityController.getInstance().openGroup(g);
+      evaluatorHandler.addTabAndRefresh(g);
+      evaluator.markDirty(g);
+      BackupManager.getInstance().addUnsavedGroup(g);
+    });
+    BackupManager.getInstance().clean();
+  }
+  
   boolean isEditorActive() {
     return active == Mode.EDITOR;
   }
@@ -59,10 +86,16 @@ public class MainScene extends TitledScene {
     return active == Mode.EVALUATOR;
   }
   
+  private boolean stopped = false;
+  
   void stop() {
-    mainHandler.stop();
-    editor.stop();
-    evaluator.stop();
+    if(!stopped){
+      mainHandler.stop();
+      editor.stop();
+      evaluator.stop();
+      
+      stopped = true;
+    }
   }
   
   Mode getActiveMode() {

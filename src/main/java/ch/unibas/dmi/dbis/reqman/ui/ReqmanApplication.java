@@ -49,6 +49,7 @@ public class ReqmanApplication extends Application {
     Utils.applyLogoIcon(primaryStage);
     primaryStage.show();
     primaryStage.setOnCloseRequest(event -> stop());
+    scene.loadBackups();
   }
   
   @Override

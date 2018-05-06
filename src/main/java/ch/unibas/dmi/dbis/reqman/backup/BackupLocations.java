@@ -2,6 +2,7 @@ package ch.unibas.dmi.dbis.reqman.backup;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,7 +12,7 @@ import java.util.List;
  */
 public class BackupLocations {
   
-  private List<BackupDescription> locations;
+  private List<BackupDescription> locations = new ArrayList<>();
   
   public BackupLocations() {
   }
