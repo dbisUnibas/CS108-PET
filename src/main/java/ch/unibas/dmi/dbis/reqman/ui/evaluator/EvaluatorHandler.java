@@ -281,6 +281,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   public void handleSaveGroup(ActionEvent actionEvent) {
     UUID groupID = evaluator.getActiveGroupUUID();
     LOGGER.debug("Saving group with id {}", groupID);
+    Group gr = EntityController.getInstance().getGroup(groupID);
     if(EntityController.getInstance().getStorageManager().hasGroupSaveFile(groupID)){
       EntityController.getInstance().saveGroup(groupID);
       LOGGER.info("Saved group {}", groupID);
@@ -289,8 +290,8 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
       Group g = EntityController.getInstance().getGroup(groupID);
       EntityController.getInstance().saveGroupAs(g);
       LOGGER.info("Group {} saved.", g.getName());
-      
     }
+    evaluator.unmarkDirty(gr);
     Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text(String.format("Group '%s' saved", EntityController.getInstance().getGroup(groupID).getName())).showInformation();
   }
   
@@ -306,6 +307,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
       LOGGER.debug("Chosen dir={}", dir);
       EntityController.getInstance().setupSaveDirectory(dir);
       EntityController.getInstance().saveGroupAs(g);
+      evaluator.unmarkDirty(g);
       Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text(String.format("Group '%s' saved", g.getName())).showInformation();
     }
   }

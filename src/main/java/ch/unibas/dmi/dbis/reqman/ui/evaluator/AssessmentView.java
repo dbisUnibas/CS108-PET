@@ -1,6 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.analysis.*;
+import ch.unibas.dmi.dbis.reqman.backup.BackupManager;
 import ch.unibas.dmi.dbis.reqman.common.StringUtils;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.*;
@@ -131,12 +132,14 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   public void markDirty() {
     LOGGER.trace("Dirty");
     notifyDirtyListeners(true);
+    BackupManager.getInstance().addUnsavedGroup(group);
   }
   
   @Override
   public void unmarkDirty() {
     LOGGER.trace("Undirty");
     notifyDirtyListeners(false);
+    BackupManager.getInstance().removeUnsavedGroup(group);
   }
   
   @Override

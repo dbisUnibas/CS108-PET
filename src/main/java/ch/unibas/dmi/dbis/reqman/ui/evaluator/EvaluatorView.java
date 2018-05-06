@@ -80,6 +80,17 @@ public class EvaluatorView extends VBox implements TitleProvider {
     tab.setOnClosed(event -> {
       groupTapMap.remove(tab.getUserData());
     });
+    view.addDirtyListener(new DirtyListener() {
+      @Override
+      public void markDirty() {
+        EvaluatorView.this.markDirty(view.getActiveGroup());
+      }
+  
+      @Override
+      public void unmarkDirty() {
+        EvaluatorView.this.unmarkDirty(view.getActiveGroup());
+      }
+    });
     if (fresh) {
       markDirty(view.getActiveGroup());
     }
@@ -87,7 +98,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
   }
   
   public void markDirty(Group group) {
-    Tab tab = legacyGroupTabMap.get(group.getName());
+    Tab tab = groupTapMap.get(group.getUuid());
     if (tab.getText().indexOf("*") < 0) {
       tab.setText(tab.getText() + "*");
     }
@@ -97,7 +108,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
   }
   
   public void unmarkDirty(Group modified) {
-    Tab tab = legacyGroupTabMap.get(modified.getName());
+    Tab tab = groupTapMap.get(modified.getUuid());
     tab.getStyleClass().remove("modified");
     if (tab.getText().indexOf("*") >= 0) {
       String text = tab.getText().substring(0, tab.getText().indexOf("*"));
@@ -106,7 +117,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
   }
   
   public boolean isDirty(Group group) {
-    Tab tab = legacyGroupTabMap.get(group.getName());
+    Tab tab = groupTapMap.get(group.getUuid());
     return tab.getStyleClass().contains("modified");
   }
   
