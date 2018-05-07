@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,7 +37,7 @@ public class BackupManager {
     return ourInstance;
   }
   
-  public List<Group> load(){
+  public List<Group> load() {
     return load(getBackupDescriptionLocation());
   }
   
@@ -47,6 +48,10 @@ public class BackupManager {
   public List<Group> load(Path path) {
     LOGGER.debug("Loading backups from {}", path);
     File f = path.toFile();
+    if (!f.exists()) {
+      LOGGER.info("No backups to load");
+      return new ArrayList<>();
+    }
     try {
       loc = JSONUtils.readFromJSONFile(f, BackupLocations.class);
       LOGGER.debug("Found backup descriptions: {}", JSONUtils.toJSON(loc));
@@ -77,12 +82,12 @@ public class BackupManager {
   }
   
   public void storeBackups() {
-    if(unsavedGroups.isEmpty()){
+    if (unsavedGroups.isEmpty()) {
       return; // Don't write any backups if nothing is there to write #jodaspeak
     }
     getDefaultBackupLocation().toFile().mkdirs();
     BackupLocations locs = new BackupLocations();
-    for(Group g : unsavedGroups){
+    for (Group g : unsavedGroups) {
       try {
         locs.add(storeBackup(g));
         LOGGER.info("Stored a backup of group {}", g.getName());
@@ -92,7 +97,7 @@ public class BackupManager {
       }
     }
     try {
-      LOGGER.debug("Locs before write: {}",JSONUtils.toJSON(locs));
+      LOGGER.debug("Locs before write: {}", JSONUtils.toJSON(locs));
       JSONUtils.writeToJSONFile(locs, getBackupDescriptionLocation().toFile());
       LOGGER.info("Wrote backup locations at {}", getBackupDescriptionLocation());
     } catch (IOException e) {
@@ -110,10 +115,15 @@ public class BackupManager {
       LOGGER.error(e);
     }
     try {
-      for(File f : getDefaultBackupLocation().toFile().listFiles()){
-        f.delete();
+      
+      try {
+        Files.deleteIfExists(getDefaultBackupLocation());
+      } catch (DirectoryNotEmptyException ex) {
+        for (File f : getDefaultBackupLocation().toFile().listFiles()) {
+          f.delete();
+        }
+        Files.deleteIfExists(getDefaultBackupLocation());
       }
-      Files.deleteIfExists(getDefaultBackupLocation());
     } catch (IOException e) {
       LOGGER.error("Couldn't delete backup directory. May a manual deletion is required.");
       LOGGER.error(e);
@@ -121,7 +131,7 @@ public class BackupManager {
   }
   
   private BackupDescription storeBackup(Group g) throws IOException {
-    BackupDescription desc = new BackupDescription(g.getUuid(), getDefaultBackupLocation().resolve(g.getName()+BACKUP_EXTENSION).toFile().getAbsolutePath());
+    BackupDescription desc = new BackupDescription(g.getUuid(), getDefaultBackupLocation().resolve(g.getName() + BACKUP_EXTENSION).toFile().getAbsolutePath());
     JSONUtils.writeToJSONFile(g, new File(desc.getPath()));
     LOGGER.info("Stored a backup of group {} at {}", g.getName(), desc.getPath());
     return desc;
@@ -129,7 +139,7 @@ public class BackupManager {
   
   private Group readBackup(String path) throws IOException {
     Group g = JSONUtils.readFromJSONFile(new File(path), Group.class);
-    LOGGER.debug("Loaded group g {} from {}",g.getName(),path);
+    LOGGER.debug("Loaded group g {} from {}", g.getName(), path);
     return g;
   }
   
