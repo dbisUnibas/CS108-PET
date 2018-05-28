@@ -294,6 +294,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
       LOGGER.info("Group {} saved.", g.getName());
     }
     evaluator.unmarkDirty(gr);
+    assessmentViewMap.get(gr.getUuid()).unmarkDirty();
     Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text(String.format("Group '%s' saved", EntityController.getInstance().getGroup(groupID).getName())).showInformation();
   }
   
