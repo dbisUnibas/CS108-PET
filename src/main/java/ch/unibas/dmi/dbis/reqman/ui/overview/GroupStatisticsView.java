@@ -74,13 +74,19 @@ public class GroupStatisticsView extends VBox {
     scrollPane.prefWidthProperty().bind(widthProperty());
     scrollPane.prefHeightProperty().bind(heightProperty());
     
-    scrollPane.setMinHeight(200);
-    scrollPane.setMinWidth(300);
+    scrollPane.setMinHeight(300);
+    scrollPane.setMinWidth(400);
+  
+    treeTableView.setMinHeight(200);
+    treeTableView.setMinWidth(250);
   }
   
   private void addDetailCharts() {
     for (Group g : EntityController.getInstance().groupList()) {
-      container.getChildren().add(createDetailChart(g));
+      StackedBarChart<String,Number> chart = createDetailChart(g);
+      chart.setMinHeight(150);
+      chart.setMinWidth(200);
+      container.getChildren().add(chart);
     }
   }
   
@@ -163,6 +169,8 @@ public class GroupStatisticsView extends VBox {
     lineChart.getData().add(catSeries);
     lineChart.getData().addAll(series);
     
+    lineChart.setMinHeight(300);
+    
     return lineChart;
   }
   
@@ -203,7 +211,7 @@ public class GroupStatisticsView extends VBox {
     
     sbc.getData().addAll(malusSeries, regularSeries, bonusSeries);
     
-    sbc.setMinHeight(100);
+    sbc.setMinHeight(200);
     
     return sbc;
   }
