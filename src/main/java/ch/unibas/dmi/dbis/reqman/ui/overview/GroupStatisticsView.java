@@ -8,19 +8,24 @@ import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
-import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
-import javafx.scene.chart.*;
-import javafx.scene.control.*;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeTableColumn;
+import javafx.scene.control.TreeTableView;
 import javafx.scene.layout.VBox;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 /**
  * TODO: write JavaDoc
@@ -45,6 +50,7 @@ public class GroupStatisticsView extends VBox {
     initComps();
     layoutComps();
     addDetailCharts();
+    update();
   }
 
   public void update() {
@@ -72,7 +78,7 @@ public class GroupStatisticsView extends VBox {
   private void layoutComps() {
     scrollPane.setContent(container);
     Utils.applyDefaultSpacing(container);
-    container.getChildren().addAll(treeTableView, chart);
+    container.getChildren().addAll(treeTableView, achievementAnalysis, chart);
     getChildren().add(scrollPane);
 //    VBox.setVgrow(treeTableView, Priority.SOMETIMES);
 
@@ -83,8 +89,8 @@ public class GroupStatisticsView extends VBox {
     scrollPane.prefWidthProperty().bind(widthProperty());
     scrollPane.prefHeightProperty().bind(heightProperty());
 
-    scrollPane.setMinHeight(200);
-    scrollPane.setMinWidth(300);
+    scrollPane.setMinHeight(500);
+    scrollPane.setMinWidth(700);
   }
 
   private void addDetailCharts() {
@@ -111,29 +117,32 @@ public class GroupStatisticsView extends VBox {
     nameCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, String> param) ->
     new ReadOnlyStringWrapper(param.getValue().getValue().getRequirement().getName()));
 
-    TreeTableColumn<RequirementOverviewItem, Integer> achievedCol = new TreeTableColumn<>("Achieved");
-    achievedCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Integer> param) ->
-        new ReadOnlyObjectWrapper(param.getValue().getValue().getAchievedCount()));
+    TreeTableColumn<RequirementOverviewItem, Number> achievedCol = new TreeTableColumn<>("Achieved");
+    achievedCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Number> param) ->
+        new ReadOnlyIntegerWrapper(param.getValue().getValue().getAchievedCount()));
 
-    TreeTableColumn<RequirementOverviewItem, Integer> achievedMalCol = new TreeTableColumn<>("Achieved (Malus)");
-    achievedCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Integer> param) ->
-        new ReadOnlyObjectWrapper(param.getValue().getValue().getRequirement().isMalus() ? param.getValue().getValue().getAchievedCount() : -1));
+    TreeTableColumn<RequirementOverviewItem, Number> achievedMalCol = new TreeTableColumn<>("Achieved (Malus)");
+    achievedMalCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Number> param) ->
+        new ReadOnlyIntegerWrapper(param.getValue().getValue().getRequirement().isMalus() ? param.getValue().getValue().getAchievedCount() : -1));
 
-    TreeTableColumn<RequirementOverviewItem, Integer> achievedBonCol = new TreeTableColumn<>("Achieved (Bonus)");
-    achievedCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Integer> param) ->
-        new ReadOnlyObjectWrapper(param.getValue().getValue().getRequirement().isBonus() ? param.getValue().getValue().getAchievedCount() : -1));
+    TreeTableColumn<RequirementOverviewItem, Number> achievedBonCol = new TreeTableColumn<>("Achieved (Bonus)");
+    achievedBonCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Number> param) ->
+        new ReadOnlyIntegerWrapper(param.getValue().getValue().getRequirement().isBonus() ? param.getValue().getValue().getAchievedCount() : -1));
 
-    TreeTableColumn<RequirementOverviewItem, Integer> notAchievedRegCol = new TreeTableColumn<>("Not Achieved (Regular)");
-    achievedCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Integer> param) ->
-        new ReadOnlyObjectWrapper(param.getValue().getValue().getRequirement().isRegular() ? param.getValue().getValue().getNotAchievedCount() : -1));
+    TreeTableColumn<RequirementOverviewItem, Number> achievedRegCol = new TreeTableColumn<>("Achieved (Regular)");
+    achievedRegCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Number> param) ->
+        new ReadOnlyIntegerWrapper(param.getValue().getValue().getRequirement().isRegular() ? param.getValue().getValue().getAchievedCount() : -1));
+
 
     achievementAnalysis = new TreeTableView<>(root);
+    achievementAnalysis.setPrefHeight(100);
 
     achievementAnalysis.getColumns().add(nameCol);
     achievementAnalysis.getColumns().add(achievedCol);
     achievementAnalysis.getColumns().add(achievedMalCol);
     achievementAnalysis.getColumns().add(achievedBonCol);
-    achievementAnalysis.getColumns().add(notAchievedRegCol);
+    achievementAnalysis.getColumns().add(achievedRegCol);
+    achievementAnalysis.setShowRoot(false);
 
     nameCol.setPrefWidth(150);
 
@@ -142,8 +151,8 @@ public class GroupStatisticsView extends VBox {
     achievementAnalysis.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     achievementAnalysis.getSelectionModel().setCellSelectionEnabled(false);
 
-
     achievementAnalysis.setMinHeight(achievementAnalysis.getPrefHeight());
+    achievementAnalysis.refresh();
   }
 
   private void setupTreeTable() {

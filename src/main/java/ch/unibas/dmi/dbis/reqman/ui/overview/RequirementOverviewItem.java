@@ -5,8 +5,10 @@ import ch.unibas.dmi.dbis.reqman.data.Progress;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
+/**
+ * Analysis methods do not really work on non-binary achievements, but who cares.
+ */
 public class RequirementOverviewItem {
 
   private final Requirement requirement;
@@ -26,23 +28,9 @@ public class RequirementOverviewItem {
   }
 
   public Integer getAchievedCount() {
-    if (!requirement.isBinary()) {
-      return -1;
-    }
     int count = 0;
     for (Progress progress : groupResults.values()) {
-      count += Math.max(0, progress.getFraction());
-    }
-    return count;
-  }
-
-  public Integer getNotAchievedCount() {
-    if (!requirement.isBinary()) {
-      return -1;
-    }
-    int count = 0;
-    for (Progress progress : groupResults.values()) {
-      if (progress.getFraction() == 0) {
+      if (progress.getFraction() > 0.5) {
         count += 1;
       }
     }

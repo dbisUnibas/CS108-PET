@@ -7,6 +7,7 @@ import ch.unibas.dmi.dbis.reqman.data.Course;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
+import ch.unibas.dmi.dbis.reqman.data.Requirement.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,6 @@ public class RequirementOverviewItemFactory {
 
   public RequirementOverviewItem createForRequirements(List<Requirement> requirements) {
     Requirement requirement = new Requirement();
-    requirement.setName("Overview - Test");
     return new RequirementOverviewItem(requirement);
   }
 }
