@@ -288,8 +288,10 @@ public class ProgressView extends VBox {
     setSide(assessmentContainer);
     
     collapsibleContainer.addRow(0, minMSLbl, minMS, maxMSLbl, maxMS);
-    collapsibleContainer.add(descLbl, 0, 1);
-    collapsibleContainer.add(taDesc, 1, 1, 3, 1);
+    if(taDesc != null && taDesc.getText() != null && !taDesc.getText().isEmpty() ){
+      collapsibleContainer.add(descLbl, 0, 1);
+      collapsibleContainer.add(taDesc, 1, 1, 3, 1);
+    }
     collapsibleContainer.add(commentLbl, 0, 2);
     collapsibleContainer.add(taComment, 1, 2, 3, 1);
     collapsibleContainer.add(lastModifiedLbl, 0, 3);
