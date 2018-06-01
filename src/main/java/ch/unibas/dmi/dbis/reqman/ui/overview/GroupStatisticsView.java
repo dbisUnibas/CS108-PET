@@ -23,7 +23,15 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
+import javafx.scene.chart.*;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import net.objecthunter.exp4j.ExpressionBuilder;
+import org.apache.commons.math3.util.Precision;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,6 +53,9 @@ public class GroupStatisticsView extends VBox {
   private LineChart<String, Number> chart;
   private ScrollPane scrollPane;
   private VBox container;
+  private HBox gradeContainer;
+  private TextField gradingFunction;
+
   private TreeTableView<RequirementOverviewItem> achievementAnalysis;
 
   public GroupStatisticsView() {
@@ -64,11 +75,12 @@ public class GroupStatisticsView extends VBox {
     setupTreeTable();
     setupAchievementAnalysis();
     container.getChildren().add(0, treeTableView);
-    container.getChildren().add(1, achievementAnalysis);
+    container.getChildren().add(2, achievementAnalysis);
     chart = createOverviewChart();
   }
   
   private void initComps() {
+    setupGradingBox();
     setupTreeTable();
     setupAchievementAnalysis();
     chart = createOverviewChart();
@@ -77,11 +89,32 @@ public class GroupStatisticsView extends VBox {
     scrollPane.setPrefSize(850, 650);
     container = new VBox();
   }
-  
+
+  private void setupGradingBox(){
+    gradingFunction = new TextField();
+    gradingFunction.setAlignment(Pos.CENTER_LEFT);
+    gradingFunction.setText("5*(p/max)+1");
+    Label gradeLabel = new Label("Grade Function: ");
+    Button update = new Button("Update Grades");
+    update.setOnAction(event -> {
+      if(gradingFunction.getText()!= null && !gradingFunction.getText().isEmpty()){
+        update();
+      }else{
+        //TODO Alert
+      }
+    });
+    gradeContainer = new HBox();
+    gradeContainer.getChildren().addAll(gradeLabel, gradingFunction, update);
+    gradeContainer.setSpacing(10);
+    gradeContainer.setMinHeight(40);
+    gradeContainer.setPrefHeight(100);
+    gradeContainer.setMinWidth(200);
+  }
+
   private void layoutComps() {
     scrollPane.setContent(container);
     Utils.applyDefaultSpacing(container);
-    container.getChildren().addAll(treeTableView, achievementAnalysis, chart);
+    container.getChildren().addAll(treeTableView, gradeContainer, achievementAnalysis, chart);
     getChildren().add(scrollPane);
 //    VBox.setVgrow(treeTableView, Priority.SOMETIMES);
     
@@ -94,7 +127,7 @@ public class GroupStatisticsView extends VBox {
     
     scrollPane.setMinHeight(300);
     scrollPane.setMinWidth(400);
-
+  
     treeTableView.setMinHeight(200);
     treeTableView.setMinWidth(250);
   }
@@ -192,7 +225,19 @@ public class GroupStatisticsView extends VBox {
     ctrl.groupList().forEach(g -> {
       TreeTableColumn<GroupOverviewItem, String> groupCol = new TreeTableColumn<>(g.getName());
       
-      groupCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String> param) -> new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getPoints(g.getUuid()))));
+      groupCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String> param) -> {
+        double points = param.getValue().getValue().getPoints(g.getUuid());
+        double max = param.getValue().getValue().getPoints(cat.getUuid());
+        try{
+          double grade = new ExpressionBuilder(gradingFunction.getText()).variables("p", "max").build().setVariable("p", points).setVariable("max", max).evaluate();
+          grade = Precision.round(grade, 2);
+          return new ReadOnlyStringWrapper(StringUtils.prettyPrint(points)+ " ("+StringUtils.prettyPrint(grade)+")");
+        }catch(Exception e){
+          //TODO Alert
+          LOGGER.error(e);
+          return new ReadOnlyStringWrapper(StringUtils.prettyPrint(points));
+        }
+      });
       
       treeTableView.getColumns().add(groupCol);
     });
@@ -205,8 +250,7 @@ public class GroupStatisticsView extends VBox {
     treeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     treeTableView.getSelectionModel().setCellSelectionEnabled(false);
     
-    
-    treeTableView.setMinHeight(treeTableView.getPrefHeight());
+    treeTableView.setMinHeight(100);
   }
   
   private LineChart<String, Number> createOverviewChart() {
@@ -242,12 +286,12 @@ public class GroupStatisticsView extends VBox {
     
     lineChart.getData().add(catSeries);
     lineChart.getData().addAll(series);
-
+    
     lineChart.setMinHeight(300);
-
+    
     return lineChart;
   }
-
+  
   private StackedBarChart<String, Number> createDetailChart(Group g) {
     ctrl = EntityController.getInstance();
     analyser = ctrl.getCatalogueAnalyser();
