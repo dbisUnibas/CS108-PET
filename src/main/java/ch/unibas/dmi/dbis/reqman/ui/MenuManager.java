@@ -67,6 +67,7 @@ public class MenuManager {
   public static final String ITEM_EXPORT_CAT = MENU_EXPORT_PREFIX + KEY_SEPARATOR + "catalogue" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_EXPORT_GROUPS = MENU_EXPORT_PREFIX + KEY_SEPARATOR + "groups" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_EXPORT_GROUP = MENU_EXPORT_PREFIX + KEY_SEPARATOR + "group-single" + KEY_SEPARATOR + ITEM_SUFFIX;
+  public static final String ITEM_EXPORT_OVERVIEW_GROUPS = MENU_EXPORT+KEY_SEPARATOR+"overview-group" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_QUIT = MENU_FILE_PREFIX + KEY_SEPARATOR + "quit" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_NEW_REQ = MENU_NEW_PREFIX + KEY_SEPARATOR + "requirement" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_NEW_MS = MENU_NEW_PREFIX + KEY_SEPARATOR + "milestone" + KEY_SEPARATOR + ITEM_SUFFIX;
@@ -90,6 +91,7 @@ public class MenuManager {
   public static final String ITEM_IMPORT = MENU_FILE_PREFIX + KEY_SEPARATOR + "import" + KEY_SEPARATOR + ITEM_SUFFIX;
   
   private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
+  
   private static MenuManager instance = null;
   
   private MenuItem itemSplitGroup;
@@ -126,6 +128,7 @@ public class MenuManager {
   private MenuItem itemExportCat;
   private MenuItem itemExportGroups;
   private MenuItem itemExportGroup;
+  private MenuItem itemExportOverviewGroups;
   private MenuItem itemQuit;
   private MenuItem itemNewReq;
   private MenuItem itemNewMS;
@@ -338,6 +341,7 @@ public class MenuManager {
     registerEditorItem(ITEM_EXPORT_CAT, itemExportCat = new MenuItem("Export Catalogue..."), true);
     registerEvaluatorItem(ITEM_EXPORT_GROUP, itemExportGroup = new MenuItem("Export Active Group..."), true);
     registerEvaluatorItem(ITEM_EXPORT_GROUPS, itemExportGroups = new MenuItem("Export Groups..."), true);
+    registerEvaluatorItem(ITEM_EXPORT_OVERVIEW_GROUPS, itemExportOverviewGroups = new MenuItem("Export Groups Overview..."), true);
     // Remaining Items
     registerMenuItem(ITEM_IMPORT, itemImport = new MenuItem("Import Catalogue..."));
     registerMenuItem(ITEM_QUIT, itemQuit = new MenuItem("Quit"));
@@ -485,6 +489,9 @@ public class MenuManager {
               break;
             case ITEM_MOD_COURSE:
               handler.handleModCourse(event);
+              break;
+            case ITEM_EXPORT_OVERVIEW_GROUPS:
+              handler.handleExportOverviewGroups(event);
               break;
             default:
               LOGGER.warn("Unknown menu key: {}, ignoring" + key);

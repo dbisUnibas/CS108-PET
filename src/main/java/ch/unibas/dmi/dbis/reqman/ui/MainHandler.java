@@ -517,6 +517,11 @@ public class MainHandler implements MenuHandler {
     }
   }
   
+  @Override
+  public void handleExportOverviewGroups(ActionEvent event) {
+    LOGGER.debug("Handling menu: Export Overview Groups");
+  }
+  
   public void setMainScene(MainScene mainScene) {
     this.mainScene = mainScene;
   }

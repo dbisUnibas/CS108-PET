@@ -77,4 +77,5 @@ public interface MenuHandler {
   
   void handleModCourse(ActionEvent event);
   
+  void handleExportOverviewGroups(ActionEvent event);
 }
