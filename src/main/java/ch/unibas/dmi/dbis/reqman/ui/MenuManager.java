@@ -361,6 +361,7 @@ public class MenuManager {
     activeKeyBindings.put(ITEM_EXPORT_CAT, "Alt+E");
     activeKeyBindings.put(ITEM_EXPORT_GROUPS, "Ctrl+E");
     activeKeyBindings.put(ITEM_SHOW_FILTERBAR, "Ctrl+F");
+    activeKeyBindings.put(ITEM_SHOW_GROUP_STATISTICS, "Ctrl+Shift+O");
   }
   
   private void setOnActionAll() {
