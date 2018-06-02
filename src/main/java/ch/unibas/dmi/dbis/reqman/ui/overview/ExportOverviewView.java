@@ -2,9 +2,7 @@ package ch.unibas.dmi.dbis.reqman.ui.overview;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CSVOverviewGroupExporter;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
-import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
-import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -15,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.swing.plaf.FileChooserUI;
 import java.io.File;
 import java.io.IOException;
 
@@ -39,6 +36,7 @@ public class ExportOverviewView extends VBox {
   private HBox buttonContainer;
   
   private Button okButton;
+  private Button memberButton;
   
   private void initComponents(){
     titleLabel = new Label("Export Groups Overview");
@@ -58,23 +56,29 @@ public class ExportOverviewView extends VBox {
     formulaContainer = new HBox();
     Utils.applyDefaultSpacing(this);
     buttonContainer = new HBox();
-    okButton = new Button("Export");
-    okButton.setDefaultButton(true);
+    Utils.applyDefaultSpacing(buttonContainer);
+    okButton = new Button("Export Groups");
+    memberButton = new Button("Export Members");
   }
   
   private void layoutComponents(){
     formulaContainer.getChildren().addAll(formulaLabel, formulaTextField);
-    buttonContainer.getChildren().addAll(Utils.createHFill(), okButton);
+    buttonContainer.getChildren().addAll(Utils.createHFill(), memberButton, okButton);
     getChildren().addAll(titleLabel,info1Label,info2Label,formulaContainer,formulaHintLabel,buttonContainer);
   }
   
   public ExportOverviewView(){
     initComponents();
     layoutComponents();
-    okButton.setOnAction(this::handleExport);
+    okButton.setOnAction(event -> {
+      handleExport(false);
+    });
+    memberButton.setOnAction(event -> {
+      handleExport(true);
+    });
   }
   
-  private void handleExport(ActionEvent actionEvent) {
+  private void handleExport(boolean members) {
     CSVOverviewGroupExporter exporter;
     if(StringUtils.isNotBlank(formulaTextField.getText())){
       exporter = CSVOverviewGroupExporter.createGradedOverviewExporter(formulaTextField.getText(), EntityController.getInstance().getCatalogue(), EntityController.getInstance().getCourse(), EntityController.getInstance().groupList());
@@ -87,7 +91,12 @@ public class ExportOverviewView extends VBox {
       return; // USER ABORT
     }
     try {
-      exporter.exportLongOverviewTable(f);
+      if(members){
+        exporter.exportLongMemberOverviewTable(f);
+      }else{
+        exporter.exportLongOverviewTable(f);
+      }
+      Utils.showInfoDialog("Export Successfull","Exported the CSV overview to "+f.getAbsolutePath());
       if(getScene() != null && getScene().getWindow() != null){
         getScene().getWindow().hide();
       }
@@ -97,5 +106,7 @@ public class ExportOverviewView extends VBox {
       Utils.showErrorDialog("Couldn't export to CSV", e.getMessage());
     }
   }
+  
+  
   
 }

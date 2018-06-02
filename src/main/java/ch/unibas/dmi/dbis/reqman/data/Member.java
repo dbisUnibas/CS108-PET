@@ -70,7 +70,7 @@ public class Member {
    * @return The firstname of the person
    */
   public String getFirstName() {
-    return firstName;
+    return firstName != null ? firstName : "";
   }
   
   /**
@@ -79,7 +79,7 @@ public class Member {
    * @return The email address of the person
    */
   public String getEmail() {
-    return email;
+    return email != null ? email : "";
   }
   
   @Override
