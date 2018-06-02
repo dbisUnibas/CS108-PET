@@ -5,15 +5,18 @@ import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
 import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import ch.unibas.dmi.dbis.reqman.templating.ExportHelper;
+import ch.unibas.dmi.dbis.reqman.ui.common.PopupStage;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
 import ch.unibas.dmi.dbis.reqman.ui.help.HelpDisplay;
+import ch.unibas.dmi.dbis.reqman.ui.overview.ExportOverviewView;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.scene.Scene;
 import javafx.scene.control.RadioMenuItem;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -520,6 +523,9 @@ public class MainHandler implements MenuHandler {
   @Override
   public void handleExportOverviewGroups(ActionEvent event) {
     LOGGER.debug("Handling menu: Export Overview Groups");
+    Scene s = new Scene(new ExportOverviewView());
+    PopupStage ps = new PopupStage("Export Groups Overview",s);
+    ps.showAndWait();
   }
   
   public void setMainScene(MainScene mainScene) {

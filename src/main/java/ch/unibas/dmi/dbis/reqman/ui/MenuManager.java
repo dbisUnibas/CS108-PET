@@ -525,7 +525,8 @@ public class MenuManager {
     menuExport.getItems().addAll(
         itemExportCat,
         itemExportGroup,
-        itemExportGroups);
+        itemExportGroups,
+        itemExportOverviewGroups);
     // The menu:
     menuFile.getItems().addAll(
         menuNew,

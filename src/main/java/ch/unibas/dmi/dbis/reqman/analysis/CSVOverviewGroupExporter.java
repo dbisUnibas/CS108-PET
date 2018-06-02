@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Class which exports a list of groups as csv
@@ -32,12 +33,16 @@ public class CSVOverviewGroupExporter {
   
   
   private CSVOverviewGroupExporter(Catalogue catalogue, Course course, Group...groups) {
+    this(catalogue,course,Arrays.asList(groups));
+  }
+  
+  
+  private CSVOverviewGroupExporter(Catalogue catalogue, Course course, List<Group> groups) {
     this.catalogue = catalogue;
     this.course = course;
     this.catalogueAnalyser = new CatalogueAnalyser(course, catalogue);
-    this.groups.addAll(Arrays.asList(groups));
+    this.groups.addAll(groups);
   }
-  
   
   private boolean hasGradeForumla(){
     return StringUtils.isNotBlank(gradeFormula);
@@ -50,7 +55,17 @@ public class CSVOverviewGroupExporter {
     return new CSVOverviewGroupExporter(catalogue,course,groups);
   }
   
+  public static CSVOverviewGroupExporter createOverviewExporter(Catalogue catalogue, Course course, List<Group> groups){
+    return new CSVOverviewGroupExporter(catalogue,course,groups);
+  }
+  
   public static CSVOverviewGroupExporter createGradedOverviewExporter(String gradeFormula, Catalogue catalogue, Course course, Group...groups){
+    CSVOverviewGroupExporter exporter = new CSVOverviewGroupExporter(catalogue,course,groups);
+    exporter.gradeFormula = gradeFormula;
+    return exporter;
+  }
+  
+  public static CSVOverviewGroupExporter createGradedOverviewExporter(String gradeFormula, Catalogue catalogue, Course course, List<Group> groups){
     CSVOverviewGroupExporter exporter = new CSVOverviewGroupExporter(catalogue,course,groups);
     exporter.gradeFormula = gradeFormula;
     return exporter;
@@ -76,6 +91,7 @@ public class CSVOverviewGroupExporter {
       sb.append(SEPARATOR);
     });
     sb.append("Total");
+    
     if(hasGradeForumla()){
       sb.append(SEPARATOR);
       sb.append("Grade");
@@ -97,7 +113,7 @@ public class CSVOverviewGroupExporter {
       
       // [Almost] Last column: Total
       sb.append(SEPARATOR);
-      sb.append(ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(maxSum));
+      sb.append(ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(groupAnalyser.getSum()));
       
       if(hasGradeForumla()){
         // Last column, if grade formula present: Grade
@@ -115,7 +131,7 @@ public class CSVOverviewGroupExporter {
   }
   
   public void exportLongOverviewTable(File file) throws IOException {
-    if(!FileUtils.getFileExtension(file).equalsIgnoreCase("csv")){
+    if(StringUtils.isBlank(FileUtils.getFileExtension(file))){
       file = new File(file.getPath()+".csv");
     }
     BufferedWriter br = new BufferedWriter(new FileWriter(file));

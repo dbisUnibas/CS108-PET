@@ -1,11 +1,23 @@
 package ch.unibas.dmi.dbis.reqman.ui.overview;
 
+import ch.unibas.dmi.dbis.reqman.analysis.CSVOverviewGroupExporter;
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
+import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import org.apache.commons.lang.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.swing.plaf.FileChooserUI;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * TODO: Write JavaDoc
@@ -13,6 +25,8 @@ import javafx.scene.layout.VBox;
  * @author loris.sauter
  */
 public class ExportOverviewView extends VBox {
+  
+  private final static Logger LOGGER = LogManager.getLogger();
   
   private Label titleLabel;
   private Label info1Label;
@@ -45,14 +59,43 @@ public class ExportOverviewView extends VBox {
     Utils.applyDefaultSpacing(this);
     buttonContainer = new HBox();
     okButton = new Button("Export");
+    okButton.setDefaultButton(true);
   }
   
   private void layoutComponents(){
-    
+    formulaContainer.getChildren().addAll(formulaLabel, formulaTextField);
+    buttonContainer.getChildren().addAll(Utils.createHFill(), okButton);
+    getChildren().addAll(titleLabel,info1Label,info2Label,formulaContainer,formulaHintLabel,buttonContainer);
   }
   
-  private void layoutComonents(){
+  public ExportOverviewView(){
+    initComponents();
+    layoutComponents();
+    okButton.setOnAction(this::handleExport);
+  }
   
+  private void handleExport(ActionEvent actionEvent) {
+    CSVOverviewGroupExporter exporter;
+    if(StringUtils.isNotBlank(formulaTextField.getText())){
+      exporter = CSVOverviewGroupExporter.createGradedOverviewExporter(formulaTextField.getText(), EntityController.getInstance().getCatalogue(), EntityController.getInstance().getCourse(), EntityController.getInstance().groupList());
+    }else{
+      exporter = CSVOverviewGroupExporter.createOverviewExporter(EntityController.getInstance().getCatalogue(),EntityController.getInstance().getCourse(), EntityController.getInstance().groupList());
+    }
+    FileChooser fc = Utils.createFileChooser("CSV Location");
+    File f = fc.showSaveDialog(null);
+    if(f == null){
+      return; // USER ABORT
+    }
+    try {
+      exporter.exportLongOverviewTable(f);
+      if(getScene() != null && getScene().getWindow() != null){
+        getScene().getWindow().hide();
+      }
+    } catch (IOException e) {
+      LOGGER.error("While csv export: {}", e);
+      LOGGER.catching(e);
+      Utils.showErrorDialog("Couldn't export to CSV", e.getMessage());
+    }
   }
   
 }
