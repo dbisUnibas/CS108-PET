@@ -174,9 +174,13 @@ public class CSVOverviewGroupExporter {
         memberBuilder.append(m.getName());
         
         sb.append(memberBuilder.toString().trim());
+
+        // Column 1: Group name
+        sb.append(SEPARATOR);
+        sb.append(group.getName());
         
   
-        // Columns 1 to n (for each milestone)
+        // Columns 2 to n (for each milestone)
         catalogue.getMilestones().forEach(ms -> {
           sb.append(SEPARATOR);
           sb.append(ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(groupAnalyser.getSumFor(groupAnalyser.getProgressSummaryFor(ms))));
