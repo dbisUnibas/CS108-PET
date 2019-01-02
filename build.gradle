@@ -1,3 +1,9 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.5'
+}
+
 /*
  * Group name
  */
@@ -17,22 +23,28 @@ Project name: ${project.name}
 brief(er) description
 """
 
-/*
- * Adds default tasks related to java projects
- */
-apply plugin: 'java'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
+}
+
+javafx {
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.graphics']
 }
 
 dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.3'
+
+
+    //JavaFX
+    compile "org.openjfx:javafx-graphics:11:win"
+    compile "org.openjfx:javafx-graphics:11:linux"
+    compile "org.openjfx:javafx-graphics:11:mac"
+    compile group: 'org.controlsfx', name: 'controlsfx', version: '9.0.0'
 
 
     compile group: 'com.j2html', name: 'j2html', version: '0.88'
@@ -79,12 +91,14 @@ sourceSets {
     }
 }
 
+mainClassName = 'ch.unibas.dmi.dbis.reqman.main.Main'
+
 jar {
     from {
         configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
     manifest{
-        attributes 'Main-Class': 'ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication'
+        attributes 'Main-Class': mainClassName
     }
 }
 
