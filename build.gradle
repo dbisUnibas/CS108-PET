@@ -59,8 +59,9 @@ dependencies {
     compile 'org.kordamp.ikonli:ikonli-openiconic-pack:2.1.1'
 
 
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.10.0'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.10.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.1'
 
     compile group: 'org.controlsfx', name: 'controlsfx', version: '8.40.14'
 
@@ -99,6 +100,7 @@ jar {
     }
     manifest{
         attributes 'Main-Class': mainClassName
+        attributes 'Multi-Release':true
     }
 }
 
