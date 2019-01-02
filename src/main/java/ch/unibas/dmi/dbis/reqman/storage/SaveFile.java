@@ -103,7 +103,13 @@ public class SaveFile<T extends VersionedEntity> {
     } else if (dir != null) {
       // Case 2: Directory specified
       // search file with matching extension in that dir
-      File[] files = dir.listFiles(f -> FileUtils.getFileExtension(f).equals(getDesignatedExtension()));
+      File[] files = dir.listFiles(f -> {
+        String extension = FileUtils.getFileExtension(f);
+        if(extension == null){
+          return false;
+        }
+        return extension.equals(getDesignatedExtension());
+      });
       if(files == null){
         throw new RuntimeException("For some reason, files is null");
       }
