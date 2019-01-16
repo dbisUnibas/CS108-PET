@@ -245,7 +245,7 @@ public class RenderManager {
         list.sort((p1,p2)-> {
           Requirement r1 = EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p1);
           Requirement r2 = EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p2);
-          return EntityController.getInstance().getCatalogueAnalyser().getRequirementComparator().compare(r1,r2);
+          return EntityController.getInstance().getCatalogueAnalyser().getProgressRequirementComparator().compare(r1,r2);
         });
         
         list.forEach(p -> sb.append(renderProgress(p)));

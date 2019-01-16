@@ -228,6 +228,10 @@ public class CatalogueAnalyser {
   public Comparator<Requirement> getRequirementComparator() {
     return getRequirementMinimalMilestoneComparator().thenComparing(Requirement::getType, SortingUtils.REQUIREMENT_TYPE_COMPARATOR).thenComparing(Requirement::getName);
   }
+
+  public Comparator<Requirement> getProgressRequirementComparator() {
+    return ((Comparator<Requirement>) (o1, o2) -> SortingUtils.REQUIREMENT_TYPE_COMPARATOR.compare(o1.getType(), o2.getType())).thenComparing(getRequirementMinimalMilestoneComparator()).thenComparing(Requirement::getName);
+  }
   
   public double getActualPoints(@NotNull Progress progress) {
     Requirement r = getRequirementOf(progress);
