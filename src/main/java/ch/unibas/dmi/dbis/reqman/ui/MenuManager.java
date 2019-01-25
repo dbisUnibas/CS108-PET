@@ -17,13 +17,12 @@ import java.util.List;
  * <p>
  * This class manages all of the menu handles, it also builds the menu and loads shortcuts.
  * <p>
- * Each menu item has a userdata string which is in the form of <code>menu[.submenu].name.item</code>.
- * E.g. the menu item <i>Quit</i> under the menu <i>File</i> has the key <code>file.quit.item</code>
+ * Each menu item has a userdata string which is in the form of <code>menu[.submenu].name.item</code>. E.g. the menu item <i>Quit</i> under the menu <i>File</i> has the key <code>file.quit.item</code>
  *
  * @author loris.sauter
  */
 public class MenuManager {
-  
+
   public static final String MENU_SUFFIX = "menu";
   public static final String ITEM_SUFFIX = "item";
   public static final String KEY_SEPARATOR = ".";
@@ -37,20 +36,20 @@ public class MenuManager {
   public static final String MENU_VIEW_PREFIX = "view";
   public static final String MENU_MODE_PREFIX = "mode";
   public static final String MENU_HELP_PREFIX = "help";
-  
+
   public static final String MENU_FILE = MENU_FILE_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
   public static final String MENU_EDIT = MENU_EDIT_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
   public static final String MENU_VIEW = MENU_VIEW_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
   public static final String MENU_MODE = MENU_MODE_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
   public static final String MENU_HELP = MENU_HELP_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
-  
+
   public static final String MENU_NEW = MENU_FILE_PREFIX + KEY_SEPARATOR + MENU_NEW_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
   public static final String MENU_OPEN = MENU_FILE_PREFIX + KEY_SEPARATOR + MENU_OPEN_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
   public static final String MENU_SAVE = MENU_FILE_PREFIX + KEY_SEPARATOR + MENU_SAVE_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
   public static final String MENU_EXPORT = MENU_FILE_PREFIX + KEY_SEPARATOR + MENU_EXPORT_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
   public static final String MENU_MODIFY = MENU_EDIT_PREFIX + KEY_SEPARATOR + MENU_MODIFY_PREFIX + KEY_SEPARATOR + MENU_SUFFIX;
-  
-  
+
+
   public static final String ITEM_NEW_COURSE = MENU_NEW_PREFIX + KEY_SEPARATOR + "course" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_NEW_CAT = MENU_NEW_PREFIX + KEY_SEPARATOR + "catalogue" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_NEW_GROUP = MENU_NEW_PREFIX + KEY_SEPARATOR + "group" + KEY_SEPARATOR + ITEM_SUFFIX;
@@ -64,14 +63,15 @@ public class MenuManager {
   public static final String ITEM_SAVE_CAT_AS = MENU_SAVE_PREFIX + KEY_SEPARATOR + "catalogue-as" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_SAVE_GROUP = MENU_SAVE_PREFIX + KEY_SEPARATOR + "group" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_SAVE_GROUP_AS = MENU_SAVE_PREFIX + KEY_SEPARATOR + "group-as" + KEY_SEPARATOR + ITEM_SUFFIX;
+  public static final String ITEM_EXPORT_EXCEL = MENU_EXPORT_PREFIX + KEY_SEPARATOR + "excel" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_EXPORT_CAT = MENU_EXPORT_PREFIX + KEY_SEPARATOR + "catalogue" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_EXPORT_GROUPS = MENU_EXPORT_PREFIX + KEY_SEPARATOR + "groups" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_EXPORT_GROUP = MENU_EXPORT_PREFIX + KEY_SEPARATOR + "group-single" + KEY_SEPARATOR + ITEM_SUFFIX;
-  public static final String ITEM_EXPORT_OVERVIEW_GROUPS = MENU_EXPORT+KEY_SEPARATOR+"overview-group" + KEY_SEPARATOR + ITEM_SUFFIX;
+  public static final String ITEM_EXPORT_OVERVIEW_GROUPS = MENU_EXPORT + KEY_SEPARATOR + "overview-group" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_QUIT = MENU_FILE_PREFIX + KEY_SEPARATOR + "quit" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_NEW_REQ = MENU_NEW_PREFIX + KEY_SEPARATOR + "requirement" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_NEW_MS = MENU_NEW_PREFIX + KEY_SEPARATOR + "milestone" + KEY_SEPARATOR + ITEM_SUFFIX;
-  public static final String ITEM_MOD_COURSE = MENU_MODIFY_PREFIX+KEY_SEPARATOR+"course"+KEY_SEPARATOR+ITEM_SUFFIX;
+  public static final String ITEM_MOD_COURSE = MENU_MODIFY_PREFIX + KEY_SEPARATOR + "course" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_MOD_CAT = MENU_MODIFY_PREFIX + KEY_SEPARATOR + "catalogue" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_MOD_REQ = MENU_MODIFY_PREFIX + KEY_SEPARATOR + "requirement" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_MOD_MS = MENU_MODIFY_PREFIX + KEY_SEPARATOR + "milestone" + KEY_SEPARATOR + ITEM_SUFFIX;
@@ -84,35 +84,35 @@ public class MenuManager {
   public static final String ITEM_SHOW_CATALOGUE_STATISTICS = MENU_VIEW_PREFIX + KEY_SEPARATOR + "catalogue-stats" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_SHOW_GROUP_STATISTICS = MENU_VIEW_PREFIX + KEY_SEPARATOR + "group-stats" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_PRESENTATION_MODE = MENU_VIEW_PREFIX + KEY_SEPARATOR + "presentation" + KEY_SEPARATOR + ITEM_SUFFIX;
-  
+
   public static final String ITEM_ABOUT = MENU_HELP_PREFIX + KEY_SEPARATOR + "about" + KEY_SEPARATOR + ITEM_SUFFIX;
   public static final String ITEM_HELP = MENU_HELP_PREFIX + KEY_SEPARATOR + "help" + KEY_SEPARATOR + ITEM_SUFFIX;
-  
+
   public static final String ITEM_IMPORT = MENU_FILE_PREFIX + KEY_SEPARATOR + "import" + KEY_SEPARATOR + ITEM_SUFFIX;
-  
+
   private final static Logger LOGGER = LogManager.getLogger(MenuManager.class);
-  
+
   private static MenuManager instance = null;
-  
+
   private MenuItem itemSplitGroup;
-  
+
   private HashMap<String, MenuItem> menuItems = new HashMap<>();
   private HashMap<String, Menu> menus = new HashMap<>();
-  
+
   private Menu menuFile;
-  
+
   private Menu menuNew;
   private Menu menuOpen;
   private Menu menuSave;
   private Menu menuExport;
   private Menu menuModify;
-  
+
   private Menu menuEdit;
   private Menu menuView;
   private Menu menuMode;
   private Menu menuHelp;
-  
-  
+
+
   private MenuItem itemNewCourse;
   private MenuItem itemNewCat;
   private MenuItem itemNewGroup;
@@ -126,6 +126,7 @@ public class MenuManager {
   private MenuItem itemSaveCatAs;
   private MenuItem itemSaveGroupAs;
   private MenuItem itemExportCat;
+  private MenuItem itemExportExcel;
   private MenuItem itemExportGroups;
   private MenuItem itemExportGroup;
   private MenuItem itemExportOverviewGroups;
@@ -147,41 +148,41 @@ public class MenuManager {
   private MenuItem itemImport;
   private MenuItem itemAbout;
   private MenuItem itemHelp;
-  
-  
+
+
   private MenuBar menuBar = new MenuBar();
-  
-  
+
+
   private ArrayList<String> editorItems = new ArrayList<>();
   private ArrayList<String> evaluatorItems = new ArrayList<>();
-  
+
   private ArrayList<String> catNeeded = new ArrayList<>();
   private ArrayList<String> groupNeeded = new ArrayList<>();
   private ArrayList<String> openItems = new ArrayList<>();
-  
+
   private HashMap<String, String> activeKeyBindings = new HashMap<>();
-  
+
   private MenuHandler handler = null;
-  
+
   private MenuManager() {
     registerComponents();
     assembleMenus();
-    
+
     loadDefaultKeyBindings();
-    
+
     setOnActionAll();
     setKeyBindings();
-    
+
     disableAllButInitial();
   }
-  
+
   public static MenuManager getInstance() {
     if (instance == null) {
       instance = new MenuManager();
     }
     return instance;
   }
-  
+
   public MenuHandler setMenuHandler(MenuHandler handler) {
     MenuHandler old = null;
     if (this.handler != null) {
@@ -190,60 +191,60 @@ public class MenuManager {
     this.handler = handler;
     return old;
   }
-  
+
   public MenuHandler getMenuHandler() {
     return handler;
   }
-  
+
   public MenuBar getMenuBar() {
     return menuBar;
   }
-  
+
   public void disableEditorItems() {
     setDisableForItems(editorItems, true);
   }
-  
+
   public void enableEditorItems() {
     setDisableForItems(editorItems, false);
   }
-  
+
   public void disableEvaluatorItems() {
     setDisableForItems(evaluatorItems, true);
   }
-  
+
   public void enableEvaluaotrItems() {
     setDisableForItems(evaluatorItems, false);
   }
-  
+
   public void disableCatalogueNeeded() {
     setDisableForItems(catNeeded, true);
   }
-  
+
   public void enableCatalogueNeeded() {
     setDisableForItems(catNeeded, false);
   }
-  
+
   public void disableGroupNeeded() {
     setDisableForItems(groupNeeded, true);
   }
-  
+
   public void enableGroupNeeded() {
     LOGGER.traceEntry();
     setDisableForItems(groupNeeded, false);
   }
-  
+
   public void disableAllButInitial() {
     disableCatalogueNeeded();
     disableEditorItems();
     disableGroupNeeded();
     disableEvaluatorItems();
   }
-  
+
   public void enableOpenItems() {
     setDisableForItems(openItems, false);
-    
+
   }
-  
+
   private void registerComponents() {
     registerMenuFileComponents();
     registerMenuEditComponents();
@@ -251,7 +252,7 @@ public class MenuManager {
     registerMenuModeComponents();
     registerMenuHelpComponents();
   }
-  
+
   /**
    * Registers and instantiates components of menu 'help'
    */
@@ -262,7 +263,7 @@ public class MenuManager {
     registerMenuItem(ITEM_ABOUT, itemAbout = new MenuItem("About..."));
     registerMenuItem(ITEM_HELP, itemHelp = new MenuItem("Help..."));
   }
-  
+
   /**
    * Registers and instantiates components of menu 'mode'
    */
@@ -273,7 +274,7 @@ public class MenuManager {
     registerMenuItem(ITEM_EDITOR, itemEditor = new MenuItem("Editor"));
     registerMenuItem(ITEM_EVALUATOR, itemEvaluator = new MenuItem("Evaluator"));
   }
-  
+
   /**
    * Registers and instantiates components of menu 'view'
    */
@@ -290,7 +291,7 @@ public class MenuManager {
     groupNeeded.add(ITEM_SHOW_GROUP_STATISTICS);
     catNeeded.addAll(Arrays.asList(ITEM_CLEAR_FILTERS, ITEM_SHOW_FILTERBAR, ITEM_SHOW_CATALOGUE_STATISTICS));
   }
-  
+
   /**
    * Registers and instantiates components of menu 'edit'
    */
@@ -310,7 +311,7 @@ public class MenuManager {
     registerEditorItem(ITEM_NEW_MS, itemNewMS = new MenuItem("New Milestone..."), true);
     registerEvaluatorItem(ITEM_SPLIT_GROUP, itemSplitGroup = new MenuItem("Split Group..."), true);
   }
-  
+
   /**
    * Registers and instantiates components of menu 'file'
    */
@@ -338,6 +339,7 @@ public class MenuManager {
     registerEvaluatorItem(ITEM_SAVE_GROUP, itemSaveGroup = new MenuItem("Save Group"), true);
     registerEvaluatorItem(ITEM_SAVE_GROUP_AS, itemSaveGroupAs = new MenuItem("Save Group As..."), true);
     // EXPORT
+    registerMenuItem(ITEM_EXPORT_EXCEL, itemExportExcel = new MenuItem("Export to Excel Sheet..."));
     registerEditorItem(ITEM_EXPORT_CAT, itemExportCat = new MenuItem("Export Catalogue..."), true);
     registerEvaluatorItem(ITEM_EXPORT_GROUP, itemExportGroup = new MenuItem("Export Active Group..."), true);
     registerEvaluatorItem(ITEM_EXPORT_GROUPS, itemExportGroups = new MenuItem("Export Groups..."), true);
@@ -353,7 +355,7 @@ public class MenuManager {
     openItems.add(ITEM_OPEN_GROUPS);
     catNeeded.add(ITEM_OPEN_GROUPS);
   }
-  
+
   private void loadDefaultKeyBindings() {
     activeKeyBindings.put(ITEM_OPEN_CAT, "Ctrl+L");
     activeKeyBindings.put(ITEM_SAVE_CAT, "Alt+S");
@@ -367,11 +369,11 @@ public class MenuManager {
     activeKeyBindings.put(ITEM_SHOW_FILTERBAR, "Ctrl+F");
     activeKeyBindings.put(ITEM_SHOW_GROUP_STATISTICS, "Ctrl+Shift+O");
   }
-  
+
   private void setOnActionAll() {
     menuItems.values().forEach(mi -> mi.setOnAction(this::handle));
   }
-  
+
   private void setKeyBindings() {
     activeKeyBindings.forEach((miKey, combination) -> {
       MenuItem mi = menuItems.get(miKey);
@@ -380,7 +382,7 @@ public class MenuManager {
       }
     });
   }
-  
+
   private void handle(ActionEvent event) {
     if (event.getSource() != null) {
       if (event.getSource() instanceof MenuItem) {
@@ -423,6 +425,9 @@ public class MenuManager {
               break;
             case ITEM_SAVE_GROUP_AS:
               handler.handleSaveGroupAs(event);
+              break;
+            case ITEM_EXPORT_EXCEL:
+              handler.handleExcelExport(event);
               break;
             case ITEM_EXPORT_CAT:
               handler.handleExportCat(event);
@@ -500,10 +505,9 @@ public class MenuManager {
       }
     }
   }
-  
+
   /**
-   * Assembles the menu 'file' with its submenues.
-   * Expects all objects being created beforehand
+   * Assembles the menu 'file' with its submenues. Expects all objects being created beforehand
    */
   private void assembleMenuFile() {
     // Submenus:
@@ -526,7 +530,8 @@ public class MenuManager {
         itemExportCat,
         itemExportGroup,
         itemExportGroups,
-        itemExportOverviewGroups);
+        itemExportOverviewGroups,
+        itemExportExcel);
     // The menu:
     menuFile.getItems().addAll(
         menuNew,
@@ -539,10 +544,9 @@ public class MenuManager {
         new SeparatorMenuItem(),
         itemQuit);
   }
-  
+
   /**
-   * Assembles the menu 'edit' with its submenu.
-   * Expects all objects being created beforehand
+   * Assembles the menu 'edit' with its submenu. Expects all objects being created beforehand
    */
   private void assembleMenuEdit() {
     // Submenu
@@ -561,10 +565,9 @@ public class MenuManager {
         new SeparatorMenuItem(),
         itemSplitGroup);
   }
-  
+
   /**
-   * Assembles the menu 'view' with its submenu.
-   * Expects all objects being created beforehand
+   * Assembles the menu 'view' with its submenu. Expects all objects being created beforehand
    */
   private void assembleMenuView() {
     // The Menu:
@@ -577,10 +580,9 @@ public class MenuManager {
         new SeparatorMenuItem(),
         itemPresentation);
   }
-  
+
   /**
-   * Assembles the menu 'mode' with its submenu.
-   * Expects all objects being created beforehand
+   * Assembles the menu 'mode' with its submenu. Expects all objects being created beforehand
    */
   private void assembleMenuMode() {
     // The Menu:
@@ -588,17 +590,17 @@ public class MenuManager {
         itemEditor,
         itemEvaluator);
   }
-  
+
   private void assembleMenus() {
     assembleMenuFile();
     assembleMenuEdit();
     assembleMenuView();
     assembleMenuMode();
     assemleMenuHelp();
-    
+
     menuBar.getMenus().addAll(menuFile, menuEdit, menuView, menuMode, menuHelp);
   }
-  
+
   private void assemleMenuHelp() {
     // The Menu:
     menuHelp.getItems().addAll(
@@ -606,11 +608,11 @@ public class MenuManager {
         itemHelp
     );
   }
-  
+
   private void registerEditorItem(String key, MenuItem item) {
     registerEditorItem(key, item, false);
   }
-  
+
   private void registerEditorItem(String key, MenuItem item, boolean catNeeded) {
     registerMenuItem(key, item);
     editorItems.add(key);
@@ -618,7 +620,7 @@ public class MenuManager {
       this.catNeeded.add(key);
     }
   }
-  
+
   private void registerEvaluatorItem(String key, MenuItem item, boolean groupNeeded) {
     registerMenuItem(key, item);
     evaluatorItems.add(key);
@@ -626,26 +628,26 @@ public class MenuManager {
       this.groupNeeded.add(key);
     }
   }
-  
+
   private void registerEvaluatorItem(String key, MenuItem item) {
     registerEvaluatorItem(key, item, false);
   }
-  
+
   private void registerMenuItem(String key, MenuItem item) {
     menuItems.put(key, item);
     item.setUserData(key);
   }
-  
+
   private void registerMenu(String key, Menu menu) {
     menus.put(key, menu);
     menu.setUserData(key);
   }
-  
+
   private void setDisableForItems(List<String> keyProvider, boolean disable) {
     keyProvider.forEach(key -> {
       LOGGER.trace(":setDisableForItems - " + String.format("Setting %b for %s", disable, key));
       menuItems.get(key).setDisable(disable);
     });
   }
-  
+
 }

@@ -2,6 +2,9 @@ package ch.unibas.dmi.dbis.reqman.ui;
 
 import ch.unibas.dmi.dbis.reqman.common.Version;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
+import ch.unibas.dmi.dbis.reqman.data.Milestone;
+import ch.unibas.dmi.dbis.reqman.data.Requirement;
+import ch.unibas.dmi.dbis.reqman.export.ExcelMilestoneExporter;
 import ch.unibas.dmi.dbis.reqman.management.OperationFactory;
 import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import ch.unibas.dmi.dbis.reqman.templating.ExportHelper;
@@ -38,7 +41,7 @@ import java.nio.file.Paths;
  * @author loris.sauter
  */
 public class MainHandler implements MenuHandler {
-  
+
   public static final String EXPORT_DISABLED_REASON = "The export feature is currently being re-written.\n" +
       "In particular, the complete export language is subject to change.";
   private static final Logger LOGGER = LogManager.getLogger(MainHandler.class);
@@ -48,7 +51,7 @@ public class MainHandler implements MenuHandler {
   private MainScene mainScene;
   private MenuManager manager = MenuManager.getInstance();
   private StatusBar statusBar;
-  
+
   public MainHandler(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
     LOGGER.traceEntry();
     this.evaluatorHandler = evaluatorHandler;
@@ -58,16 +61,16 @@ public class MainHandler implements MenuHandler {
     });
     this.editorHandler = editorHandler;
     manager.enableOpenItems();
-    
+
   }
-  
+
   public static MainHandler getInstance(EvaluatorHandler evaluatorHandler, EditorHandler editorHandler) {
     if (instance == null) {
       instance = new MainHandler(evaluatorHandler, editorHandler);
     }
     return instance;
   }
-  
+
   @Override
   public void handleNewCatalogue(ActionEvent event) {
     editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.CATALOGUE));
@@ -77,7 +80,7 @@ public class MainHandler implements MenuHandler {
     mainScene.setActive(MainScene.Mode.EDITOR);
     manager.enableCatalogueNeeded();
   }
-  
+
   @Override
   public void handleNewGroup(ActionEvent event) {
     if (EntityController.getInstance().hasCourse() && EntityController.getInstance().hasCatalogue()) {
@@ -92,7 +95,7 @@ public class MainHandler implements MenuHandler {
       }
     }
   }
-  
+
   @Override
   public void handleOpenCat(ActionEvent event) {
     if (EntityController.getInstance().hasCatalogue()) {
@@ -107,7 +110,7 @@ public class MainHandler implements MenuHandler {
       return;
     }
     try {
-      
+
       if (EntityController.getInstance().isStorageManagerReady()) {
         LOGGER.debug("Open Catalogue - course loaded");
         EntityController.getInstance().openCatalogue();
@@ -132,9 +135,9 @@ public class MainHandler implements MenuHandler {
       LOGGER.catching(e);
       Utils.showErrorDialog("IOException during Open Catalogue", e.getLocalizedMessage());
     }
-    
+
   }
-  
+
   @Override
   public void handleOpenGroups(ActionEvent event) {
     if (mainScene.isEditorActive()) {
@@ -166,12 +169,12 @@ public class MainHandler implements MenuHandler {
     }
     LOGGER.debug("Opening performed");
   }
-  
+
   @Override
   public void handleSaveCat(ActionEvent event) {
     editorHandler.saveCatalogue();
   }
-  
+
   @Override
   public void handleSaveGroup(ActionEvent event) {
     if (!evaluatorHandler.isGroupLoaded()) {
@@ -179,12 +182,12 @@ public class MainHandler implements MenuHandler {
     }
     evaluatorHandler.handleSaveGroup(event);
   }
-  
+
   @Override
   public void handleSaveCatAs(ActionEvent event) {
     editorHandler.saveAsCatalogue();
   }
-  
+
   @Override
   public void handleSaveGroupAs(ActionEvent event) {
     if (!evaluatorHandler.isGroupLoaded()) {
@@ -192,7 +195,21 @@ public class MainHandler implements MenuHandler {
     }
     evaluatorHandler.handleSaveGroupAs(event);
   }
-  
+
+  @Override
+  public void handleExcelExport(ActionEvent event) {
+    DirectoryChooser dc = new DirectoryChooser();
+    dc.setTitle("Folder for Excel Files");
+    File exportDir = dc.showDialog(mainScene.getWindow());
+    if (exportDir == null) {
+      return;
+    }
+
+    for (Milestone milestone : EntityController.getInstance().getObservableMilestones()) {
+      ExcelMilestoneExporter.exportRequirements(EntityController.getInstance().getCatalogueAnalyser().getRequirementsFor(milestone), EntityController.getInstance().groupList(), Paths.get(exportDir.getPath(), milestone.getName() + ".xlsx").toFile());
+    }
+  }
+
   @Override
   public void handleExportCat(ActionEvent event) {
     if (!EntityController.getInstance().hasCatalogue() && EntityController.getInstance().hasCourse()) {
@@ -214,14 +231,14 @@ public class MainHandler implements MenuHandler {
       try {
         ExportHelper.exportCatalogue(exportConfig, f);
         mainScene.showNotification("Export finished to " + f.getAbsolutePath());
-        
+
         //Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Catalogue exported to:\\"+f.getAbsolutePath()).showInformation();
       } catch (FileNotFoundException e) {
         LOGGER.catching(Level.FATAL, e);
       }
     }
   }
-  
+
   @Override
   public void handleExportGroups(ActionEvent event) {
     // TODO Temporary solution, until pretty ui is made
@@ -253,14 +270,14 @@ public class MainHandler implements MenuHandler {
         String name = StringUtils.isNotBlank(group.getExportFileName()) ? group.getExportFileName() : group.getName();
         File f = Paths.get(destDir.getPath(), name).toFile();
         ExportHelper.exportGroup(exportConfig, f, group);
-        Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Export of group "+group.getName()+" finished!").showInformation();
+        Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Export of group " + group.getName() + " finished!").showInformation();
       } catch (FileNotFoundException e) {
         LOGGER.catching(Level.FATAL, e);
       }
     });
     Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Exported all groups").showInformation();
   }
-  
+
   @Override
   public void handleExportGroup(ActionEvent event) {
     if (!EntityController.getInstance().hasCatalogue() && EntityController.getInstance().hasCourse() && EntityController.getInstance().hasGroups()) {
@@ -282,19 +299,19 @@ public class MainHandler implements MenuHandler {
       try {
         ExportHelper.exportGroup(exportConfig, f, evaluatorHandler.getActiveGroup());
         mainScene.showNotification("Export finished to " + f.getAbsolutePath());
-        
+
         //Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Group exported to:\\"+f.getAbsolutePath()).showInformation();
       } catch (FileNotFoundException e) {
         LOGGER.catching(Level.FATAL, e);
       }
     }
   }
-  
+
   @Override
   public void handleQuit(ActionEvent event) {
     Platform.exit();
   }
-  
+
   @Override
   public void handleNewReq(ActionEvent event) {
     if (mainScene.isEditorActive()) {
@@ -303,7 +320,7 @@ public class MainHandler implements MenuHandler {
       }
     }
   }
-  
+
   @Override
   public void handleNewMS(ActionEvent event) {
     if (mainScene.isEditorActive()) {
@@ -311,9 +328,9 @@ public class MainHandler implements MenuHandler {
         editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.MILESTONE));
       }
     }
-    
+
   }
-  
+
   @Override
   public void handleModCat(ActionEvent event) {
     if (mainScene.isEditorActive()) {
@@ -321,9 +338,9 @@ public class MainHandler implements MenuHandler {
         editorHandler.handle(CUDEvent.generateModificationEvent(event, TargetEntity.CATALOGUE, null));// By design, can be null
       }
     }
-    
+
   }
-  
+
   @Override
   public void handleModReq(ActionEvent event) {
     if (mainScene.isEditorActive()) {
@@ -332,7 +349,7 @@ public class MainHandler implements MenuHandler {
       }
     }
   }
-  
+
   @Override
   public void handleModMS(ActionEvent event) {
     if (mainScene.isEditorActive()) {
@@ -341,7 +358,7 @@ public class MainHandler implements MenuHandler {
       }
     }
   }
-  
+
   @Override
   public void handleModGroup(ActionEvent event) {
     if (mainScene.isEvaluatorActive()) {
@@ -350,22 +367,22 @@ public class MainHandler implements MenuHandler {
       }
     }
   }
-  
+
   @Override
   public void handleShowEditor(ActionEvent event) {
     if (mainScene.isEvaluatorActive()) {
       mainScene.setActive(MainScene.Mode.EDITOR);
     }
   }
-  
+
   @Override
   public void handleShowEvaluator(ActionEvent event) {
     if (mainScene.isEditorActive()) {
       mainScene.setActive(MainScene.Mode.EVALUATOR);
     }
-    
+
   }
-  
+
   @Override
   public void handlePresentationMode(ActionEvent event) {
     if (event.getSource() instanceof RadioMenuItem) {
@@ -379,7 +396,7 @@ public class MainHandler implements MenuHandler {
       }
     }
   }
-  
+
   @Override
   public void handleNewCourse(ActionEvent event) {
     editorHandler.handle(CUDEvent.generateCreationEvent(event, TargetEntity.COURSE));
@@ -390,22 +407,22 @@ public class MainHandler implements MenuHandler {
     editorHandler.setupEditor();
     manager.enableCatalogueNeeded();
   }
-  
+
   @Override
   public void handleOpenCourse(ActionEvent event) {
     editorHandler.openCourse();
   }
-  
+
   @Override
   public void handleSaveCourse(ActionEvent event) {
     editorHandler.saveCourse();
   }
-  
+
   @Override
   public void handleSaveCourseAs(ActionEvent event) {
     editorHandler.saveAsCourse();
   }
-  
+
   @Override
   public void handleClearFilter(ActionEvent event) {
     LOGGER.debug("Clearing filter");
@@ -421,9 +438,9 @@ public class MainHandler implements MenuHandler {
         }
         break;
     }
-    
+
   }
-  
+
   @Override
   public void handleShowFilterBar(ActionEvent event) {
     LOGGER.debug("Showing filter bar");
@@ -445,9 +462,9 @@ public class MainHandler implements MenuHandler {
         }
         break;
     }
-    
+
   }
-  
+
   @Override
   public void handleSplitGroup(ActionEvent event) {
     if (EntityController.getInstance().hasGroups()) {
@@ -457,12 +474,12 @@ public class MainHandler implements MenuHandler {
       LOGGER.debug("Cannot split group if there is no group available");
     }
   }
-  
+
   @Override
   public void handleCatalogueStatistics(ActionEvent event) {
     editorHandler.showStatistics();
   }
-  
+
   @Override
   public void handleImport(ActionEvent event) {
     if (Utils.showConfirmationDialog("Import Catalogue", "You will lose unsafed changes on both, groups and catalogue / course.\nAre you sure to continue?")) {
@@ -489,28 +506,28 @@ public class MainHandler implements MenuHandler {
                 "ReqMan probably would still work, but re-start is recommended.\n");
       }
     }
-    
+
   }
-  
+
   @Override
   public void handleGroupStatistics(ActionEvent event) {
     evaluatorHandler.showStatistics();
   }
-  
+
   @Override
   public void handleShowAbout(ActionEvent event) {
     LOGGER.debug("ABOUT");
-    Utils.showInfoDialog("About", "ReqMan "+Version.getInstance().getFullVersion(),"Requirements Manager.\n" +
+    Utils.showInfoDialog("About", "ReqMan " + Version.getInstance().getFullVersion(), "Requirements Manager.\n" +
         "Tool do define a schema for requirements (known as the catalogue in the editor mode) and use this schema to assess progress on it (in the evaluator mode)");
   }
-  
+
   @Override
   public void handleShowHelp(ActionEvent event) {
     LOGGER.debug("HELP");
     HelpDisplay helpDisplay = new HelpDisplay();
     helpDisplay.show();
   }
-  
+
   @Override
   public void handleModCourse(ActionEvent event) {
     if (mainScene.isEditorActive()) {
@@ -519,31 +536,31 @@ public class MainHandler implements MenuHandler {
       }
     }
   }
-  
+
   @Override
   public void handleExportOverviewGroups(ActionEvent event) {
     LOGGER.debug("Handling menu: Export Overview Groups");
     Scene s = new Scene(new ExportOverviewView());
-    PopupStage ps = new PopupStage("Export Groups Overview",s);
+    PopupStage ps = new PopupStage("Export Groups Overview", s);
     ps.showAndWait();
   }
-  
+
   public void setMainScene(MainScene mainScene) {
     this.mainScene = mainScene;
   }
-  
+
   public void setStatusBar(StatusBar statusBar) {
     this.statusBar = statusBar;
     evaluatorHandler.setStatusBar(statusBar);
     editorHandler.setStatusBar(statusBar);
     OperationFactory.registerStatusBar(statusBar);
   }
-  
+
   void stop() {
     evaluatorHandler.stop();
     EntityController.getInstance().saveSession();
   }
-  
+
   void checkGroupsPresent() {
     if (evaluatorHandler.isGroupLoaded()) {
       MenuManager.getInstance().enableGroupNeeded();

@@ -1,6 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.overview;
 
-import ch.unibas.dmi.dbis.reqman.analysis.CSVOverviewGroupExporter;
+import ch.unibas.dmi.dbis.reqman.export.CSVOverviewGroupExporter;
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.scene.control.Button;

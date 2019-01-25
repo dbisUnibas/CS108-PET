@@ -24,6 +24,8 @@ public interface MenuHandler {
   void handleSaveCatAs(ActionEvent event);
   
   void handleSaveGroupAs(ActionEvent event);
+
+  void handleExcelExport(ActionEvent event);
   
   void handleExportCat(ActionEvent event);
   
