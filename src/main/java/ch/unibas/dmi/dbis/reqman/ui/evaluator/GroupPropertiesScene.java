@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
  *
  * @author loris.sauter
  */
-public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.dbis.reqman.data.Group> {
+public class GroupPropertiesScene extends AbstractVisualCreator<Group> {
   
   private TextField tfName;
   private TextField tfProjectName;
   private TextField tfExportFileName;
   private TableView<ObservableMember> table;
-  private ch.unibas.dmi.dbis.reqman.data.Group group = null;
+  private Group group = null;
   private ObservableList<ObservableMember> tableData;
   
   GroupPropertiesScene() {
@@ -99,7 +99,7 @@ public class GroupPropertiesScene extends AbstractVisualCreator<ch.unibas.dmi.db
   }
   
   @Override
-  public ch.unibas.dmi.dbis.reqman.data.Group create() throws IllegalStateException {
+  public Group create() throws IllegalStateException {
     if (!isCreatorReady()) {
       throw new IllegalStateException("Cannot create Group, creator not ready");
     }
