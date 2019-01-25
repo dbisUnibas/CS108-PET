@@ -16,12 +16,7 @@ assess their voyage on achieving the **requirement**s with so called **progress*
 
 ## Build
 
-`ReqMan` uses gradle. The source of `ReqMan` is located under `dev/src/`.
-To start building `ReqMan`, navigate to the `dev/` folder.
-
-### ReqMan
-
-To build `ReqMan` run:
+`ReqMan` uses gradle. To build `ReqMan` run:
 
 ```
 gradlew build
@@ -31,9 +26,6 @@ gradlew build
 
 `ReqMan` (and its modes `editor` and `evaluator`) is a JavaFX application
 packed in an executable jar. Thus to run `ReqMan` one must execute the jar.
-
-After building the jar as described above, it is assumed the user is still
-in the `dev/` folder.
 
 The command to run `ReqMan` from command line, starting the GUI application
 use the following command (where X stands for the complete version string
@@ -45,7 +37,7 @@ java -jar build/libs/reqman-X.jar
 	
 ## Dependencies
 
-Beside using JavaFX 8 (from java 1.8.0_121) all dependencies are handled by the gradle build script.
+We use Java 11.
 
 ## Issues
 
@@ -54,6 +46,8 @@ To report bugs or add feature requests, use the [GitHub issues page](https://git
 ## Contributors
 
 Loris Sauter - loris.sauter@unibas.ch
+
+Silvan Heller - silvan.heller@unibas.ch
 
 ## License
 
