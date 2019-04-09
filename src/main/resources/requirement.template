@@ -1,5 +1,0 @@
-### ${requirement.name} ${requirement.mandatory[][optional]}
-
-**Points**: ${requirement.maxPoints}pts. (${requirement.binary[binary][partially]} achievable)
-
-${requirement.description}
