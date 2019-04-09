@@ -13,6 +13,9 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * DO NOT START FROM THIS CLASS WITHIN INTELLIJ. INSTEAD USE {@link ch.unibas.dmi.dbis.reqman.main.Main}
+ */
 public class ReqmanApplication extends Application {
   
   /**
@@ -32,6 +35,9 @@ public class ReqmanApplication extends Application {
   public ReqmanApplication() {
   }
   
+  /**
+   * DO NOT START FROM THIS CLASS WITHIN INTELLIJ. INSTEAD USE {@link ch.unibas.dmi.dbis.reqman.main.Main}
+   */
   public static void main(String[] args) {
     System.setProperty("line.separator", "\n"); // To enforce UN*X line endings
     version = Version.getInstance();
