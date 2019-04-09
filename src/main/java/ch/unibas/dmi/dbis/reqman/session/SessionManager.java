@@ -25,21 +25,25 @@ public class SessionManager {
   public static final String SESSION_FILE_NAME = "session.reqman";
   
   private SessionStorage sessionStorage = null;
+
   /**
    * Loads the session storage.
    * Loading order is as follows:
    * <ol>
-   *   <li>A file named like {@link #SESSION_FILE_NAME} in the current working dir</li>
-   *   <li>A folder named like {@link #REQMAN_DIRECTORY} in the current working dir contains a  {@link #SESSION_FILE_NAME} named file</li>
-   *   <li>A file named like {@link #SESSION_FILE_NAME} in the user's home dir</li>
-   *   <li>A folder named like {@link #REQMAN_DIRECTORY} in the user's home dir contains a {@link #SESSION_FILE_NAME} named file</li>
+   * <li>A file named like {@link #SESSION_FILE_NAME} in the current working dir</li>
+   * <li>A folder named like {@link #REQMAN_DIRECTORY} in the current working dir contains a  {@link #SESSION_FILE_NAME}
+   * named file</li>
+   * <li>A file named like {@link #SESSION_FILE_NAME} in the user's home dir</li>
+   * <li>A folder named like {@link #REQMAN_DIRECTORY} in the user's home dir contains a {@link #SESSION_FILE_NAME}
+   * named file</li>
    * </ol>
+   *
    * @return The session file or null if there was none available
    */
-  private SessionStorage loadSessionStorage(){
+  private SessionStorage loadSessionStorage() {
     String home = System.getProperty("user.home");
     String cwd = System.getProperty("user.dir");
-  
+
     SessionStorage session = null;
     
     Path[] paths = new Path[4];
@@ -56,14 +60,14 @@ public class SessionManager {
     return session;
   }
   
-  private SessionStorage loadSessionStorage(File file){
+  private SessionStorage loadSessionStorage(File file) {
     LOGGER.debug("Loading session from {}", file);
     try {
       SessionStorage session = JSONUtils.readFromJSONFile(file, SessionStorage.class);
       LOGGER.debug("Successfully loaded session file {}", file);
       return session;
     } catch (IOException e) {
-      LOGGER.debug("Couldn't read session-file {} for reason {}. Returning null.",file,e);
+      LOGGER.debug("Couldn't read session-file {} for reason {}. Returning null.", file, e);
       return null;
     }
   }
@@ -72,13 +76,15 @@ public class SessionManager {
    * Loads the session storage.
    * Loading order is as follows:
    * <ol>
-   *   <li>A file named like {@link #SESSION_FILE_NAME} in the current working dir</li>
-   *   <li>A folder named like {@link #REQMAN_DIRECTORY} in the current working dir contains a  {@link #SESSION_FILE_NAME} named file</li>
-   *   <li>A file named like {@link #SESSION_FILE_NAME} in the user's home dir</li>
-   *   <li>A folder named like {@link #REQMAN_DIRECTORY} in the user's home dir contains a {@link #SESSION_FILE_NAME} named file</li>
+   * <li>A file named like {@link #SESSION_FILE_NAME} in the current working dir</li>
+   * <li>A folder named like {@link #REQMAN_DIRECTORY} in the current working dir contains a  {@link #SESSION_FILE_NAME}
+   * named file</li>
+   * <li>A file named like {@link #SESSION_FILE_NAME} in the user's home dir</li>
+   * <li>A folder named like {@link #REQMAN_DIRECTORY} in the user's home dir contains a {@link #SESSION_FILE_NAME}
+   * named file</li>
    * </ol>
    */
-  public void loadSession(){
+  public void loadSession() {
     sessionStorage = loadSessionStorage();
   }
   
@@ -88,13 +94,16 @@ public class SessionManager {
   
   /**
    * Stores the given session file.
-   * The location is a file named {@link #SESSION_FILE_NAME} in a folder named {@link #REQMAN_DIRECTORY} in the user's home directory.
-   * If the application is unable to create that directory, it writes the file named {@link #SESSION_FILE_NAME} to the user's home directory.
+   * The location is a file named {@link #SESSION_FILE_NAME} in a folder named {@link #REQMAN_DIRECTORY} in the user's
+   * home directory.
+   * If the application is unable to create that directory, it writes the file named {@link #SESSION_FILE_NAME} to the
+   * user's home directory.
+   *
    * @param session
    */
-  public boolean storeSession(SessionStorage session){
+  public boolean storeSession(SessionStorage session) {
     Path location = Paths.get(System.getProperty("user.home"), REQMAN_DIRECTORY, SESSION_FILE_NAME);
-    if(!makeReqManDirIfNotExistent() ){
+    if (!makeReqManDirIfNotExistent()) {
       location = Paths.get(System.getProperty("user.home"), SESSION_FILE_NAME);
     }
     try {
@@ -106,9 +115,9 @@ public class SessionManager {
     }
   }
   
-  private boolean makeReqManDirIfNotExistent(){
+  private boolean makeReqManDirIfNotExistent() {
     Path loc = Paths.get(System.getProperty("user.home"), REQMAN_DIRECTORY);
-    if(!Files.isDirectory(loc)){
+    if (!Files.isDirectory(loc)) {
       try {
         Files.createDirectory(loc);
         return true;
@@ -116,18 +125,18 @@ public class SessionManager {
         LOGGER.catching(Level.ERROR, e);
         return false;
       }
-    }else{
-      return  true;
+    } else {
+      return true;
     }
   }
   
   
-  
   /**
    * Returns whether there is a session file.
+   *
    * @return
    */
-  public boolean hasSession(){
+  public boolean hasSession() {
     SessionStorage session = loadSessionStorage();
     return session != null;
   }

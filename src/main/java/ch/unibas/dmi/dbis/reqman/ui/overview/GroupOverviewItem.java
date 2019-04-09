@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * A simple container item which holds a name and a map of id-points pairs for {@link ch.unibas.dmi.dbis.reqman.data.Group}s.
+ * A simple container item which holds a name and a map of id-points pairs for {@link
+ * ch.unibas.dmi.dbis.reqman.data.Group}s.
  * <p>
  * In particular, this object represents a row in a {@link javafx.scene.control.TreeTableView}
  * where the 'name' stands for the entry (see below) and the id-points pairs stand for the columns,

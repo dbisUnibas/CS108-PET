@@ -12,6 +12,7 @@ public interface FilterActionHandler {
   
   /**
    * Returns how many items are found
+   *
    * @param pattern
    * @return
    */

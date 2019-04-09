@@ -55,18 +55,18 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   
   private List<DirtyListener> dirtyListeners = new ArrayList<>();
   
-  public void addDirtyListener(DirtyListener listener){
+  public void addDirtyListener(DirtyListener listener) {
     dirtyListeners.add(listener);
   }
   
-  public void removeDirtyListener(DirtyListener listener){
+  public void removeDirtyListener(DirtyListener listener) {
     dirtyListeners.remove(listener);
   }
   
-  private void notifyDirtyListeners(boolean dirty){
-    if(dirty){
+  private void notifyDirtyListeners(boolean dirty) {
+    if (dirty) {
       dirtyListeners.forEach(DirtyListener::markDirty);
-    }else{
+    } else {
       dirtyListeners.forEach(DirtyListener::unmarkDirty);
     }
   }
@@ -82,9 +82,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     AssessmentManager.getInstance().addFilterable(this);
     
-    if(!AssessmentManager.getInstance().hasActiveProgressSummary()){
+    if (!AssessmentManager.getInstance().hasActiveProgressSummary()) {
       summaryCb.getSelectionModel().selectFirst();
-    }else{
+    } else {
       applyActiveMilestone(AssessmentManager.getInstance().getActiveMilestone());
     }
     
@@ -94,13 +94,13 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   @Override
   public void pointsChanged(double newValue) {
     LOGGER.trace("Points changed");
-    if(currentlyFilteredProgress != null && !currentlyFilteredProgress.isEmpty()){
+    if (currentlyFilteredProgress != null && !currentlyFilteredProgress.isEmpty()) {
       updateSumDisplay(true);
-    }else{
+    } else {
       updateSumDisplay();
     }
     checkDependencies();
-    if(pointsChangedConsumer != null){
+    if (pointsChangedConsumer != null) {
       pointsChangedConsumer.accept(1d);
     }
   }
@@ -144,9 +144,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   
   @Override
   public void applyFilter(Filter filter) {
-    LOGGER.debug("apply filter: "+filter);
+    LOGGER.debug("apply filter: " + filter);
     Milestone ms = AssessmentManager.getInstance().getActiveMilestone();
-    LOGGER.debug("Active MS: "+ms.getName());
+    LOGGER.debug("Active MS: " + ms.getName());
     List<Requirement> reqs = EntityController.getInstance().getCatalogueAnalyser().getFilteredRequirements(filter);
     displayProgressViews(reqs);
   }
@@ -156,9 +156,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     ProgressSummary ps = EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(ms);
     displayProgressViews(ps);
     ProgressSummary active = summaryCb.getSelectionModel().getSelectedItem();
-    if(active != null && active.equals(ps)){
+    if (active != null && active.equals(ps)) {
       // nothing
-    }else{
+    } else {
       int ordinal = EntityController.getInstance().getCatalogueAnalyser().getProgressSummaryOrdinal(ps);
       summaryCb.getSelectionModel().select(ordinal);
       //summaryCb.getSelectionModel().select(ps);// Doesn't render properly
@@ -173,45 +173,45 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   private Consumer<Double> pointsChangedConsumer = null;
   
   public void setOnPointsChanged(Consumer<Double> consumer) {
-    pointsChangedConsumer= consumer;
+    pointsChangedConsumer = consumer;
   }
   
   public void bindActiveIndicator(ReadOnlyBooleanProperty activeIndicator) {
     activeProperty.bind(activeIndicator);
     activeProperty.addListener((observable, oldValue, newValue) -> {
-      if(newValue){
-        LOGGER.debug("Going ACTIVE - "+group.getName());
-      }else{
-        LOGGER.debug("Going INACTIVE - "+group.getName());
+      if (newValue) {
+        LOGGER.debug("Going ACTIVE - " + group.getName());
+      } else {
+        LOGGER.debug("Going INACTIVE - " + group.getName());
       }
       activateFilterableBehaviour(newValue);
     });
   }
   
-  private void activateFilterableBehaviour(boolean active){
-    if(active){
+  private void activateFilterableBehaviour(boolean active) {
+    if (active) {
       AssessmentManager.getInstance().addFilterable(this);
-      if(AssessmentManager.getInstance().hasActiveProgressSummary()){
-        LOGGER.debug("ProgressSummary present: "+AssessmentManager.getInstance().getActiveMilestone().getName());
+      if (AssessmentManager.getInstance().hasActiveProgressSummary()) {
+        LOGGER.debug("ProgressSummary present: " + AssessmentManager.getInstance().getActiveMilestone().getName());
         summaryCb.getSelectionModel().select(EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(AssessmentManager.getInstance().getActiveMilestone()));
       }
-      if(AssessmentManager.getInstance().hasActiveFilter() ){
-        LOGGER.debug("Filter present: "+AssessmentManager.getInstance().getActiveFilter().getDisplayRepresentation());
+      if (AssessmentManager.getInstance().hasActiveFilter()) {
+        LOGGER.debug("Filter present: " + AssessmentManager.getInstance().getActiveFilter().getDisplayRepresentation());
         applyFilter(AssessmentManager.getInstance().getActiveFilter());
       }
-    }else{
+    } else {
       AssessmentManager.getInstance().removeFilterable(this);
     }
   }
   
-  void checkDependencies(){
-    for(ProgressView pv : activeProgressViews){
+  void checkDependencies() {
+    for (ProgressView pv : activeProgressViews) {
       Progress p = pv.getProgress();
-      if(EntityController.getInstance().getGroupAnalyser(group).isProgressUnlocked(p)){
+      if (EntityController.getInstance().getGroupAnalyser(group).isProgressUnlocked(p)) {
         // Everything fine: Progress unlocked
         pv.setLocked(false);
         LOGGER.trace("Unlocking pv of {}", pv.getRequirement().getName());
-      }else{
+      } else {
         pv.setLocked(true);
         LOGGER.trace("Locking pv of {}", pv.getRequirement().getName());
       }
@@ -233,7 +233,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     activeProgressViews.clear();
     for (Progress p : currentlyFilteredProgress) {
-      activeProgressViews.add(new ProgressView(group,p, getActiveProgressSummary()));
+      activeProgressViews.add(new ProgressView(group, p, getActiveProgressSummary()));
     }
     
     for (ProgressView pv : activeProgressViews) {
@@ -247,32 +247,32 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   }
   
   private void updateSumDisplay() {
-    if(summaryCb.getSelectionModel().getSelectedItem() == null){
+    if (summaryCb.getSelectionModel().getSelectedItem() == null) {
       return;
     }
     double visible = EntityController.getInstance().getGroupAnalyser(group).getSumFor(summaryCb.getSelectionModel().getSelectedItem());
     double visibleMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(summaryCb.getSelectionModel().getSelectedItem());
     double total = EntityController.getInstance().getGroupAnalyser(group).getSum();
     double totalMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum();
-    updatePointsSummary(visible,visibleMax,total,totalMax);
+    updatePointsSummary(visible, visibleMax, total, totalMax);
   }
   
-  private void updatePointsSummary(double visible, double visibleMax, double total, double totalMax){
-    displaySensitivelyPoints(visiblePoints,visible,false);
-    displaySensitivelyPoints(maxVisibleLbl,visibleMax,true);
-    displaySensitivelyPoints(totalPoints,total,false);
+  private void updatePointsSummary(double visible, double visibleMax, double total, double totalMax) {
+    displaySensitivelyPoints(visiblePoints, visible, false);
+    displaySensitivelyPoints(maxVisibleLbl, visibleMax, true);
+    displaySensitivelyPoints(totalPoints, total, false);
     displaySensitivelyPoints(maxTotalLbl, totalMax, true);
   }
   
-  private void displaySensitivelyPoints(Label lbl, double points, boolean paranthesis){
-    if(points < 0){
+  private void displaySensitivelyPoints(Label lbl, double points, boolean paranthesis) {
+    if (points < 0) {
       lbl.setTextFill(Color.RED);
-    }else{
+    } else {
       lbl.setTextFill(Color.BLACK);
     }
-    if(paranthesis){
-      lbl.setText("("+StringUtils.prettyPrint(points)+")");
-    }else{
+    if (paranthesis) {
+      lbl.setText("(" + StringUtils.prettyPrint(points) + ")");
+    } else {
       lbl.setText(StringUtils.prettyPrint(points));
     }
   }
@@ -283,7 +283,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
       double visibleMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumForProgressList(currentlyFilteredProgress);
       double total = EntityController.getInstance().getGroupAnalyser(group).getSum();
       double totalMax = EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum();
-      updatePointsSummary(visible,visibleMax,total,totalMax);
+      updatePointsSummary(visible, visibleMax, total, totalMax);
     } else {
       updateSumDisplay();
     }
@@ -327,7 +327,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
       }
 //      summaryCb.setItems(FXCollections.observableArrayList(EntityController.getInstance().createProgressSummaries() ));
       summaryCb.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-        if(oldValue != null && oldValue.equals(newValue)){
+        if (oldValue != null && oldValue.equals(newValue)) {
           return; // don't fire the event chain if its already the same ps
         }
         LOGGER.debug("Selected ProgressSummary: {}", newValue);
@@ -346,14 +346,14 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     setCenter(scrollPane);
     Utils.applyDefaultSpacing(footerContainer);
     footerContainer.setAlignment(Pos.CENTER_RIGHT);
-    footerContainer.getChildren().addAll(sumLbl, Utils.createHFill(),visiblePoints,maxVisibleLbl, new Label(POINTS_MAX_POINTS_SEPARATOR),totalPoints, maxTotalLbl);
+    footerContainer.getChildren().addAll(sumLbl, Utils.createHFill(), visiblePoints, maxVisibleLbl, new Label(POINTS_MAX_POINTS_SEPARATOR), totalPoints, maxTotalLbl);
     setBottom(footerContainer);
     
     updateSumDisplay();
   }
   
   private void displayProgressViews(ProgressSummary progressSummary) {
-    if(AssessmentManager.getInstance().hasActiveFilter()){
+    if (AssessmentManager.getInstance().hasActiveFilter()) {
       applyFilter(AssessmentManager.getInstance().getActiveFilter());
       return;
     }
@@ -365,7 +365,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     progressList.sort(EntityController.getInstance().getGroupAnalyser(group).getProgressComparator());
     activeProgressViews.clear();
     for (Progress p : progressList) {
-      activeProgressViews.add(new ProgressView(group,p, progressSummary));
+      activeProgressViews.add(new ProgressView(group, p, progressSummary));
     }
     
     for (ProgressView pv : activeProgressViews) {

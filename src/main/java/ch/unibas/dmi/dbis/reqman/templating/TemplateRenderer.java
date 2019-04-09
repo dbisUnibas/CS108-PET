@@ -14,62 +14,62 @@ import java.util.regex.Pattern;
  */
 public class TemplateRenderer {
 
-    private static final Logger LOGGER = LogManager.getLogger(TemplateRenderer.class);
+  private static final Logger LOGGER = LogManager.getLogger(TemplateRenderer.class);
 
-    @Deprecated // Not used
-    private TemplateParser parser = null;
+  @Deprecated // Not used
+  private TemplateParser parser = null;
 
-    @Deprecated
-    public TemplateRenderer(TemplateParser parser) {
-        this.parser = parser;
-    }
+  @Deprecated
+  public TemplateRenderer(TemplateParser parser) {
+    this.parser = parser;
+  }
 
-    public TemplateRenderer() {
-    }
+  public TemplateRenderer() {
+  }
 
-    public <E> String render(Template<E> template, E instance) {
-        LOGGER.debug("Rendering template for instance: " + instance.toString());
-        LOGGER.trace("Render template: " + template.getTemplate());
-        StringBuilder out = new StringBuilder(template.getTemplate());
+  public <E> String render(Template<E> template, E instance) {
+    LOGGER.debug("Rendering template for instance: " + instance.toString());
+    LOGGER.trace("Render template: " + template.getTemplate());
+    StringBuilder out = new StringBuilder(template.getTemplate());
 
-        template.getReplacements().forEach(replacement -> {
-            Field<E, ?> field = replacement.getField();
-            LOGGER.debug("Replacement: " + replacement.toString());
-            int calcStart = out.indexOf(replacement.getTargetExpression());
-            int calcEnd = calcStart + replacement.getTargetExpression().length();
-            LOGGER.debug("Calculated region: <" + calcStart + "," + calcEnd + ">");
-            LOGGER.trace("PreReplacement: " + out.toString());
-            String repl = field.render(instance);
-            if (field instanceof ParametrizedField && !(field instanceof ConditionalField)) {
-                repl = ((ParametrizedField) field).renderCarefully(instance, ((ParametrizedField) field).getParameter());
-            }
-            out.replace(calcStart, calcEnd, repl);
+    template.getReplacements().forEach(replacement -> {
+      Field<E, ?> field = replacement.getField();
+      LOGGER.debug("Replacement: " + replacement.toString());
+      int calcStart = out.indexOf(replacement.getTargetExpression());
+      int calcEnd = calcStart + replacement.getTargetExpression().length();
+      LOGGER.debug("Calculated region: <" + calcStart + "," + calcEnd + ">");
+      LOGGER.trace("PreReplacement: " + out.toString());
+      String repl = field.render(instance);
+      if (field instanceof ParametrizedField && !(field instanceof ConditionalField)) {
+        repl = ((ParametrizedField) field).renderCarefully(instance, ((ParametrizedField) field).getParameter());
+      }
+      out.replace(calcStart, calcEnd, repl);
 
-            LOGGER.trace("PostReplacement: " + out.toString());
-        });
+      LOGGER.trace("PostReplacement: " + out.toString());
+    });
 
-        return out.toString();
-    }
+    return out.toString();
+  }
 
 
-    /**
-     * MAP must have the REGEX escaped value in it!
-     *
-     * @param template
-     * @param instance
-     * @param fields
-     * @param <E>
-     * @return
-     */
-    @Deprecated
-    public <E> String oldRender(String template, E instance, Map<String, Field<E, ?>> fields) {
+  /**
+   * MAP must have the REGEX escaped value in it!
+   *
+   * @param template
+   * @param instance
+   * @param fields
+   * @param <E>
+   * @return
+   */
+  @Deprecated
+  public <E> String oldRender(String template, E instance, Map<String, Field<E, ?>> fields) {
 
-        StringBuilder out = new StringBuilder(template);
-        fields.forEach((variable, field) -> {
-            Pattern p = Pattern.compile(variable);
-            Matcher m = p.matcher(out.toString());
-            while (m.find()) {
-                if (field.getType() == Field.Type.SUB_ENTITY) {
+    StringBuilder out = new StringBuilder(template);
+    fields.forEach((variable, field) -> {
+      Pattern p = Pattern.compile(variable);
+      Matcher m = p.matcher(out.toString());
+      while (m.find()) {
+        if (field.getType() == Field.Type.SUB_ENTITY) {
                     /*
                     Entity sub = field.getSubEntity();
                     Field f = sub.getFieldForName(field.getSubFieldName() );
@@ -77,13 +77,13 @@ public class TemplateRenderer {
                     System.out.println(o);
                     out.replace(m.start(), m.end(), f.oldRender(field.getGetter().apply(instance)));
                     */
-                } else {
-                    out.replace(m.start(), m.end(), field.render(instance));
-                }
-            }
-        });
-        return out.toString();
-    }
+        } else {
+          out.replace(m.start(), m.end(), field.render(instance));
+        }
+      }
+    });
+    return out.toString();
+  }
 
 
 }

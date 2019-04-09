@@ -288,7 +288,7 @@ public class ProgressView extends VBox {
     setSide(assessmentContainer);
     
     collapsibleContainer.addRow(0, minMSLbl, minMS, maxMSLbl, maxMS);
-    if(taDesc != null && taDesc.getText() != null && !taDesc.getText().isEmpty() ){
+    if (taDesc != null && taDesc.getText() != null && !taDesc.getText().isEmpty()) {
       collapsibleContainer.add(descLbl, 0, 1);
       collapsibleContainer.add(taDesc, 1, 1, 3, 1);
     }
@@ -444,12 +444,12 @@ public class ProgressView extends VBox {
   
   private void updatePointsDisplay() {
     // Only update point display, if in non-spinner environment
-    if(!progress.isFresh()){
+    if (!progress.isFresh()) {
       if (points != null) {
         points.setText(StringUtils.prettyPrint(EntityController.getInstance().getCatalogueAnalyser().getActualPoints(progress)));
       }
-    }else{
-      if(points != null){
+    } else {
+      if (points != null) {
         points.setText("0");
       }
     }
@@ -546,7 +546,7 @@ public class ProgressView extends VBox {
     SimpleDateFormat df = new SimpleDateFormat("dd.MM.yyyy 'at' HH:mm");
     if (progress.getAssessmentDate() != null) {
       lastModifiedDisplay.setText(df.format(progress.getAssessmentDate()));
-    }else{
+    } else {
       lastModifiedDisplay.setText("");
     }
   }

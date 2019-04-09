@@ -10,7 +10,8 @@ import java.util.stream.Collectors;
 
 /**
  * Analysing and managing unit for catalogues.
- * This class is responsible of fully resolve relationships of the entities related to the requirements definition (editor).
+ * This class is responsible of fully resolve relationships of the entities related to the requirements definition
+ * (editor).
  *
  * @author loris.sauter
  */
@@ -168,10 +169,10 @@ public class CatalogueAnalyser {
     return nbOfDependents > 0;
   }
   
-  public List<Requirement> getDependants(Requirement requirement){
+  public List<Requirement> getDependants(Requirement requirement) {
     List<Requirement> list = new ArrayList<>();
-    if(isPredecessor(requirement)){
-      list.addAll(catalogue.getRequirements().stream().filter(r->getPredecessors(r).contains(requirement)).collect(Collectors.toList()) );
+    if (isPredecessor(requirement)) {
+      list.addAll(catalogue.getRequirements().stream().filter(r -> getPredecessors(r).contains(requirement)).collect(Collectors.toList()));
     }
     return list;
   }
@@ -228,7 +229,7 @@ public class CatalogueAnalyser {
   public Comparator<Requirement> getRequirementComparator() {
     return getRequirementMinimalMilestoneComparator().thenComparing(Requirement::getType, SortingUtils.REQUIREMENT_TYPE_COMPARATOR).thenComparing(Requirement::getName);
   }
-
+  
   public Comparator<Requirement> getProgressRequirementComparator() {
     return ((Comparator<Requirement>) (o1, o2) -> SortingUtils.REQUIREMENT_TYPE_COMPARATOR.compare(o1.getType(), o2.getType())).thenComparing(getRequirementMinimalMilestoneComparator()).thenComparing(Requirement::getName);
   }

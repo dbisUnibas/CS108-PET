@@ -10,19 +10,19 @@ public class MissingEntityException extends Exception {
   private final NamedEntity entity;
   private final String missing;
   
-  public MissingEntityException(NamedEntity entity, String missing){
+  public MissingEntityException(NamedEntity entity, String missing) {
     super();
     this.entity = entity;
     this.missing = missing;
   }
   
-  public MissingEntityException(String message, NamedEntity entity, String missing){
+  public MissingEntityException(String message, NamedEntity entity, String missing) {
     super(message);
     this.entity = entity;
     this.missing = missing;
   }
   
-  public MissingEntityException(String message, Throwable cause, NamedEntity entity, String missing){
+  public MissingEntityException(String message, Throwable cause, NamedEntity entity, String missing) {
     super(message, cause);
     this.entity = entity;
     this.missing = missing;

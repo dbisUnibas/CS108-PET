@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Requirement {
-
+  
   /**
    * The unique identifier of the requirement
    */
@@ -65,7 +65,7 @@ public class Requirement {
    * The optional category this requirement belongs to.
    */
   private String category;
-
+  
   /**
    * The default constructor for a requirement.
    * All the properties of this requirement have to be set manually after this instance is created.
@@ -73,23 +73,23 @@ public class Requirement {
   public Requirement() {
     uuid = UUID.randomUUID();
   }
-
-
+  
+  
   @JsonIgnore
   public boolean hasPredecessors() {
     return !predecessors.isEmpty();
   }
-
+  
   public void clearPropertiesMap() {
     propertiesMap.clear();
   }
-
-
+  
+  
   public String addProperty(String key, String value) {
     return propertiesMap.put(key, value);
   }
-
-
+  
+  
   @Override
   public int hashCode() {
     int result;
@@ -107,17 +107,17 @@ public class Requirement {
     result = 31 * result + (getCategory() != null ? getCategory().hashCode() : 0);
     return result;
   }
-
+  
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-
+    
     Requirement that = (Requirement) o;
-
+    
     return getUuid().equals(that.getUuid());
   }
-
+  
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("Requirement{");
@@ -135,95 +135,95 @@ public class Requirement {
     sb.append('}');
     return sb.toString();
   }
-
+  
   public String getName() {
-
+    
     return name;
   }
-
+  
   public void setName(String name) {
     this.name = name;
   }
-
+  
   public String getDescription() {
     return description;
   }
-
+  
   public void setDescription(String description) {
     this.description = description;
   }
-
-
+  
+  
   public double getMaxPoints() {
     return maxPoints;
   }
-
+  
   public void setMaxPoints(double maxPoints) {
     this.maxPoints = maxPoints;
   }
-
+  
   public boolean isBinary() {
     return binary;
   }
-
+  
   public void setBinary(boolean binary) {
     this.binary = binary;
   }
-
+  
   @JsonIgnore
   public boolean isMandatory() {
     return type.equals(Type.REGULAR);
   }
-
+  
   @JsonIgnore
   public boolean isMalus() {
     return type.equals(Type.MALUS);
   }
-
+  
   public String removeProperty(String key) {
-    if(propertiesMap==null){
+    if (propertiesMap == null) {
       return null;
     }
     return propertiesMap.remove(key);
   }
-
+  
   public Map<String, String> getPropertiesMap() {
-    if(propertiesMap == null){
+    if (propertiesMap == null) {
       this.propertiesMap = new HashMap<>();
     }
     return new HashMap<String, String>(propertiesMap);
   }
-
+  
   public void setPropertiesMap(Map<String, String> propertiesMap) {
     this.propertiesMap = propertiesMap;
   }
-
+  
   public String getExcerpt() {
     return excerpt;
   }
-
+  
   public void setExcerpt(String excerpt) {
     this.excerpt = excerpt;
   }
-
+  
   public UUID getMinimalMilestoneUUID() {
     return minimalMilestoneUUID;
   }
-
+  
   public void setMinimalMilestoneUUID(UUID minimalMilestoneUUID) {
     this.minimalMilestoneUUID = minimalMilestoneUUID;
   }
-
+  
   public UUID getMaximalMilestoneUUID() {
     return maximalMilestoneUUID;
   }
-
+  
   public void setMaximalMilestoneUUID(UUID maximalMilestoneUUID) {
     this.maximalMilestoneUUID = maximalMilestoneUUID;
   }
-
+  
   public boolean addPredecessor(Requirement requirement) {
-    if(predecessors == null){
+    if (predecessors == null) {
       this.predecessors = new ArrayList<>();
     }
     if (!predecessors.contains(requirement.getUuid())) {
@@ -231,45 +231,45 @@ public class Requirement {
     }
     return false;
   }
-
+  
   public boolean removePredecessor(Requirement requirement) {
-    if(predecessors == null){
+    if (predecessors == null) {
       return false;
     }
     return predecessors.remove(requirement.getUuid());
   }
-
+  
   public UUID[] getPredecessors() {
-    if(predecessors == null){
+    if (predecessors == null) {
       return new UUID[0];
     }
     return predecessors.toArray(new UUID[0]);
   }
-
+  
   public void setPredecessors(UUID[] predecessors) {
-    if(predecessors == null){
+    if (predecessors == null) {
       this.predecessors = new ArrayList<>();
     }
     this.predecessors.clear();
     this.predecessors.addAll(Arrays.asList(predecessors));
   }
-
+  
   public Type getType() {
     return type;
   }
-
+  
   public void setType(Type type) {
     this.type = type;
   }
-
+  
   public String getCategory() {
     return category;
   }
-
+  
   public void setCategory(String category) {
     this.category = category;
   }
-
+  
   /**
    * Denotes whether this requirement is a regular requirement.
    * Non-regular requirements are either bonus or malus requirements and are not considered for the
@@ -279,20 +279,20 @@ public class Requirement {
    */
   @JsonIgnore
   public boolean isRegular() {
-    if(this.type == null){
+    if (this.type == null) {
       return false;
     }
     return this.type.equals(Type.REGULAR);
   }
-
+  
   @JsonIgnore
   public boolean isBonus() {
-    if(this.type == null){
+    if (this.type == null) {
       return false;
     }
     return type.equals(Type.BONUS);
   }
-
+  
   /**
    * Returns the UUID of this requirement.
    *
@@ -301,22 +301,22 @@ public class Requirement {
   public UUID getUuid() {
     return uuid;
   }
-
+  
   @JsonIgnore
   public void setAllPredecessors(Set<Requirement> predecessors) {
-    if(this.predecessors == null){
+    if (this.predecessors == null) {
       this.predecessors = new ArrayList<>();
     }
     this.predecessors.clear();
     this.predecessors.addAll(predecessors.stream().map(Requirement::getUuid).collect(Collectors.toSet()));
   }
-
+  
   public enum Type {
-
+    
     REGULAR,
     MALUS,
     BONUS;
-
+    
     @Override
     public String toString() {
       return StringUtils.capitalize(name().toLowerCase());

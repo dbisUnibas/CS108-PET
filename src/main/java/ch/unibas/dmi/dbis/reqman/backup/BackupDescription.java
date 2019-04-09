@@ -15,8 +15,8 @@ class BackupDescription {
   private UUID uuid;
   private String path;
   
-  public BackupDescription(){
-  
+  public BackupDescription() {
+
   }
   
   public BackupDescription(UUID uuid, String path) {
@@ -25,11 +25,11 @@ class BackupDescription {
   }
   
   public static BackupDescription empty() {
-    return new BackupDescription(null,null);
+    return new BackupDescription(null, null);
   }
   
   @JsonIgnore
-  public boolean isEmpty(){
+  public boolean isEmpty() {
     return uuid == null && path == null;
   }
   

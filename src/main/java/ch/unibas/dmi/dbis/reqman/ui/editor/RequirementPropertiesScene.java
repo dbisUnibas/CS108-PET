@@ -141,9 +141,9 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     Set<UUID> reqPred = Arrays.stream(requirement.getPredecessors()).collect(Collectors.toSet());
     Set<UUID> pred = predecessors.stream().map(Requirement::getUuid).collect(Collectors.toSet());
     
-    if(pred.equals(reqPred)){
+    if (pred.equals(reqPred)) {
       LOGGER.debug("Predecessors unchanged");
-    }else{
+    } else {
       requirement.setPredecessors(pred.toArray(new UUID[0]));
     }
   }
@@ -370,9 +370,9 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   
   private void saveProperties() {
     LOGGER.debug("Save Requirement properties");
-    LOGGER.debug("Req.props.size={}, ui.prop.size={}",requirement.getPropertiesMap().size(), tableData.size());
-    LOGGER.debug("Requirement porps: {}",requirement.getPropertiesMap());
-    LOGGER.debug("UI props: {}",tableData);
+    LOGGER.debug("Req.props.size={}, ui.prop.size={}", requirement.getPropertiesMap().size(), tableData.size());
+    LOGGER.debug("Requirement porps: {}", requirement.getPropertiesMap());
+    LOGGER.debug("UI props: {}", tableData);
     if (!isMetaListOnlyEmpty()) {
       requirement.setPropertiesMap(convertFromMetaKeyValuePairList(tableData));
     }
@@ -441,7 +441,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       if (selected == null) {
         return;
       }
-      if(!predecessors.contains(selected)){
+      if (!predecessors.contains(selected)) {
         predecessors.add(selected);
       }
     });
@@ -468,9 +468,9 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   private TableView<MetaKeyValuePair> createPropertiesTable() {
     TableView<MetaKeyValuePair> table = new TableView<>();
     table.setEditable(true);
-  
+    
     Callback<TableColumn<MetaKeyValuePair, String>,
-            TableCell<MetaKeyValuePair, String>> cellFactory
+        TableCell<MetaKeyValuePair, String>> cellFactory
         = (TableColumn<MetaKeyValuePair, String> p) -> new EditingCell();
     
     TableColumn<MetaKeyValuePair, String> firstCol = new TableColumn<>("Key");
@@ -491,7 +491,6 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     });
     
     /* === Make each change update the value*/
-    
     
     
     table.getColumns().addAll(firstCol, secondCol);
@@ -594,10 +593,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   public static class EditingCell extends TableCell<MetaKeyValuePair, String> {
     
     private TextField textField;
-  
+    
     public EditingCell() {
     }
-  
+    
     @Override
     public void startEdit() {
       if (!isEmpty()) {
@@ -608,19 +607,19 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         textField.selectAll();
       }
     }
-  
+    
     @Override
     public void cancelEdit() {
       super.cancelEdit();
-    
+      
       setText(getItem());
       setGraphic(null);
     }
-  
+    
     @Override
     public void updateItem(String item, boolean empty) {
       super.updateItem(item, empty);
-    
+      
       if (empty) {
         setText(null);
         setGraphic(null);
@@ -637,10 +636,10 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         }
       }
     }
-  
+    
     private void createTextField() {
       textField = new TextField(getString());
-      textField.setMinWidth(this.getWidth() - this.getGraphicTextGap()* 2);
+      textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
       textField.focusedProperty().addListener(
           (ObservableValue<? extends Boolean> arg0,
            Boolean arg1, Boolean arg2) -> {
@@ -649,7 +648,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
             }
           });
     }
-  
+    
     private String getString() {
       return getItem() == null ? "" : getItem().toString();
     }

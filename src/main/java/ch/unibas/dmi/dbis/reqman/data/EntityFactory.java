@@ -337,7 +337,7 @@ public class EntityFactory {
     Set<UUID> progReqUuids = progressList.stream().map(Progress::getRequirementUUID).collect(Collectors.toSet());
     boolean hasMissing = reqUuids.removeAll(progReqUuids);
     int missing = reqUuids.size();
-    if(hasMissing){
+    if (hasMissing) {
       reqUuids.stream().map(reqUuid -> createProgressFor(reqMap.get(reqUuid))).forEach(progressList::add);
     }
     group.setProgressList(progressList);
@@ -352,7 +352,7 @@ public class EntityFactory {
     Set<UUID> summariesIds = summaries.stream().map(ProgressSummary::getMilestoneUUID).collect(Collectors.toSet());
     boolean hasMissing = msIds.removeAll(summariesIds);
     int missing = msIds.size();
-    if(hasMissing){
+    if (hasMissing) {
       msIds.stream().map(msId -> createProgressSummary(msMap.get(msId))).forEach(summaries::add);
     }
     group.setProgressSummaries(summaries);

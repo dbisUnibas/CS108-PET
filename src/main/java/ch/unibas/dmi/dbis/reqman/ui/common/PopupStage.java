@@ -16,36 +16,36 @@ import javafx.stage.Stage;
  */
 public class PopupStage extends Stage {
 
-    protected String title;
+  protected String title;
 
-    protected Scene content;
+  protected Scene content;
 
-    public PopupStage() {
-        this("N/A", null, true);
+  public PopupStage() {
+    this("N/A", null, true);
+  }
+
+  public PopupStage(String title, Scene content, boolean modality) {
+    this.content = content;
+    this.title = title;
+
+    Utils.applyLogoIcon(this);
+    initComponents(modality);
+  }
+
+  public PopupStage(String title, Scene content) {
+    this(title, content, true);
+  }
+
+  protected void initComponents(boolean modal) {
+    if (content != null) {
+      setScene(content);
+    }
+    if (title != null) {
+      setTitle(title);
+    }
+    if (modal) {
+      initModality(Modality.APPLICATION_MODAL);
     }
 
-    public PopupStage(String title, Scene content, boolean modality) {
-        this.content = content;
-        this.title = title;
-
-        Utils.applyLogoIcon(this);
-        initComponents(modality);
-    }
-
-    public PopupStage(String title, Scene content) {
-        this(title, content, true);
-    }
-
-    protected void initComponents(boolean modal) {
-        if (content != null) {
-            setScene(content);
-        }
-        if (title != null) {
-            setTitle(title);
-        }
-        if (modal) {
-            initModality(Modality.APPLICATION_MODAL);
-        }
-
-    }
+  }
 }

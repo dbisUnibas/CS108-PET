@@ -86,7 +86,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
       public void markDirty() {
         EvaluatorView.this.markDirty(view.getActiveGroup());
       }
-  
+
       @Override
       public void unmarkDirty() {
         EvaluatorView.this.unmarkDirty(view.getActiveGroup());
@@ -122,7 +122,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
     return tab.getStyleClass().contains("modified");
   }
   
-  public void setActiveTab(Group group){
+  public void setActiveTab(Group group) {
     Tab toActive = groupTapMap.get(group.getUuid());
     tabPane.getSelectionModel().select(toActive);
   }
@@ -140,10 +140,10 @@ public class EvaluatorView extends VBox implements TitleProvider {
   public UUID getActiveGroupUUID() {
     Tab tab = tabPane.getSelectionModel().getSelectedItem();
     Object obj = tab.getUserData();
-    if(obj instanceof UUID){
-      UUID groupID = (UUID)obj;
+    if (obj instanceof UUID) {
+      UUID groupID = (UUID) obj;
       return groupID;
-    }else{
+    } else {
       LOGGER.error("A tab without group-id was found. This should not happen. Saving will probably not work!");
       return null;
     }
@@ -157,9 +157,9 @@ public class EvaluatorView extends VBox implements TitleProvider {
   
   public void showFilterBar() {
     filterBar.clear();
-    if(!getChildren().contains(filterBar)){
+    if (!getChildren().contains(filterBar)) {
       getChildren().add(0, filterBar);
-    }else{
+    } else {
       getChildren().remove(filterBar);
     }
   }
@@ -171,7 +171,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
   }
   
   public void closeFilterBar() {
-    if(filterBar != null){
+    if (filterBar != null) {
       filterBar.close();
     }
   }
@@ -236,12 +236,12 @@ public class EvaluatorView extends VBox implements TitleProvider {
     tabPane.setDisable(true);
   }
   
-  private Function<Void,Void> statisticsCloser;
+  private Function<Void, Void> statisticsCloser;
   
   public void showStatistics(HashMap<UUID, AssessmentView> assessmentViewMap) {
     GroupStatisticsView view = new GroupStatisticsView();
     Scene scene = new Scene(view);
-    PopupStage stage = new PopupStage("Groups Point Overview", scene,false);
+    PopupStage stage = new PopupStage("Groups Point Overview", scene, false);
     // Following code hides the stage asap the focus is lost
     /*stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
       if(!stage.isFocused()){
@@ -250,9 +250,9 @@ public class EvaluatorView extends VBox implements TitleProvider {
     });*/
     stage.show();
     
-    assessmentViewMap.values().forEach(av ->{
+    assessmentViewMap.values().forEach(av -> {
       av.setOnPointsChanged(pts -> {
-        if(stage.isShowing() ){
+        if (stage.isShowing()) {
           view.update();
         }
       });
@@ -273,7 +273,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
   }
   
   public void stop() {
-    if(statisticsCloser != null){
+    if (statisticsCloser != null) {
       statisticsCloser.apply(null);
     }
     BackupManager.getInstance().storeBackups();

@@ -128,7 +128,7 @@ public class GroupStatisticsView extends VBox {
     secondTitle.setStyle("-fx-font-size: 14pt; -fx-font-weight: bold;");
     second.getChildren().addAll(secondTitle, requirementAnalysis);
     Utils.applyDefaultSpacing(gradeContainer);
-    tableContainer.getChildren().addAll(first,gradeContainer, second);
+    tableContainer.getChildren().addAll(first, gradeContainer, second);
     tableTab.setContent(tableScroll);
     tableScroll.setFitToWidth(true);
     tabPane.getTabs().add(tableTab);
@@ -210,7 +210,7 @@ public class GroupStatisticsView extends VBox {
     requirementAnalysis.refresh();
   }
   
-  private void fillTreeTable(){
+  private void fillTreeTable() {
     treeTableView.getColumns().clear();
     ctrl = EntityController.getInstance();
     analyser = ctrl.getCatalogueAnalyser();
@@ -222,23 +222,23 @@ public class GroupStatisticsView extends VBox {
       TreeItem<GroupOverviewItem> msItem = new TreeItem<>(factory.createFor(ms, ctrl.groupList()));
       root.getChildren().add(msItem);
     });
-  
+    
     TreeTableColumn<GroupOverviewItem, String> nameCol = new TreeTableColumn<>("Name");
     nameCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String> param) ->
         new ReadOnlyStringWrapper(param.getValue().getValue().getName()));
-  
+    
     TreeTableColumn<GroupOverviewItem, String> maxCol = new TreeTableColumn<>("Maximal Available");
     maxCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String> param) -> new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getPoints(cat.getUuid()))));
-  
-  
+    
+    
     treeTableView.setRoot(root);
-  
+    
     treeTableView.getColumns().add(nameCol);
     treeTableView.getColumns().add(maxCol);
-  
+    
     ctrl.groupList().forEach(g -> {
       TreeTableColumn<GroupOverviewItem, String> groupCol = new TreeTableColumn<>(g.getName());
-    
+      
       groupCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String> param) -> {
         double points = param.getValue().getValue().getPoints(g.getUuid());
         double max = param.getValue().getValue().getPoints(cat.getUuid());
@@ -252,11 +252,11 @@ public class GroupStatisticsView extends VBox {
           return new ReadOnlyStringWrapper(StringUtils.prettyPrint(points));
         }
       });
-    
+      
       treeTableView.getColumns().add(groupCol);
     });
-  
-  
+    
+    
     nameCol.setPrefWidth(150);
   }
   

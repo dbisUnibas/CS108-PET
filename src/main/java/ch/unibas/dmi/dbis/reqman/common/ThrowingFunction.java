@@ -11,14 +11,14 @@ import java.util.function.Function;
 @Deprecated
 public interface ThrowingFunction<T, R> extends Function<T, R> {
 
-    R applyThrowing(T input) throws Exception;
+  R applyThrowing(T input) throws Exception;
 
-    @Override
-    default R apply(T input) {
-        try {
-            return applyThrowing(input);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+  @Override
+  default R apply(T input) {
+    try {
+      return applyThrowing(input);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
     }
+  }
 }

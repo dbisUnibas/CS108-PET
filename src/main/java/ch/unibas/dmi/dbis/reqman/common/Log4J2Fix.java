@@ -9,23 +9,23 @@ package ch.unibas.dmi.dbis.reqman.common;
  */
 public final class Log4J2Fix {
 
-    /**
-     * Private constructor
-     */
-    private Log4J2Fix() {
-        // no instances needed.
-    }
+  /**
+   * Private constructor
+   */
+  private Log4J2Fix() {
+    // no instances needed.
+  }
 
-    /**
-     * Fixes the log4j issue LOG4J2-1799
-     * by removing the system properites 'sun.stdout.encoding' and 'sun.stderr.encoding'
-     */
-    public static final void applyHotFix() {
+  /**
+   * Fixes the log4j issue LOG4J2-1799
+   * by removing the system properites 'sun.stdout.encoding' and 'sun.stderr.encoding'
+   */
+  public static final void applyHotFix() {
         /*
         Workaround for:
         https://issues.apache.org/jira/browse/LOG4J2-1799
          */
-        System.getProperties().remove("sun.stdout.encoding");
-        System.getProperties().remove("sun.stderr.encoding");
-    }
+    System.getProperties().remove("sun.stdout.encoding");
+    System.getProperties().remove("sun.stderr.encoding");
+  }
 }

@@ -25,7 +25,8 @@ public class BackupLocations {
     return new BackupLocations();
   }
   
-  @JsonIgnore public boolean add(BackupDescription backupDescription) {
+  @JsonIgnore
+  public boolean add(BackupDescription backupDescription) {
     return locations.add(backupDescription);
   }
   

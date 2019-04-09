@@ -17,7 +17,6 @@ import javafx.util.StringConverter;
  * TODO: Write JavaDoc
  *
  * @author loris.sauter
- *
  * @deprecated Since it got replaced by {@link CourseInfoView}
  */
 @Deprecated

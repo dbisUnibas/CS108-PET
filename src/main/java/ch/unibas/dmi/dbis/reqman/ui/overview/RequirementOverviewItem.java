@@ -3,6 +3,7 @@ package ch.unibas.dmi.dbis.reqman.ui.overview;
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.data.Progress;
 import ch.unibas.dmi.dbis.reqman.data.Requirement;
+
 import java.util.HashMap;
 import java.util.Map;
 

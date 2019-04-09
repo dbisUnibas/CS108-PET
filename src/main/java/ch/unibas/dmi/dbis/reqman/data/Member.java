@@ -27,7 +27,7 @@ public class Member {
    */
   private String email;
   
-  public Member(){
+  public Member() {
   
   }
   

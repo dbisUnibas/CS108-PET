@@ -46,7 +46,7 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
     this.statusBar = statusBar;
   }
   
-  public EditorHandler(){
+  public EditorHandler() {
     AssessmentManager.getInstance().addFilterable(this);
   }
   
@@ -297,7 +297,7 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   @Override
   public int applyFilter(Requirement.Type type) {
     List<Requirement> filtered = EntityController.getInstance().getCatalogueAnalyser().findRequirementsByType(type);
-    if(filtered.isEmpty()){
+    if (filtered.isEmpty()) {
       return 0;
     }
     displayOnly(filtered);
@@ -344,7 +344,7 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   
   @Override
   public void applyFilter(@NotNull Filter filter) {
-    if(!active){
+    if (!active) {
       return;
     }
     LOGGER.debug("Applying filter {}", filter.getDisplayRepresentation());
@@ -355,7 +355,7 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   
   @Override
   public void applyActiveMilestone(@NotNull Milestone ps) {
-    if(!active){
+    if (!active) {
       return;
     }
     // Technically not really needed
@@ -375,7 +375,7 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   }
   
   private void reset() {
-  
+
   }
   
   void setEditorView(EditorView view) {

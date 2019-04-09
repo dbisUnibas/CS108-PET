@@ -2,11 +2,8 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.data.Group;
 import ch.unibas.dmi.dbis.reqman.data.Member;
-import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
 import ch.unibas.dmi.dbis.reqman.ui.common.PromptPopup;
-
-import java.util.function.Consumer;
 
 /**
  * TODO: Write JavaDoc

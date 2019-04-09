@@ -55,12 +55,12 @@ public class Utils {
   
   private static List<Image> iconList = null;
   
-  public static List<Image> getIconList(){
-    if(iconList == null){
+  public static List<Image> getIconList() {
+    if (iconList == null) {
       List<String> pathList = new ArrayList<>();
       iconList = new ArrayList<>();
-      for(int i=16; i<=1024; i*=2){
-        pathList.add("logo/logo"+i+".png");
+      for (int i = 16; i <= 1024; i *= 2) {
+        pathList.add("logo/logo" + i + ".png");
       }
       pathList.sort(Comparator.reverseOrder());
       pathList.forEach(path -> iconList.add(new Image(Utils.class.getClassLoader().getResourceAsStream(path))));
@@ -68,8 +68,8 @@ public class Utils {
     return iconList;
   }
   
-  public static void applyLogoIcon(Stage s){
-    s.getIcons().addAll(getIconList() );
+  public static void applyLogoIcon(Stage s) {
+    s.getIcons().addAll(getIconList());
   }
   
   /**
@@ -87,7 +87,7 @@ public class Utils {
     grid.setStyle("-fx-padding: 10px; -fx-spacing: 10px; -fx-hgap: 10px;-fx-vgap: 10px");
   }
   
-  public static void applyDefaultFineGridSpacing(GridPane grid){
+  public static void applyDefaultFineGridSpacing(GridPane grid) {
     grid.setStyle("-fx-padding: 2px; -fx-spacing: 2px; -fx-hgap: 2px;-fx-vgap: 1px");
   }
   
@@ -192,8 +192,8 @@ public class Utils {
       } catch (IOException e) {
         arrowUpIcon = new Label(ARROW_UP);
       }
-    }else if(arrowUpIcon instanceof SVGNode){
-      return ((SVGNode)arrowUpIcon).copy();
+    } else if (arrowUpIcon instanceof SVGNode) {
+      return ((SVGNode) arrowUpIcon).copy();
     }
     return arrowUpIcon;
   }
@@ -271,8 +271,8 @@ public class Utils {
       } catch (IOException e) {
         arrowDownIcon = new Label(ARROW_DOWN);
       }
-    }else if(arrowDownIcon instanceof SVGNode){
-      return ((SVGNode)arrowDownIcon).copy();
+    } else if (arrowDownIcon instanceof SVGNode) {
+      return ((SVGNode) arrowDownIcon).copy();
     }
     return arrowDownIcon;
   }
@@ -314,7 +314,7 @@ public class Utils {
     public void updateItem(Milestone item, boolean empty) {
       super.updateItem(item, empty);
       if (!empty) {
-        setText(item.getName() );
+        setText(item.getName());
       } else {
         setText("");
       }

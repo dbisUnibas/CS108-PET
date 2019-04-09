@@ -12,7 +12,7 @@ class OpenCatalogueTask extends ManagementTask<Catalogue> {
   
   
   OpenCatalogueTask() {
-  
+
   }
   
   
@@ -21,7 +21,7 @@ class OpenCatalogueTask extends ManagementTask<Catalogue> {
     LOGGER.trace(":call");
     updateAll("Opening Catalogue in (" + StorageManager.getInstance().getSaveDir().getAbsolutePath() + ")", 0.2);
     Catalogue cat = StorageManager.getInstance().openCatalogue();
-    LOGGER.info("Successfully read catalogue file " + StorageManager.getInstance().getCataloguePath() );
+    LOGGER.info("Successfully read catalogue file " + StorageManager.getInstance().getCataloguePath());
     updateAll("Successfully read catalogue from (" + StorageManager.getInstance().getCataloguePath() + ")", 1.0);
     return LOGGER.traceExit(cat);
   }

@@ -13,7 +13,7 @@ import java.util.*;
  * @author loris.sauter
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Course extends VersionedEntity{
+public class Course extends VersionedEntity {
   
   private final UUID uuid;
   
@@ -179,19 +179,19 @@ public class Course extends VersionedEntity{
     return new ArrayList<>(timeEntities);
   }
   
-  public Time[] getTimeEntities(){
+  public Time[] getTimeEntities() {
     return timeEntities.toArray(new Time[0]);
   }
   
-  void setTimeEntities(Time[] entities){
+  void setTimeEntities(Time[] entities) {
     timeEntities.addAll(Arrays.asList(entities));
   }
   
-  public UUID[] getGroupUUIDs(){
+  public UUID[] getGroupUUIDs() {
     return groupUUIDs.toArray(new UUID[0]);
   }
   
-  void setGroupUUIDs(UUID[] uuids){
+  void setGroupUUIDs(UUID[] uuids) {
     groupUUIDs.addAll(Arrays.asList(uuids));
   }
   

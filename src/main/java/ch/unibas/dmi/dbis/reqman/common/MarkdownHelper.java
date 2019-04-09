@@ -16,13 +16,13 @@ import java.io.InputStreamReader;
  */
 public class MarkdownHelper {
   
-  private MarkdownHelper(){
+  private MarkdownHelper() {
     // No instance needed
   }
   
   public static String loadAndRender(String path) throws IOException {
     InputStream instream = MarkdownHelper.class.getClassLoader().getResourceAsStream(path);
-  
+
     BufferedReader reader = new BufferedReader(new InputStreamReader(instream));
     
     Parser parser = Parser.builder().build();

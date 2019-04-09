@@ -324,7 +324,7 @@ public class EntityController {
   }
   
   public boolean removeRequirement(Requirement requirement) {
-    if(catalogueAnalyser.isPredecessor(requirement)){
+    if (catalogueAnalyser.isPredecessor(requirement)) {
       catalogueAnalyser.getDependants(requirement).forEach(r -> r.removePredecessor(requirement));
     }
     boolean result = entityFactory.getCatalogue().removeRequirement(requirement);

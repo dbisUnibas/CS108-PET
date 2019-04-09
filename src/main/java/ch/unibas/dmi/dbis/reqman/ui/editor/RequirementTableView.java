@@ -65,7 +65,7 @@ public class RequirementTableView extends BorderPane {
     layoutComponents();
   }
   
-  public void setOnPointsChanged(Consumer<Double> consumer){
+  public void setOnPointsChanged(Consumer<Double> consumer) {
     changedConsumer = consumer;
   }
   
@@ -85,7 +85,7 @@ public class RequirementTableView extends BorderPane {
     });
   }
   
-  public void setRequirements(@NotNull ObservableList<Requirement> requirements,@NotNull Catalogue catalogue) {
+  public void setRequirements(@NotNull ObservableList<Requirement> requirements, @NotNull Catalogue catalogue) {
     cat = catalogue;
     // Ensures that this view is really simply view - and nothing more!
     LOGGER.traceEntry();
@@ -149,9 +149,9 @@ public class RequirementTableView extends BorderPane {
   
   public void updateRequirement(Requirement requirement) {
     ObservableRequirement toUpdate = getDisplayOf(requirement);
-    if(toUpdate != null){
+    if (toUpdate != null) {
       toUpdate.update(requirement);
-    }else{
+    } else {
       removeFromTable(requirement);
       tableData.add(ObservableRequirement.fromRequirement(requirement));
     }
@@ -165,8 +165,8 @@ public class RequirementTableView extends BorderPane {
   }
   
   private ObservableRequirement getDisplayOf(Requirement requirement) {
-    for(ObservableRequirement dispReq : tableData){
-      if(dispReq.getRequirement().equals(requirement)){
+    for (ObservableRequirement dispReq : tableData) {
+      if (dispReq.getRequirement().equals(requirement)) {
         return dispReq;
       }
     }
@@ -189,7 +189,7 @@ public class RequirementTableView extends BorderPane {
       totalPoints.set(analyser.getMaximalRegularSum());
       totalBonus.set(analyser.getMaximalBonusSum());
       totalMalus.set(analyser.getMaximalMalusSum());
-      if(changedConsumer != null){
+      if (changedConsumer != null) {
         changedConsumer.accept(analyser.getMaximalRegularSum());
       }
     }
@@ -320,7 +320,7 @@ public class RequirementTableView extends BorderPane {
     TableColumn<ObservableRequirement, String> typeColumn = new TableColumn<>("Type");
     typeColumn.setCellValueFactory(c -> c.getValue().typeProperty());
     typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-  
+
     TableColumn<ObservableRequirement, String> categoryColumn = new TableColumn<>("Category");
     categoryColumn.setCellValueFactory(c -> c.getValue().categoryProperty());
     categoryColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -415,7 +415,7 @@ public class RequirementTableView extends BorderPane {
     public Requirement getRequirement() {
       return requirement;
     }
-  
+
     public void update(Requirement requirement) {
       this.requirement = requirement;
       name.set(requirement.getName());
@@ -425,7 +425,7 @@ public class RequirementTableView extends BorderPane {
       minMSName.set(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(requirement.getMinimalMilestoneUUID()).getName());
       maxMSName.set(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(requirement.getMaximalMilestoneUUID()).getName());
     }
-  
+
     double getPoints() {
       return points.get();
     }

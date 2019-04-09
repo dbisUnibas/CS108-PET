@@ -61,9 +61,9 @@ public class CataloguePropertiesScene extends AbstractVisualCreator<Catalogue> {
     if (name == null) {
       throw new IllegalArgumentException("[Catalogue] Name MUST not be null");
     }
-    if(catalogue == null){
+    if (catalogue == null) {
       catalogue = EntityController.getInstance().createCatalogue(name);
-    }else {
+    } else {
       catalogue.setName(name);
     }
     

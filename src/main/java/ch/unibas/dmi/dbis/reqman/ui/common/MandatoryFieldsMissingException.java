@@ -5,12 +5,12 @@ package ch.unibas.dmi.dbis.reqman.ui.common;
  *
  * @author loris.sauter
  */
-public class MandatoryFieldsMissingException extends  RuntimeException{
+public class MandatoryFieldsMissingException extends RuntimeException {
   
   public static final String DEFAULT_MESSAGE = "One or more mandatory fields are not set";
   private String formattedMessage = "";
   
-  private MandatoryFieldsMissingException(String msg){
+  private MandatoryFieldsMissingException(String msg) {
     super(msg);
   }
   
@@ -19,26 +19,26 @@ public class MandatoryFieldsMissingException extends  RuntimeException{
   }
   
   public MandatoryFieldsMissingException(Throwable cause) {
-    super(DEFAULT_MESSAGE,cause);
+    super(DEFAULT_MESSAGE, cause);
   }
   
   public MandatoryFieldsMissingException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
     super(message, cause, enableSuppression, writableStackTrace);
   }
   
-  public String getFormattedMessage(){
+  public String getFormattedMessage() {
     return formattedMessage;
   }
   
-  public static MandatoryFieldsMissingException createWithFormattedMessage(String message){
+  public static MandatoryFieldsMissingException createWithFormattedMessage(String message) {
     MandatoryFieldsMissingException ex = new MandatoryFieldsMissingException(DEFAULT_MESSAGE);
     ex.formattedMessage = message;
     return ex;
   }
   
-  public static MandatoryFieldsMissingException createWithFormattedMessage(String message, Throwable cause){
+  public static MandatoryFieldsMissingException createWithFormattedMessage(String message, Throwable cause) {
     MandatoryFieldsMissingException ex = new MandatoryFieldsMissingException(cause);
-    ex.formattedMessage=message;
+    ex.formattedMessage = message;
     return ex;
   }
 }

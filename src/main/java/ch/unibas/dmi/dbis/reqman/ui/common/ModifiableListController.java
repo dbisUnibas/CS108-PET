@@ -14,48 +14,48 @@ import java.util.ArrayList;
  */
 public abstract class ModifiableListController<T> implements ModifiableListHandler<T> {
 
-    private ObservableList<T> items = FXCollections.observableList(new ArrayList<T>());
+  private ObservableList<T> items = FXCollections.observableList(new ArrayList<T>());
 
-    public ModifiableListController() {
+  public ModifiableListController() {
 
+  }
+
+  public ObservableList<T> getItems() {
+    return items;
+  }
+
+  public void setItems(ObservableList<T> items) {
+    this.items = items;
+  }
+
+  public void addItem(T item) {
+    items.add(item);
+  }
+
+  public void removeItem(T item) {
+    items.remove(item);
+  }
+
+  public void addAll(T... items) {
+    this.items.addAll(items);
+  }
+
+  @Override
+  public void onRemove(ModifiableListView.RemoveEvent<T> event) {
+    T toRemove = event.getSelected();
+    if (toRemove == null) {
+      return; // Cannot remove a non selected item.
     }
+    int index = items.indexOf(toRemove);
+    items.remove(index);
+  }
 
-    public ObservableList<T> getItems() {
-        return items;
-    }
-
-    public void setItems(ObservableList<T> items) {
-        this.items = items;
-    }
-
-    public void addItem(T item) {
-        items.add(item);
-    }
-
-    public void removeItem(T item) {
-        items.remove(item);
-    }
-
-    public void addAll(T... items) {
-        this.items.addAll(items);
-    }
-
-    @Override
-    public void onRemove(ModifiableListView.RemoveEvent<T> event) {
-        T toRemove = event.getSelected();
-        if (toRemove == null) {
-            return; // Cannot remove a non selected item.
-        }
-        int index = items.indexOf(toRemove);
-        items.remove(index);
-    }
-
-    @Override
-    public void onAdd(ModifiableListView.AddEvent<T> event) {
-        items.add(createNew());
-    }
+  @Override
+  public void onAdd(ModifiableListView.AddEvent<T> event) {
+    items.add(createNew());
+  }
 
 
-    protected abstract T createNew();
+  protected abstract T createNew();
 
 }

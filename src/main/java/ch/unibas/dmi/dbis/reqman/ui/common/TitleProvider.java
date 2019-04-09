@@ -6,6 +6,6 @@ package ch.unibas.dmi.dbis.reqman.ui.common;
  * @author loris.sauter
  */
 public interface TitleProvider {
-
-    String getTitle();
+  
+  String getTitle();
 }

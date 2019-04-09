@@ -2,13 +2,11 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Group;
-import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.data.ProgressSummary;
 import ch.unibas.dmi.dbis.reqman.ui.common.AbstractVisualCreator;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * TODO: write JavaDoc
@@ -32,7 +30,7 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
   
   @Override
   public String getPromptTitle() {
-    return group.getName()+"'s Progress Summary of "+ EntityController.getInstance().getCatalogueAnalyser().getMilestoneOf(summary).getName();
+    return group.getName() + "'s Progress Summary of " + EntityController.getInstance().getCatalogueAnalyser().getMilestoneOf(summary).getName();
   }
   
   @Override

@@ -1,6 +1,5 @@
 package ch.unibas.dmi.dbis.reqman.storage;
 
-import ch.unibas.dmi.dbis.reqman.control.EntityController;
 import ch.unibas.dmi.dbis.reqman.data.Catalogue;
 import ch.unibas.dmi.dbis.reqman.data.Course;
 import ch.unibas.dmi.dbis.reqman.data.Group;
@@ -20,7 +19,8 @@ import java.util.UUID;
  * The {@link StorageManager} manages {@link SaveFile} for a ReqMan session.
  * <p>
  * For this purpose, the StorageManager is able to open any ReqMan related file and may open related files as well.
- * For instance, if a catalogue file is being scheduled for opening, the manager will automatically try to open a corresponding course file or throw an exception.
+ * For instance, if a catalogue file is being scheduled for opening, the manager will automatically try to open a
+ * corresponding course file or throw an exception.
  * <p>
  * It keeps track of all opened files and is enables other components of ReqMan to read and write from the files.
  * <p>
@@ -41,11 +41,12 @@ public class StorageManager {
   
   /**
    * Creates a new StorageManager for the current session, by specifying the savefolder.
+   *
    * @param dir The folder in which ReqMan should store all files
    */
   private StorageManager(File dir) {
     this.dir = dir;
-    LOGGER.debug("Created with dir={}",dir);
+    LOGGER.debug("Created with dir={}", dir);
     groupSaveFileList = new ArrayList<>();
   }
   
@@ -53,15 +54,16 @@ public class StorageManager {
   
   /**
    * Creates a new StorageManager for the current session, by specifying the savefolder.
+   *
    * @param dir The folder in which ReqMan should store all files
    */
-  public static StorageManager getInstance(File dir){
-    if(instance == null){
+  public static StorageManager getInstance(File dir) {
+    if (instance == null) {
       instance = new StorageManager(dir);
-    }else{
+    } else {
       File currentDir = instance.getSaveDir();
       instance.LOGGER.debug("Receiving opening with dir={}, currentDir={}", dir, currentDir);
-      if(!dir.equals(currentDir)){
+      if (!dir.equals(currentDir)) {
         instance.setSaveDir(dir);
         instance.LOGGER.debug("Prepared directory: dir={}", instance.getSaveDir());
       }
@@ -69,8 +71,8 @@ public class StorageManager {
     return instance;
   }
   
-  public static StorageManager getInstance(){
-    if(instance == null){
+  public static StorageManager getInstance() {
+    if (instance == null) {
       throw new IllegalStateException("Cannot get instance of StorageManager, due to instance not set");
     }
     return instance;
@@ -78,9 +80,10 @@ public class StorageManager {
   
   /**
    * Lists the files found in the current directory.
+   *
    * @return
    */
-  public List<ReqmanFile> listFiles(){
+  public List<ReqmanFile> listFiles() {
     ArrayList<ReqmanFile> files = new ArrayList<>();
     Arrays.stream(dir.listFiles(REQMAN_FILE_FILTER)).forEach(f -> {
       LOGGER.debug("Processing file {}", f);
@@ -100,14 +103,14 @@ public class StorageManager {
     courseSaveFile = SaveFile.createForSaveDir(dir, Course.class);
     courseSaveFile.open();
     LOGGER.debug("Opened course: {}", courseSaveFile.getEntity());
-    return (Course)courseSaveFile.getEntity();
+    return (Course) courseSaveFile.getEntity();
   }
   
-  public Course openCourse(File file) throws IOException{
+  public Course openCourse(File file) throws IOException {
     courseSaveFile = SaveFile.createForSaveFile(file, Course.class);
     courseSaveFile.open();
     LOGGER.debug("Opened course:{}", courseSaveFile.getEntity());
-    return (Course)courseSaveFile.getEntity();
+    return (Course) courseSaveFile.getEntity();
   }
   
   public Catalogue openCatalogue() throws IOException, UuidMismatchException {
@@ -118,25 +121,25 @@ public class StorageManager {
     Catalogue cat = (Catalogue) catalogueSaveFile.getEntity();
     Course course = openCourse();
     
-    if(!matchingUuid(course.getCatalogueUUID(), cat.getUuid())){
+    if (!matchingUuid(course.getCatalogueUUID(), cat.getUuid())) {
       // 'Clean savefiles'
       catalogueSaveFile = null;
       courseSaveFile = null;
       throw new UuidMismatchException(course.getCatalogueUUID(), cat.getUuid());
     }
-    LOGGER.debug("Opened catalogue {}",cat);
+    LOGGER.debug("Opened catalogue {}", cat);
     return cat;
   }
   
-  public Course getCourse(){
-    if(courseSaveFile != null){
+  public Course getCourse() {
+    if (courseSaveFile != null) {
       return (Course) courseSaveFile.getEntity();
     }
     return null;
   }
   
-  public Catalogue getCatalogue(){
-    if(catalogueSaveFile != null){
+  public Catalogue getCatalogue() {
+    if (catalogueSaveFile != null) {
       return (Catalogue) catalogueSaveFile.getEntity();
     }
     return null;
@@ -154,11 +157,11 @@ public class StorageManager {
     boolean matchingCourse = matchingUuid(group.getCourseUuid(), course.getUuid());
     boolean matchingCatalogue = matchingUuid(group.getCatalogueUuid(), cat.getUuid());
     
-    if(!(matchingCatalogue && matchingCourse)){
+    if (!(matchingCatalogue && matchingCourse)) {
       UuidMismatchException ex;
-      if(!matchingCatalogue){
+      if (!matchingCatalogue) {
         ex = new UuidMismatchException(group.getCourseUuid(), cat.getUuid());
-      }else{
+      } else {
         ex = new UuidMismatchException(group.getCourseUuid(), course.getUuid());
       }
       throw ex;
@@ -172,13 +175,13 @@ public class StorageManager {
     checkIfDirSet();
     courseSaveFile = SaveFile.createForEntity(course);
     courseSaveFile.setSaveDirectory(dir);
-    LOGGER.debug("Course savePath={}",courseSaveFile.getSaveFilePath());
+    LOGGER.debug("Course savePath={}", courseSaveFile.getSaveFilePath());
     courseSaveFile.save();
     LOGGER.debug("Saved course to {}", courseSaveFile.getSaveFilePath());
   }
   
-  public void saveCourse() throws IOException{
-    LOGGER.debug("Saving to {}",courseSaveFile.getSaveFilePath());
+  public void saveCourse() throws IOException {
+    LOGGER.debug("Saving to {}", courseSaveFile.getSaveFilePath());
     courseSaveFile.save();
     LOGGER.debug("Saved course to {}", courseSaveFile.getSaveFilePath());
   }
@@ -203,9 +206,9 @@ public class StorageManager {
     checkIfDirSet();
     SaveFile groupFile = SaveFile.createForEntity(group);
     groupFile.setSaveDirectory(dir);
-    if(sensitively){
+    if (sensitively) {
       groupFile.save();
-    }else{
+    } else {
       groupFile.save();
     }
     LOGGER.debug("Saved group to {}", groupFile.getSaveFilePath());
@@ -214,7 +217,7 @@ public class StorageManager {
   
   public void saveGroup(UUID groupUuid) throws IOException {
     for (SaveFile sf : groupSaveFileList) {
-      if (groupUuid.equals(((Group) sf.getEntity()).getUuid())){
+      if (groupUuid.equals(((Group) sf.getEntity()).getUuid())) {
         LOGGER.debug("Trying to save at {}", sf.getSaveFilePath());
         sf.save();
         LOGGER.debug("Saved group to {}", sf.getSaveFilePath());
@@ -223,9 +226,9 @@ public class StorageManager {
     }
   }
   
-  public boolean hasGroupSaveFile(UUID groupUuid){
-    for(SaveFile sf : groupSaveFileList){
-      if(groupUuid.equals( ((Group)sf.getEntity()).getUuid())){
+  public boolean hasGroupSaveFile(UUID groupUuid) {
+    for (SaveFile sf : groupSaveFileList) {
+      if (groupUuid.equals(((Group) sf.getEntity()).getUuid())) {
         return true;
       }
     }
@@ -233,15 +236,15 @@ public class StorageManager {
   }
   
   
-  private static List<String> getKnownExtensions(){
+  private static List<String> getKnownExtensions() {
     ArrayList<String> list = new ArrayList<>();
-    for(ReqmanFile.Type type : ReqmanFile.Type.values()){
-      list.add(type.getExtension() );
+    for (ReqmanFile.Type type : ReqmanFile.Type.values()) {
+      list.add(type.getExtension());
     }
     return list;
   }
   
-  private static boolean matchingUuid(UUID expected, UUID actual){
+  private static boolean matchingUuid(UUID expected, UUID actual) {
     return expected.equals(actual);
   }
   
@@ -250,14 +253,14 @@ public class StorageManager {
   }
   
   public String getCataloguePath() {
-    if(catalogueSaveFile == null){
+    if (catalogueSaveFile == null) {
       return null;
     }
     return catalogueSaveFile.getSaveFilePath();
   }
   
   public String getCoursePath() {
-    if(courseSaveFile == null){
+    if (courseSaveFile == null) {
       return null;
     }
     return courseSaveFile.getSaveFilePath();
@@ -270,15 +273,15 @@ public class StorageManager {
   
   public void saveGroupSensitively(Group g) throws IOException {
     LOGGER.debug("Saving group saensitively");
-    if(hasGroupSaveFile(g.getUuid())){
+    if (hasGroupSaveFile(g.getUuid())) {
       saveGroup(g.getUuid());
-    }else{
+    } else {
       saveGroup(g, true);
     }
   }
   
-  private void checkIfDirSet() throws RuntimeException{
-    if(dir == null){
+  private void checkIfDirSet() throws RuntimeException {
+    if (dir == null) {
       throw new RuntimeException("Save Directory not set");
     }
   }

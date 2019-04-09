@@ -44,7 +44,7 @@ public class MemberScene extends AbstractVisualCreator<Member> {
       return;
     }
     
-    member = new Member(tfName.getText(), StringUtils.isNotBlank(tfFirstName.getText()) ? tfFirstName.getText() : "", StringUtils.isNotBlank(tfEmail.getText()) ? tfEmail.getText():"");
+    member = new Member(tfName.getText(), StringUtils.isNotBlank(tfFirstName.getText()) ? tfFirstName.getText() : "", StringUtils.isNotBlank(tfEmail.getText()) ? tfEmail.getText() : "");
     
     dismiss();
     

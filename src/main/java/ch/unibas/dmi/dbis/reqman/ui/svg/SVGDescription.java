@@ -69,10 +69,10 @@ public class SVGDescription {
   }
   
   public void addShape(SVGShape shape) {
-    if(shapes == null){
+    if (shapes == null) {
       shapes = new ArrayList<>();
       shapes.add(shape);
-    }else{
+    } else {
       shapes.add(shape);
     }
   }
@@ -154,11 +154,11 @@ public class SVGDescription {
     this.classNames = classNames;
   }
   
-  public boolean hasStrokeCurrentColor(){
+  public boolean hasStrokeCurrentColor() {
     return stroke == null;
   }
   
-  public boolean hasFillCurrentColor(){
+  public boolean hasFillCurrentColor() {
     return fill == null;
   }
   

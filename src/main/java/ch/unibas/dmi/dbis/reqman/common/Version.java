@@ -46,7 +46,7 @@ public class Version implements Comparable<Version> {
     }
   }
   
-  private Version(String version){
+  private Version(String version) {
     this.version = version;
     parseVersion();
   }
@@ -54,7 +54,7 @@ public class Version implements Comparable<Version> {
   private int major = -1;
   private int minor = -1;
   private int patch = -1;
-  private String suffix  = null;
+  private String suffix = null;
   
   @Override
   public int compareTo(@NotNull Version o) {
@@ -65,33 +65,33 @@ public class Version implements Comparable<Version> {
     return major == -1;
   }
   
-  private void parseVersion(){
+  private void parseVersion() {
     LOGGER.debug("Parsing version: {}", version);
     String[] first = version.split("-");
-    if (first.length > 1){
+    if (first.length > 1) {
       suffix = first[1];
-    }else if(first == null || first.length == 0){
+    } else if (first == null || first.length == 0) {
       LOGGER.fatal("No real version set." + ERROR_MSG);
       // Possible if in ide and not loaded / manually set version
       return;
     }
     String[] majorMinorPatch = first[0].split("\\.");
     LOGGER.debug("Version parsing: {}", Arrays.toString(majorMinorPatch));
-    if(majorMinorPatch.length < 3){
+    if (majorMinorPatch.length < 3) {
       LOGGER.fatal("Invalid version format!" + ERROR_MSG);
       return;
     }
-    try{
+    try {
       major = Integer.parseInt(majorMinorPatch[0]);
       minor = Integer.parseInt(majorMinorPatch[1]);
       patch = Integer.parseInt(majorMinorPatch[2]);
-    }catch(NumberFormatException e){
-      LOGGER.warn("Illegal version format! ({}). "+ERROR_MSG, e);
+    } catch (NumberFormatException e) {
+      LOGGER.warn("Illegal version format! ({}). " + ERROR_MSG, e);
       return;
     }
   }
   
-  public boolean hasSuffix(){
+  public boolean hasSuffix() {
     return suffix != null;
   }
   
@@ -113,7 +113,8 @@ public class Version implements Comparable<Version> {
   
   /**
    * Returns the single version instance, so the application has access to its own version.
-   * Technically this is not a singleton class, since the version can also be used to compare read versions from entities.
+   * Technically this is not a singleton class, since the version can also be used to compare read versions from
+   * entities.
    *
    * @return The single version instance
    */
@@ -124,7 +125,7 @@ public class Version implements Comparable<Version> {
     return instance;
   }
   
-  public static Version forString(String version){
+  public static Version forString(String version) {
     return new Version(version);
   }
   

@@ -8,14 +8,14 @@ package ch.unibas.dmi.dbis.reqman.management;
 public class NonUniqueGroupNameException extends RuntimeException {
 
 
-    private final String name;
+  private final String name;
 
-    public NonUniqueGroupNameException(String name) {
-        super("Group name not unique");
-        this.name = name;
-    }
+  public NonUniqueGroupNameException(String name) {
+    super("Group name not unique");
+    this.name = name;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 }

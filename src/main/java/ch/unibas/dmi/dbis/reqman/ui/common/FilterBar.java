@@ -65,7 +65,7 @@ public class FilterBar extends HBox {
   private void layoutComponents() {
     getChildren().add(vertical);
     vertical.getChildren().add(horizontal);
-    horizontal.getChildren().addAll(nameLbl, modeCB, containsLbl, searchInput, andBtn, orBtn, negBtn, Utils.createHFill(), rmBtn,disposeBtn);
+    horizontal.getChildren().addAll(nameLbl, modeCB, containsLbl, searchInput, andBtn, orBtn, negBtn, Utils.createHFill(), rmBtn, disposeBtn);
     vertical.getChildren().add(infoLbl);
     Utils.applyDefaultSpacing(this);
     Utils.applyDefaultSpacing(horizontal);
@@ -130,9 +130,9 @@ public class FilterBar extends HBox {
   private void handleRemoveLast(ActionEvent actionEvent) {
     searchInput.setText("");
     infoLbl.setText("");
-    if(filterStack.size() >= 1){
+    if (filterStack.size() >= 1) {
       setFilter(filterStack.pop());
-    }else{
+    } else {
       clear();
     }
   }
@@ -163,7 +163,7 @@ public class FilterBar extends HBox {
     }
   }
   
-  public void close(){
+  public void close() {
     handleClose(new ActionEvent());
   }
   

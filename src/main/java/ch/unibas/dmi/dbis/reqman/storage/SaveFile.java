@@ -60,8 +60,8 @@ public class SaveFile<T extends VersionedEntity> {
   
   public void setSaveDirectory(File dir) {
     // TODO Check dir
-    if(!dir.isDirectory() ){
-      throw new IllegalArgumentException("Cannot set save directory for non-directory file "+dir.toString());
+    if (!dir.isDirectory()) {
+      throw new IllegalArgumentException("Cannot set save directory for non-directory file " + dir.toString());
     }
     this.dir = dir;
   }
@@ -79,17 +79,17 @@ public class SaveFile<T extends VersionedEntity> {
     JSONUtils.writeToJSONFile(entity, file);
   }
   
-  private void saveSensitively() throws IOException{
+  private void saveSensitively() throws IOException {
     // No file set:
     if (dir == null) {
       throw new RuntimeException("No directory given");
     }
-  
+
     if (file == null) {
       file = new File(getSaveFilePath());
     }
     int suffix = 1;
-    while(file.exists()){
+    while (file.exists()) {
       file = new File(getSaveFileName(suffix++));
     }
     entity.setVersion(Version.getInstance().getVersion());
@@ -105,12 +105,12 @@ public class SaveFile<T extends VersionedEntity> {
       // search file with matching extension in that dir
       File[] files = dir.listFiles(f -> {
         String extension = FileUtils.getFileExtension(f);
-        if(extension == null){
+        if (extension == null) {
           return false;
         }
         return extension.equals(getDesignatedExtension());
       });
-      if(files == null){
+      if (files == null) {
         throw new RuntimeException("For some reason, files is null");
       }
       if (files.length >= 1) {
@@ -155,15 +155,15 @@ public class SaveFile<T extends VersionedEntity> {
     return entity.getName().replace(' ', '_') + IOUtils.EXTENSION_SEPARATOR + getDesignatedExtension();
   }
   
-  private String getSaveFileName(int no){
-    return entity.getName().replace(' ', '_')+'-'+no+IOUtils.EXTENSION_SEPARATOR+getDesignatedExtension();
+  private String getSaveFileName(int no) {
+    return entity.getName().replace(' ', '_') + '-' + no + IOUtils.EXTENSION_SEPARATOR + getDesignatedExtension();
   }
   
   String getSaveFilePath() {
     return dir.getPath() + IOUtils.FILE_SEPARATOR + getSaveFileName();
   }
   
-  private String getSaveFilePath(int no){
+  private String getSaveFilePath(int no) {
     return dir.getPath() + IOUtils.FILE_SEPARATOR + getSaveFileName(no);
   }
   

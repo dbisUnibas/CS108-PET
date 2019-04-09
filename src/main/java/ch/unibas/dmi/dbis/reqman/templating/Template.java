@@ -10,28 +10,28 @@ import java.util.List;
  */
 public class Template<E> {
 
-    private String template;
+  private String template;
 
-    private List<Replacement<E>> replacements;
+  private List<Replacement<E>> replacements;
 
-    private Entity entity;
+  private Entity entity;
 
-    public Template(String template, List<Replacement<E>> replacements, Entity entity) {
-        this.template = template;
-        this.replacements = replacements;
-        this.entity = entity;
-    }
+  public Template(String template, List<Replacement<E>> replacements, Entity entity) {
+    this.template = template;
+    this.replacements = replacements;
+    this.entity = entity;
+  }
 
 
-    public String getTemplate() {
-        return template;
-    }
+  public String getTemplate() {
+    return template;
+  }
 
-    public List<Replacement<E>> getReplacements() {
-        return replacements;
-    }
+  public List<Replacement<E>> getReplacements() {
+    return replacements;
+  }
 
-    public Entity getEntity() {
-        return entity;
-    }
+  public Entity getEntity() {
+    return entity;
+  }
 }

@@ -97,13 +97,14 @@ public class ReqmanFile {
      */
     SESSION;
     
-    public String getExtension(){
+    public String getExtension() {
       return name().toLowerCase();
     }
     
     public final FileFilter getFileFilter = pathname -> FileUtils.getFileExtension(pathname).equals(getExtension());
-    public final FileChooser.ExtensionFilter getExtensionFilter(){
-      return new FileChooser.ExtensionFilter(StringUtils.capitalize(getExtension() )+" files", "*."+getExtension());
+
+    public final FileChooser.ExtensionFilter getExtensionFilter() {
+      return new FileChooser.ExtensionFilter(StringUtils.capitalize(getExtension()) + " files", "*." + getExtension());
     }
   }
 }

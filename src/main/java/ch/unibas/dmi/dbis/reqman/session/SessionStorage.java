@@ -93,6 +93,7 @@ public class SessionStorage {
   public int dataSize() {
     return data.size();
   }
+
   @JsonIgnore
   public boolean isDataEmpty() {
     return data.isEmpty();

@@ -16,8 +16,8 @@ public class SVGLoader {
   
   private static SVGLoader instance = null;
   
-  public static SVGLoader getInstance(){
-    if(instance == null){
+  public static SVGLoader getInstance() {
+    if (instance == null) {
       instance = new SVGLoader();
     }
     return instance;
@@ -26,16 +26,16 @@ public class SVGLoader {
   private Map<String, SVGDescription> cache;
   private SVGParser parser = new SVGParser();
   
-  private SVGLoader(){
+  private SVGLoader() {
     cache = new HashMap<>();
   }
   
   public SVGNode load(String path) throws IOException {
     try {
       SVGDescription desc;
-      if(cache.containsKey(path)){
-        desc =  cache.get(path);
-      }else{
+      if (cache.containsKey(path)) {
+        desc = cache.get(path);
+      } else {
         desc = parser.parse(path);
       }
       return new SVGNode(desc);

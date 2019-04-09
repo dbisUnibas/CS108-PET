@@ -13,11 +13,12 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
- * Displays information about the {@link ch.unibas.dmi.dbis.reqman.data.Course} and {@link ch.unibas.dmi.dbis.reqman.data.Catalogue}
+ * Displays information about the {@link ch.unibas.dmi.dbis.reqman.data.Course} and {@link
+ * ch.unibas.dmi.dbis.reqman.data.Catalogue}
  *
  * @author loris.sauter
  */
-public class CourseInfoView extends HBox{
+public class CourseInfoView extends HBox {
   
   private static final Logger LOGGER = LogManager.getLogger();
   
@@ -38,15 +39,15 @@ public class CourseInfoView extends HBox{
   private SimpleStringProperty catalogueNameProperty;
   private SimpleStringProperty catalogueDescProperty;
   
-  public CourseInfoView(){
+  public CourseInfoView() {
     initComponents();
     layoutComponents();
   }
   
-  public CourseInfoView(Course course, Catalogue catalogue){
+  public CourseInfoView(Course course, Catalogue catalogue) {
     this.catalogue = catalogue;
     this.course = course;
-  
+
     initComponents();
     layoutComponents();
   }
@@ -58,7 +59,7 @@ public class CourseInfoView extends HBox{
     populateInfo();
   }
   
-  private void initComponents(){
+  private void initComponents() {
     
     grid = Utils.generateDefaultGridPane();
     
@@ -83,8 +84,8 @@ public class CourseInfoView extends HBox{
     
   }
   
-  private void layoutComponents(){
-    grid.addRow(0,  courseKeyLbl, courseLbl, semesterKeyLbl, semesterLbl, catalogueKeyLbl, catalogueLbl);
+  private void layoutComponents() {
+    grid.addRow(0, courseKeyLbl, courseLbl, semesterKeyLbl, semesterLbl, catalogueKeyLbl, catalogueLbl);
     
     this.getChildren().clear();
     getChildren().add(grid);
@@ -93,15 +94,15 @@ public class CourseInfoView extends HBox{
     setMinHeight(20);
   }
   
-  private void populateInfo(){
-    if(course != null){
+  private void populateInfo() {
+    if (course != null) {
       String name = course.getName();
       String semester = course.getSemester();
       courseNameProperty.set(name != null ? name : "");
       semesterProperty.set(semester != null ? semester : "");
     }
     
-    if(catalogue != null){
+    if (catalogue != null) {
       String name = catalogue.getName();
       String desc = catalogue.getDescription();
       catalogueNameProperty.set(name != null ? name : "");

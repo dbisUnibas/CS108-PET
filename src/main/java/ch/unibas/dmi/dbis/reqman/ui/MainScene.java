@@ -64,11 +64,11 @@ public class MainScene extends TitledScene {
   public void loadBackups() {
     LOGGER.debug("Loading backups");
     List<Group> groups = BackupManager.getInstance().load();
-    LOGGER.debug("Backups to load: {}",groups.size());
-    if(groups.size() >= 1){
+    LOGGER.debug("Backups to load: {}", groups.size());
+    if (groups.size() >= 1) {
       mainHandler.handleOpenCat(new ActionEvent());
     }
-    groups.forEach(g ->{
+    groups.forEach(g -> {
       LOGGER.debug("Loading backup of {}", g.getName());
       EntityController.getInstance().openGroup(g);
       evaluatorHandler.addTabAndRefresh(g);
@@ -89,7 +89,7 @@ public class MainScene extends TitledScene {
   private boolean stopped = false;
   
   void stop() {
-    if(!stopped){
+    if (!stopped) {
       mainHandler.stop();
       editor.stop();
       evaluator.stop();
@@ -125,7 +125,7 @@ public class MainScene extends TitledScene {
     active = mode;
   }
   
-  void showNotification(String text){
+  void showNotification(String text) {
     notificationPane.show(text);
   }
   

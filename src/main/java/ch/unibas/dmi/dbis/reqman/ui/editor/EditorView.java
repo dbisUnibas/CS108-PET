@@ -62,18 +62,18 @@ public class EditorView extends BorderPane implements TitleProvider {
   }
   
   public void closeFilterBar() {
-    if(filterBar != null){
+    if (filterBar != null) {
       filterBar.close();
     }
     //topBox.getChildren().remove(filterBar);
   }
   
-  private Function<Void,Void> statisticsCloser;
+  private Function<Void, Void> statisticsCloser;
   
   public void showStatistics() {
     CatalogueStatisticsView view = new CatalogueStatisticsView();
     Scene scene = new Scene(view);
-    PopupStage stage = new PopupStage("Catalogue Overview", scene,false);
+    PopupStage stage = new PopupStage("Catalogue Overview", scene, false);
     // Following code hides the stage asap the focus is lost
     /*stage.focusedProperty().addListener((observable, oldValue, newValue) -> {
       if(!stage.isFocused()){
@@ -82,7 +82,7 @@ public class EditorView extends BorderPane implements TitleProvider {
     });*/
     stage.show();
     reqTableView.setOnPointsChanged(pts -> {
-      if(stage.isShowing()){
+      if (stage.isShowing()) {
         view.update();
       }
     });
@@ -97,7 +97,7 @@ public class EditorView extends BorderPane implements TitleProvider {
   }
   
   public void stop() {
-    if(statisticsCloser != null){
+    if (statisticsCloser != null) {
       statisticsCloser.apply(null);
     }
   }
@@ -142,11 +142,11 @@ public class EditorView extends BorderPane implements TitleProvider {
     topBox = new VBox();
   }
   
-  public void showFilterBar(){
+  public void showFilterBar() {
     filterBar.clear();
-    if(!topBox.getChildren().contains(filterBar)){
-      topBox.getChildren().add(0,filterBar);
-    }else{
+    if (!topBox.getChildren().contains(filterBar)) {
+      topBox.getChildren().add(0, filterBar);
+    } else {
       topBox.getChildren().remove(filterBar);
     }
   }

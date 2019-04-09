@@ -90,11 +90,11 @@ public class CatalogueConverter {
           } catch (ClassCastException ex) {
             LOGGER.fatal("Error while casting: {}. Aborting.", ex);
             lastException = ex;
-          } catch (RuntimeException e){
+          } catch (RuntimeException e) {
             LOGGER.fatal("Error while extracting ({}). Aborting.", e);
             lastException = e;
           }
-        }else{
+        } else {
           LOGGER.fatal("Version check failed");
         }
       } catch (RuntimeException ex) {
@@ -115,7 +115,7 @@ public class CatalogueConverter {
     return catalogue;
   }
   
-  private void extractMilestones(Map<String, Object> map)  {
+  private void extractMilestones(Map<String, Object> map) {
     List oldMilestones = (List) map.get(MILESTONES_KEY);
     for (Object obj : oldMilestones) {
       LOGGER.debug("Converting milestone {}", obj);
@@ -157,11 +157,11 @@ public class CatalogueConverter {
       boolean mandatory = Boolean.valueOf(req.get(MANDATORY_KEY).toString());
       boolean malus = Boolean.valueOf(req.get(MALUS_KEY).toString());
       
-      if(malus && mandatory){
+      if (malus && mandatory) {
         requirement.setType(Requirement.Type.MALUS);
-      }else if(mandatory && !malus){
+      } else if (mandatory && !malus) {
         requirement.setType(Requirement.Type.REGULAR);
-      }else{
+      } else {
         requirement.setType(Requirement.Type.BONUS);
       }
       
@@ -175,11 +175,11 @@ public class CatalogueConverter {
   
   private void extractPredecessors(Map req, Requirement requirement) {
     Object preds = req.get(PRED_NAMES_KEY);
-    if(preds != null){
-      List predsList = (List)preds;
-      if(!predsList.isEmpty()){
-        for(Object obj : predsList){
-          if(nameRequirementMap.containsKey(obj.toString())){
+    if (preds != null) {
+      List predsList = (List) preds;
+      if (!predsList.isEmpty()) {
+        for (Object obj : predsList) {
+          if (nameRequirementMap.containsKey(obj.toString())) {
             requirement.addPredecessor(nameRequirementMap.get(obj.toString()));
           }
         }
@@ -189,12 +189,12 @@ public class CatalogueConverter {
   
   private void extractProperties(Map req, Requirement requirement) {
     Object obj = req.get(PROPS_KEY);
-    Map props = (Map)obj;
-    if(props.containsKey(CAT_KEY)){
+    Map props = (Map) obj;
+    if (props.containsKey(CAT_KEY)) {
       requirement.setCategory(props.get(CAT_KEY).toString());
       props.remove(CAT_KEY);
     }
-    for(Object key : props.keySet()){
+    for (Object key : props.keySet()) {
       requirement.addProperty(key.toString(), props.get(key).toString());
     }
     LOGGER.debug("Extracted category {} and properties {}", requirement.getCategory(), requirement.getPropertiesMap());
@@ -218,7 +218,7 @@ public class CatalogueConverter {
           }
           return v.compareTo(toVersion) < 0;
         }
-      }else{
+      } else {
         return true;
       }
     }

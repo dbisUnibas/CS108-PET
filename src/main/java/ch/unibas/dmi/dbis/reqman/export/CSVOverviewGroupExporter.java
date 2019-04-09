@@ -29,14 +29,13 @@ public class CSVOverviewGroupExporter {
   private final Catalogue catalogue;
   private final Course course;
   private final CatalogueAnalyser catalogueAnalyser;
-  private ArrayList<Group> groups= new ArrayList<>();
+  private ArrayList<Group> groups = new ArrayList<>();
   
   private String gradeFormula;
   
   
-  
-  private CSVOverviewGroupExporter(Catalogue catalogue, Course course, Group...groups) {
-    this(catalogue,course,Arrays.asList(groups));
+  private CSVOverviewGroupExporter(Catalogue catalogue, Course course, Group... groups) {
+    this(catalogue, course, Arrays.asList(groups));
   }
   
   
@@ -47,41 +46,41 @@ public class CSVOverviewGroupExporter {
     this.groups.addAll(groups);
   }
   
-  private boolean hasGradeForumla(){
+  private boolean hasGradeForumla() {
     return StringUtils.isNotBlank(gradeFormula);
   }
   
   private static final String LF = "\n";
   private static final String SEPARATOR = ",";
   
-  public static CSVOverviewGroupExporter createOverviewExporter(Catalogue catalogue, Course course, Group...groups){
-    return new CSVOverviewGroupExporter(catalogue,course,groups);
+  public static CSVOverviewGroupExporter createOverviewExporter(Catalogue catalogue, Course course, Group... groups) {
+    return new CSVOverviewGroupExporter(catalogue, course, groups);
   }
   
-  public static CSVOverviewGroupExporter createOverviewExporter(Catalogue catalogue, Course course, List<Group> groups){
-    return new CSVOverviewGroupExporter(catalogue,course,groups);
+  public static CSVOverviewGroupExporter createOverviewExporter(Catalogue catalogue, Course course, List<Group> groups) {
+    return new CSVOverviewGroupExporter(catalogue, course, groups);
   }
   
-  public static CSVOverviewGroupExporter createGradedOverviewExporter(String gradeFormula, Catalogue catalogue, Course course, Group...groups){
-    CSVOverviewGroupExporter exporter = new CSVOverviewGroupExporter(catalogue,course,groups);
+  public static CSVOverviewGroupExporter createGradedOverviewExporter(String gradeFormula, Catalogue catalogue, Course course, Group... groups) {
+    CSVOverviewGroupExporter exporter = new CSVOverviewGroupExporter(catalogue, course, groups);
     exporter.gradeFormula = gradeFormula;
     return exporter;
   }
   
-  public static CSVOverviewGroupExporter createGradedOverviewExporter(String gradeFormula, Catalogue catalogue, Course course, List<Group> groups){
-    CSVOverviewGroupExporter exporter = new CSVOverviewGroupExporter(catalogue,course,groups);
+  public static CSVOverviewGroupExporter createGradedOverviewExporter(String gradeFormula, Catalogue catalogue, Course course, List<Group> groups) {
+    CSVOverviewGroupExporter exporter = new CSVOverviewGroupExporter(catalogue, course, groups);
     exporter.gradeFormula = gradeFormula;
     return exporter;
   }
   
   /**
    * Creates a long overview table: milestones as columns and for each group a row
-   *
+   * <p>
    * Implementation is also row based
    *
    * @return
    */
-  private String buildLongOverviewTable(){
+  private String buildLongOverviewTable() {
     final StringBuilder sb = new StringBuilder();
     
     final double maxSum = catalogueAnalyser.getMaximalRegularSum();
@@ -95,7 +94,7 @@ public class CSVOverviewGroupExporter {
     });
     sb.append("Total");
     
-    if(hasGradeForumla()){
+    if (hasGradeForumla()) {
       sb.append(SEPARATOR);
       sb.append("Grade");
     }
@@ -104,7 +103,7 @@ public class CSVOverviewGroupExporter {
     
     // Rows: per group
     groups.forEach(group -> {
-      GroupAnalyser groupAnalyser = new GroupAnalyser(course,catalogue,group);
+      GroupAnalyser groupAnalyser = new GroupAnalyser(course, catalogue, group);
       // Column 0: Group name
       sb.append(group.getName());
       
@@ -118,7 +117,7 @@ public class CSVOverviewGroupExporter {
       sb.append(SEPARATOR);
       sb.append(ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(groupAnalyser.getSum()));
       
-      if(hasGradeForumla()){
+      if (hasGradeForumla()) {
         // Last column, if grade formula present: Grade
         sb.append(SEPARATOR);
         double points = groupAnalyser.getSum();
@@ -129,18 +128,18 @@ public class CSVOverviewGroupExporter {
       
       sb.append(LF);
     });
-  
+    
     return sb.toString();
   }
   
   /**
    * Creates a long overview table: milestones as columns and for each group member a row
-   *
+   * <p>
    * Implementation is also row based
    *
    * @return
    */
-  private String buildLongOverviewTablePerMember(){
+  private String buildLongOverviewTablePerMember() {
     final StringBuilder sb = new StringBuilder();
     
     final double maxSum = catalogueAnalyser.getMaximalRegularSum();
@@ -156,7 +155,7 @@ public class CSVOverviewGroupExporter {
     });
     sb.append("Total");
     
-    if(hasGradeForumla()){
+    if (hasGradeForumla()) {
       sb.append(SEPARATOR);
       sb.append("Grade");
     }
@@ -165,10 +164,10 @@ public class CSVOverviewGroupExporter {
     
     // Rows: per group
     groups.forEach(group -> {
-      GroupAnalyser groupAnalyser = new GroupAnalyser(course,catalogue,group);
+      GroupAnalyser groupAnalyser = new GroupAnalyser(course, catalogue, group);
       
-      for(Member m : group.getMembers()){
-  
+      for (Member m : group.getMembers()) {
+        
         // Column 0: Member Name
         StringBuilder memberBuilder = new StringBuilder();
         memberBuilder.append(m.getFirstName());
@@ -176,23 +175,23 @@ public class CSVOverviewGroupExporter {
         memberBuilder.append(m.getName());
         
         sb.append(memberBuilder.toString().trim());
-
+        
         // Column 1: Group name
         sb.append(SEPARATOR);
         sb.append(group.getName());
         
-  
+        
         // Columns 2 to n (for each milestone)
         catalogue.getMilestones().forEach(ms -> {
           sb.append(SEPARATOR);
           sb.append(ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(groupAnalyser.getSumFor(groupAnalyser.getProgressSummaryFor(ms))));
         });
-  
+        
         // [Almost] Last column: Total
         sb.append(SEPARATOR);
         sb.append(ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(groupAnalyser.getSum()));
-  
-        if(hasGradeForumla()){
+        
+        if (hasGradeForumla()) {
           // Last column, if grade formula present: Grade
           sb.append(SEPARATOR);
           double points = groupAnalyser.getSum();
@@ -200,7 +199,7 @@ public class CSVOverviewGroupExporter {
           grade = Precision.round(grade, 2);
           sb.append(ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(grade));
         }
-  
+        
         sb.append(LF);
       }
       
@@ -210,8 +209,8 @@ public class CSVOverviewGroupExporter {
   }
   
   public void exportLongOverviewTable(File file) throws IOException {
-    if(StringUtils.isBlank(FileUtils.getFileExtension(file))){
-      file = new File(file.getPath()+".csv");
+    if (StringUtils.isBlank(FileUtils.getFileExtension(file))) {
+      file = new File(file.getPath() + ".csv");
     }
     BufferedWriter br = new BufferedWriter(new FileWriter(file));
     br.write(buildLongOverviewTable());
@@ -220,15 +219,14 @@ public class CSVOverviewGroupExporter {
   }
   
   public void exportLongMemberOverviewTable(File file) throws IOException {
-    if(StringUtils.isBlank(FileUtils.getFileExtension(file))){
-      file = new File(file.getPath()+".csv");
+    if (StringUtils.isBlank(FileUtils.getFileExtension(file))) {
+      file = new File(file.getPath() + ".csv");
     }
     BufferedWriter br = new BufferedWriter(new FileWriter(file));
     br.write(buildLongOverviewTablePerMember());
     br.flush();
     br.close();
   }
-  
   
   
 }

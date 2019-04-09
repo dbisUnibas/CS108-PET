@@ -17,10 +17,11 @@ public class AssessmentManager {
   private HashSet<Filterable> listeners = new HashSet<>();
   private Milestone activeMilestone = null;
   private Filter activeFilter = null;
+  
   private AssessmentManager() {
   
   }
-
+  
   public static AssessmentManager getInstance() {
     if (instance == null) {
       instance = new AssessmentManager();

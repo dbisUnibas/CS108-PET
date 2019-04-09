@@ -1,7 +1,6 @@
 package ch.unibas.dmi.dbis.reqman.ui.evaluator;
 
 import ch.unibas.dmi.dbis.reqman.analysis.CatalogueAnalyser;
-import ch.unibas.dmi.dbis.reqman.backup.BackupManager;
 import ch.unibas.dmi.dbis.reqman.common.Callback;
 import ch.unibas.dmi.dbis.reqman.common.EntityAlreadyOpenException;
 import ch.unibas.dmi.dbis.reqman.common.MissingEntityException;
@@ -39,7 +38,7 @@ import java.util.UUID;
  *
  * @author loris.sauter
  */
-public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHandler{
+public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHandler {
   
   private final static Logger LOGGER = LogManager.getLogger(EvaluatorHandler.class);
   
@@ -63,7 +62,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   private Callback firstGroupCallback = null;
   
   public EvaluatorHandler() {
-  
+
   }
   
   public void setStatusBar(StatusBar statusBar) {
@@ -149,7 +148,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
         } else {
           LOGGER.debug(":handleCreation - new create");
           gr = EvaluatorPromptFactory.promptGroup();
-          if(gr == null){
+          if (gr == null) {
             LOGGER.debug("User aborted creation of group");
             return;
           }
@@ -170,7 +169,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     CatalogueAnalyser analyser = EntityController.getInstance().getCatalogueAnalyser();
     List<Requirement> requirements = null;
     
-    switch(mode){
+    switch (mode) {
       case NAME:
         requirements = analyser.findRequirementsNameContains(pattern);
         break;
@@ -202,7 +201,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     assessmentViewMap.get(evaluator.getActiveGroupUUID()).displayAll();
   }
   
-  public void resetFilterForAll(){
+  public void resetFilterForAll() {
     assessmentViewMap.values().forEach(AssessmentView::displayAll);
   }
   
@@ -227,21 +226,21 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   }
   
   public void loadBackups() {
-  
+
   }
   
   private void reset() {
     this.assessmentViewMap.clear();
   }
   
-  private void handleAddGroup(Group group){
+  private void handleAddGroup(Group group) {
     handleAddGroup(group, false);
   }
   
-  public void handleSplit(ActionEvent event){
+  public void handleSplit(ActionEvent event) {
     LOGGER.debug("Handling splitting");
     Group split = EvaluatorPromptFactory.promptSplit();
-    if(split == null){
+    if (split == null) {
       // User abort?!
       LOGGER.debug("User abort");
       return;
@@ -254,26 +253,26 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
       return;
     }
     FileChooser fc = Utils.createFileChooser("Open Groups");
-    if(EntityController.getInstance().getStorageManager() != null && EntityController.getInstance().getStorageManager().getSaveDir() != null){
+    if (EntityController.getInstance().getStorageManager() != null && EntityController.getInstance().getStorageManager().getSaveDir() != null) {
       fc.setInitialDirectory(EntityController.getInstance().getStorageManager().getSaveDir());
     }
     fc.getExtensionFilters().add(ReqmanFile.Type.GROUP.getExtensionFilter());
-    List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow() );
-    if(files == null){
+    List<File> files = fc.showOpenMultipleDialog(evaluator.getScene().getWindow());
+    if (files == null) {
       return; // user abort
-    }else{
+    } else {
       List<Group> groups = null;
       try {
         groups = EntityController.getInstance().openGroups(files);
-      }catch(EntityAlreadyOpenException ex){
-        Utils.showErrorDialog(ex.getEntityType()+" already open", ex.getEntityType()+" already open", "Cannot open the entity of type "+ex.getEntityType()+" and uuid="+ex.getUuid().toString()+" more than once.");
+      } catch (EntityAlreadyOpenException ex) {
+        Utils.showErrorDialog(ex.getEntityType() + " already open", ex.getEntityType() + " already open", "Cannot open the entity of type " + ex.getEntityType() + " and uuid=" + ex.getUuid().toString() + " more than once.");
       } catch (UuidMismatchException | IOException e) {
         LOGGER.catching(e);
-        Utils.showErrorDialog("Exception while opening groups", "The following exception was caught:\n\t"+e.getMessage());
+        Utils.showErrorDialog("Exception while opening groups", "The following exception was caught:\n\t" + e.getMessage());
         return;
       } catch (MissingEntityException e) {
-        Utils.showErrorDialog("Corrupt group file", "The group file of group ("+e.getEntity().getName()+") is corrupt.\n" +
-            "The entity has no or an empty field '"+e.getMissing()+"'.\n" +
+        Utils.showErrorDialog("Corrupt group file", "The group file of group (" + e.getEntity().getName() + ") is corrupt.\n" +
+            "The entity has no or an empty field '" + e.getMissing() + "'.\n" +
             "Please restart ReqMan to avoid further corrupt files.");
       }
       groups.forEach(this::loadGroupUIAndRefresh);
@@ -284,10 +283,10 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     UUID groupID = evaluator.getActiveGroupUUID();
     LOGGER.debug("Saving group with id {}", groupID);
     Group gr = EntityController.getInstance().getGroup(groupID);
-    if(EntityController.getInstance().getStorageManager().hasGroupSaveFile(groupID)){
+    if (EntityController.getInstance().getStorageManager().hasGroupSaveFile(groupID)) {
       EntityController.getInstance().saveGroup(groupID);
       LOGGER.info("Saved group {}", groupID);
-    }else{
+    } else {
       LOGGER.debug("No save file for group {} found. Using current save dir");
       Group g = EntityController.getInstance().getGroup(groupID);
       EntityController.getInstance().saveGroupAs(g);
@@ -301,9 +300,9 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   public void handleSaveGroupAs(ActionEvent event) {
     UUID groupID = evaluator.getActiveGroupUUID();
     Group g = EntityController.getInstance().getGroup(groupID);
-    if(g == null){
+    if (g == null) {
       LOGGER.error("Cannot save a null-group. Ignoring.");
-    }else{
+    } else {
       LOGGER.debug("Saving group ({}) as...", g.getName());
       DirectoryChooser dc = Utils.createDirectoryChooser("Save as");
       File dir = dc.showDialog(evaluator.getScene().getWindow());
@@ -383,9 +382,9 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   }
   
   void openGroupTab(Group group) {
-    if(evaluator.isGroupTabbed(group)){
+    if (evaluator.isGroupTabbed(group)) {
       LOGGER.debug("Not re-adding groupt tab if group {} already open", group.getName());
-    }else{
+    } else {
       addTab(group, false);
     }
   }
@@ -425,35 +424,35 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
     groups.forEach(this::loadGroupUIAndRefresh);
   }
   
-  private void loadGroupUI(Group g){
+  private void loadGroupUI(Group g) {
     loadGroupUI(g, false);
   }
   
-  private void loadGroupUIAndRefresh(Group g){
+  private void loadGroupUIAndRefresh(Group g) {
     loadGroupUI(g, true);
   }
   
   private void loadGroupUI(Group g, boolean recalculate) {
     LOGGER.traceEntry("Group: {}", g);
-    if(recalculate){
+    if (recalculate) {
       addTabAndRefresh(g);
-    }else{
+    } else {
       addTab(g, false);
     }
     
   }
   
-  public void showStatistics(){
+  public void showStatistics() {
     evaluator.showStatistics(assessmentViewMap);
   }
   
-  public void addTabAndRefresh(Group group){
+  public void addTabAndRefresh(Group group) {
     AssessmentView av = getAssessmentView(group);
     av.recalculatePoints();
-    if(evaluator.isGroupTabbed(group)){
+    if (evaluator.isGroupTabbed(group)) {
       // Do not open another tab for alraedy tabbed group
       av.recalculatePoints();
-    }else{
+    } else {
       evaluator.addGroupTab(av, false);
     }
     evaluator.setActiveTab(group);
@@ -462,7 +461,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   @NotNull
   private AssessmentView getAssessmentView(Group group) {
     AssessmentView av = assessmentViewMap.get(group.getUuid());
-    if(av == null){
+    if (av == null) {
       av = createAssessmentView(group);
       assessmentViewMap.put(group.getUuid(), av);
     }

@@ -8,7 +8,8 @@ import java.util.stream.Collectors;
 
 /**
  * Analysing and managing unit for group.
- * This class is responsible of fully resolve relationships of the entities related to the requirement assessment / progress tracking (evaluator).
+ * This class is responsible of fully resolve relationships of the entities related to the requirement assessment /
+ * progress tracking (evaluator).
  *
  * @author loris.sauter
  */
@@ -52,7 +53,8 @@ public class GroupAnalyser {
   }
   
   /**
-   * Returns a list of {@link Progress} objects that are associated with the given {@link ProgressSummary}, but are unassessed.
+   * Returns a list of {@link Progress} objects that are associated with the given {@link ProgressSummary}, but are
+   * unassessed.
    *
    * @param ps
    * @return
@@ -220,9 +222,12 @@ public class GroupAnalyser {
    * Checks if the given {@link Progress} matches the given {@link ProgressSummary}.
    * <p>
    * Matching is defined as follows:
-   * Either the {@link Progress} has already progress associated with (e.g. {@link Progress#hasProgress()} returns true),
-   * then the {@link ProgressSummary}'s Uuid must be equal to the one returned by {@link Progress#getProgressSummaryUUID()}.
-   * Or the {@link Progress} is <i>fresh</i>, then it is checked if the progress' {@link Requirement}'s {@link Milestone}
+   * Either the {@link Progress} has already progress associated with (e.g. {@link Progress#hasProgress()} returns
+   * true),
+   * then the {@link ProgressSummary}'s Uuid must be equal to the one returned by {@link
+   * Progress#getProgressSummaryUUID()}.
+   * Or the {@link Progress} is <i>fresh</i>, then it is checked if the progress' {@link Requirement}'s {@link
+   * Milestone}
    * equals the milestone, represented by the progress summary.
    *
    * @param p

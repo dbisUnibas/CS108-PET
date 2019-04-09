@@ -14,12 +14,12 @@ public class EntityAlreadyOpenException extends RuntimeException {
   
   
   public EntityAlreadyOpenException(UUID uuid, String entityType) {
-    super("Entity of type ("+entityType+") and uuid="+uuid.toString()+" already opened");
+    super("Entity of type (" + entityType + ") and uuid=" + uuid.toString() + " already opened");
     this.uuid = uuid;
     this.entityType = entityType;
   }
   
-  public EntityAlreadyOpenException(String msg, UUID uuid, String entityType){
+  public EntityAlreadyOpenException(String msg, UUID uuid, String entityType) {
     super(msg);
     this.uuid = uuid;
     this.entityType = entityType;

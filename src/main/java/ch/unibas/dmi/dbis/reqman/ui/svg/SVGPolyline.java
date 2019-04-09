@@ -5,7 +5,7 @@ package ch.unibas.dmi.dbis.reqman.ui.svg;
  *
  * @author loris.sauter
  */
-public class SVGPolyline implements SVGShape{
+public class SVGPolyline implements SVGShape {
   
   
   public static final String POLYLINE_KEY = "polyline";
@@ -19,17 +19,17 @@ public class SVGPolyline implements SVGShape{
     return POLYLINE_KEY;
   }
   
-  public SVGPolyline(){
+  public SVGPolyline() {
     size = 0;
   }
   
-  public SVGPolyline(double...coordinates){
+  public SVGPolyline(double... coordinates) {
     size = coordinates.length / 2; // Intentionally integer division: svg specs say, if odd number, omit last - invalid - coordinate.
     yPoints = new double[size];
     xPoints = new double[size];
-    for(int i=0; i<size; i++){
-      xPoints[i] = coordinates[i*2];
-      yPoints[i] = coordinates[i*2+1];
+    for (int i = 0; i < size; i++) {
+      xPoints[i] = coordinates[i * 2];
+      yPoints[i] = coordinates[i * 2 + 1];
     }
   }
   

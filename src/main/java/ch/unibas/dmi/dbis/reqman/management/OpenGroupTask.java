@@ -14,19 +14,19 @@ import java.io.File;
  */
 public class OpenGroupTask extends ThrowingManagementTask<Group> {
 
-    private static final Logger LOGGER = LogManager.getLogger(OpenGroupTask.class);
+  private static final Logger LOGGER = LogManager.getLogger(OpenGroupTask.class);
 
-    private final File file;
+  private final File file;
 
-    public OpenGroupTask(File file) {
-        this.file = file;
-    }
+  public OpenGroupTask(File file) {
+    this.file = file;
+  }
 
-    @Override
-    protected Group call() throws Exception {
-        updateAll("Opening group " + file.getName() + "...", 0.2);
-        Group gr = JSONUtils.readGroupJSONFile(file);
-        updateAll("Succsessfully opened group " + gr.getName() + ".", 1.0);
-        return gr;
-    }
+  @Override
+  protected Group call() throws Exception {
+    updateAll("Opening group " + file.getName() + "...", 0.2);
+    Group gr = JSONUtils.readGroupJSONFile(file);
+    updateAll("Succsessfully opened group " + gr.getName() + ".", 1.0);
+    return gr;
+  }
 }

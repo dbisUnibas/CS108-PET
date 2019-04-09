@@ -41,13 +41,12 @@ public class MilestonePropertiesScene extends AbstractVisualCreator<Milestone> {
       d = Date.from(inputDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
     
-    if(milestone == null){
+    if (milestone == null) {
       milestone = EntityController.getInstance().createMilestone(name, d);
-    }else{
+    } else {
       milestone.setName(name);
       milestone.setTimeUUID(EntityController.getInstance().getEntityFactory().createTime(d).getUuid());
     }
-    
     
     
     getWindow().hide();

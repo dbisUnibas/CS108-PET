@@ -7,11 +7,11 @@ package ch.unibas.dmi.dbis.reqman.templating;
  */
 public interface Renderer<E> {
 
-    /**
-     * Renders the given instance.
-     *
-     * @param instance
-     * @return
-     */
-    String render(E instance);
+  /**
+   * Renders the given instance.
+   *
+   * @param instance
+   * @return
+   */
+  String render(E instance);
 }

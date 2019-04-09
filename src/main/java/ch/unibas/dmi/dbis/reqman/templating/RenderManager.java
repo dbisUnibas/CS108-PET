@@ -45,7 +45,6 @@ public class RenderManager {
    * .bonusMS[<ordinal>]
    * .malusMS[<ordinal>]
    * <p>
-   *
    */
   private final Entity<Catalogue> CATALOGUE_ENTITY = new Entity<Catalogue>("catalogue",
       new Field<Catalogue, String>("name", Field.Type.NORMAL, Catalogue::getName),
@@ -66,8 +65,8 @@ public class RenderManager {
         return sb.toString();
       }),
       new Field<Catalogue, Double>("sumTotal", Field.Type.NORMAL, c -> EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSum()),
-      new Field<Catalogue, Double>("bonusTotal", Field.Type.NORMAL, c-> EntityController.getInstance().getCatalogueAnalyser().getMaximalBonusSum()),
-      new Field<Catalogue,Double>("malusTotal", Field.Type.NORMAL,c->EntityController.getInstance().getCatalogueAnalyser().getMaximalMalusSum()),
+      new Field<Catalogue, Double>("bonusTotal", Field.Type.NORMAL, c -> EntityController.getInstance().getCatalogueAnalyser().getMaximalBonusSum()),
+      new Field<Catalogue, Double>("malusTotal", Field.Type.NORMAL, c -> EntityController.getInstance().getCatalogueAnalyser().getMaximalMalusSum()),
       new ParametrizedField<Catalogue, Double>("sumMS", _unused -> 0d) {
         @Override
         public String renderCarefully(Catalogue instance, String parameter) {
@@ -242,10 +241,10 @@ public class RenderManager {
       new Field<ProgressSummary, List<Progress>>("progressList", Field.Type.LIST, ps -> EntityController.getInstance().getGroupAnalyser(group).getProgressMadeUntilOrOpen(ps), list -> {
         StringBuilder sb = new StringBuilder();
         
-        list.sort((p1,p2)-> {
+        list.sort((p1, p2) -> {
           Requirement r1 = EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p1);
           Requirement r2 = EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p2);
-          return EntityController.getInstance().getCatalogueAnalyser().getProgressRequirementComparator().compare(r1,r2);
+          return EntityController.getInstance().getCatalogueAnalyser().getProgressRequirementComparator().compare(r1, r2);
         });
         
         list.forEach(p -> sb.append(renderProgress(p)));
@@ -265,8 +264,8 @@ public class RenderManager {
       new Field<ProgressSummary, List<String>>("summary", Field.Type.LIST, ps -> {
         List<String> list = new ArrayList<>();
         EntityController.getInstance().getGroupAnalyser(group).getProgressFor(ps).forEach(p -> {
-          if(org.apache.commons.lang.StringUtils.isNotBlank(p.getComment())){
-            list.add(EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p).getName()+": "+p.getComment()+"<br />\n"); // TODO Line spearator as parameter / config / ?
+          if (org.apache.commons.lang.StringUtils.isNotBlank(p.getComment())) {
+            list.add(EntityController.getInstance().getCatalogueAnalyser().getRequirementOf(p).getName() + ": " + p.getComment() + "<br />\n"); // TODO Line spearator as parameter / config / ?
           }
         });
         return list;
@@ -292,7 +291,7 @@ public class RenderManager {
    */
   public final Entity<Progress> PROGRESS_ENTITY = new Entity<Progress>("progress",
       Field.createNormalField("points", p -> EntityController.getInstance().getCatalogueAnalyser().getActualPoints(p)),
-      Field.createNormalField("comment",Progress::getComment),
+      Field.createNormalField("comment", Progress::getComment),
       Field.createNormalField("fraction", Progress::getFraction),
       new ConditionalField<Progress>("hasPoints", Progress::hasProgress, b -> "POINTS EXISTING", b -> "NO POINTS"),
       new ConditionalField<Progress>("isUnlocked", p -> EntityController.getInstance().getGroupAnalyser(group).isProgressUnlocked(p), b -> "UNLOCEKD", b -> "LOCKED"),
@@ -318,7 +317,7 @@ public class RenderManager {
         // Issue: No milestone associated, due to not assessed?--> check this!
         return EntityController.getInstance().getGroupAnalyser(group).getMilestoneOf(p);
       }), MILESTONE_ENTITY),
-      new SubEntityField<Progress, ProgressSummary>("progressSummary", (p-> EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryOf(p)), PROGRESS_SUMMARY_ENTITY)
+      new SubEntityField<Progress, ProgressSummary>("progressSummary", (p -> EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryOf(p)), PROGRESS_SUMMARY_ENTITY)
   );
   private Template<ProgressSummary> templateProgressSummaryMilestone = null;
   /**
@@ -341,15 +340,15 @@ public class RenderManager {
             StringBuilder sb = new StringBuilder();
             list.forEach(ps -> sb.append(renderProgressSummary(ps)));
             return sb.toString();
-      }),
+          }),
       new Field<Group, Double>("sumTotal", Field.Type.NORMAL, g -> EntityController.getInstance().getGroupAnalyser(g).getSum()),
       new ParametrizedField<Group, Double>("sumMS", g -> 0d) {
         
         @Override
         public String renderCarefully(Group instance, String parameter) {
           Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneByPosition(Integer.parseInt(parameter));
-          if(ms == null){
-            return "[ERROR] Milestone ("+parameter+") not found.";
+          if (ms == null) {
+            return "[ERROR] Milestone (" + parameter + ") not found.";
           }
           ProgressSummary ps = EntityController.getInstance().getGroupAnalyser(group).getProgressSummaryFor(ms);
           return StringUtils.prettyPrint(EntityController.getInstance().getGroupAnalyser(group).getSumFor(ps));

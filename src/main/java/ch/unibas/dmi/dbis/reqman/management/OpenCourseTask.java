@@ -11,7 +11,7 @@ import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
 public class OpenCourseTask extends ManagementTask<Course> {
   
   OpenCourseTask() {
-  
+
   }
   
   
@@ -20,7 +20,7 @@ public class OpenCourseTask extends ManagementTask<Course> {
     LOGGER.trace(":call");
     updateAll("Opening Course from (" + StorageManager.getInstance().getSaveDir().getAbsolutePath() + ")", 0.2);
     Course course = StorageManager.getInstance().openCourse();
-    LOGGER.info("Successfully read course file " + StorageManager.getInstance().getCoursePath() );
+    LOGGER.info("Successfully read course file " + StorageManager.getInstance().getCoursePath());
     updateAll("Successfully read catalogue from (" + StorageManager.getInstance().getCoursePath() + ")", 1.0);
     return LOGGER.traceExit(course);
   }

@@ -13,15 +13,15 @@ import javafx.scene.control.ListCell;
 public class ProgressSummaryCell extends ListCell<ProgressSummary> {
   
   @Override
-  public void updateItem(ProgressSummary item, boolean empty){
-    super.updateItem(item,empty);
-    if(item == null){
+  public void updateItem(ProgressSummary item, boolean empty) {
+    super.updateItem(item, empty);
+    if (item == null) {
       return;
     }
-    if(!empty){
+    if (!empty) {
       Milestone ms = EntityController.getInstance().getCatalogueAnalyser().getMilestoneOf(item);
       setText(ms != null ? ms.getName() : "[ERROR] No such milestone");
-    }else{
+    } else {
       setText("");
     }
   }

@@ -33,7 +33,7 @@ public class ReqmanApplication extends Application {
   }
   
   public static void main(String[] args) {
-    System.setProperty("line.separator","\n"); // To enforce UN*X line endings
+    System.setProperty("line.separator", "\n"); // To enforce UN*X line endings
     version = Version.getInstance();
     LOGGER = LogManager.getLogger(ReqmanApplication.class);
     LOGGER.info(LoggingUtils.REQMAN_MARKER, "Starting reqman @ v" + version.getFullVersion());
@@ -64,8 +64,8 @@ public class ReqmanApplication extends Application {
     LOGGER.catching(Level.ERROR, e);
     Utils.showErrorDialog("Error - " + e.getClass().getSimpleName(),
         "An exception occurred",
-        "An uncaught exception occurred. The exception is of type "+e.getClass().getSimpleName()+".\n" +
-            "The exception's message is as follows:\n\t"+e.getMessage()+"\n" +
+        "An uncaught exception occurred. The exception is of type " + e.getClass().getSimpleName() + ".\n" +
+            "The exception's message is as follows:\n\t" + e.getMessage() + "\n" +
             "ReqMan probably would still work, but re-start is recommended.\n");
     
   }

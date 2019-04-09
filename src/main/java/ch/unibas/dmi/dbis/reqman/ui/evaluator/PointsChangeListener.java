@@ -6,6 +6,6 @@ package ch.unibas.dmi.dbis.reqman.ui.evaluator;
  * @author loris.sauter
  */
 public interface PointsChangeListener {
-
-    void pointsChanged(double newValue);
+  
+  void pointsChanged(double newValue);
 }

@@ -9,10 +9,10 @@ import javafx.scene.paint.Color;
  */
 public class SVGUtils {
   
-  private SVGUtils(){
+  private SVGUtils() {
     // no instance
   }
   
-  public static final Color NONE = Color.gray(1,0);
+  public static final Color NONE = Color.gray(1, 0);
   
 }
