@@ -59,8 +59,10 @@ public class GroupStatisticsView extends VBox {
     
     initComps();
     layoutComps();
-    addDetailCharts();
+    //addDetailCharts();
     update();
+    this.setPrefWidth(1000);
+    this.setPrefHeight(600);
   }
   
   public void update() {
