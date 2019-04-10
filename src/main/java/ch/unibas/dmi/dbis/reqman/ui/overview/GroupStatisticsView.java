@@ -48,7 +48,8 @@ public class GroupStatisticsView extends VBox {
   private TreeTableView<GroupOverviewItem> treeTableView;
   private EntityController ctrl;
   private CatalogueAnalyser analyser;
-  private LineChart<String, Number> chart;
+  private LineChart<String, Number> pointsChart;
+  private LineChart<String, Number> perMilestoneChart;
   private HBox gradeContainer;
   private TextField gradingFunction;
   
@@ -59,7 +60,6 @@ public class GroupStatisticsView extends VBox {
     
     initComps();
     layoutComps();
-    //addDetailCharts();
     update();
     this.setPrefWidth(1000);
     this.setPrefHeight(600);
@@ -74,8 +74,10 @@ public class GroupStatisticsView extends VBox {
     setupGradingBox();
     setupTreeTable();
     setupRequirementAnalysis();
-    chart = createOverviewChart();
-    chart.setPrefSize(800, 600);
+    pointsChart = createOverviewChart();
+    pointsChart.setPrefSize(800, 600);
+    perMilestoneChart = createPerMilestoneOverviewChart();
+    perMilestoneChart.setPrefSize(800, 600);
     tabPane = new TabPane();
   }
   
@@ -139,23 +141,20 @@ public class GroupStatisticsView extends VBox {
     Tab lineChartTab = new Tab("Overall Progress Chart");
     VBox chartContainer = new VBox();
     Utils.applyDefaultSpacing(chartContainer);
-    chartContainer.getChildren().add(chart);
+    chartContainer.getChildren().add(pointsChart);
+    lineChartTab.setContent(chartContainer);
+    tabPane.getTabs().add(lineChartTab);
+  
+    // === Tab with grade / percentage per milestone chart
+    lineChartTab = new Tab("Per Milestone Progress Chart");
+    chartContainer = new VBox();
+    Utils.applyDefaultSpacing(chartContainer);
+    chartContainer.getChildren().add(perMilestoneChart);
     lineChartTab.setContent(chartContainer);
     tabPane.getTabs().add(lineChartTab);
     
   }
-  
-  private void addDetailCharts() {
-    for (Group g : EntityController.getInstance().groupList()) {
-      StackedBarChart<String, Number> chart = createDetailChart(g);
-      chart.setMinHeight(150);
-      chart.setMinWidth(200);
-      Tab chartTab = new Tab(chart.getTitle());
-      chartTab.setContent(chart);
-      tabPane.getTabs().add(chartTab);
-    }
-  }
-  
+
   private void setupRequirementAnalysis() {
     ctrl = EntityController.getInstance();
     analyser = ctrl.getCatalogueAnalyser();
@@ -274,14 +273,14 @@ public class GroupStatisticsView extends VBox {
     treeTableView.setMinHeight(100);
   }
   
-  private LineChart<String, Number> createOverviewChart() {
+  private LineChart<String, Number> createPerMilestoneOverviewChart() {
     ctrl = EntityController.getInstance();
     analyser = ctrl.getCatalogueAnalyser();
     Catalogue cat = ctrl.getCatalogue();
     
     final CategoryAxis xAxis = new CategoryAxis();
     final NumberAxis yAxis = new NumberAxis();
-    yAxis.setLabel("Points");
+    yAxis.setLabel("Normalized Points per Milestone");
     xAxis.setLabel("Milestones");
     final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
     lineChart.setTitle("Milestone Points Overview");
@@ -289,7 +288,7 @@ public class GroupStatisticsView extends VBox {
     XYChart.Series<String, Number> catSeries = new XYChart.Series<>();
     catSeries.setName("Maximal Points");
     for (Milestone ms : cat.getMilestones()) {
-      catSeries.getData().add(new XYChart.Data<>(ms.getName(), analyser.getCumulativeMaximalRegularSumFor(ms)));
+      catSeries.getData().add(new XYChart.Data<>(ms.getName(), 1));
     }
     
     ArrayList<XYChart.Series<String, Number>> series = new ArrayList<>();
@@ -300,11 +299,10 @@ public class GroupStatisticsView extends VBox {
       XYChart.Series<String, Number> serie = new XYChart.Series<>();
       serie.setName(g.getName());
       for (Milestone ms : cat.getMilestones()) {
-        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getCumulativeSumFor(groupAnalyser.getProgressSummaryFor(ms))));
+        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getSumFor(groupAnalyser.getProgressSummaryFor(ms))/analyser.getMaximalRegularSumFor(ms)));
       }
       series.add(serie);
     }
-    
     lineChart.getData().add(catSeries);
     lineChart.getData().addAll(series);
     
@@ -313,45 +311,43 @@ public class GroupStatisticsView extends VBox {
     return lineChart;
   }
   
-  private StackedBarChart<String, Number> createDetailChart(Group g) {
+  
+  
+  private LineChart<String, Number> createOverviewChart() {
     ctrl = EntityController.getInstance();
     analyser = ctrl.getCatalogueAnalyser();
     Catalogue cat = ctrl.getCatalogue();
-    GroupAnalyser groupAnalyser = ctrl.getGroupAnalyser(g);
     
     final CategoryAxis xAxis = new CategoryAxis();
-    xAxis.setLabel("Milestones");
     final NumberAxis yAxis = new NumberAxis();
-    yAxis.setLabel("Points");
-    final StackedBarChart<String, Number> sbc = new StackedBarChart<>(xAxis, yAxis);
-    xAxis.setCategories(FXCollections.observableArrayList(cat.getMilestones().stream().map(Milestone::getName).collect(Collectors.toList())));
+    yAxis.setLabel("Normalized Cumulative Points Achieved");
+    xAxis.setLabel("Milestones");
+    final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+    lineChart.setTitle("Milestone Points Overview");
     
-    XYChart.Series<String, Number> malusSeries = new XYChart.Series<>();
-    malusSeries.setName("Malus Points");
-    XYChart.Series<String, Number> regularSeries = new XYChart.Series<>();
-    regularSeries.setName("Regular Points");
-    XYChart.Series<String, Number> bonusSeries = new XYChart.Series<>();
-    bonusSeries.setName("Bonus Points");
-    
-    double malus, regular, bonus, offset;
-    
+    XYChart.Series<String, Number> catSeries = new XYChart.Series<>();
+    catSeries.setName("Maximal Points");
     for (Milestone ms : cat.getMilestones()) {
-      malus = groupAnalyser.getMalusSumFor(groupAnalyser.getProgressSummaryFor(ms));
-      offset = malus < 0 ? malus : 0;
-      regular = offset + groupAnalyser.getRegularSumFor(groupAnalyser.getProgressSummaryFor(ms));
-      offset = regular < 0 ? regular : 0;
-      bonus = offset + groupAnalyser.getBonusSumFor(groupAnalyser.getProgressSummaryFor(ms));
-      
-      malusSeries.getData().add(new XYChart.Data<>(ms.getName(), malus));
-      regularSeries.getData().add(new XYChart.Data<>(ms.getName(), regular));
-      bonusSeries.getData().add(new XYChart.Data<>(ms.getName(), bonus));
+      catSeries.getData().add(new XYChart.Data<>(ms.getName(), 1));
     }
-    sbc.setTitle("Details Per Milestone of " + g.getName());
     
-    sbc.getData().addAll(malusSeries, regularSeries, bonusSeries);
+    ArrayList<XYChart.Series<String, Number>> series = new ArrayList<>();
     
-    sbc.setMinHeight(200);
+    for (Group g : ctrl.groupList()) {
+      GroupAnalyser groupAnalyser = ctrl.getGroupAnalyser(g);
+      
+      XYChart.Series<String, Number> serie = new XYChart.Series<>();
+      serie.setName(g.getName());
+      for (Milestone ms : cat.getMilestones()) {
+        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getCumulativeSumFor(groupAnalyser.getProgressSummaryFor(ms))/analyser.getCumulativeMaximalRegularSumFor(ms)));
+      }
+      series.add(serie);
+    }
+    lineChart.getData().add(catSeries);
+    lineChart.getData().addAll(series);
     
-    return sbc;
+    lineChart.setMinHeight(300);
+    
+    return lineChart;
   }
 }
