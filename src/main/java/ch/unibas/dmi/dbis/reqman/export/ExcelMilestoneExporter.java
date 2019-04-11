@@ -121,7 +121,7 @@ public class ExcelMilestoneExporter {
     cell.setCellValue(prettyPrintGroupName(_group));
     cell.setCellStyle(groupNameStyle);
     colNum = 0;
-    String[] headers = {"Achieved", "Achievement", "Description", "Comment", "Points"};
+    String[] headers = {"Achieved", "Category", "Achievement", "Description", "Comment", "Points"};
     row = _sheet.createRow(_rowNum++);
     for (String header : headers) {
       cell = row.createCell(colNum++, CellType.STRING);
@@ -160,6 +160,7 @@ public class ExcelMilestoneExporter {
         int colNum = 0;
         XSSFRow row = _sheet.createRow(_rowNum++);
         generateCell(row, colNum++, CellType.STRING, one ? _styles.get(type).getFirst() : _styles.get(type).getSecond());
+        generateCell(row, colNum++, CellType.STRING, one ? _styles.get(type).getFirst() : _styles.get(type).getSecond()).setCellValue(req.getCategory());
         generateCell(row, colNum++, CellType.STRING, one ? _styles.get(type).getFirst() : _styles.get(type).getSecond()).setCellValue(req.getName());
         generateCell(row, colNum++, CellType.STRING, one ? _styles.get(type).getFirst() : _styles.get(type).getSecond()).setCellValue(req.getExcerpt());
         generateCell(row, colNum++, CellType.STRING, one ? _styles.get(type).getFirst() : _styles.get(type).getSecond()).setCellValue("");
