@@ -314,7 +314,7 @@ public class EntityFactory {
   
   public List<ProgressSummary> createProgressSummaries() {
     ensureCatalogueSet("Create ProgressSummary List");
-    return catalogue.getMilestones().stream().map(this::createProgressSummary).collect(Collectors.toList());
+    return catalogue.getMilestones().stream().map(EntityFactory::createProgressSummary).collect(Collectors.toList());
   }
   
   public List<ProgressSummary> copyProgressSummaries(Group source) {
@@ -383,7 +383,7 @@ public class EntityFactory {
     return p;
   }
   
-  private ProgressSummary createProgressSummary(Milestone ms) {
+  public static ProgressSummary createProgressSummary(Milestone ms) {
     ProgressSummary ps = new ProgressSummary();
     ps.setMilestoneUUID(ms.getUuid());
     return ps;

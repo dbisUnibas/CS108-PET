@@ -1,7 +1,7 @@
 package ch.unibas.dmi.dbis.reqman.export;
 
-import ch.unibas.dmi.dbis.reqman.data.Group;
-import ch.unibas.dmi.dbis.reqman.data.Requirement;
+import ch.unibas.dmi.dbis.reqman.control.EntityController;
+import ch.unibas.dmi.dbis.reqman.data.*;
 import ch.unibas.dmi.dbis.reqman.data.Requirement.Type;
 import org.apache.commons.math3.util.Pair;
 import org.apache.poi.ss.usermodel.Font;
@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Exports all achievements for a given milestone to an excel-file which is easier to use for grading on-the-fly during
@@ -37,8 +38,7 @@ public class ExcelMilestoneExporter {
   private static int _rowNum;
   private static Map<Type, Pair<XSSFCellStyle, XSSFCellStyle>> _styles = new HashMap<>();
   
-  public static void exportRequirements(List<Requirement> reqs, List<Group> groups, File export) {
-    _reqs = reqs;
+  public static void exportRequirements(List<Group> groups, File export, Milestone milestone) {
     _rowNum = 0;
     _workbook = new XSSFWorkbook();
     
@@ -71,6 +71,11 @@ public class ExcelMilestoneExporter {
     _styles.put(Type.MALUS, Pair.create(one, two));
     
     for (Group group : groups) {
+      _reqs = EntityController.getInstance().getGroupAnalyser(group)
+          .getProgressFor(EntityFactory.createProgressSummary(milestone))
+          .stream().filter(Progress::isFresh)
+          .map(p -> EntityController.getInstance().getCatalogueAnalyser().getRequirementById(p.getRequirementUUID()))
+          .collect(Collectors.toList());
       _group = group;
       _sheet = _workbook.createSheet(group.getName());
       writeReqs();
@@ -78,12 +83,12 @@ public class ExcelMilestoneExporter {
       row.createCell(0).setCellStyle(footerStyle);
       row.createCell(1).setCellStyle(footerStyle);
       row.createCell(2).setCellStyle(footerStyle);
-      XSSFCell cell = row.createCell(3);
+      XSSFCell cell = row.createCell(4);
       cell.setCellValue("Total");
       cell.setCellStyle(footerStyle);
       
-      cell = row.createCell(4, CellType.FORMULA);
-      cell.setCellFormula("SUMIF(A3:A23, \"YES\", E3:E" + (2 + reqs.size()) + ")");
+      cell = row.createCell(5, CellType.FORMULA);
+      cell.setCellFormula("SUMIF(A3:A" + (2 + _reqs.size()) + ", \"YES\", E3:E" + (2 + _reqs.size()) + ")");
       cell.setCellStyle(footerStyle);
     }
     

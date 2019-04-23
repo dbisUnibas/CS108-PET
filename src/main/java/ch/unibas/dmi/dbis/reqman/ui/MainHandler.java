@@ -205,7 +205,7 @@ public class MainHandler implements MenuHandler {
     }
     
     for (Milestone milestone : EntityController.getInstance().getObservableMilestones()) {
-      ExcelMilestoneExporter.exportRequirements(EntityController.getInstance().getCatalogueAnalyser().getRequirementsFor(milestone), EntityController.getInstance().groupList(), Paths.get(exportDir.getPath(), milestone.getName() + ".xlsx").toFile());
+      ExcelMilestoneExporter.exportRequirements(EntityController.getInstance().groupList(), Paths.get(exportDir.getPath(), milestone.getName() + ".xlsx").toFile(), milestone);
     }
   }
   
