@@ -15,18 +15,18 @@ import java.util.List;
  * @author silvan.heller
  */
 public class RequirementOverviewItemFactory {
-
+  
   private final Catalogue catalogue;
   private final Course course;
   private final CatalogueAnalyser catalogueAnalyser;
-
-
+  
+  
   public RequirementOverviewItemFactory(Course course, Catalogue catalogue) {
     this.catalogue = catalogue;
     this.course = course;
     catalogueAnalyser = new CatalogueAnalyser(course, catalogue);
   }
-
+  
   public RequirementOverviewItem createForRequirement(Requirement req, List<Group> groups) {
     RequirementOverviewItem item = new RequirementOverviewItem(req);
     GroupAnalyser analyser;
@@ -36,7 +36,7 @@ public class RequirementOverviewItemFactory {
     }
     return item;
   }
-
+  
   public RequirementOverviewItem createForRequirements(List<Requirement> requirements) {
     Requirement requirement = new Requirement();
     return new RequirementOverviewItem(requirement);

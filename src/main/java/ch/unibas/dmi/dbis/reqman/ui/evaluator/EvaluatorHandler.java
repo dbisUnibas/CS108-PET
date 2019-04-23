@@ -62,7 +62,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   private Callback firstGroupCallback = null;
   
   public EvaluatorHandler() {
-
+  
   }
   
   public void setStatusBar(StatusBar statusBar) {
@@ -226,7 +226,7 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   }
   
   public void loadBackups() {
-
+  
   }
   
   private void reset() {

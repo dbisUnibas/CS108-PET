@@ -86,7 +86,7 @@ public class EvaluatorView extends VBox implements TitleProvider {
       public void markDirty() {
         EvaluatorView.this.markDirty(view.getActiveGroup());
       }
-
+      
       @Override
       public void unmarkDirty() {
         EvaluatorView.this.unmarkDirty(view.getActiveGroup());

@@ -6,11 +6,11 @@ package ch.unibas.dmi.dbis.reqman.ui.event;
  * @author loris.sauter
  */
 public enum TargetEntity {
-
+  
   REQUIREMENT,
   MILESTONE,
   CATALOGUE,
-
+  
   PROGRESS,
   PROGRESS_SUMMARY,
   GROUP,

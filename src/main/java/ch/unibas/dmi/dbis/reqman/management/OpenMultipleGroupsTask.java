@@ -13,13 +13,13 @@ import java.util.List;
  * @author loris.sauter
  */
 public class OpenMultipleGroupsTask extends ManagementTask<List<Group>> {
-
+  
   private final List<File> files;
-
+  
   public OpenMultipleGroupsTask(List<File> files) {
     this.files = new ArrayList<>(files);
   }
-
+  
   @Override
   protected List<Group> call() throws Exception {
     List<Group> list = new ArrayList<>();
@@ -31,7 +31,7 @@ public class OpenMultipleGroupsTask extends ManagementTask<List<Group>> {
     }
     return list;
   }
-
+  
   /**
    * @param i Must be that first stage: i==1
    * @return
@@ -39,7 +39,7 @@ public class OpenMultipleGroupsTask extends ManagementTask<List<Group>> {
   private double calcFirstProgress(double i) {
     return i * (0.2 / (double) files.size()) + (i - 1) * (0.8 / (double) files.size());
   }
-
+  
   private double calcSecondProgress(double i) {
     return i * (0.2 / (double) files.size()) + (i) * (0.8 / (double) files.size());
   }

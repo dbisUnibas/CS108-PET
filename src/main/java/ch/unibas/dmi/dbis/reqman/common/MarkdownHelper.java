@@ -22,7 +22,7 @@ public class MarkdownHelper {
   
   public static String loadAndRender(String path) throws IOException {
     InputStream instream = MarkdownHelper.class.getClassLoader().getResourceAsStream(path);
-
+    
     BufferedReader reader = new BufferedReader(new InputStreamReader(instream));
     
     Parser parser = Parser.builder().build();

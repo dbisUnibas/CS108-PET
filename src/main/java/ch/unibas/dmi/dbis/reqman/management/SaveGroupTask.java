@@ -11,15 +11,15 @@ import java.io.File;
  * @author loris.sauter
  */
 public class SaveGroupTask extends ManagementTask<Boolean> {
-
+  
   private final File file;
   private final Group group;
-
+  
   public SaveGroupTask(File file, Group group) {
     this.file = file;
     this.group = group;
   }
-
+  
   @Override
   protected Boolean call() throws Exception {
     updateAll("Start writing " + group.getName() + " to disk", 0.2);

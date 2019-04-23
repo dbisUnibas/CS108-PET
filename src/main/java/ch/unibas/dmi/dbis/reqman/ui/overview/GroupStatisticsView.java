@@ -10,9 +10,11 @@ import ch.unibas.dmi.dbis.reqman.data.Milestone;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import javafx.beans.property.ReadOnlyIntegerWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
-import javafx.scene.chart.*;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -22,7 +24,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 /**
  * UI element to show an overview of the participated groups.
@@ -144,7 +145,7 @@ public class GroupStatisticsView extends VBox {
     chartContainer.getChildren().add(pointsChart);
     lineChartTab.setContent(chartContainer);
     tabPane.getTabs().add(lineChartTab);
-  
+    
     // === Tab with grade / percentage per milestone chart
     lineChartTab = new Tab("Per Milestone Progress Chart");
     chartContainer = new VBox();
@@ -154,7 +155,7 @@ public class GroupStatisticsView extends VBox {
     tabPane.getTabs().add(lineChartTab);
     
   }
-
+  
   private void setupRequirementAnalysis() {
     ctrl = EntityController.getInstance();
     analyser = ctrl.getCatalogueAnalyser();
@@ -299,7 +300,7 @@ public class GroupStatisticsView extends VBox {
       XYChart.Series<String, Number> serie = new XYChart.Series<>();
       serie.setName(g.getName());
       for (Milestone ms : cat.getMilestones()) {
-        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getSumFor(groupAnalyser.getProgressSummaryFor(ms))/analyser.getMaximalRegularSumFor(ms)));
+        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getSumFor(groupAnalyser.getProgressSummaryFor(ms)) / analyser.getMaximalRegularSumFor(ms)));
       }
       series.add(serie);
     }
@@ -310,7 +311,6 @@ public class GroupStatisticsView extends VBox {
     
     return lineChart;
   }
-  
   
   
   private LineChart<String, Number> createOverviewChart() {
@@ -339,7 +339,7 @@ public class GroupStatisticsView extends VBox {
       XYChart.Series<String, Number> serie = new XYChart.Series<>();
       serie.setName(g.getName());
       for (Milestone ms : cat.getMilestones()) {
-        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getCumulativeSumFor(groupAnalyser.getProgressSummaryFor(ms))/analyser.getCumulativeMaximalRegularSumFor(ms)));
+        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getCumulativeSumFor(groupAnalyser.getProgressSummaryFor(ms)) / analyser.getCumulativeMaximalRegularSumFor(ms)));
       }
       series.add(serie);
     }

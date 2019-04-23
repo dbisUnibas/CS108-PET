@@ -320,7 +320,7 @@ public class RequirementTableView extends BorderPane {
     TableColumn<ObservableRequirement, String> typeColumn = new TableColumn<>("Type");
     typeColumn.setCellValueFactory(c -> c.getValue().typeProperty());
     typeColumn.setCellFactory(TextFieldTableCell.forTableColumn());
-
+    
     TableColumn<ObservableRequirement, String> categoryColumn = new TableColumn<>("Category");
     categoryColumn.setCellValueFactory(c -> c.getValue().categoryProperty());
     categoryColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -415,7 +415,7 @@ public class RequirementTableView extends BorderPane {
     public Requirement getRequirement() {
       return requirement;
     }
-
+    
     public void update(Requirement requirement) {
       this.requirement = requirement;
       name.set(requirement.getName());
@@ -425,7 +425,7 @@ public class RequirementTableView extends BorderPane {
       minMSName.set(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(requirement.getMinimalMilestoneUUID()).getName());
       maxMSName.set(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(requirement.getMaximalMilestoneUUID()).getName());
     }
-
+    
     double getPoints() {
       return points.get();
     }

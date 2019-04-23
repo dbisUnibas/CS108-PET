@@ -17,7 +17,7 @@ public class Templates {
   private String groupTemplate;
   
   public Templates() {
-
+  
   }
   
   public String getRequirementTemplate() {

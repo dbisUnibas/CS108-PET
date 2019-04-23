@@ -16,31 +16,31 @@ import java.io.*;
  * @author loris.sauter
  */
 public class TemplatingConfigurationManager {
-
+  
   /**
    * The template configuration file name
    */
   public static final String CONFIG_FILE_NAME = "templating" + "." + ConfigUtils.CONFIG_EXTENSION;
-
+  
   /**
    * The template extension
    */
   public static final String TEMPLATE_EXTENSION = "template";
-
+  
   /**
    * The value to indicate that no such template exists
    */
   public static final String IGNORE_TEMPLATE = "#";
-
+  
   private final Logger LOGGER = LogManager.getLogger(TemplatingConfigurationManager.class);
-
+  
   /**
    * The templates object
    */
   private Templates templates = null;
   private TemplatingConfiguration config;
   private File configFile = null;
-
+  
   /**
    * Loads the config from the given string.
    * The string must be a JSON formatted representation of {@link TemplatingConfiguration}
@@ -55,7 +55,7 @@ public class TemplatingConfigurationManager {
     }
     loadTemplateConfig();
   }
-
+  
   /**
    * Returns the templates if already loaded.
    *
@@ -68,7 +68,7 @@ public class TemplatingConfigurationManager {
     }
     return templates;
   }
-
+  
   /**
    * Returns the export file extension
    *
@@ -81,7 +81,7 @@ public class TemplatingConfigurationManager {
     }
     return config.getExtension();
   }
-
+  
   /**
    * Loads the template configuration from the given file.
    * The passed file must exist and be a JSON formatted representation of {@link TemplatingConfiguration}
@@ -105,7 +105,7 @@ public class TemplatingConfigurationManager {
     loadTemplateConfig();
     LOGGER.info("Finished loading templating config.");
   }
-
+  
   /**
    * Loads the template configuration assuming default location
    * The default location of the template configuration file is
@@ -114,7 +114,7 @@ public class TemplatingConfigurationManager {
   public void loadConfig() {
     loadConfig(getConfigFile());
   }
-
+  
   /**
    * Returns the loaded configuration
    *
@@ -126,7 +126,7 @@ public class TemplatingConfigurationManager {
     }
     return config;
   }
-
+  
   /**
    * Returns the default path to the template configuration.
    * If the application is executed from within a JAR, the configuration file is expected
@@ -144,7 +144,7 @@ public class TemplatingConfigurationManager {
       return new File(dir.getPath() + ConfigUtils.getFileSeparator() + CONFIG_FILE_NAME);
     }
   }
-
+  
   /**
    * Reads the template file specified and returns the file's contents.
    * If the hash symbol is used for a file name, the template is set to be the empty string.
@@ -164,10 +164,10 @@ public class TemplatingConfigurationManager {
       sb.append(line);
       sb.append("\n");
     });
-
+    
     return sb.toString();
   }
-
+  
   /**
    * Effectively loads the contents of the template configuration
    */
@@ -178,7 +178,7 @@ public class TemplatingConfigurationManager {
       throw new ConfigurationException("Could not find template file: ", e);
     }
   }
-
+  
   /**
    * Handles exception during loading.
    * Most exceptions are logged and re-thrown as {@link ConfigurationException}
@@ -196,7 +196,7 @@ public class TemplatingConfigurationManager {
       throw LOGGER.throwing(Level.ERROR, new ConfigurationException("An error occurred while reading the configuration.", e));
     }
   }
-
+  
   /**
    * Sets the {@link TemplatingConfiguration} while validating it.
    *
@@ -208,7 +208,7 @@ public class TemplatingConfigurationManager {
     this.config = config;
     return result; // if true: had to fix the config.
   }
-
+  
   /**
    * Creates the {@link File} of a template file.
    * The entries of the template configuration could be absolute or relative paths and this
@@ -241,7 +241,7 @@ public class TemplatingConfigurationManager {
       }
     }
   }
-
+  
   /**
    * Creates the {@link Templates} container for the read template entices.
    *
@@ -251,18 +251,18 @@ public class TemplatingConfigurationManager {
   private Templates createTemplateConfig() throws FileNotFoundException {
     LOGGER.traceEntry();
     TemplatingConfiguration config = getConfig();
-
+    
     Templates tc = new Templates();
     tc.setRequirementTemplate(readTemplateFile(config.getRequirementEntry()));
     tc.setMilestoneTemplate(readTemplateFile(config.getMilestoneEntry()));
     tc.setCatalogueTemplate(readTemplateFile(config.getCatalogueEntry()));
-
+    
     tc.setProgressTemplate(readTemplateFile(config.getProgressEntry()));
     tc.setProgressSummaryTemplate(readTemplateFile(config.getProgressSummaryEntry()));
     tc.setGroupTemplate(readTemplateFile(config.getGroupEntry()));
-
+    
     return tc;
   }
-
-
+  
+  
 }

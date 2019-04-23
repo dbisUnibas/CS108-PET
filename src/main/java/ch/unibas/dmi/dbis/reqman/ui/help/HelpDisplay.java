@@ -25,7 +25,7 @@ public class HelpDisplay extends VBox {
   private PopupStage popupStage;
   private WebView webView;
   private WebEngine webEngine;
-
+  
   public HelpDisplay() {
     try {
       html = MarkdownHelper.loadAndRender(GENERAL_HELP);

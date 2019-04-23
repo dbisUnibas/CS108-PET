@@ -8,14 +8,14 @@ package ch.unibas.dmi.dbis.reqman.configuration;
  * @author loris.sauter
  */
 public class ConfigurationException extends RuntimeException {
-
+  
   /**
    * The default constructor for {@link ConfigurationException} with a default message
    */
   public ConfigurationException() {
     super("An exception occurred while reading the configuration");
   }
-
+  
   /**
    * Constructs a new {@link ConfigurationException} with specified exception message
    *
@@ -24,7 +24,7 @@ public class ConfigurationException extends RuntimeException {
   public ConfigurationException(String message) {
     super(message);
   }
-
+  
   /**
    * Constructs a new {@link ConfigurationException} with a detailed message and a specified cause
    *
@@ -34,7 +34,7 @@ public class ConfigurationException extends RuntimeException {
   public ConfigurationException(String message, Throwable cause) {
     super(message, cause);
   }
-
+  
   /**
    * Constructs a new {@link ConfigurationException} with a specified cause
    *
@@ -43,5 +43,5 @@ public class ConfigurationException extends RuntimeException {
   public ConfigurationException(Throwable cause) {
     super(cause);
   }
-
+  
 }

@@ -47,7 +47,7 @@ public class CourseInfoView extends HBox {
   public CourseInfoView(Course course, Catalogue catalogue) {
     this.catalogue = catalogue;
     this.course = course;
-
+    
     initComponents();
     layoutComponents();
   }

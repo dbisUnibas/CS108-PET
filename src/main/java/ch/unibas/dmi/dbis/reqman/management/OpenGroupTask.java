@@ -13,15 +13,15 @@ import java.io.File;
  * @author loris.sauter
  */
 public class OpenGroupTask extends ThrowingManagementTask<Group> {
-
+  
   private static final Logger LOGGER = LogManager.getLogger(OpenGroupTask.class);
-
+  
   private final File file;
-
+  
   public OpenGroupTask(File file) {
     this.file = file;
   }
-
+  
   @Override
   protected Group call() throws Exception {
     updateAll("Opening group " + file.getName() + "...", 0.2);

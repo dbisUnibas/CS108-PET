@@ -10,9 +10,9 @@ import java.util.function.Function;
 @FunctionalInterface
 @Deprecated
 public interface ThrowingFunction<T, R> extends Function<T, R> {
-
+  
   R applyThrowing(T input) throws Exception;
-
+  
   @Override
   default R apply(T input) {
     try {

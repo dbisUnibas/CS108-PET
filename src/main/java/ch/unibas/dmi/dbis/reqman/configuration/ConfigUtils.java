@@ -10,19 +10,19 @@ import java.io.File;
  * @author loris.sauter
  */
 public class ConfigUtils {
-
+  
   /**
    * The file extension for configuration files
    */
   public static final String CONFIG_EXTENSION = "config";
-
+  
   /**
    * The private default constructor since no objects needed
    */
   private ConfigUtils() {
     // No instance needed
   }
-
+  
   /**
    * Checks if the application currently is executed from within a JAR or not
    *
@@ -32,7 +32,7 @@ public class ConfigUtils {
     String codeSourceLocation = ConfigUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath();
     return codeSourceLocation.endsWith(".jar");
   }
-
+  
   /**
    * Convenient method to get the code source location.
    *
@@ -41,7 +41,7 @@ public class ConfigUtils {
   public static File getCodeSourceLocation() {
     return new File(ConfigUtils.class.getProtectionDomain().getCodeSource().getLocation().getPath());
   }
-
+  
   /**
    * Convenient method to get the system file separator.
    *
@@ -50,6 +50,6 @@ public class ConfigUtils {
   public static final String getFileSeparator() {
     return System.getProperty("file.separator");
   }
-
-
+  
+  
 }

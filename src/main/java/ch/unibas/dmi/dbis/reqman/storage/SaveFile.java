@@ -84,7 +84,7 @@ public class SaveFile<T extends VersionedEntity> {
     if (dir == null) {
       throw new RuntimeException("No directory given");
     }
-
+    
     if (file == null) {
       file = new File(getSaveFilePath());
     }

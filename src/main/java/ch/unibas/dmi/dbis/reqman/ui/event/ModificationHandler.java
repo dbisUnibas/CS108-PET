@@ -9,9 +9,9 @@ import javafx.event.EventHandler;
  */
 @FunctionalInterface
 public interface ModificationHandler extends EventHandler<CUDEvent> {
-
+  
   void handleModification(CUDEvent event);
-
+  
   @Override
   default void handle(CUDEvent event) {
     if (CUDEvent.MODIFICATION.equals(event.getEventType())) {

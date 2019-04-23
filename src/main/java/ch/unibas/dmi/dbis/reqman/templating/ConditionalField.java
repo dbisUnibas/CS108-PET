@@ -12,16 +12,16 @@ import java.util.function.Function;
  * @author loris.sauter
  */
 public class ConditionalField<E> extends ParametrizedField<E, Boolean> {
-
+  
   private static final Logger LOGGER = LogManager.getLogger(TemplateRenderer.class);
-
+  
   /**
    * On runtime, this will contain the parsed false-string
    * e.g given expression: <code>${requirement.mandatory[mandatory][bonus]}</code>
    * this will return <code>bonus</code> during runtime.
    */
   private Function<Boolean, String> falseRenderer = null;
-
+  
   /**
    * @param name
    * @param getter
@@ -34,28 +34,28 @@ public class ConditionalField<E> extends ParametrizedField<E, Boolean> {
     super(name, Type.CONDITIONAL, getter, defaultTrueRenderer);
     this.falseRenderer = defaultFalseRenderer;
   }
-
+  
   public static <E> ConditionalField<E> copy(ConditionalField<E> source) {
     ConditionalField<E> copy = new ConditionalField<E>(source.getName(), source.getGetter(), source.getTrueRenderer(), source.getFalseRenderer());
     return copy;
   }
-
+  
   public Function<Boolean, String> getTrueRenderer() {
     return getRenderer();
   }
-
+  
   public void setTrueRenderer(Function<Boolean, String> trueRenderer) {
     setRenderer(trueRenderer);
   }
-
+  
   public Function<Boolean, String> getFalseRenderer() {
     return falseRenderer;
   }
-
+  
   public void setFalseRenderer(Function<Boolean, String> falseRenderer) {
     this.falseRenderer = falseRenderer;
   }
-
+  
   @Override
   public String render(E instance) {
     LOGGER.trace(":render$Conditional");
@@ -69,7 +69,7 @@ public class ConditionalField<E> extends ParametrizedField<E, Boolean> {
       return getFalseRenderer().apply(fieldValue);
     }
   }
-
+  
   /**
    * Passed directly to {@link ConditionalField#render(Object)}
    *
@@ -81,7 +81,7 @@ public class ConditionalField<E> extends ParametrizedField<E, Boolean> {
   public String renderCarefully(E instance, String param) {
     return render(instance);
   }
-
+  
   @Override
   public String toString() {
     final StringBuffer sb = new StringBuffer("ConditionalField{");

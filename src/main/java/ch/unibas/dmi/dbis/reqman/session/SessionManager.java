@@ -25,7 +25,7 @@ public class SessionManager {
   public static final String SESSION_FILE_NAME = "session.reqman";
   
   private SessionStorage sessionStorage = null;
-
+  
   /**
    * Loads the session storage.
    * Loading order is as follows:
@@ -43,7 +43,7 @@ public class SessionManager {
   private SessionStorage loadSessionStorage() {
     String home = System.getProperty("user.home");
     String cwd = System.getProperty("user.dir");
-
+    
     SessionStorage session = null;
     
     Path[] paths = new Path[4];

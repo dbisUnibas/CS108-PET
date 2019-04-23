@@ -375,7 +375,7 @@ public class EditorHandler implements EventHandler<CUDEvent>, FilterActionHandle
   }
   
   private void reset() {
-
+  
   }
   
   void setEditorView(EditorView view) {

@@ -102,7 +102,7 @@ public class ReqmanFile {
     }
     
     public final FileFilter getFileFilter = pathname -> FileUtils.getFileExtension(pathname).equals(getExtension());
-
+    
     public final FileChooser.ExtensionFilter getExtensionFilter() {
       return new FileChooser.ExtensionFilter(StringUtils.capitalize(getExtension()) + " files", "*." + getExtension());
     }

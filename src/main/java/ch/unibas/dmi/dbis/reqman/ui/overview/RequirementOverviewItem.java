@@ -11,23 +11,23 @@ import java.util.Map;
  * Analysis methods do not really work on non-binary achievements, but who cares.
  */
 public class RequirementOverviewItem {
-
+  
   private final Requirement requirement;
   private Map<Group, Progress> groupResults;
-
+  
   public RequirementOverviewItem(Requirement requirement) {
     this.requirement = requirement;
     groupResults = new HashMap<>();
   }
-
+  
   public void markResult(Group group, Progress result) {
     groupResults.put(group, result);
   }
-
+  
   public Requirement getRequirement() {
     return requirement;
   }
-
+  
   public Integer getAchievedCount() {
     int count = 0;
     for (Progress progress : groupResults.values()) {

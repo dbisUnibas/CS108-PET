@@ -16,7 +16,7 @@ class BackupDescription {
   private String path;
   
   public BackupDescription() {
-
+  
   }
   
   public BackupDescription(UUID uuid, String path) {

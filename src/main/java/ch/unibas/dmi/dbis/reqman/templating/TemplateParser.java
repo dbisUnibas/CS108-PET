@@ -17,42 +17,42 @@ import java.util.regex.Pattern;
  * @author loris.sauter
  */
 public class TemplateParser {
-
-
+  
+  
   public static final String INDICATOR_REGEX = "\\$\\{";
   public static final String CLOSING_REGEX = "\\}";
   public static final String FIELD_DELIMETER_REGEX = "\\.";
   public static final String NAME_REGEX = "[a-zA-Z\\-]+";
   public static final String OPTION_OPENING_REGEX = "\\[";
   public static final String OPTION_CLOSING_REGEX = "\\]";
-
-
+  
+  
   public static final String INDICATOR = "${";
   public static final String CLOSING = "}";
   public static final String FIELD_DELIMETER = ".";
   public static final String OPTION_OPENING = "[";
   public static final String OPTION_CLOSING = "]";
-
+  
   private static final Logger LOGGER = LogManager.getLogger(TemplateParser.class);
-
+  
   private Entity entity;
-
+  
   @Deprecated
   private String searchOpen;
-
+  
   private Pattern pattern;
   private String regexEntity;
-
+  
   public TemplateParser() {
   }
-
+  
   public void setupFor(Entity entity) {
     this.entity = entity;
     searchOpen = INDICATOR_REGEX + this.entity.getEntityName() + FIELD_DELIMETER_REGEX + NAME_REGEX;
     pattern = Pattern.compile(searchOpen + CLOSING_REGEX);
     regexEntity = INDICATOR_REGEX + entity.getEntityName();
   }
-
+  
   public <E> Template<E> parseTemplate(String template) {
     if (entity == null) {
       throw new IllegalStateException("Parser not set up. One must invoke TemplateParser.setupFor(Entity) before parsing a template.");
@@ -60,7 +60,7 @@ public class TemplateParser {
     List<Replacement<E>> list = parseReplacements(template);
     return new Template<E>(template, list, entity);
   }
-
+  
   @Deprecated
   public <E> Map<String, Field<E, ?>> oldParse(String template) {
     // DIRECT FIELDS
@@ -68,15 +68,15 @@ public class TemplateParser {
     Matcher matcher = pattern.matcher(template);
     while (matcher.find()) {
       String variable = template.substring(matcher.start(), matcher.end());
-
+      
       Field<E, ?> field = parseNormalField(variable);
-
+      
       String currentPatternOpen = INDICATOR_REGEX + entity.getEntityName() + FIELD_DELIMETER_REGEX + field.getName();
       map.put(currentPatternOpen + CLOSING_REGEX, field); // need to escape regex predifned dollar symbol
       //map.put(variable, field);
-
+      
     }
-
+    
     // SUB_ENTITY FIELDS
     Pattern p = Pattern.compile(searchOpen + FIELD_DELIMETER_REGEX + NAME_REGEX + CLOSING_REGEX);
     Matcher m = p.matcher(template);
@@ -97,11 +97,11 @@ public class TemplateParser {
             }
             */
     }
-
-
+    
+    
     return map;
   }
-
+  
   <E> List<Replacement<E>> parseReplacements(String template) {
     LOGGER.trace("parseReplacements");
     ArrayList<Replacement<E>> list = new ArrayList<>();
@@ -142,10 +142,10 @@ public class TemplateParser {
       }
       LOGGER.debug(String.format("[parseRep] Added replacement: %s", list.get(list.size() - 1).toString()));
     }
-
+    
     return list;
   }
-
+  
   private <E> SubEntityField<E, ?> parseSubField(String regexField, String expression) {
     LOGGER.debug("[parseSubEntity] Expression: " + expression);
     Pattern patternSub = Pattern.compile(regexField + FIELD_DELIMETER_REGEX + NAME_REGEX);
@@ -178,7 +178,7 @@ public class TemplateParser {
     }
     return null;
   }
-
+  
   /**
    * Used to EITHER parse CONDITIONAL and PARAMETRIZED fields.
    *
@@ -249,11 +249,11 @@ public class TemplateParser {
         throwNoSuchField(found);
       }
     }
-
-
+    
+    
     return null;
   }
-
+  
   private <E> Field<E, ?> parseNormalField(String expression) {
     Pattern p = Pattern.compile(FIELD_DELIMETER_REGEX + NAME_REGEX + CLOSING_REGEX);
     LOGGER.debug("[parseNormal] Field regex: " + p.pattern());
@@ -269,27 +269,27 @@ public class TemplateParser {
     }
     throw new ParseException("Found undefined expression: " + expression);
   }
-
+  
   private void throwNoSuchField(String name) throws ParseException {
     throw new ParseException("Entity (" + entity.getEntityName() + ") has no field with name " + name + " registered");
   }
-
+  
   public static class ParseException extends RuntimeException {
     public ParseException() {
     }
-
+    
     public ParseException(String message) {
       super(message);
     }
-
+    
     public ParseException(String message, Throwable cause) {
       super(message, cause);
     }
-
+    
     public ParseException(Throwable cause) {
       super(cause);
     }
-
+    
     public ParseException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
       super(message, cause, enableSuppression, writableStackTrace);
     }

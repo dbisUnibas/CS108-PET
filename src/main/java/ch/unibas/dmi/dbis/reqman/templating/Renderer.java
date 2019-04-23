@@ -6,7 +6,7 @@ package ch.unibas.dmi.dbis.reqman.templating;
  * @author loris.sauter
  */
 public interface Renderer<E> {
-
+  
   /**
    * Renders the given instance.
    *

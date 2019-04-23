@@ -12,8 +12,8 @@ import java.util.List;
  * @author loris.sauter
  */
 public class OpenBackupsTask extends ManagementTask<List<OpenBackupsTask.BackupObject>> {
-
-
+  
+  
   @Override
   protected List<BackupObject> call() throws Exception {
     throw new UnsupportedOperationException("Not implemented anymore");
@@ -66,30 +66,30 @@ public class OpenBackupsTask extends ManagementTask<List<OpenBackupsTask.BackupO
         }
         return list;*/
   }
-
+  
   public static class BackupObject {
     final boolean cat;
     private Catalogue catalogue = null;
     private Group group = null;
     private File location = null;
-
+    
     private BackupObject(boolean catalogue) {
       this.cat = catalogue;
     }
-
+    
     static BackupObject createCatalogueBackup(Catalogue cat, File location) {
       BackupObject obj = new BackupObject(true);
       obj.setCatalogue(cat);
       obj.setLocation(location);
       return obj;
     }
-
+    
     static BackupObject createGroupBackup(Group group) {
       BackupObject obj = new BackupObject(false);
       obj.setGroup(group);
       return obj;
     }
-
+    
     @Override
     public String toString() {
       final StringBuffer sb = new StringBuffer("BackupObject{");
@@ -100,36 +100,36 @@ public class OpenBackupsTask extends ManagementTask<List<OpenBackupsTask.BackupO
       sb.append('}');
       return sb.toString();
     }
-
+    
     public boolean isCatalogue() {
       return cat;
     }
-
-
+    
+    
     public Catalogue getCatalogue() {
       return catalogue;
     }
-
+    
     private void setCatalogue(Catalogue catalogue) {
       this.catalogue = catalogue;
     }
-
+    
     public Group getGroup() {
       return group;
     }
-
+    
     private void setGroup(Group group) {
       this.group = group;
     }
-
+    
     public File getLocation() {
       return location;
     }
-
+    
     private void setLocation(File location) {
       this.location = location;
     }
   }
-
-
+  
+  
 }

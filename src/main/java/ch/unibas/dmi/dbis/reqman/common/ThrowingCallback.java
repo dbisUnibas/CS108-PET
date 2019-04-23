@@ -6,9 +6,9 @@ package ch.unibas.dmi.dbis.reqman.common;
 @FunctionalInterface
 @Deprecated
 public interface ThrowingCallback extends ThrowingFunction<Void, Void> {
-
+  
   void callThrowing() throws Exception;
-
+  
   @Override
   default Void applyThrowing(Void aVoid) {
     try {

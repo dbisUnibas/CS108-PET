@@ -11,7 +11,7 @@ import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
 public class OpenCourseTask extends ManagementTask<Course> {
   
   OpenCourseTask() {
-
+  
   }
   
   

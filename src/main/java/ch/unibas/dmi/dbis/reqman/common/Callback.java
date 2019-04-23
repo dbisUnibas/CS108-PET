@@ -23,13 +23,13 @@ import java.util.function.Function;
  */
 @FunctionalInterface
 public interface Callback extends Function<Void, Void> {
-
+  
   /**
    * The ecextuable body of the callback.
    */
   void call();
-
-
+  
+  
   /**
    * Invokes {@link #call()} and returns <code>null</code>.
    *

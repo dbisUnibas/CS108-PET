@@ -12,7 +12,7 @@ class OpenCatalogueTask extends ManagementTask<Catalogue> {
   
   
   OpenCatalogueTask() {
-
+  
   }
   
   

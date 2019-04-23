@@ -13,25 +13,25 @@ import java.util.regex.Pattern;
  * @author loris.sauter
  */
 public class TemplateRenderer {
-
+  
   private static final Logger LOGGER = LogManager.getLogger(TemplateRenderer.class);
-
+  
   @Deprecated // Not used
   private TemplateParser parser = null;
-
+  
   @Deprecated
   public TemplateRenderer(TemplateParser parser) {
     this.parser = parser;
   }
-
+  
   public TemplateRenderer() {
   }
-
+  
   public <E> String render(Template<E> template, E instance) {
     LOGGER.debug("Rendering template for instance: " + instance.toString());
     LOGGER.trace("Render template: " + template.getTemplate());
     StringBuilder out = new StringBuilder(template.getTemplate());
-
+    
     template.getReplacements().forEach(replacement -> {
       Field<E, ?> field = replacement.getField();
       LOGGER.debug("Replacement: " + replacement.toString());
@@ -44,14 +44,14 @@ public class TemplateRenderer {
         repl = ((ParametrizedField) field).renderCarefully(instance, ((ParametrizedField) field).getParameter());
       }
       out.replace(calcStart, calcEnd, repl);
-
+      
       LOGGER.trace("PostReplacement: " + out.toString());
     });
-
+    
     return out.toString();
   }
-
-
+  
+  
   /**
    * MAP must have the REGEX escaped value in it!
    *
@@ -63,7 +63,7 @@ public class TemplateRenderer {
    */
   @Deprecated
   public <E> String oldRender(String template, E instance, Map<String, Field<E, ?>> fields) {
-
+    
     StringBuilder out = new StringBuilder(template);
     fields.forEach((variable, field) -> {
       Pattern p = Pattern.compile(variable);
@@ -84,6 +84,6 @@ public class TemplateRenderer {
     });
     return out.toString();
   }
-
-
+  
+  
 }

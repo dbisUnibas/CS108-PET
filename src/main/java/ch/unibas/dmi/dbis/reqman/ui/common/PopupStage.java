@@ -15,27 +15,27 @@ import javafx.stage.Stage;
  * @author loris.sauter
  */
 public class PopupStage extends Stage {
-
+  
   protected String title;
-
+  
   protected Scene content;
-
+  
   public PopupStage() {
     this("N/A", null, true);
   }
-
+  
   public PopupStage(String title, Scene content, boolean modality) {
     this.content = content;
     this.title = title;
-
+    
     Utils.applyLogoIcon(this);
     initComponents(modality);
   }
-
+  
   public PopupStage(String title, Scene content) {
     this(title, content, true);
   }
-
+  
   protected void initComponents(boolean modal) {
     if (content != null) {
       setScene(content);
@@ -46,6 +46,6 @@ public class PopupStage extends Stage {
     if (modal) {
       initModality(Modality.APPLICATION_MODAL);
     }
-
+    
   }
 }
