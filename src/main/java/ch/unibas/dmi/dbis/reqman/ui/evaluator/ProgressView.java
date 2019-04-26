@@ -484,6 +484,7 @@ public class ProgressView extends VBox {
     taComment.textProperty().addListener((observable, oldValue, newValue) -> {
       progress.setComment(newValue);
       LOGGER.debug("Handled comment: {}", newValue);
+      notifyDirtyListeners(true);
     });
   }
   

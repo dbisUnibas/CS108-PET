@@ -1,4 +1,4 @@
-# ReqMan v2.2.0
+# ReqMan
 
 
 ---
