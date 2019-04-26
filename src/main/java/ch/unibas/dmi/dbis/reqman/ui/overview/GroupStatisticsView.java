@@ -24,56 +24,68 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * UI element to show an overview of the participated groups.
  * This overview may contain statistical information, charts and others.
  * <p>
- * Current features:
- * <ul>
- * <li>Table with group-milestone point mapping</li>
- * <li>Table with how many groups fulfilled a requirement, per requirement</li>
- * <li>Line chart with progress over milestones of groups</li>
- * <li>Bar chart per group, with visualization of regular / malus / bonus ratio per milestone</li>
- * </ul>
  *
+ * @author silvan.heller
  * @author loris.sauter
  */
 public class GroupStatisticsView extends VBox {
-  // TODO Code cleanup and restructure code
   
   private static final Logger LOGGER = LogManager.getLogger();
   
+  /**
+   * TabPane where the different tabs with different plots are added
+   */
   private TabPane tabPane;
   
-  private TreeTableView<GroupOverviewItem> treeTableView;
-  private EntityController ctrl;
-  private CatalogueAnalyser analyser;
+  /**
+   * Overview of all groups with points per milestone & grades
+   */
+  private TreeTableView<GroupOverviewItem> groupOverviewTable;
+  /**
+   * Overview of all requirements, how often they were achieved or not achieved
+   */
+  private TreeTableView<RequirementOverviewItem> requirementAnalysis;
+  /**
+   * Visualization of progress w.r.t. overall points
+   */
   private LineChart<String, Number> pointsChart;
+  /**
+   * Visualization of progress w.r.t. points per milestone
+   */
   private LineChart<String, Number> perMilestoneChart;
+  
+  /**
+   * The box where the user enters the function which calculates the grade based on points
+   */
   private HBox gradeContainer;
   private TextField gradingFunction;
   
-  
-  private TreeTableView<RequirementOverviewItem> requirementAnalysis;
+  /**
+   * Utility to reduce code-duplication
+   */
+  private EntityController ctrl = EntityController.getInstance();
+  private CatalogueAnalyser analyser = ctrl.getCatalogueAnalyser();
   
   public GroupStatisticsView() {
-    
     initComps();
     layoutComps();
-    update();
     this.setPrefWidth(1000);
     this.setPrefHeight(600);
   }
   
   public void update() {
-    // TODO re-implement
-    
+    LOGGER.trace("Not doing anything in update");
   }
   
   private void initComps() {
     setupGradingBox();
-    setupTreeTable();
+    setupGroupOverviewTable();
     setupRequirementAnalysis();
     pointsChart = createOverviewChart();
     pointsChart.setPrefSize(800, 600);
@@ -90,10 +102,9 @@ public class GroupStatisticsView extends VBox {
     Button update = new Button("Update Grades");
     update.setOnAction(event -> {
       if (gradingFunction.getText() != null && !gradingFunction.getText().isEmpty()) {
-        updateTreeTable();
-        
+        fillGroupOverviewTable();
       } else {
-        //TODO Alert
+        LOGGER.debug("Empty text for grading function, grades are not updated");
       }
     });
     gradeContainer = new HBox();
@@ -102,10 +113,6 @@ public class GroupStatisticsView extends VBox {
     gradeContainer.setMinHeight(40);
     gradeContainer.setPrefHeight(100);
     gradeContainer.setMinWidth(200);
-  }
-  
-  private void updateTreeTable() {
-    fillTreeTable();
   }
   
   private void layoutComps() {
@@ -125,18 +132,20 @@ public class GroupStatisticsView extends VBox {
     Utils.applyDefaultSpacing(first);
     Label firstTitle = new Label("Points per Milestone Overview");
     firstTitle.setStyle("-fx-font-size: 14pt; -fx-font-weight: bold;");
-    first.getChildren().addAll(firstTitle, treeTableView);
-    VBox second = new VBox();
-    Utils.applyDefaultSpacing(second);
-    requirementAnalysis.setMinHeight(requirementAnalysis.getExpandedItemCount() * 5); // TODO Fix magic number
-    Label secondTitle = new Label("Requirement Analysis");
-    secondTitle.setStyle("-fx-font-size: 14pt; -fx-font-weight: bold;");
-    second.getChildren().addAll(secondTitle, requirementAnalysis);
+    first.getChildren().addAll(firstTitle, groupOverviewTable);
     Utils.applyDefaultSpacing(gradeContainer);
-    tableContainer.getChildren().addAll(first, gradeContainer, second);
+    tableContainer.getChildren().addAll(first, gradeContainer);
     tableTab.setContent(tableScroll);
     tableScroll.setFitToWidth(true);
     tabPane.getTabs().add(tableTab);
+    
+    // === Tab with requirement analysis
+    var reqAnalysisTab = new Tab("Requirements Analysis");
+    var container = new VBox();
+    Utils.applyDefaultSpacing(container);
+    container.getChildren().add(requirementAnalysis);
+    reqAnalysisTab.setContent(container);
+    tabPane.getTabs().add(reqAnalysisTab);
     
     // === Tab with line chart
     Tab lineChartTab = new Tab("Overall Progress Chart");
@@ -157,17 +166,21 @@ public class GroupStatisticsView extends VBox {
   }
   
   private void setupRequirementAnalysis() {
-    ctrl = EntityController.getInstance();
-    analyser = ctrl.getCatalogueAnalyser();
     Catalogue cat = ctrl.getCatalogue();
     
     RequirementOverviewItemFactory factory = new RequirementOverviewItemFactory(ctrl.getCourse(), ctrl.getCatalogue());
     TreeItem<RequirementOverviewItem> root = new TreeItem<>(factory.createForRequirements(cat.getRequirements()));
     root.setExpanded(true);
     
+    /*
+     * For each requirement, sum the number of groups that achieved it. Reqs are only displayed if they are achieved by at least one group or if they are mali.
+     * For mali, it is undesirable that mali are displayed which have not been achieved by anybody because we are not at that milestone yet. However, implementing this would be tedious and require hacking around the architecture of ReqMan.
+     */
     cat.getRequirements().forEach(req -> {
       TreeItem<RequirementOverviewItem> it = new TreeItem<>(factory.createForRequirement(req, ctrl.groupList()));
-      root.getChildren().add(it);
+      if (it.getValue().getAchievedCount() > 0 || it.getValue().getRequirement().isMalus()) {
+        root.getChildren().add(it);
+      }
     });
     
     TreeTableColumn<RequirementOverviewItem, String> nameCol = new TreeTableColumn<>("Name");
@@ -192,7 +205,7 @@ public class GroupStatisticsView extends VBox {
     
     
     requirementAnalysis = new TreeTableView<>(root);
-    requirementAnalysis.setPrefHeight(100);
+    requirementAnalysis.setPrefHeight(500);
     
     requirementAnalysis.getColumns().add(nameCol);
     requirementAnalysis.getColumns().add(achievedCol);
@@ -212,10 +225,11 @@ public class GroupStatisticsView extends VBox {
     requirementAnalysis.refresh();
   }
   
-  private void fillTreeTable() {
-    treeTableView.getColumns().clear();
-    ctrl = EntityController.getInstance();
-    analyser = ctrl.getCatalogueAnalyser();
+  /**
+   * Redraws the whole table. Both called when the grading function is updated and on initialization.
+   */
+  private void fillGroupOverviewTable() {
+    groupOverviewTable.getColumns().clear();
     Catalogue cat = ctrl.getCatalogue();
     GroupOverviewItemFactory factory = new GroupOverviewItemFactory(ctrl.getCourse(), ctrl.getCatalogue());
     TreeItem<GroupOverviewItem> root = new TreeItem<>(factory.createForCatalogue(ctrl.groupList()));
@@ -233,10 +247,10 @@ public class GroupStatisticsView extends VBox {
     maxCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String> param) -> new ReadOnlyStringWrapper(StringUtils.prettyPrint(param.getValue().getValue().getPoints(cat.getUuid()))));
     
     
-    treeTableView.setRoot(root);
+    groupOverviewTable.setRoot(root);
     
-    treeTableView.getColumns().add(nameCol);
-    treeTableView.getColumns().add(maxCol);
+    groupOverviewTable.getColumns().add(nameCol);
+    groupOverviewTable.getColumns().add(maxCol);
     
     ctrl.groupList().forEach(g -> {
       TreeTableColumn<GroupOverviewItem, String> groupCol = new TreeTableColumn<>(g.getName());
@@ -249,34 +263,26 @@ public class GroupStatisticsView extends VBox {
           grade = Precision.round(grade, 2);
           return new ReadOnlyStringWrapper(StringUtils.prettyPrint(points) + " (" + StringUtils.prettyPrint(grade) + ")");
         } catch (Exception e) {
-          //TODO Alert
           LOGGER.error(e);
           return new ReadOnlyStringWrapper(StringUtils.prettyPrint(points));
         }
       });
-      
-      treeTableView.getColumns().add(groupCol);
+      groupOverviewTable.getColumns().add(groupCol);
     });
-    
     
     nameCol.setPrefWidth(150);
   }
   
-  private void setupTreeTable() {
-    
-    treeTableView = new TreeTableView<>();
-    fillTreeTable();
-    treeTableView.setTableMenuButtonVisible(true);
-    
-    treeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-    treeTableView.getSelectionModel().setCellSelectionEnabled(false);
-    
-    treeTableView.setMinHeight(100);
+  private void setupGroupOverviewTable() {
+    groupOverviewTable = new TreeTableView<>();
+    fillGroupOverviewTable();
+    groupOverviewTable.setTableMenuButtonVisible(true);
+    groupOverviewTable.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    groupOverviewTable.getSelectionModel().setCellSelectionEnabled(false);
+    groupOverviewTable.setMinHeight(100);
   }
   
   private LineChart<String, Number> createPerMilestoneOverviewChart() {
-    ctrl = EntityController.getInstance();
-    analyser = ctrl.getCatalogueAnalyser();
     Catalogue cat = ctrl.getCatalogue();
     
     final CategoryAxis xAxis = new CategoryAxis();
@@ -284,26 +290,35 @@ public class GroupStatisticsView extends VBox {
     yAxis.setLabel("Normalized Points per Milestone");
     xAxis.setLabel("Milestones");
     final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
-    lineChart.setTitle("Milestone Points Overview");
+    lineChart.setTitle("Points per Milestone Overview");
     
-    XYChart.Series<String, Number> catSeries = new XYChart.Series<>();
-    catSeries.setName("Maximal Points");
-    for (Milestone ms : cat.getMilestones()) {
-      catSeries.getData().add(new XYChart.Data<>(ms.getName(), 1));
-    }
+    var milestones = new HashMap<Milestone, Boolean>();
+    cat.getMilestones().forEach(m -> milestones.put(m, false));
     
     ArrayList<XYChart.Series<String, Number>> series = new ArrayList<>();
-    
     for (Group g : ctrl.groupList()) {
       GroupAnalyser groupAnalyser = ctrl.getGroupAnalyser(g);
       
       XYChart.Series<String, Number> serie = new XYChart.Series<>();
       serie.setName(g.getName());
       for (Milestone ms : cat.getMilestones()) {
-        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getSumFor(groupAnalyser.getProgressSummaryFor(ms)) / analyser.getMaximalRegularSumFor(ms)));
+        var points = groupAnalyser.getSumFor(groupAnalyser.getProgressSummaryFor(ms));
+        if (points != 0) {
+          milestones.put(ms, true);
+          serie.getData().add(new XYChart.Data<>(ms.getName(), points / analyser.getMaximalRegularSumFor(ms)));
+        }
       }
       series.add(serie);
     }
+    
+    XYChart.Series<String, Number> catSeries = new XYChart.Series<>();
+    catSeries.setName("Maximal Points");
+    for (Milestone ms : cat.getMilestones()) {
+      if (milestones.get(ms)) {
+        catSeries.getData().add(new XYChart.Data<>(ms.getName(), 1));
+      }
+    }
+    
     lineChart.getData().add(catSeries);
     lineChart.getData().addAll(series);
     
@@ -314,8 +329,6 @@ public class GroupStatisticsView extends VBox {
   
   
   private LineChart<String, Number> createOverviewChart() {
-    ctrl = EntityController.getInstance();
-    analyser = ctrl.getCatalogueAnalyser();
     Catalogue cat = ctrl.getCatalogue();
     
     final CategoryAxis xAxis = new CategoryAxis();
@@ -323,15 +336,12 @@ public class GroupStatisticsView extends VBox {
     yAxis.setLabel("Normalized Cumulative Points Achieved");
     xAxis.setLabel("Milestones");
     final LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
-    lineChart.setTitle("Milestone Points Overview");
-    
-    XYChart.Series<String, Number> catSeries = new XYChart.Series<>();
-    catSeries.setName("Maximal Points");
-    for (Milestone ms : cat.getMilestones()) {
-      catSeries.getData().add(new XYChart.Data<>(ms.getName(), 1));
-    }
+    lineChart.setTitle("Point Progress Overview");
     
     ArrayList<XYChart.Series<String, Number>> series = new ArrayList<>();
+    
+    var milestones = new HashMap<Milestone, Boolean>();
+    cat.getMilestones().forEach(m -> milestones.put(m, false));
     
     for (Group g : ctrl.groupList()) {
       GroupAnalyser groupAnalyser = ctrl.getGroupAnalyser(g);
@@ -339,10 +349,24 @@ public class GroupStatisticsView extends VBox {
       XYChart.Series<String, Number> serie = new XYChart.Series<>();
       serie.setName(g.getName());
       for (Milestone ms : cat.getMilestones()) {
-        serie.getData().add(new XYChart.Data<>(ms.getName(), groupAnalyser.getCumulativeSumFor(groupAnalyser.getProgressSummaryFor(ms)) / analyser.getCumulativeMaximalRegularSumFor(ms)));
+        var points = groupAnalyser.getCumulativeSumFor(groupAnalyser.getProgressSummaryFor(ms));
+        if (points != 0) {
+          milestones.put(ms, true);
+          serie.getData().add(new XYChart.Data<>(ms.getName(), points / analyser.getCumulativeMaximalRegularSumFor(ms)));
+        }
       }
       series.add(serie);
     }
+    
+    XYChart.Series<String, Number> catSeries = new XYChart.Series<>();
+    catSeries.setName("Maximal Points");
+    for (Milestone ms : cat.getMilestones()) {
+      if (milestones.get(ms)) {
+        catSeries.getData().add(new XYChart.Data<>(ms.getName(), 1));
+      }
+    }
+    
+    
     lineChart.getData().add(catSeries);
     lineChart.getData().addAll(series);
     

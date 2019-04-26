@@ -9,6 +9,9 @@ import java.util.Map;
 
 /**
  * Analysis methods do not really work on non-binary achievements, but who cares.
+ * If you want to make this work on non-binary achievements, you probably need to include some sort of averaging / probability distributions.
+ *
+ * @author silvan.heller
  */
 public class RequirementOverviewItem {
   
