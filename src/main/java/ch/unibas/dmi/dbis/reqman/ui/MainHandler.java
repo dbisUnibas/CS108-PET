@@ -269,12 +269,20 @@ public class MainHandler implements MenuHandler {
         String name = StringUtils.isNotBlank(group.getExportFileName()) ? group.getExportFileName() : group.getName();
         File f = Paths.get(destDir.getPath(), name).toFile();
         ExportHelper.exportGroup(exportConfig, f, group);
-        Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Export of group " + group.getName() + " finished!").showInformation();
+        try {
+          Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Export of group " + group.getName() + " finished!").showInformation();
+        } catch (NullPointerException e) {
+          LOGGER.warn("Catching NullPointerException for Notification. This is an untriangulated bug.");
+        }
       } catch (FileNotFoundException e) {
         LOGGER.catching(Level.FATAL, e);
       }
     });
-    Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Exported all groups").showInformation();
+    try {
+      Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Exported all groups").showInformation();
+    } catch (NullPointerException e) {
+      LOGGER.warn("Catching NullPointerException for Notification. This is an untriangulated bug.");
+    }
   }
   
   @Override
