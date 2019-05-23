@@ -152,9 +152,10 @@ public class ExcelMilestoneExporter {
     
     _sheet.setColumnWidth(0, ("Achieved".length() + 2) * 256);
     _sheet.autoSizeColumn(1);
-    _sheet.setColumnWidth(2, 60 * 256);
-    _sheet.setColumnWidth(3, 50 * 256);
-    _sheet.autoSizeColumn(4);
+    _sheet.autoSizeColumn(2);
+    _sheet.setColumnWidth(3, 60 * 256);
+    _sheet.setColumnWidth(4, 50 * 256);
+    _sheet.autoSizeColumn(5);
   }
   
   private static void writeReqs(Type type) {
