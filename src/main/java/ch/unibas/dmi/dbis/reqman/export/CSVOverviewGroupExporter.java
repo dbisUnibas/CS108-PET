@@ -218,6 +218,48 @@ public class CSVOverviewGroupExporter {
     br.close();
   }
   
+  public void exportGroupAchievements(File achievements) throws IOException {
+    BufferedWriter br = new BufferedWriter(new FileWriter(achievements));
+    final StringBuilder sb = new StringBuilder();
+    
+    final double maxSum = catalogueAnalyser.getMaximalRegularSum();
+    
+    // First Row: Headers: Group, achievements, Grade
+    sb.append("Group");
+    sb.append(SEPARATOR);
+    catalogue.getRequirements().forEach(requirement -> {
+      sb.append(requirement.getUuid()).append(":").append(requirement.getName().replace(",", "."));
+      sb.append(SEPARATOR);
+    });
+    sb.append("Grade");
+    sb.append(LF);
+    // End of first row
+    groups.forEach(group -> {
+      GroupAnalyser groupAnalyser = new GroupAnalyser(course, catalogue, group);
+      // Column 0: Group name
+      sb.append(group.getName());
+      
+      catalogue.getRequirements().forEach(requirement -> {
+        sb.append(SEPARATOR);
+        sb.append(groupAnalyser.getProgressFor(requirement).getFraction());
+      });
+      
+      // Last column, if grade formula present: Grade
+      sb.append(SEPARATOR);
+      double points = groupAnalyser.getSum();
+      double grade = new ExpressionBuilder(gradeFormula).variables("p", "max").build().setVariable("p", points).setVariable("max", maxSum).evaluate();
+      grade = Precision.round(grade, 2);
+      sb.append(ch.unibas.dmi.dbis.reqman.common.StringUtils.prettyPrint(grade));
+      
+      sb.append(LF);
+    });
+    //seperator
+    //lf
+    br.write(sb.toString());
+    br.flush();
+    br.close();
+  }
+  
   public void exportLongMemberOverviewTable(File file) throws IOException {
     if (StringUtils.isBlank(FileUtils.getFileExtension(file))) {
       file = new File(file.getPath() + ".csv");

@@ -96,6 +96,8 @@ public class ExportOverviewView extends VBox {
       } else {
         exporter.exportLongOverviewTable(f);
       }
+      File achievements = f.getAbsoluteFile().getParentFile().toPath().resolve("achievements.csv").toFile();
+      exporter.exportGroupAchievements(achievements);
       Utils.showInfoDialog("Export Successfull", "Exported the CSV overview to " + f.getAbsolutePath());
       if (getScene() != null && getScene().getWindow() != null) {
         getScene().getWindow().hide();
