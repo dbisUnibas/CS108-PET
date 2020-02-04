@@ -187,21 +187,21 @@ public class GroupStatisticsView extends VBox {
     nameCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, String> param) ->
         new ReadOnlyStringWrapper(param.getValue().getValue().getRequirement().getName()));
     
-    TreeTableColumn<RequirementOverviewItem, Number> achievedCol = new TreeTableColumn<>("Achieved");
-    achievedCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Number> param) ->
-        new ReadOnlyIntegerWrapper(param.getValue().getValue().getAchievedCount()));
+    TreeTableColumn<RequirementOverviewItem, String> achievedCol = new TreeTableColumn<>("Achieved");
+    achievedCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, String> param) ->
+        new ReadOnlyStringWrapper(""+param.getValue().getValue().getAchievedCount()));
     
-    TreeTableColumn<RequirementOverviewItem, Number> achievedMalCol = new TreeTableColumn<>("Achieved (Malus)");
-    achievedMalCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Number> param) ->
-        new ReadOnlyIntegerWrapper(param.getValue().getValue().getRequirement().isMalus() ? param.getValue().getValue().getAchievedCount() : -1));
+    TreeTableColumn<RequirementOverviewItem, String> achievedMalCol = new TreeTableColumn<>("Achieved (Malus)");
+    achievedMalCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, String> param) ->
+        new ReadOnlyStringWrapper(param.getValue().getValue().getRequirement().isMalus() ? ""+param.getValue().getValue().getAchievedCount() : ""));
     
-    TreeTableColumn<RequirementOverviewItem, Number> achievedBonCol = new TreeTableColumn<>("Achieved (Bonus)");
-    achievedBonCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Number> param) ->
-        new ReadOnlyIntegerWrapper(param.getValue().getValue().getRequirement().isBonus() ? param.getValue().getValue().getAchievedCount() : -1));
+    TreeTableColumn<RequirementOverviewItem, String> achievedBonCol = new TreeTableColumn<>("Achieved (Bonus)");
+    achievedBonCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, String> param) ->
+        new ReadOnlyStringWrapper(param.getValue().getValue().getRequirement().isBonus() ? ""+param.getValue().getValue().getAchievedCount() : ""));
     
-    TreeTableColumn<RequirementOverviewItem, Number> achievedRegCol = new TreeTableColumn<>("Achieved (Regular)");
-    achievedRegCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, Number> param) ->
-        new ReadOnlyIntegerWrapper(param.getValue().getValue().getRequirement().isRegular() ? param.getValue().getValue().getAchievedCount() : -1));
+    TreeTableColumn<RequirementOverviewItem, String> achievedRegCol = new TreeTableColumn<>("Achieved (Regular)");
+    achievedRegCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<RequirementOverviewItem, String> param) ->
+        new ReadOnlyStringWrapper(param.getValue().getValue().getRequirement().isRegular() ? ""+param.getValue().getValue().getAchievedCount() : ""));
     
     
     requirementAnalysis = new TreeTableView<>(root);
