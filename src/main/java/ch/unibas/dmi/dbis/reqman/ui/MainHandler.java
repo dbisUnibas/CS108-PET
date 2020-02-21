@@ -32,6 +32,7 @@ import org.controlsfx.control.Notifications;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 
 /**
@@ -214,6 +215,16 @@ public class MainHandler implements MenuHandler {
     if (!EntityController.getInstance().hasCatalogue() && EntityController.getInstance().hasCourse()) {
       return;
     }
+    if (ExportHelper.getInstance().canQuickExport()) {
+      try {
+        ExportHelper.getInstance().exportCatalogue();
+        mainScene.showNotification("Catalogue export finished");
+        return;
+        //Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Catalogue exported to:\\"+f.getAbsolutePath()).showInformation();
+      } catch (FileNotFoundException | UnsupportedEncodingException e) {
+        LOGGER.catching(Level.FATAL, e);
+      }
+    }
     FileChooser exportConfigFC = new FileChooser();
     exportConfigFC.setTitle("Templating Config");
     File exportConfig = exportConfigFC.showOpenDialog(mainScene.getWindow());
@@ -228,11 +239,11 @@ public class MainHandler implements MenuHandler {
     if (f != null) {
       LOGGER.debug("Exporting to {}", f);
       try {
-        ExportHelper.exportCatalogue(exportConfig, f);
+        ExportHelper.getInstance().exportCatalogue(exportConfig, f);
         mainScene.showNotification("Export finished to " + f.getAbsolutePath());
         
         //Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Catalogue exported to:\\"+f.getAbsolutePath()).showInformation();
-      } catch (FileNotFoundException e) {
+      } catch (FileNotFoundException | UnsupportedEncodingException e) {
         LOGGER.catching(Level.FATAL, e);
       }
     }
@@ -274,7 +285,7 @@ public class MainHandler implements MenuHandler {
         } catch (NullPointerException e) {
           LOGGER.warn("Catching NullPointerException for Notification. This is an untriangulated bug.");
         }
-      } catch (FileNotFoundException e) {
+      } catch (FileNotFoundException | UnsupportedEncodingException e) {
         LOGGER.catching(Level.FATAL, e);
       }
     });
@@ -308,7 +319,7 @@ public class MainHandler implements MenuHandler {
         mainScene.showNotification("Export finished to " + f.getAbsolutePath());
         
         //Notifications.create().title("Export successful!").hideAfter(Duration.seconds(5)).text("Group exported to:\\"+f.getAbsolutePath()).showInformation();
-      } catch (FileNotFoundException e) {
+      } catch (FileNotFoundException | UnsupportedEncodingException e) {
         LOGGER.catching(Level.FATAL, e);
       }
     }

@@ -10,8 +10,10 @@ import ch.unibas.dmi.dbis.reqman.session.SessionManager;
 import ch.unibas.dmi.dbis.reqman.session.SessionStorage;
 import ch.unibas.dmi.dbis.reqman.storage.StorageManager;
 import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
+import ch.unibas.dmi.dbis.reqman.templating.ExportHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.commons.math3.analysis.function.Exp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -481,6 +483,7 @@ public class EntityController {
       } else {
         storageManager = StorageManager.getInstance(new File(session.getLastUsedDir()));
       }
+      ExportHelper.getInstance().loadLastUsedDestinations(session.getLastUsedTemplatingConfig(), session.getLastUsedCatalogueExport());
     } else {
       LOGGER.info("No session available");
     }
@@ -493,6 +496,14 @@ public class EntityController {
       session.setDate(new Date());
       session.setVersion(Version.getInstance().getVersion());
       session.setLastUsedDir(storageManager.getSaveDir().getAbsolutePath());
+      var exportConfig = ExportHelper.getInstance().getTemplateConfig();
+      if(exportConfig != null){
+        session.setLastUsedTemplatingConfig(exportConfig.getAbsolutePath());
+      }
+      var catalogueDest = ExportHelper.getInstance().getCatalogueExportDestination();
+      if(catalogueDest != null){
+        session.setLastUsedCatalogueExport(catalogueDest.getAbsolutePath());
+      }
       sessionManager.storeSession(session);
       LOGGER.info("Stored session {}", session);
     } else {

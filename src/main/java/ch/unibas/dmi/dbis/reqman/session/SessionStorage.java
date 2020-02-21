@@ -17,14 +17,26 @@ import java.util.function.Function;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SessionStorage {
   
+  /**
+   * The date of when the session was created / closed
+   */
   private Date date;
+  /**
+   * Reqman version -- to prevent version mismatch
+   */
   private String version;
+  /**
+   * catalogue / course
+   */
   private String lastUsedDir;
   private boolean enabled = true;
   
   private MainScene.Mode lastOpenMode;
   
   private List<String> lastOpenGroups;
+  
+  private String lastUsedTemplatingConfig;
+  private String lastUsedCatalogueExport;
   
   private UUID lastActiveProgressSummary;
   
@@ -182,15 +194,36 @@ public class SessionStorage {
   public void replaceAllData(BiFunction<? super String, ? super String, ? extends String> function) {
     data.replaceAll(function);
   }
-  
-  @Override
-  public String toString() {
-    final StringBuffer sb = new StringBuffer("SessionStorage{");
-    sb.append("date=").append(date);
-    sb.append(", version='").append(version).append('\'');
-    sb.append(", lastUsedDir='").append(lastUsedDir).append('\'');
-    sb.append(", data=").append(data);
-    sb.append('}');
-    return sb.toString();
-  }
+    
+    public String getLastUsedTemplatingConfig() {
+        return lastUsedTemplatingConfig;
+    }
+    
+    public void setLastUsedTemplatingConfig(String lastUsedTemplatingConfig) {
+        this.lastUsedTemplatingConfig = lastUsedTemplatingConfig;
+    }
+    
+    public String getLastUsedCatalogueExport() {
+        return lastUsedCatalogueExport;
+    }
+    
+    public void setLastUsedCatalogueExport(String lastUsedCatalogueExport) {
+        this.lastUsedCatalogueExport = lastUsedCatalogueExport;
+    }
+    
+    @Override
+    public String toString() {
+        return "SessionStorage{" +
+            "date=" + date +
+            ", version='" + version + '\'' +
+            ", lastUsedDir='" + lastUsedDir + '\'' +
+            ", enabled=" + enabled +
+            ", lastOpenMode=" + lastOpenMode +
+            ", lastOpenGroups=" + lastOpenGroups +
+            ", lastUsedTemplatingConfig='" + lastUsedTemplatingConfig + '\'' +
+            ", lastUsedCatalogueExport='" + lastUsedCatalogueExport + '\'' +
+            ", lastActiveProgressSummary=" + lastActiveProgressSummary +
+            ", data=" + data +
+            '}';
+    }
 }
