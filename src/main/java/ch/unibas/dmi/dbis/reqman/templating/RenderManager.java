@@ -209,7 +209,7 @@ public class RenderManager {
         public String renderCarefully(Requirement instance, String parameter) {
           Map<String, String> map = getGetter().apply(instance);
           if (!map.containsKey(parameter)) {
-            LOGGER.error(String.format("Error while parsing meta of requirement [name=%s]: There is no meta with name: %s", instance.getName(), parameter));
+            LOGGER.warn(String.format("Cannot render meta of requirement [%s]: There is no meta with name: %s", instance.getName(), parameter));
             return "";
           }
           String value = map.get(parameter);

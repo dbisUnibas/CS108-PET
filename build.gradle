@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.5'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
 }
 
 /*
@@ -23,15 +23,16 @@ Project name: ${project.name}
 brief(er) description
 """
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
 
 repositories {
     mavenCentral()
 }
 
 javafx {
-    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.web', 'javafx.graphics']
+    version = "11.0.2"
+    modules = [ 'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.fxml', 'javafx.web']
 }
 
 dependencies {
@@ -41,10 +42,14 @@ dependencies {
 
 
     //JavaFX
-    compile "org.openjfx:javafx-graphics:11:win"
-    compile "org.openjfx:javafx-graphics:11:linux"
-    compile "org.openjfx:javafx-graphics:11:mac"
-    compile group: 'org.controlsfx', name: 'controlsfx', version: '9.0.0'
+    compile "org.openjfx:javafx-graphics:11.0.2:win"
+    compile "org.openjfx:javafx-graphics:11.0.2:linux"
+    compile "org.openjfx:javafx-graphics:11.0.2:mac"
+    compile 'org.openjfx:javafx-controls:11.0.2'
+    compile 'org.openjfx:javafx-base:11.0.2'
+    compile 'org.openjfx:javafx-graphics:11.0.2'
+    compile 'org.openjfx:javafx-web:11.0.2'
+    compile group: 'org.controlsfx', name: 'controlsfx', version: '11.0.0'
 
 
     compile group: 'com.j2html', name: 'j2html', version: '0.88'

@@ -40,6 +40,7 @@ public class ReqmanApplication extends Application {
    */
   public static void main(String[] args) {
     System.setProperty("line.separator", "\n"); // To enforce UN*X line endings
+    System.setProperty("javafx.version", "11.0.2"); // To make controlsfx happy
     version = Version.getInstance();
     LOGGER = LogManager.getLogger(ReqmanApplication.class);
     LOGGER.info(LoggingUtils.REQMAN_MARKER, "Starting reqman @ v" + version.getFullVersion());
@@ -66,6 +67,7 @@ public class ReqmanApplication extends Application {
   }
   
   private void handleUncaughtException(Thread t, Throwable e) {
+    LOGGER.fatal("Fatal error occurred, due to uncaught exception. Java: "+System.getProperty("java.version")+ ", JavaFX: "+System.getProperty("javafx.version")+", ReqMan: "+Version.getInstance().getFullVersion());
     LOGGER.error("Uncaught exception on thread {}", t);
     LOGGER.catching(Level.ERROR, e);
     Utils.showErrorDialog("Error - " + e.getClass().getSimpleName(),
