@@ -344,14 +344,14 @@ public class RequirementTableView extends BorderPane {
       }
       return row;
     });*/
-    
+    // TODO Get the binding correctly - this is not working as smooth is it should
     table.setRowFactory(tv -> new TableRow<>(){
       @Override
       protected void updateItem(ObservableRequirement item, boolean empty) {
         super.updateItem(item, empty);
         if(item != null && !empty){
           if(item.disabled.get() && !getTableView().getSelectionModel().getSelectedItems().contains(item)){
-            setStyle("-fx-background-color: #d400006b;");
+            setStyle("-fx-background-color: #7b7b7b;");
           }
         }
       }
