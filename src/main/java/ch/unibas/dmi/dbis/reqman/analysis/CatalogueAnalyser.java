@@ -74,12 +74,16 @@ public class CatalogueAnalyser {
   }
   
   /**
-   * Returns only those requirements, which firstly occur on the specified milestone.
+   * Returns only those requirements, which firstly occur on the specified milestone and are active
    *
    * @param milestone
    * @return
    */
   public List<Requirement> getRequirementsFor(Milestone milestone) {
+    return catalogue.getActiveRequirements().stream().filter(r -> matchesMinimalMilestone(r, milestone)).sorted(getRequirementComparator()).collect(Collectors.toList());
+  }
+  
+  public List<Requirement> getAllRequirementsFor(Milestone milestone){
     return catalogue.getRequirements().stream().filter(r -> matchesMinimalMilestone(r, milestone)).sorted(getRequirementComparator()).collect(Collectors.toList());
   }
   
@@ -100,7 +104,7 @@ public class CatalogueAnalyser {
    * @return
    */
   public double getMaximalRegularSum() {
-    return catalogue.getRequirements().stream().filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
+    return catalogue.getActiveRequirements().stream().filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
   /**

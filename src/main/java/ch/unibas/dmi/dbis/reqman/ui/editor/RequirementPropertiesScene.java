@@ -52,6 +52,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
   private Spinner spinnerPoints = new Spinner(0d, Double.MAX_VALUE, 0.0);
   private RadioButton rbRegular = new RadioButton("Regular");
   private CheckBox cbBinary = new CheckBox("Binary");
+  private CheckBox cbDisabled = new CheckBox("Disabled");
   private RadioButton rbBonus = new RadioButton("Bonus");
   private RadioButton rbMalus = new RadioButton("Malus");
   private Requirement requirement = null;
@@ -109,6 +110,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
         // regular
         requirement = EntityController.getInstance().createRequirement(name, excerpt, maxPoints, min, max);
       }
+      
     } else {
       requirement.setName(name);
       requirement.setExcerpt(excerpt);
@@ -125,6 +127,8 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
       }
       requirement.setBinary(cbBinary.isSelected());
     }
+    // Late setting
+    requirement.setDisabled(cbDisabled.isSelected());
     
     requirement.setDescription(desc);
     requirement.setCategory(cat);
@@ -243,12 +247,12 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
     rbRegular.setSelected(true);
     
     cbBinary.setTooltip(new Tooltip("If this requirement cannot be partially fulfilled (selected) or might be partially fulfilled (unselected)."));
-    
+    cbDisabled.setTooltip(new Tooltip("If this requirement should be disabled and, thus, not count to the score"));
     Label binaryInfo = new Label("(Bonus and Malus defaults to binary being selected.)");
     Font old = binaryInfo.getFont();
     binaryInfo.setFont(Font.font(old.getFamily(), FontPosture.ITALIC, old.getSize()));
     
-    typeGroup.getChildren().addAll(rbRegular, rbBonus, rbMalus, cbBinary, binaryInfo);
+    typeGroup.getChildren().addAll(rbRegular, rbBonus, rbMalus, cbBinary, binaryInfo,cbDisabled);
     GridPane.setHgrow(typeGroup, Priority.ALWAYS);
     
     
@@ -344,7 +348,7 @@ public class RequirementPropertiesScene extends AbstractVisualCreator<Requiremen
           break;
       }
       cbBinary.setSelected(requirement.isBinary());
-      
+      cbDisabled.setSelected(requirement.isDisabled());
       loadPredecessors();
       loadProperties();
     }

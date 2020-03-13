@@ -4,10 +4,8 @@ import ch.unibas.dmi.dbis.reqman.common.VersionedEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A catalogue is a collection of {@link Milestone}s and {@link Requirement}s.
@@ -147,6 +145,16 @@ public class Catalogue extends VersionedEntity {
   }
   
   /**
+   * Returns all non-disabled requirements
+   * @return All non-disabled requirements
+   */
+  @JsonIgnore
+  public List<Requirement> getActiveRequirements() {
+    var reqs = new ArrayList<>(requirements);
+    return reqs.stream().filter(r -> !r.isDisabled()).collect(Collectors.toList());
+  }
+  
+  /**
    * Returns the requirements list itself
    *
    * @return The list of requirements
@@ -213,4 +221,6 @@ public class Catalogue extends VersionedEntity {
   public void addAllRequirements(Requirement... requirements) {
     this.requirements.addAll(Arrays.asList(requirements));
   }
+  
+  
 }
