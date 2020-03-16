@@ -148,7 +148,7 @@ public class RenderManager {
       new Field<Milestone, Double>("sumMax", Field.Type.NORMAL, ms -> EntityController.getInstance().getCatalogueAnalyser().getMaximalRegularSumFor(ms)),
       new Field<Milestone, Double>("bonusMax", Field.Type.NORMAL, ms -> EntityController.getInstance().getCatalogueAnalyser().getMaximalBonusSumFor(ms)),
       new Field<Milestone, Double>("malusMax", Field.Type.NORMAL, ms -> EntityController.getInstance().getCatalogueAnalyser().getMaximalMalusSumFor(ms)),
-      new Field<Milestone, List<Requirement>>("requirements", Field.Type.LIST, ms -> EntityController.getInstance().getCatalogueAnalyser().getRequirementsFor(ms), (list) -> {
+      new Field<Milestone, List<Requirement>>("requirements", Field.Type.LIST, ms -> EntityController.getInstance().getCatalogueAnalyser().getAllRequirementsFor(ms), (list) -> {
         StringBuilder sb = new StringBuilder();
         list.sort(EntityController.getInstance().getCatalogueAnalyser().getRequirementComparator());
         list.forEach(req -> {
@@ -173,6 +173,7 @@ public class RenderManager {
    * .type
    * .category
    * .description
+   * .disabled[][]
    */
   public final Entity<Requirement> REQUIREMENT_ENTITY = new Entity<Requirement>("requirement",
       new Field<Requirement, String>("name", Field.Type.NORMAL, Requirement::getName),
@@ -220,7 +221,8 @@ public class RenderManager {
           }
         }
       },
-      new ConditionalField<Requirement>("singularMS", r -> r.getMinimalMilestoneUUID().equals(r.getMaximalMilestoneUUID()), b -> "YES", b -> "NO")
+      new ConditionalField<Requirement>("singularMS", r -> r.getMinimalMilestoneUUID().equals(r.getMaximalMilestoneUUID()), b -> "YES", b -> "NO"),
+      new ConditionalField<Requirement>("disabled", Requirement::isDisabled, b -> "=== DISABLED ===", b -> "")
   );
   private Group group = null;
   private Catalogue catalogue = null;
