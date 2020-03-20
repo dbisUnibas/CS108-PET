@@ -37,3 +37,10 @@ Styling for all displays (label which display an information)
     -fx-background-color: #bdbdbd ; /* Material grey lighten-1 */
 }
 
+.disabled {
+    -fx-background-color: #7b7b7b;
+}
+
+.disabled .table-cell {
+    -fx-strikethrough: true;
+}
