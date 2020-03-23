@@ -88,7 +88,7 @@ public class ExcelMilestoneExporter {
       cell.setCellStyle(footerStyle);
       
       cell = row.createCell(5, CellType.FORMULA);
-      cell.setCellFormula("SUMIF(A3:A" + (2 + _reqs.size()) + ", \"YES\", E3:E" + (2 + _reqs.size()) + ")");
+      cell.setCellFormula("SUMIF(A3:A" + (2 + _reqs.size()) + ", \"YES\", F3:F" + (2 + _reqs.size()) + ")");
       cell.setCellStyle(footerStyle);
     }
     
@@ -162,6 +162,9 @@ public class ExcelMilestoneExporter {
     //Write Regular requirements
     boolean one = true;
     for (Requirement req : _reqs) {
+      if (req.isDisabled()) {
+        continue;
+      }
       if (req.getType() == type) {
         int colNum = 0;
         XSSFRow row = _sheet.createRow(_rowNum++);
