@@ -93,7 +93,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   
   @Override
   public void pointsChanged(double newValue) {
-    LOGGER.trace("Points changed");
+    LOGGER.debug("Points changed");
     if (currentlyFilteredProgress != null && !currentlyFilteredProgress.isEmpty()) {
       updateSumDisplay(true);
     } else {
@@ -233,7 +233,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     
     activeProgressViews.clear();
     for (Progress p : currentlyFilteredProgress) {
-      activeProgressViews.add(new ProgressView(group, p, getActiveProgressSummary()));
+      if(shouldRenderProgress(p)){
+        activeProgressViews.add(new ProgressView(group, p, getActiveProgressSummary()));
+      }
     }
     
     for (ProgressView pv : activeProgressViews) {
@@ -365,7 +367,9 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     progressList.sort(EntityController.getInstance().getGroupAnalyser(group).getProgressComparator());
     activeProgressViews.clear();
     for (Progress p : progressList) {
-      activeProgressViews.add(new ProgressView(group, p, progressSummary));
+      if(shouldRenderProgress(p)){
+        activeProgressViews.add(new ProgressView(group, p, progressSummary));
+      }
     }
     
     for (ProgressView pv : activeProgressViews) {
@@ -376,6 +380,11 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
     attachProgressViews();
     checkDependencies();
     updateSumDisplay();
+  }
+  
+  private boolean shouldRenderProgress(Progress p){
+    var req = EntityController.getInstance().getCatalogueAnalyser().getRequirementById(p.getRequirementUUID());
+    return !req.isDisabled();
   }
   
   private void setupMaxPointsDisplay(double sum) {

@@ -9,10 +9,7 @@ import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -286,6 +283,7 @@ public class RequirementTableView extends BorderPane {
     }
   }
   
+  @SuppressWarnings("unchecked")
   private TableView<ObservableRequirement> initTable() {
     table = new TableView<>();
     table.setEditable(false);
@@ -333,7 +331,31 @@ public class RequirementTableView extends BorderPane {
     table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     
     // DEBUG
-    
+    /*table.setRowFactory(tv -> {
+      TableRow<ObservableRequirement> row = new TableRow<>();
+      if(row.itemProperty().get() != null){
+        LOGGER.debug(":requirementRow req="+row.itemProperty().get().requirement);
+        if(row.itemProperty().get().disabled.get()){
+          row.setStyle("-fx-background-color: red;");
+        }
+        //row.styleProperty().bind(Bindings.when(row.itemProperty().get().disabled).then("-fx-background-color: #6b0000;").otherwise(""));
+      }
+      return row;
+    });*/
+    // TODO Get the binding correctly - this is not working as smooth is it should, especially since when scrolling all get 'disabled' style
+    table.setRowFactory(tv -> new TableRow<>(){
+      @Override
+      protected void updateItem(ObservableRequirement item, boolean empty) {
+        super.updateItem(item, empty);
+        if(item != null && !empty){
+          if(item.disabled.get() && !getTableView().getSelectionModel().getSelectedItems().contains(item)){
+            getStyleClass().add("disabled");
+          }else{
+            getStyleClass().remove("disabled");
+          }
+        }
+      }
+    });
     
     return table;
   }
@@ -352,6 +374,8 @@ public class RequirementTableView extends BorderPane {
     private final SimpleStringProperty minMSName;
     private final SimpleStringProperty maxMSName;
     
+    private final SimpleBooleanProperty disabled;
+    
     
     private Requirement requirement;
     
@@ -366,6 +390,7 @@ public class RequirementTableView extends BorderPane {
       
       minMSName = new SimpleStringProperty(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(req.getMinimalMilestoneUUID()).getName());
       maxMSName = new SimpleStringProperty(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(req.getMaximalMilestoneUUID()).getName());
+      disabled = new SimpleBooleanProperty(req.isDisabled());
     }
     
     
@@ -424,6 +449,7 @@ public class RequirementTableView extends BorderPane {
       type.set(requirement.getType().toString());
       minMSName.set(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(requirement.getMinimalMilestoneUUID()).getName());
       maxMSName.set(EntityController.getInstance().getCatalogueAnalyser().getMilestoneById(requirement.getMaximalMilestoneUUID()).getName());
+      disabled.set(requirement.isDisabled());
     }
     
     double getPoints() {
@@ -481,5 +507,7 @@ public class RequirementTableView extends BorderPane {
     StringProperty maxMSNameProperty() {
       return maxMSName;
     }
+    
+    BooleanProperty disabledProperty(){return disabled;}
   }
 }

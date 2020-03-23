@@ -74,12 +74,16 @@ public class CatalogueAnalyser {
   }
   
   /**
-   * Returns only those requirements, which firstly occur on the specified milestone.
+   * Returns only those requirements, which firstly occur on the specified milestone and are active
    *
    * @param milestone
    * @return
    */
   public List<Requirement> getRequirementsFor(Milestone milestone) {
+    return catalogue.getActiveRequirements().stream().filter(r -> matchesMinimalMilestone(r, milestone)).sorted(getRequirementComparator()).collect(Collectors.toList());
+  }
+  
+  public List<Requirement> getAllRequirementsFor(Milestone milestone){
     return catalogue.getRequirements().stream().filter(r -> matchesMinimalMilestone(r, milestone)).sorted(getRequirementComparator()).collect(Collectors.toList());
   }
   
@@ -100,7 +104,7 @@ public class CatalogueAnalyser {
    * @return
    */
   public double getMaximalRegularSum() {
-    return catalogue.getRequirements().stream().filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
+    return catalogue.getActiveRequirements().stream().filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
   /**
@@ -115,15 +119,15 @@ public class CatalogueAnalyser {
   }
   
   public double getMaximalRegularSumFor(List<Requirement> list) {
-    return list.stream().filter(Requirement::isRegular).mapToDouble(Requirement::getMaxPoints).sum();
+    return list.stream().filter(Requirement::isRegular).filter(r -> !r.isDisabled()).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
   public double getMaximalBonusSumFor(List<Requirement> list) {
-    return list.stream().filter(Requirement::isBonus).mapToDouble(Requirement::getMaxPoints).sum();
+    return list.stream().filter(Requirement::isBonus).filter(r -> !r.isDisabled()).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
   public double getMaximalMalusSumFor(List<Requirement> list) {
-    return list.stream().filter(Requirement::isMalus).mapToDouble(Requirement::getMaxPoints).sum();
+    return list.stream().filter(Requirement::isMalus).filter(r -> !r.isDisabled()).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
   public double getMaximalRegularSumForProgressList(List<Progress> list) {
@@ -141,7 +145,7 @@ public class CatalogueAnalyser {
    * @return
    */
   public double getMaximalBonusSum() {
-    return catalogue.getRequirements().stream().filter(Requirement::isBonus).mapToDouble((Requirement::getMaxPoints)).sum();
+    return catalogue.getActiveRequirements().stream().filter(Requirement::isBonus).mapToDouble((Requirement::getMaxPoints)).sum();
   }
   
   public double getMaximalBonusSumFor(Milestone ms) {
@@ -149,7 +153,7 @@ public class CatalogueAnalyser {
   }
   
   public double getMaximalMalusSum() {
-    return catalogue.getRequirements().stream().filter(Requirement::isMalus).mapToDouble(Requirement::getMaxPoints).sum();
+    return catalogue.getActiveRequirements().stream().filter(Requirement::isMalus).mapToDouble(Requirement::getMaxPoints).sum();
   }
   
   public double getMaximalMalusSumFor(Milestone ms) {

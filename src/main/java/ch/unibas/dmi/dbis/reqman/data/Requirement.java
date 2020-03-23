@@ -49,8 +49,15 @@ public class Requirement {
    * A non-binary requirement may be partially fulfilled.
    */
   private boolean binary;
+  
   /**
-   * The type of the requriement
+   * Whether this requirement is disabled.
+   * Disabled requirements do not count to the total score.
+   */
+  private boolean disabled;
+  
+  /**
+   * The type of the requirement
    */
   private Type type;
   /**
@@ -129,6 +136,7 @@ public class Requirement {
     sb.append(", maximalMilestoneUUID=").append(maximalMilestoneUUID);
     sb.append(", maxPoints=").append(maxPoints);
     sb.append(", binary=").append(binary);
+    sb.append(", disabled=").append(disabled);
     sb.append(", type=").append(type);
     sb.append(", propertiesMap=").append(propertiesMap);
     sb.append(", category='").append(category).append('\'');
@@ -168,6 +176,14 @@ public class Requirement {
   
   public void setBinary(boolean binary) {
     this.binary = binary;
+  }
+  
+  public boolean isDisabled() {
+    return disabled;
+  }
+  
+  public void setDisabled(boolean disabled) {
+    this.disabled = disabled;
   }
   
   @JsonIgnore

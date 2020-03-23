@@ -31,22 +31,22 @@
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- EDITOR -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.editor" level="INFO" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.reqman.ui.editor" level="WARN" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- EVALUATOR -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.evaluator" level="INFO" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.reqman.ui.evaluator" level="WARN" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- DATA -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.data" level="INFO" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.reqman.data" level="WARN" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- CONTROL -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.control" level="INFO" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.reqman.control" level="WARN" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
@@ -56,7 +56,7 @@
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- GENERAL UI -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui" level="ERROR" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.reqman.ui" level="WARN" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
