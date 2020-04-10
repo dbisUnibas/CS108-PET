@@ -7,9 +7,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Analysing and managing unit for group.
- * This class is responsible of fully resolve relationships of the entities related to the requirement assessment /
- * progress tracking (evaluator).
+ * Analysing and managing unit for group. This class is responsible of fully resolve relationships of the entities
+ * related to the requirement assessment / progress tracking (evaluator).
  *
  * @author loris.sauter
  */
@@ -35,8 +34,8 @@ public class GroupAnalyser {
   
   
   /**
-   * Returns all {@link Progress} whose assessment was made until the specified {@link ProgressSummary}.
-   * Until means, the given progress was assessed at the given progress summary.
+   * Returns all {@link Progress} whose assessment was made until the specified {@link ProgressSummary}. Until means,
+   * the given progress was assessed at the given progress summary.
    *
    * @param ps
    * @return
@@ -143,9 +142,13 @@ public class GroupAnalyser {
   public boolean isProgressUnlocked(Progress progress) {
     int predecessorsFulfilled = 0;
     for (Requirement r : catalogueAnalyser.getPredecessors(getRequirementOf(progress))) {
-      Progress p = getProgressFor(r);
-      if (p.hasProgress()) {
-        predecessorsFulfilled++;
+      if (r.isDisabled()) {
+       predecessorsFulfilled++;
+      } else {
+        Progress p = getProgressFor(r);
+        if (p.hasProgress()) {
+          predecessorsFulfilled++;
+        }
       }
     }
     return predecessorsFulfilled == getRequirementOf(progress).getPredecessors().length;
@@ -221,14 +224,10 @@ public class GroupAnalyser {
   /**
    * Checks if the given {@link Progress} matches the given {@link ProgressSummary}.
    * <p>
-   * Matching is defined as follows:
-   * Either the {@link Progress} has already progress associated with (e.g. {@link Progress#hasProgress()} returns
-   * true),
-   * then the {@link ProgressSummary}'s Uuid must be equal to the one returned by {@link
-   * Progress#getProgressSummaryUUID()}.
-   * Or the {@link Progress} is <i>fresh</i>, then it is checked if the progress' {@link Requirement}'s {@link
-   * Milestone}
-   * equals the milestone, represented by the progress summary.
+   * Matching is defined as follows: Either the {@link Progress} has already progress associated with (e.g. {@link
+   * Progress#hasProgress()} returns true), then the {@link ProgressSummary}'s Uuid must be equal to the one returned by
+   * {@link Progress#getProgressSummaryUUID()}. Or the {@link Progress} is <i>fresh</i>, then it is checked if the
+   * progress' {@link Requirement}'s {@link Milestone} equals the milestone, represented by the progress summary.
    *
    * @param p
    * @param ps
