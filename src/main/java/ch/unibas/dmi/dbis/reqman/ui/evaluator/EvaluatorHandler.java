@@ -113,24 +113,20 @@ public class EvaluatorHandler implements EventHandler<CUDEvent>, FilterActionHan
   }
   
   public void handleDeletion(CUDEvent event) {
-    return;
-    // TODO Re-Implemet closing of group
-    /*
     switch (event.getTargetEntity()) {
       case GROUP:
         // DELETE GROUP
         LOGGER.trace(":handleDeletion");
         if (event.getDelivery() != null && event.getDelivery() instanceof Group) {
           Group del = (Group) event.getDelivery();
-          if (manager.removeGroup(del)) {
-            removeGroupFromMap(del);
-          }
-          LOGGER.debug(":handleDeletion - Remaining: " + manager.groupList().toString());
+          evaluator.removeTab(del);
+          EntityController.getInstance().removeGroup(del);
+          LOGGER.debug(":handleDeletion<Group> - Remaining: {}", EntityController.getInstance().groupList());
         }
         break;
       default:
         // Ignoring
-    }*/
+    }
   }
   
   public void setOnFirstGroup(Callback callback) {

@@ -93,7 +93,7 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
   
   @Override
   public void pointsChanged(double newValue) {
-    LOGGER.trace("Points changed");
+    LOGGER.debug("Points changed");
     if (currentlyFilteredProgress != null && !currentlyFilteredProgress.isEmpty()) {
       updateSumDisplay(true);
     } else {
@@ -215,8 +215,6 @@ public class AssessmentView extends BorderPane implements PointsChangeListener, 
         pv.setLocked(true);
         LOGGER.trace("Locking pv of {}", pv.getRequirement().getName());
       }
-      var req = EntityController.getInstance().getCatalogueAnalyser().getRequirementById(p.getRequirementUUID());
-      pv.setLocked(req.isDisabled());
       pv.updatePredecessorDisplay();
     }
   }

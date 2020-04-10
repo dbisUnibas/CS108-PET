@@ -9,9 +9,6 @@ import ch.unibas.dmi.dbis.reqman.data.Requirement;
 import ch.unibas.dmi.dbis.reqman.ui.common.Utils;
 import ch.unibas.dmi.dbis.reqman.ui.event.CUDEvent;
 import ch.unibas.dmi.dbis.reqman.ui.event.TargetEntity;
-import javafx.beans.binding.Bindings;
-import javafx.beans.binding.BooleanBinding;
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -286,6 +283,7 @@ public class RequirementTableView extends BorderPane {
     }
   }
   
+  @SuppressWarnings("unchecked")
   private TableView<ObservableRequirement> initTable() {
     table = new TableView<>();
     table.setEditable(false);
@@ -344,14 +342,16 @@ public class RequirementTableView extends BorderPane {
       }
       return row;
     });*/
-    // TODO Get the binding correctly - this is not working as smooth is it should
+    // TODO Get the binding correctly - this is not working as smooth is it should, especially since when scrolling all get 'disabled' style
     table.setRowFactory(tv -> new TableRow<>(){
       @Override
       protected void updateItem(ObservableRequirement item, boolean empty) {
         super.updateItem(item, empty);
         if(item != null && !empty){
           if(item.disabled.get() && !getTableView().getSelectionModel().getSelectedItems().contains(item)){
-            setStyle("-fx-background-color: #7b7b7b;");
+            getStyleClass().add("disabled");
+          }else{
+            getStyleClass().remove("disabled");
           }
         }
       }

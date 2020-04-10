@@ -13,7 +13,6 @@ import ch.unibas.dmi.dbis.reqman.storage.UuidMismatchException;
 import ch.unibas.dmi.dbis.reqman.templating.ExportHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import org.apache.commons.math3.analysis.function.Exp;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
