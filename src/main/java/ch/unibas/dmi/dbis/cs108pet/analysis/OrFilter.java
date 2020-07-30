@@ -1,0 +1,39 @@
+package ch.unibas.dmi.dbis.cs108pet.analysis;
+
+import ch.unibas.dmi.dbis.cs108pet.data.Requirement;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Combination filter for two filters using logical OR.
+ *
+ * @author loris.sauter
+ */
+public class OrFilter implements Filter {
+  
+  private final Filter one;
+  private final Filter two;
+  
+  public OrFilter(@NotNull Filter one, @NotNull Filter two) {
+    this.one = one;
+    this.two = two;
+  }
+  
+  @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("OrFilter{");
+    sb.append("one=").append(one);
+    sb.append(", two=").append(two);
+    sb.append('}');
+    return sb.toString();
+  }
+  
+  @Override
+  public boolean test(Requirement requirement) {
+    return one.or(two).test(requirement);
+  }
+  
+  @Override
+  public String getDisplayRepresentation() {
+    return one.getDisplayRepresentation() + " or " + two.getDisplayRepresentation();
+  }
+}

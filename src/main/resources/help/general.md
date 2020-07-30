@@ -1,16 +1,16 @@
-# ReqMan Help
+# CS108-PET Help
 
-This help text refers to ReqMan version 2.0.0.
+This help text refers to cs108-pet (cs108 Performance Evaluation Tool) version 2.0.0.
 
 ## Be Quick
 
 To be quick and efficient, 
-ReqMan always remembers your last course / catalogue tuple.
+`pet` always remembers your last course / catalogue tuple.
 Thus, one can directly open the catalogue
 (without having to manually load the course beforehand)
 or open group (Shortcut: Ctrl+O) to start working.
 
-We store this so-called _session_ in a JSON file at `<userhome>/.reqman/session.reqman`
+We store this so-called _session_ in a JSON file at `<userhome>/.cs108pet/session.json`
 
 ## Revert Assessment
 
