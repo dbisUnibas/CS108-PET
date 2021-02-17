@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<Configuration name="ReqManDevConfig" status="WARN">
+<Configuration name="CS108PET-DEV-CONFIG" status="WARN">
     <Properties>
         <Property name="loggingPattern">[%d{dd.MM.yyyy HH:mm:ss.SSS}][%-5level][%t] %C{1} - %msg%n</Property>
     </Properties>
@@ -7,7 +7,7 @@
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout pattern="${loggingPattern}"/>
         </Console>
-        <RollingFile name="rollingFile" fileName="logs/reqman.log" filePattern="logs/$${date:yyyy-MM}/reqman-dev-%d{MM-dd-yyyy}-%i.log.gz">
+        <RollingFile name="rollingFile" fileName="logs/dev-cs108pet.log" filePattern="logs/$${date:yyyy-MM}/dev-cs108pet-%d{MM-dd-yyyy}-%i.log.gz">
             <PatternLayout pattern="${loggingPattern}"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10 MB" />
@@ -21,79 +21,79 @@
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- TEMPLATING -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.templating" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.templating" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
-        <Logger name="ch.unibas.dmi.dbis.reqman.templating.TemplateParser" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.templating.TemplateParser" level="DEBUG" additivity="false">
             <AppenderRef ref="console"/>
             <AppenderRef ref="rollingFile"/>
         </Logger>
-        <Logger name="ch.unibas.dmi.dbis.reqman.templating.TemplateRenderer" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.templating.TemplateRenderer" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
-        <Logger name="ch.unibas.dmi.dbis.reqman.templating.RenderManager" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.templating.RenderManager" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- CONFIGURATION -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.configuration" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.configuration" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- EDITOR -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.editor" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.ui.editor" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.editor.EditorHandler" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.ui.editor.EditorHandler" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.editor.RequirementTableView" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.ui.editor.RequirementTableView" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- EVALUATOR -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.evaluator" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.ui.evaluator" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.evaluator.EvaluatorHandler" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.ui.evaluator.EvaluatorHandler" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.evaluator.AssessmentView" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.ui.evaluator.AssessmentView" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.evaluator.ProgressView" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.ui.evaluator.ProgressView" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- DATA -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.data" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.data" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- CONTROL -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.control.CatalogueConverter" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.control.CatalogueConverter" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- APPLICATION -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui.ReqmanApplication" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.ui.CS108PETApplication" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- GENERAL UI -->
-        <Logger name="ch.unibas.dmi.dbis.reqman.ui" level="DEBUG" additivity="false">
+        <Logger name="ch.unibas.dmi.dbis.cs108pet.ui" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>
-        <!-- GENERAL REQMAN -->
-        <Logger name="ch.unibas.dmi.dbis.reqman" level="DEBUG" additivity="false">
+        <!-- GENERAL CS108PET -->
+        <Logger name="ch.unibas.dmi.dbis.cs108pet" level="DEBUG" additivity="false">
             <AppenderRef ref="console" />
             <AppenderRef ref="rollingFile"/>
         </Logger>

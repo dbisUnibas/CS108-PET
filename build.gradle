@@ -261,7 +261,7 @@ jar.doLast {
 
 task reqmanVersion {
     doLast {
-        println('Current version of ReqMan: ')
+        println('Current version of pet: ')
         printVersion()
     }
 }

@@ -1,22 +1,22 @@
-# ReqMan
+# CS108-PET
 
 
 ---
 
-ReqMan (Requirements Manager) is a JavaFX application to manage requirements.
+cs108-pet (CS108 Perforamnce Evaluation Tool, or pet for short) is a JavaFX application to manage performance analysis.
 
 **Requirement**s are grouped in **milestone**s and the collection of **requirement**s
 with their respective **milestone**s is called **catalogue**. **Catalogue**s are 
-created using `ReqMan`'s built in `editor`.
+created using `pet`'s built in `editor`.
 
-Using `ReqMan`'s built in `evaluator` one can register several **group**s and
+Using `pet`'s built in `evaluator` one can register several **group**s and
 assess their voyage on achieving the **requirement**s with so called **progress**.
 
 **Catalogue**s and **group**s may be exported with templates provided.
 
 ## Build
 
-`ReqMan` uses gradle. To build `ReqMan` run:
+`pet` uses gradle. To build `pet` run:
 
 ```
 gradlew build
@@ -24,15 +24,15 @@ gradlew build
 
 ## Usage
 
-`ReqMan` (and its modes `editor` and `evaluator`) is a JavaFX application
-packed in an executable jar. Thus to run `ReqMan` one must execute the jar.
+`pet` (and its modes `editor` and `evaluator`) is a JavaFX application
+packed in an executable jar. Thus to run `pet` one must execute the jar.
 
-The command to run `ReqMan` from command line, starting the GUI application
+The command to run `pet` from command line, starting the GUI application
 use the following command (where X stands for the complete version string
 (refer to versioning for further information about the version)):
 
 ```
-java -jar build/libs/reqman-X.jar
+java -jar build/libs/cs108-pet-X.jar
 ```
 	
 ## Dependencies
@@ -45,17 +45,16 @@ To report bugs or add feature requests, use the [GitHub issues page](https://git
 
 ## Contributors
 
-Loris Sauter - loris.sauter@unibas.ch
-
-Silvan Heller - silvan.heller@unibas.ch
+* Loris Sauter - loris.sauter@unibas.ch
+* Silvan Heller - silvan.heller@unibas.ch
 
 ## License
 
-`ReqMan` is open source and licensed under the MIT license.
+`pet` is open source and licensed under the MIT license.
 See LICENSE.txt for the complete license text.
 
 ## Versioning
 
-`ReqMan` uses semantic versioning as defined by http://semver.org/
+`pet` uses semantic versioning as defined by http://semver.org/
 
 
