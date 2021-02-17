@@ -94,7 +94,7 @@ sourceSets {
     }
 }
 
-mainClassName = 'ch.unibas.dmi.dbis.reqman.main.Main'
+mainClassName = 'ch.unibas.dmi.dbis.cs108pet.main.Main'
 
 jar {
     from {
@@ -110,7 +110,7 @@ jar {
 processResources {
     // Pass version to reqman by adding it to reqman.properties
     from(sourceSets.main.resources.srcDirs) {
-        include 'reqman.properties'
+        include 'cs108pet.properties'
         expand projectVersion: project.version
     }
     exclude 'log4j2-test.xml'
