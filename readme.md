@@ -3,7 +3,7 @@
 
 ---
 
-cs108-pet (CS108 Perforamnce Evaluation Tool, or pet for short) is a JavaFX application to manage performance analysis.
+cs108-pet (CS108 Performance Evaluation Tool, or pet for short) is a JavaFX application to manage performance analysis.
 
 **Requirement**s are grouped in **milestone**s and the collection of **requirement**s
 with their respective **milestone**s is called **catalogue**. **Catalogue**s are 
