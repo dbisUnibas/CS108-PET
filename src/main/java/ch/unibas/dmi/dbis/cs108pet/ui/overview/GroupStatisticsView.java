@@ -252,7 +252,8 @@ public class GroupStatisticsView extends VBox {
     groupOverviewTable.getColumns().add(maxCol);
 
     ctrl.groupList().forEach(g -> {
-      TreeTableColumn<GroupOverviewItem, String> groupCol = new TreeTableColumn<>(g.getProjectName());
+      String colTitle = !StringUtils.isNullOrEmpty(g.getProjectName()) ? g.getProjectName() : g.getName();
+      TreeTableColumn<GroupOverviewItem, String> groupCol = new TreeTableColumn<>(colTitle);
 
       groupCol.setCellValueFactory((TreeTableColumn.CellDataFeatures<GroupOverviewItem, String> param) -> {
         double points = param.getValue().getValue().getPoints(g.getUuid());
