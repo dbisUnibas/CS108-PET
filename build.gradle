@@ -218,9 +218,9 @@ build.doLast {
  * The versioning follows the Appache Versioning rules.
  * @return The read version
  */
-static String readVersion() {
+String readVersion() {
     Properties p = new Properties()
-    File f = new File('version.properties')
+    File f = new File("${project.projectDir}/version.properties")
     p.load(f.newDataInputStream())
     //Integer build = (p.getProperty('artifactBuildNumber') as Integer)
     String suffix = p.getProperty('artifactVersionSuffix')
