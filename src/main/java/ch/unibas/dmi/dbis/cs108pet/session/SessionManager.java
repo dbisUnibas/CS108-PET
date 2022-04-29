@@ -138,7 +138,7 @@ public class SessionManager {
    */
   public boolean hasSession() {
     SessionStorage session = loadSessionStorage();
-    return session != null;
+    return session != null && session.isValidDir(session.getLastUsedDir());
   }
   
   

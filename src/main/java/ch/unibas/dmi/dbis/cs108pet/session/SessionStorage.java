@@ -4,6 +4,8 @@ import ch.unibas.dmi.dbis.cs108pet.ui.MainScene;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -96,6 +98,10 @@ public class SessionStorage {
   
   public void setLastUsedDir(String lastUsedDir) {
     this.lastUsedDir = lastUsedDir;
+  }
+
+  public boolean isValidDir(String lastUsedDir) {
+    return Files.isDirectory(Path.of(lastUsedDir));
   }
   
   public SessionStorage() {
