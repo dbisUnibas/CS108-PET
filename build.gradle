@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 
 /*
@@ -23,14 +23,14 @@ Project name: ${project.name}
 brief(er) description
 """
 
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
     mavenCentral()
 }
 
-def javafxversion = "14"
+def javafxversion = "17"
 
 javafx {
     version = javafxversion
@@ -39,39 +39,39 @@ javafx {
 
 dependencies {
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
-    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.3'
 
 
     //JavaFX
     implementation "org.openjfx:javafx-controls:$javafxversion"
 
-    compile group: 'org.controlsfx', name: 'controlsfx', version: '11.0.0'
+    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.0.0'
 
 
-    compile group: 'com.j2html', name: 'j2html', version: '0.88'
+    implementation group: 'com.j2html', name: 'j2html', version: '0.88'
     // https://mvnrepository.com/artifact/commons-lang/commons-lang
-    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
-    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+    implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    implementation group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 
-    compile 'com.intellij:annotations:12.0'
+    implementation 'com.intellij:annotations:12.0'
 
-    compile 'org.kordamp.ikonli:ikonli-javafx:2.1.1'
-    //compile 'org.kordamp.ikonli:ikonli-dashicons-pack:2.1.1' // Maven central invalid --> not found on maven central (currently ?)
-    compile 'org.kordamp.ikonli:ikonli-openiconic-pack:2.1.1'
+    implementation 'org.kordamp.ikonli:ikonli-javafx:2.1.1'
+    //implementation 'org.kordamp.ikonli:ikonli-dashicons-pack:2.1.1' // Maven central invalid --> not found on maven central (currently ?)
+    implementation 'org.kordamp.ikonli:ikonli-openiconic-pack:2.1.1'
 
-    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
-    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.17.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.17.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.17.0'
 
-    compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.11.0'
+    implementation group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.11.0'
 
-    compile group: 'net.objecthunter', name: 'exp4j', version: '0.4.8'
+    implementation group: 'net.objecthunter', name: 'exp4j', version: '0.4.8'
 
     //Export to XLS
-    compile group: 'org.apache.poi', name: 'poi-ooxml', version: '4.0.1'
-    
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '4.0.1'
+
+    testImplementation group: 'junit', name: 'junit', version: '4.11'
 }
 compileJava.options.encoding = 'UTF-8'
 
@@ -98,13 +98,14 @@ mainClassName = 'ch.unibas.dmi.dbis.cs108pet.main.Main'
 
 jar {
     from {
-        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.compileClasspath.collect{ it.isDirectory() ? it : zipTree(it)}
         configurations.runtimeClasspath.collect{ it.isDirectory() ? it : zipTree(it)}
     }
     manifest{
         attributes 'Main-Class': mainClassName
         attributes 'Multi-Release':true
     }
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
 
 processResources {
@@ -113,6 +114,7 @@ processResources {
         include 'cs108pet.properties'
         expand projectVersion: project.version
     }
+    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
     exclude 'log4j2-test.xml'
     // Do not copy the original file, since it would not have the version in it
     /*from(sourceSets.main.resources.srcDirs) {
