@@ -114,7 +114,7 @@ processResources {
         include 'cs108pet.properties'
         expand projectVersion: project.version
     }
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    duplicatesStrategy(DuplicatesStrategy.INCLUDE)
     exclude 'log4j2-test.xml'
     // Do not copy the original file, since it would not have the version in it
     /*from(sourceSets.main.resources.srcDirs) {
