@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
  * DO NOT START FROM THIS CLASS WITHIN INTELLIJ. INSTEAD USE {@link ch.unibas.dmi.dbis.cs108pet.main.Main}
  */
 public class CS108PETApplication extends Application {
-  
+
   /**
    * Temporary
    */
@@ -31,21 +31,21 @@ public class CS108PETApplication extends Application {
   private static volatile boolean exp = false;
   private int currentView = -1;
   private MainScene scene;
-  
+
   public CS108PETApplication() {
   }
-  
+
   /**
    * DO NOT START FROM THIS CLASS WITHIN INTELLIJ. INSTEAD USE {@link ch.unibas.dmi.dbis.cs108pet.main.Main}
    */
   public static void main(String[] args) {
-    
+
     version = Version.getInstance();
     LOGGER = LogManager.getLogger(CS108PETApplication.class);
     LOGGER.info(LoggingUtils.ROOT_APP_MARKER, "Starting pet @ v" + version.getFullVersion());
     launch(args);
   }
-  
+
   @Override
   public void start(Stage primaryStage) {
     Thread.setDefaultUncaughtExceptionHandler(this::handleUncaughtException);
@@ -57,27 +57,33 @@ public class CS108PETApplication extends Application {
     primaryStage.setOnCloseRequest(event -> stop());
     scene.loadBackups();
   }
-  
+
   @Override
   public void stop() {
     if (scene != null) {
       scene.stop();
     }
   }
-  
+
   private void handleUncaughtException(Thread t, Throwable e) {
     var jv = System.getProperty("java.version");
     var jfxv = System.getProperty("javafx.version") == null ? "null" : System.getProperty("javafx.version");
-    LOGGER.fatal("Fatal error occurred, due to uncaught exception. Java: "+jv+ ", JavaFX: "+jfxv+", pet: "+Version.getInstance().getFullVersion());
-    LOGGER.error("Uncaught exception on thread {}", t);
-    LOGGER.catching(Level.ERROR, e);
+    var error = "Fatal error occurred, due to uncaught exception. Java: " + jv + ", JavaFX: " + jfxv + ", pet: " + Version.getInstance().getFullVersion();
+    if (LOGGER == null) {
+      System.err.println(error);
+      System.err.println("Error occurred on thread: " + t);
+    } else {
+      LOGGER.fatal(error);
+      LOGGER.error("Uncaught exception on thread {}", t);
+      LOGGER.catching(Level.ERROR, e);
+    }
     Utils.showErrorDialog("Error - " + e.getClass().getSimpleName(),
         "An exception occurred",
         "An uncaught exception occurred. The exception is of type " + e.getClass().getSimpleName() + ".\n" +
             "The exception's message is as follows:\n\t" + e.getMessage() + "\n" +
             "pet probably would still work, but re-start is recommended.\n");
-    
+
   }
-  
-  
+
+
 }

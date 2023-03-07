@@ -18,6 +18,8 @@
         <!-- GENERAL org packages -->
         <Logger name="org" level="ERROR">
             <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org" level="DEBUG">
             <AppenderRef ref="rollingFile"/>
         </Logger>
         <!-- TEMPLATING -->
