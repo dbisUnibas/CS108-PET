@@ -30,7 +30,7 @@ repositories {
     mavenCentral()
 }
 
-def javafxversion = "17"
+def javafxversion = '17'
 
 javafx {
     version = javafxversion
@@ -42,12 +42,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.9.3'
 
-
-    //JavaFX
-    implementation "org.openjfx:javafx-controls:$javafxversion"
-
-    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.0.0'
-
+    implementation group: 'org.controlsfx', name: 'controlsfx', version: '11.1.2'
 
     implementation group: 'com.j2html', name: 'j2html', version: '0.88'
     // https://mvnrepository.com/artifact/commons-lang/commons-lang
