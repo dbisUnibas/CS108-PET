@@ -66,6 +66,9 @@ public class ProgressSummaryScene extends AbstractVisualCreator<ProgressSummary>
     
     taExternal = new TextArea();
     taInternal = new TextArea();
+
+    taExternal.setWrapText(true);
+    taInternal.setWrapText(true);
     
     int rowIndex = 0;
     
