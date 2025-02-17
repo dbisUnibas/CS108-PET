@@ -253,7 +253,7 @@ task setupVersion {
 }
 
 jar.doLast {
-    println 'Produced jar: ' + jar.archiveName
+    println 'Produced jar: '
 }
 
 task reqmanVersion {
